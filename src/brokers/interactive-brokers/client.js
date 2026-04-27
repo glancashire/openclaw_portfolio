@@ -5,6 +5,7 @@ class InteractiveBrokersClient {
   constructor(options = {}) {
     this.options = options;
     this.config = loadInteractiveBrokersConfig();
+    this.baseUrl = this.config.baseUrl;
   }
 
   configurationStatus() {
@@ -14,32 +15,96 @@ class InteractiveBrokersClient {
   async authenticate() {
     const status = this.configurationStatus();
     if (!status.ok) {
+      return blocked('missing_config', status.missing, this.options.portfolio);
+    }
+
+    // IBKR Client Portal / Gateway auth is session-based and commonly fronted by a local gateway.
+    // For the MVP, we validate reachability and auth-status endpoints before trading/account operations.
+    try {
+      const authStatus = await this.request('/iserver/auth/status');
       return {
-        ok: false,
-        reason: 'missing_config',
-        missing: status.missing,
+        ok: true,
+        mode: 'session-status',
+        authStatus,
         log: logBrokerEvent({
           broker: 'interactive-brokers',
           operation: 'authenticate',
-          status: 'blocked',
-          summary: { missing: status.missing },
+          status: 'ok',
+          summary: { authenticated: authStatus?.authenticated ?? null },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        reason: 'http_error',
+        error: error.message,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'authenticate',
+          status: 'http_error',
+          summary: { message: error.message },
           portfolio: this.options.portfolio,
         }),
       };
     }
-
-    return {
-      ok: false,
-      reason: 'not_implemented',
-      log: logBrokerEvent({
-        broker: 'interactive-brokers',
-        operation: 'authenticate',
-        status: 'stub',
-        summary: { configured: true, liveHttp: false },
-        portfolio: this.options.portfolio,
-      }),
-    };
   }
+
+  async request(path, { method = 'GET', body } = {}) {
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      method,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await response.text();
+    if (!response.ok) {
+      throw new Error(`IBKR request failed (${response.status}): ${text}`);
+    }
+    return safeJson(text);
+  }
+
+  async sessionStatus() {
+    return this.request('/tickle');
+  }
+
+  async fetchAuthStatus() {
+    return this.request('/iserver/auth/status');
+  }
+
+  async fetchAccounts() {
+    return this.request('/portfolio/accounts');
+  }
+
+  async fetchPositions(accountId) {
+    if (!accountId) throw new Error('fetchPositions requires accountId');
+    return this.request(`/portfolio/${encodeURIComponent(accountId)}/positions/0`);
+  }
+}
+
+function safeJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw: text };
+  }
+}
+
+function blocked(reason, missing, portfolio) {
+  return {
+    ok: false,
+    reason,
+    missing,
+    log: logBrokerEvent({
+      broker: 'interactive-brokers',
+      operation: 'authenticate',
+      status: 'blocked',
+      summary: { missing },
+      portfolio,
+    }),
+  };
 }
 
 module.exports = { InteractiveBrokersClient };
