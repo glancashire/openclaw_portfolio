@@ -33,11 +33,11 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 | Region | Target % | Min % | Max % |
 |---|---:|---:|---:|
 | Switzerland | 50 | 40 | 60 |
-| Eurozone | 12 | 15 | 9 |
+| Eurozone | 12 | 9 | 15 |
 | UK | 3 | 2 | 4 |
 | USA | 20 | 15 | 25 |
-| China | 8 | 12 | 6 |
-| Japan | 4 | 6 | 2 |
+| China | 8 | 6 | 12 |
+| Japan | 4 | 2 | 6 |
 | Asia | 3 | 2 | 4 |
 
 ## Industry / Sector Constraints
@@ -48,19 +48,21 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 
 ## Approved Instruments
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
-| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet)  | Equity | : | : | : | | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0032912732 |
-| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Equity | : | : | : | | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0130595124#uebersicht |
-| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Equity | : | : | : | | EUR | https://www.justetf.com/ch/etf-profile.html?isin=LU0950668870#basisinfos |
-| LU0950670850 | UBS ETF (LU) MSCI UK UCITS ETF (GBP) A-acc | Equity | : | : | : | | GBP | https://www.justetf.com/ch/etf-profile.html?isin=LU0950670850 |
-| IE00B5BMR087 | iShares Core S&P 500 UCITS ET USD (Acc) | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5BMR087 |
-| IE00B44T3H88 | HSBC MSCI China HMCH SE | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B44T3H88 |
-| IE00B5L8K969 | iShares MSCI EM Asia, CSEMAS | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5L8K969 |
-| IE00B4L5YX21 | iShares Core MSCI Japan IMI UCITS ETF USD (Acc) | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B4L5YX21 |
-| US37950E2596 | Uts Glbl X MSCI AR Shs (21347688) | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=US37950E2596 |
+| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | <target %> | <min %> | <max %> | SIX | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0032912732 |
+| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Swiss equities | <target %> | <min %> | <max %> | SIX | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0130595124#uebersicht |
+| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | <target %> | <min %> | <max %> | <exchange> | EUR | https://www.justetf.com/ch/etf-profile.html?isin=LU0950668870#basisinfos |
+| LU0950670850 | UBS ETF (LU) MSCI UK UCITS ETF (GBP) A-acc | Global equities | <target %> | <min %> | <max %> | <exchange> | GBP | https://www.justetf.com/ch/etf-profile.html?isin=LU0950670850 |
+| IE00B5BMR087 | iShares Core S&P 500 UCITS ET USD (Acc) | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5BMR087 |
+| IE00B44T3H88 | HSBC MSCI China HMCH SE | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B44T3H88 |
+| IE00B5L8K969 | iShares MSCI EM Asia, CSEMAS | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5L8K969 |
+| IE00B4L5YX21 | iShares Core MSCI Japan IMI UCITS ETF USD (Acc) | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B4L5YX21 |
+| US37950E2596 | Uts Glbl X MSCI AR Shs (21347688) | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=US37950E2596 |
+| <ticker / ISIN> | <bond or money-market ETF needed> | Bonds / cash-like | <target %> | <min %> | <max %> | <exchange> | CHF | Conservative placeholder to satisfy asset-class coverage until approved. |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
 |---|---|
+
 
 ## Rebalancing Policy
 - Check frequency: daily
