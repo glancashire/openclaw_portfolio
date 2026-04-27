@@ -6,7 +6,7 @@ Create a new OpenClaw instance that manages investment portfolios across broker/
 
 The system should help enforce a defined portfolio strategy with disciplined allocation, monitoring, gradual deployment of capital, rebalancing, audit reporting, and clear human approval gates.
 
-The first supported broker is **IG / IG Bank / ig.com**. The architecture must allow additional brokers later, such as **Swissquote**.
+The first supported brokers are **IG / IG Bank / ig.com** and **Interactive Brokers**. The architecture must allow additional brokers later, such as **Swissquote**.
 
 The first supported assets are **widely traded ETFs only**, denominated or tracked in **CHF** where possible. No options, leverage products, CFDs, derivatives, crypto, structured products, or short selling in the first version.
 
@@ -49,6 +49,7 @@ The first supported assets are **widely traded ETFs only**, denominated or track
 - Multiple portfolios.
 - One broker account per portfolio.
 - IG / ig.com broker adapter.
+- Interactive Brokers Web API adapter.
 - ETF-only portfolios.
 - CHF base currency.
 - Portfolio creation workflow.
@@ -110,6 +111,11 @@ portfolio/
 
 brokers/
  ig/
+ adapter.md
+ auth.md
+ instruments.md
+ orders.md
+ interactive-brokers/
  adapter.md
  auth.md
  instruments.md
@@ -429,8 +435,8 @@ normalise_broker_order(raw_order)
 
 ## 12. IG Broker Adapter — MVP Requirements
 
-The first broker adapter should support IG / ig.com.
-You can find the documentation here [IG Labs | Trading APIs](https://labs.ig.com/)
+The first broker adapters should support IG / ig.com and Interactive Brokers.
+You can find the documentation here [IG Labs | Trading APIs](https://labs.ig.com/) and [IBKR Web API | IBKR Campus](https://www.interactivebrokers.eu/campus/ibkr-api-page/web-api/)
 ### Required capabilities
 
 - Authenticate using secure credential storage.
@@ -837,7 +843,7 @@ Initial settings:
 ## Status
 - Status: draft
 - Base currency: CHF
-- Broker: ig
+- Broker: interactive-brokers
 - Asset scope: ETF only
 - Execution mode: require_confirmation
 ```

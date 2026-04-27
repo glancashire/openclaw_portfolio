@@ -5,13 +5,13 @@
 - Created: 2026-04-27
 - Last reviewed: 2026-04-27
 - Base currency: CHF
-- Broker: ig
+- Broker: interactive-brokers
 - Broker account reference: LTME7
 - Execution mode: require_confirmation
 - Asset scope: ETF only
 
 ## Strategy Summary
-ETF portfolio draft awaiting investor profile, approved ETF universe, and broker-account details.
+ETF portfolio draft for Interactive Brokers, awaiting final onboarding details and approved instrument allocation targets.
 
 ## Investor Profile
 - Risk level: medium
@@ -90,7 +90,7 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 - Stop trading if broker/API errors occur: true
 
 ## Broker Access
-- Broker adapter: ig
+- Broker adapter: interactive-brokers
 - Credentials source: environment variables or secret store only
 - Never store API keys in Markdown: true
 - Account matching rule: account id mapping

@@ -91,8 +91,8 @@ function validatePortfolioStrategy(filePath) {
   if (baseCurrency && baseCurrency !== 'CHF') {
     issues.push({ severity: 'warning', filePath, message: `Base currency is ${baseCurrency}; MVP is CHF-first.` });
   }
-  if (broker && broker !== 'ig') {
-    issues.push({ severity: 'warning', filePath, message: `Broker is ${broker}; MVP implementation currently targets IG first.` });
+  if (broker && !['ig', 'interactive-brokers'].includes(broker)) {
+    issues.push({ severity: 'warning', filePath, message: `Broker is ${broker}; current implementation support is focused on IG and Interactive Brokers.` });
   }
 
   const allocationRows = parseMarkdownTable(extractSection(text, 'Allocation Targets'));
