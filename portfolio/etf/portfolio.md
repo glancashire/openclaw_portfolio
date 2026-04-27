@@ -85,8 +85,8 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 - Max single issuer allocation: 10%
 - Max equity allocation: 100%
 - Max bond duration: 10
-- Max cash drag after full deployment: <%>
-- Stop trading if portfolio value drops by: 20%
+- Max cash drag after full deployment: 5%
+- Stop trading if portfolio value drops by: 20% over 30 calendar days
 - Stop trading if broker/API errors occur: true
 
 ## Broker Access
