@@ -8,6 +8,7 @@ Before doing anything else:
 2. Read USER.md — who you're helping
 3. Read memory/YYYY-MM-DD.md (today only, yesterday if context is thin)
 4. **Main session only:** Also read MEMORY.md
+5. If `playbook.md` exists, read it before project work so repo-local skills and conventions are applied.
 
 ⠀Memory
 
