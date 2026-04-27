@@ -9,6 +9,7 @@
     "validate:all-portfolios": "node scripts/validate-portfolio.js portfolio/etf/portfolio.md portfolio/_template/portfolio.md",
     "validate:strategy": "node scripts/validate-strategy.js portfolio/etf/portfolio.md",
     "check:activation": "node scripts/check-portfolio-activation.js portfolio/etf/portfolio.md",
-    "next:questions": "node scripts/next-portfolio-questions.js portfolio/etf/portfolio.md"
+    "next:questions": "node scripts/next-portfolio-questions.js portfolio/etf/portfolio.md",
+    "apply:answers": "node scripts/apply-portfolio-answers.js portfolio/etf/portfolio.md /tmp/answers.json"
   }
 }
