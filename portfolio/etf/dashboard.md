@@ -7,7 +7,7 @@
 - Number of holdings: <number>
 - Strategy status: rebalance_needed
 - Last sync: YYYY-MM-DD HH:mm:ss
-- Last rebalance check: 2026-04-27 16:43:35
+- Last rebalance check: 2026-04-27 17:01:39
 
 ## Allocation vs Target
 | Asset class | Current % | Target % | Drift % | Status |
@@ -21,11 +21,12 @@
 |---|---|---:|---:|---:|---:|---|
 
 ## Recommended Actions
-1. Run allocation and drift analysis once approved instruments and synced holdings are available.
-2. Review data quality warnings before proposing trades.
+1. Review recent trade proposals and approved instruments before generating instrument-level orders.
+2. Refresh history snapshots after holdings updates and trade execution.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
+- Latest history note: Draft portfolio placeholder
 
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
