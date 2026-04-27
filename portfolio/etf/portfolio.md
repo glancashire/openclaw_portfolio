@@ -2,11 +2,11 @@
 
 ## Status
 - Status: draft
-- Created: YYYY-MM-DD
-- Last reviewed: YYYY-MM-DD
+- Created: 2026-04-27
+- Last reviewed: 2026-04-27
 - Base currency: CHF
 - Broker: ig
-- Broker account reference: <account_alias_or_safe_identifier>
+- Broker account reference: LTME7
 - Execution mode: require_confirmation
 - Asset scope: ETF only
 
@@ -14,12 +14,12 @@
 ETF portfolio draft awaiting investor profile, approved ETF universe, and broker-account details.
 
 ## Investor Profile
-- Risk level: <low | medium | high>
-- Investment horizon: <years>
-- Liquidity needs: <low | medium | high>
-- Maximum acceptable drawdown: <%>
-- Income requirement: <none | low | medium | high>
-- ESG preference: <none | prefer | required>
+- Risk level: medium
+- Investment horizon: 10
+- Liquidity needs: low
+- Maximum acceptable drawdown: 30%
+- Income requirement: none
+- ESG preference: none
 - Currency preference: CHF-first
 
 ## Allocation Targets
@@ -32,9 +32,13 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 ## Geographic Targets
 | Region | Target % | Min % | Max % |
 |---|---:|---:|---:|
-| Switzerland | 20 | 10 | 30 |
-| Developed World ex-CH | 60 | 45 | 75 |
-| Emerging Markets | 20 | 0 | 25 |
+| Switzerland | 50 | 40 | 60 |
+| Eurozone | 12 | 15 | 9 |
+| UK | 3 | 2 | 4 |
+| USA | 20 | 15 | 25 |
+| China | 8 | 12 | 6 |
+| Japan | 4 | 6 | 2 |
+| Asia | 3 | 2 | 4 |
 
 ## Industry / Sector Constraints
 | Sector | Min % | Max % | Notes |
@@ -44,7 +48,15 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 
 ## Approved Instruments
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
-|---|---|---|---:|---:|---:|---|---|---|
+| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet)  | Equity | : | : | : | | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0032912732 |
+| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Equity | : | : | : | | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0130595124#uebersicht |
+| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Equity | : | : | : | | EUR | https://www.justetf.com/ch/etf-profile.html?isin=LU0950668870#basisinfos |
+| LU0950670850 | UBS ETF (LU) MSCI UK UCITS ETF (GBP) A-acc | Equity | : | : | : | | GBP | https://www.justetf.com/ch/etf-profile.html?isin=LU0950670850 |
+| IE00B5BMR087 | iShares Core S&P 500 UCITS ET USD (Acc) | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5BMR087 |
+| IE00B44T3H88 | HSBC MSCI China HMCH SE | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B44T3H88 |
+| IE00B5L8K969 | iShares MSCI EM Asia, CSEMAS | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5L8K969 |
+| IE00B4L5YX21 | iShares Core MSCI Japan IMI UCITS ETF USD (Acc) | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B4L5YX21 |
+| US37950E2596 | Uts Glbl X MSCI AR Shs (21347688) | Equity | : | : | : | | USD | https://www.justetf.com/ch/etf-profile.html?isin=US37950E2596 |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
@@ -54,32 +66,32 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 - Check frequency: daily
 - Rebalance frequency: monthly or when thresholds are breached
 - Rebalance threshold: absolute drift > 5 percentage points or relative drift > 20%
-- Minimum trade size: CHF <amount>
+- Minimum trade size: CHF 500
 - Avoid unnecessary trades: true
 - Prefer using new cash before selling: true
 
 ## Market Entry Policy
 - Initial deployment mode: staged
-- Deployment period: <e.g. 5-20 trading days>
-- Max daily deployment: <% of available cash>
+- Deployment period: 10
+- Max daily deployment: 10%
 - Avoid buying after extreme daily price moves: true
 - Use limit orders where supported: true
 - Require confirmation before first live trade: true
 
 ## Risk Limits
-- Max single ETF allocation: <%>
-- Max single issuer allocation: <%>
-- Max equity allocation: <%>
-- Max bond duration: <years or n/a>
+- Max single ETF allocation: 5%
+- Max single issuer allocation: 10%
+- Max equity allocation: 100%
+- Max bond duration: 10
 - Max cash drag after full deployment: <%>
-- Stop trading if portfolio value drops by: <% over <period>>
+- Stop trading if portfolio value drops by: 20%
 - Stop trading if broker/API errors occur: true
 
 ## Broker Access
 - Broker adapter: ig
 - Credentials source: environment variables or secret store only
 - Never store API keys in Markdown: true
-- Account matching rule: <account alias / account id mapping>
+- Account matching rule: account id mapping
 - Read-only mode available: true
 - Dry-run mode available: true
 
