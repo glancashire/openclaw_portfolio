@@ -34,7 +34,7 @@ ETF portfolio draft awaiting investor profile, approved ETF universe, and broker
 |---|---:|---:|---:|
 | Switzerland | 20 | 10 | 30 |
 | Developed World ex-CH | 60 | 45 | 75 |
-| Emerging Markets | 0 | 0 | 10 |
+| Emerging Markets | 20 | 0 | 25 |
 
 ## Industry / Sector Constraints
 | Sector | Min % | Max % | Notes |

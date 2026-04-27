@@ -34,7 +34,7 @@ Conservative sample ETF strategy used as a safe template. Replace with portfolio
 |---|---:|---:|---:|
 | Switzerland | 20 | 10 | 30 |
 | Developed World ex-CH | 50 | 35 | 65 |
-| Emerging Markets | 0 | 0 | 10 |
+| Emerging Markets | 30 | 0 | 35 |
 
 ## Industry / Sector Constraints
 | Sector | Min % | Max % | Notes |

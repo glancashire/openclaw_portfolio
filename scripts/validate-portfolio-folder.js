@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { validateFileContract } = require('../src/markdown/validateFileContract');
 const { loadPortfolioDocument, validatePortfolioDocument } = require('../src/markdown/portfolioMarkdown');
+const { validatePortfolioStrategy } = require('../src/validation/strategyValidation');
 
 const folder = process.argv[2];
 if (!folder) {
@@ -24,6 +25,7 @@ for (const name of requiredFiles) {
   if (name === 'portfolio.md') {
     const doc = loadPortfolioDocument(filePath);
     issues = issues.concat(validatePortfolioDocument(doc, filePath));
+    issues = issues.concat(validatePortfolioStrategy(filePath));
   }
 
   if (issues.length === 0) {
