@@ -1,0 +1,45 @@
+const fs = require('fs');
+
+function tableRowsFromFile(filePath, headingStartsWith) {
+  const text = fs.readFileSync(filePath, 'utf8');
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim().startsWith(headingStartsWith));
+  if (start === -1) return [];
+  const tableLines = [];
+  for (let i = start + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('## ') && tableLines.length) break;
+    if (line.startsWith('|')) tableLines.push(line);
+  }
+  return tableLines.slice(2).map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
+}
+
+function recentTrades(tradesPath, limit = 5) {
+  const rows = tableRowsFromFile(tradesPath, '## Trade Log');
+  return rows.slice(-limit).reverse().map((row) => ({
+    date: row[0] || '',
+    status: row[1] || '',
+    action: row[2] || '',
+    instrument: row[4] || row[3] || '',
+    amount: row[8] || row[7] || '0',
+    reason: row[9] || '',
+  }));
+}
+
+function latestHistory(historyPath) {
+  const rows = tableRowsFromFile(historyPath, '## Daily Valuation History');
+  if (!rows.length) return null;
+  const row = rows[rows.length - 1];
+  return {
+    date: row[0] || '',
+    snapshot: row[1] || '',
+    totalValue: row[2] || '0',
+    invested: row[3] || '0',
+    cash: row[4] || '0',
+    dailyChange: row[5] || '0',
+    dailyChangePct: row[6] || '0',
+    notes: row[7] || '',
+  };
+}
+
+module.exports = { recentTrades, latestHistory };

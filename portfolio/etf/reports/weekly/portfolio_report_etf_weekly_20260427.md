@@ -4,18 +4,18 @@
 - Report type: weekly
 - Period start: 
 - Period end: 
-- Generated: 2026-04-27T16:09:14.595Z
+- Generated: 2026-04-27T17:01:39.312Z
 
 ## Executive Summary
-Short summary pending performance and allocation engine implementation.
+Latest snapshot: CHF 0 total, CHF 0 cash.
 
 ## Performance
 | Metric | Value |
 |---|---:|
 | Start value CHF | |
-| End value CHF | |
-| Change CHF | |
-| Change % | |
+| End value CHF | 0 |
+| Change CHF | 0 |
+| Change % | 0 |
 
 ## Allocation Review
 | Asset class | Start % | End % | Target % | Drift % |

@@ -1,4 +1,4 @@
-const { formatReport, writeReport } = require('../src/reporting/reportGenerator');
+const { generateAndWriteReport } = require('../src/reporting/reportGenerator');
 
 const portfolioDir = process.argv[2];
 const period = process.argv[3];
@@ -8,10 +8,5 @@ if (!portfolioDir || !period) {
   process.exit(1);
 }
 
-const content = formatReport({
-  portfolioName: portfolioDir.split('/').pop(),
-  period,
-  generated: new Date().toISOString(),
-});
-const out = writeReport({ portfolioDir, period, dateStamp, content });
+const out = generateAndWriteReport({ portfolioDir, period, dateStamp });
 console.log(JSON.stringify({ report: out }, null, 2));

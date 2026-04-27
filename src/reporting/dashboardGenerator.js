@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { analyzeAllocation } = require('../analysis/allocationAnalysis');
+const { recentTrades, latestHistory } = require('./portfolioData');
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -23,28 +24,39 @@ function strategyStatus(allocations) {
 
 function formatAllocationRows(rows) {
   if (!rows.length) return '| <asset class> | 0 | 0 | 0 | blocked |';
-  return rows
-    .map((row) => `| ${row.assetClass} | ${row.current} | ${row.target} | ${row.drift} | ${row.status} |`)
-    .join('\n');
+  return rows.map((row) => `| ${row.assetClass} | ${row.current} | ${row.target} | ${row.drift} | ${row.status} |`).join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], existingTrades = [] }) {
+function generateDashboard({ portfolioName, holdingsText, allocations = [], existingTrades = [], latestSnapshot = null }) {
   const summary = parseHoldingsSummary(holdingsText);
   const tradeRows = existingTrades.length
     ? existingTrades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.status} |`).join('\n')
     : '| YYYY-MM-DD | <action> | <instrument> | 0 | none |';
 
-  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: <number>\n- Strategy status: ${strategyStatus(allocations)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Value CHF | Current % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n\n## Recommended Actions\n1. Run allocation and drift analysis once approved instruments and synced holdings are available.\n2. Review data quality warnings before proposing trades.\n\n## Risk Warnings\n- Dashboard regeneration currently computes allocation drift at the asset-class level only.\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
+  const warnings = [
+    '- Dashboard regeneration currently computes allocation drift at the asset-class level only.',
+  ];
+  if (latestSnapshot?.notes) warnings.push(`- Latest history note: ${latestSnapshot.notes}`);
+
+  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: <number>\n- Strategy status: ${strategyStatus(allocations)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Value CHF | Current % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n\n## Recommended Actions\n1. Review recent trade proposals and approved instruments before generating instrument-level orders.\n2. Refresh history snapshots after holdings updates and trade execution.\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
 function regenerateDashboard(portfolioDir) {
   const portfolioName = path.basename(portfolioDir);
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const historyPath = path.join(portfolioDir, 'history.md');
   const dashboardPath = path.join(portfolioDir, 'dashboard.md');
   const holdingsText = fs.readFileSync(holdingsPath, 'utf8');
   const allocations = analyzeAllocation({ portfolioPath, holdingsPath });
-  const dashboard = generateDashboard({ portfolioName, holdingsText, allocations });
+  const dashboard = generateDashboard({
+    portfolioName,
+    holdingsText,
+    allocations,
+    existingTrades: recentTrades(tradesPath),
+    latestSnapshot: latestHistory(historyPath),
+  });
   fs.writeFileSync(dashboardPath, dashboard);
   return dashboardPath;
 }
