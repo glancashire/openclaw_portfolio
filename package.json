@@ -1,0 +1,11 @@
+{
+  "name": "openclaw-portfolio-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Structured Markdown portfolio manager foundation for OpenClaw",
+  "type": "commonjs",
+  "scripts": {
+    "validate:portfolio": "node scripts/validate-portfolio.js portfolio/etf/portfolio.md",
+    "validate:all-portfolios": "node scripts/validate-portfolio.js portfolio/etf/portfolio.md portfolio/_template/portfolio.md"
+  }
+}
