@@ -3,9 +3,11 @@ const { analyzeAllocation } = require('./allocationAnalysis');
 
 function parseCashChf(holdingsPath) {
   const text = fs.readFileSync(holdingsPath, 'utf8');
-  const match = text.match(/\|\s*CHF\s*\|\s*([^|]+)\|\s*([^|]+)\|\s*([^|]+)\|/);
-  if (!match) return 0;
-  const value = Number(String(match[3]).replace(/[ ,]/g, '').trim());
+  const lines = text.split(/\r?\n/);
+  const cashRow = lines.find((line) => /^\|\s*CHF\s*\|/.test(line));
+  if (!cashRow) return 0;
+  const cells = cashRow.split('|').slice(1, -1).map((cell) => cell.trim());
+  const value = Number(String(cells[3] || cells[1] || '0').replace(/[ ,]/g, '').trim());
   return Number.isFinite(value) ? value : 0;
 }
 
