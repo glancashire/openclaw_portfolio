@@ -12,26 +12,40 @@ function buildInstrumentProposal(baseProposal, instrument, estimatedChf, extra =
     priceSource: 'cash_balance',
   } : estimateOrderSize({ tickerOrIsin: instrument.tickerOrIsin, estimatedChf });
 
-  return {
+  const merged = {
     ...baseProposal,
+    ...extra,
+  };
+  const totalValueChf = Number(merged.totalValueChf || 0);
+  const targetPct = Number(instrument.target || merged.allocationTargetPct || 0);
+  const executableChf = Number(sizing.estimatedOrderChf || 0);
+  const allocationAfterPct = totalValueChf > 0 ? Number(((executableChf / totalValueChf) * 100).toFixed(2)) : Number(merged.allocationBeforePct || 0);
+  const driftAfter = Number((allocationAfterPct - targetPct).toFixed(2));
+  const driftCorrected = Number((Math.abs(merged.driftBefore || 0) - Math.abs(driftAfter)).toFixed(2));
+
+  return {
+    ...merged,
     instrument: instrument.tickerOrIsin,
     instrumentName: instrument.name,
     currency: instrument.currency,
     estimatedChf,
-    estimatedOrderChf: sizing.estimatedOrderChf,
+    estimatedOrderChf: executableChf,
     quantity: sizing.quantity,
     limitPrice: sizing.limitPrice,
-    blocked: baseProposal.blocked || (!isCashSleeve && sizing.quantity <= 0),
-    action: isCashSleeve ? 'hold' : baseProposal.action,
-    status: isCashSleeve ? 'planned' : baseProposal.status,
+    allocationTargetPct: targetPct,
+    allocationAfterPct,
+    driftAfter,
+    driftCorrected,
+    blocked: merged.blocked || (!isCashSleeve && sizing.quantity <= 0),
+    action: isCashSleeve ? 'hold' : merged.action,
+    status: isCashSleeve ? 'planned' : merged.status,
     rationale: isCashSleeve
       ? 'Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.'
-      : `Deploy available cash toward underweight ${baseProposal.assetClass} using ${instrument.name}.`,
+      : `Deploy available cash toward underweight ${merged.assetClass} using ${instrument.name}.`,
     riskNote: isCashSleeve
       ? 'Planning entry only; no broker order required for the cash sleeve.'
       : `Dry-run instrument proposal only; ${sizing.sizingNote}`,
     priceSource: sizing.priceSource,
-    ...extra,
   };
 }
 

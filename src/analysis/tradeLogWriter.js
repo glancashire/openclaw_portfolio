@@ -5,7 +5,18 @@ function appendTradeProposals(tradesPath, proposals, timestamp = new Date().toIS
 
   let text = fs.readFileSync(tradesPath, 'utf8');
   const rows = proposals.map((proposal) => {
-    const reason = `${proposal.rationale} Drift before: ${proposal.driftBefore}%. ${proposal.riskNote}`;
+    const reason = [
+      proposal.rationale,
+      `allocation before ${proposal.allocationBeforePct ?? 'n/a'}%`,
+      `target ${proposal.allocationTargetPct ?? 'n/a'}%`,
+      `allocation after ${proposal.allocationAfterPct ?? 'n/a'}%`,
+      `drift before ${proposal.driftBefore ?? 'n/a'}%`,
+      `drift after ${proposal.driftAfter ?? 'n/a'}%`,
+      `drift corrected ${proposal.driftCorrected ?? 'n/a'}%`,
+      `expected cost CHF ${proposal.estimatedOrderChf || proposal.estimatedChf || 0}`,
+      `funding source ${proposal.fundingSource || 'unknown'}`,
+      proposal.riskNote,
+    ].join('; ');
     const approval = proposal.blocked ? 'blocked_by_min_trade_size' : 'pending_user_approval';
     const tickerOrIsin = proposal.instrument || proposal.assetClass;
     const name = proposal.instrumentName || `${proposal.assetClass} basket`;

@@ -7,7 +7,7 @@
 - Number of holdings: 0
 - Strategy status: rebalance_needed
 - Last sync: 2026-04-28 18:02:00
-- Last rebalance check: 2026-04-28 21:21:26
+- Last rebalance check: 2026-04-28 21:58:28
 
 ## Allocation vs Target
 | Asset class | Current % | Target % | Drift % | Status |
@@ -31,7 +31,7 @@
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 440.8 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: Initial dry-run funded state
+- Latest history note: quarterly report cycle snapshot
 
 ## Execution Plan
 - IE00B5BMR087: target 40% | intended CHF 1620 | executable CHF 1620 | gap CHF 0
@@ -43,7 +43,7 @@
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
 |---|---|---|---:|---|
-| 2026-04-28 20:09:11 | hold | CHF cash balance | 1000 | planned |
-| 2026-04-28 20:09:11 | buy | UBS SLI ETF (SMI gleichgewichtet) | 960 | proposed |
-| 2026-04-28 20:09:11 | buy | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 979.2 | proposed |
-| 2026-04-28 20:09:11 | buy | iShares Core S&P 500 UCITS ETF USD (Acc) | 1620 | proposed |
+| 2026-04-28 21:44:33 | hold | CHF cash balance | 1000 | planned |
+| 2026-04-28 21:44:33 | buy | UBS SLI ETF (SMI gleichgewichtet) | 960 | proposed |
+| 2026-04-28 21:44:33 | buy | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 979.2 | proposed |
+| 2026-04-28 21:44:33 | buy | iShares Core S&P 500 UCITS ETF USD (Acc) | 1620 | proposed |

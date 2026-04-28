@@ -1,6 +1,14 @@
 const fs = require('fs');
 const { analyzeAllocation } = require('./allocationAnalysis');
 
+function parseTotalValueChf(holdingsPath) {
+  const text = fs.readFileSync(holdingsPath, 'utf8');
+  const match = text.match(/- Total value CHF:\s*(.+)/);
+  if (!match) return 0;
+  const value = Number(String(match[1] || '0').replace(/[ ,]/g, '').trim());
+  return Number.isFinite(value) ? value : 0;
+}
+
 function parseCashChf(holdingsPath) {
   const text = fs.readFileSync(holdingsPath, 'utf8');
   const lines = text.split(/\r?\n/);
@@ -23,6 +31,7 @@ function parseMinimumTradeSize(portfolioPath) {
 
 function proposeTrades({ portfolioPath, holdingsPath }) {
   const cashChf = parseCashChf(holdingsPath);
+  const totalValueChf = parseTotalValueChf(holdingsPath);
   const minTradeSize = parseMinimumTradeSize(portfolioPath);
   const allocations = analyzeAllocation({ portfolioPath, holdingsPath });
 
@@ -49,12 +58,21 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
   const proposals = underweight.map((row) => {
     const share = Math.abs(row.drift) / totalTargetGap;
     const estimatedChf = Number((cashChf * share).toFixed(2));
+    const allocationAfter = totalValueChf > 0 ? Number((((row.current / 100) * totalValueChf + estimatedChf) / totalValueChf * 100).toFixed(2)) : row.current;
+    const driftAfter = Number((allocationAfter - row.target).toFixed(2));
     return {
       status: 'proposed',
       action: 'buy',
       assetClass: row.assetClass,
+      totalValueChf,
       estimatedChf,
       driftBefore: row.drift,
+      allocationBeforePct: row.current,
+      allocationTargetPct: row.target,
+      allocationAfterPct: allocationAfter,
+      driftAfter,
+      driftCorrected: Number((row.drift - driftAfter).toFixed(2)),
+      fundingSource: estimatedChf > 0 ? 'cash' : 'sell_required',
       rationale: `Deploy available cash toward underweight ${row.assetClass}.`,
       blocked: minTradeSize > 0 && estimatedChf < minTradeSize,
       riskNote: 'Asset-class proposal only; instrument selection required before order generation.',
@@ -63,6 +81,7 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
 
   return {
     cashChf,
+    totalValueChf,
     minTradeSize,
     proposals,
     notes: proposals.some((p) => p.blocked)
