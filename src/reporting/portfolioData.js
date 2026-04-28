@@ -14,16 +14,34 @@ function tableRowsFromFile(filePath, headingStartsWith) {
   return tableLines.slice(2).map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
 }
 
-function recentTrades(tradesPath, limit = 5) {
-  const rows = tableRowsFromFile(tradesPath, '## Trade Log');
-  return rows.slice(-limit).reverse().map((row) => ({
+function parseTradeRow(row) {
+  return {
     date: row[0] || '',
     status: row[1] || '',
     action: row[2] || '',
+    tickerOrIsin: row[3] || '',
     instrument: row[4] || row[3] || '',
-    amount: row[8] || row[7] || '0',
+    quantity: row[5] || '0',
+    limitPrice: row[6] || '0',
+    estimatedChf: row[7] || '0',
+    amount: row[7] || '0',
+    actualChf: row[8] || '0',
     reason: row[9] || '',
-  }));
+    approval: row[10] || '',
+    brokerOrderId: row[11] || '',
+  };
+}
+
+function recentTrades(tradesPath, limit = 5) {
+  const rows = tableRowsFromFile(tradesPath, '## Trade Log');
+  return rows.slice(-limit).reverse().map(parseTradeRow);
+}
+
+function latestTradeProposals(tradesPath) {
+  const rows = tableRowsFromFile(tradesPath, '## Trade Log').map(parseTradeRow);
+  if (!rows.length) return [];
+  const latestDate = rows[rows.length - 1].date;
+  return rows.filter((row) => row.date === latestDate);
 }
 
 function latestHistory(historyPath) {
@@ -42,4 +60,4 @@ function latestHistory(historyPath) {
   };
 }
 
-module.exports = { recentTrades, latestHistory };
+module.exports = { recentTrades, latestTradeProposals, latestHistory };

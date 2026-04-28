@@ -6,12 +6,12 @@
 - Last reviewed: 2026-04-27
 - Base currency: CHF
 - Broker: interactive-brokers
-- Broker account reference: LTME7
+- Broker account reference: U25624150
 - Execution mode: require_confirmation
 - Asset scope: ETF only
 
 ## Strategy Summary
-ETF portfolio draft for Interactive Brokers, awaiting final onboarding details and approved instrument allocation targets.
+Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad equity exposure with a small Swiss tilt and a defensive CHF cash-like sleeve. Sized for approximately CHF 5000 and designed to stay easy to manage.
 
 ## Investor Profile
 - Risk level: medium
@@ -32,13 +32,9 @@ ETF portfolio draft for Interactive Brokers, awaiting final onboarding details a
 ## Geographic Targets
 | Region | Target % | Min % | Max % |
 |---|---:|---:|---:|
-| Switzerland | 50 | 40 | 60 |
-| Eurozone | 12 | 9 | 15 |
-| UK | 3 | 2 | 4 |
-| USA | 20 | 15 | 25 |
-| China | 8 | 6 | 12 |
-| Japan | 4 | 2 | 6 |
-| Asia | 3 | 2 | 4 |
+| Switzerland | 20 | 10 | 30 |
+| Developed World ex-CH | 60 | 50 | 70 |
+| Bonds / cash-like CHF | 20 | 10 | 30 |
 
 ## Industry / Sector Constraints
 | Sector | Min % | Max % | Notes |
@@ -48,16 +44,11 @@ ETF portfolio draft for Interactive Brokers, awaiting final onboarding details a
 
 ## Approved Instruments
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
-| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | <target %> | <min %> | <max %> | SIX | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0032912732 |
-| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Swiss equities | <target %> | <min %> | <max %> | SIX | CHF | https://www.justetf.com/ch/etf-profile.html?isin=CH0130595124#uebersicht |
-| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | <target %> | <min %> | <max %> | <exchange> | EUR | https://www.justetf.com/ch/etf-profile.html?isin=LU0950668870#basisinfos |
-| LU0950670850 | UBS ETF (LU) MSCI UK UCITS ETF (GBP) A-acc | Global equities | <target %> | <min %> | <max %> | <exchange> | GBP | https://www.justetf.com/ch/etf-profile.html?isin=LU0950670850 |
-| IE00B5BMR087 | iShares Core S&P 500 UCITS ET USD (Acc) | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5BMR087 |
-| IE00B44T3H88 | HSBC MSCI China HMCH SE | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B44T3H88 |
-| IE00B5L8K969 | iShares MSCI EM Asia, CSEMAS | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B5L8K969 |
-| IE00B4L5YX21 | iShares Core MSCI Japan IMI UCITS ETF USD (Acc) | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=IE00B4L5YX21 |
-| US37950E2596 | Uts Glbl X MSCI AR Shs (21347688) | Global equities | <target %> | <min %> | <max %> | <exchange> | USD | https://www.justetf.com/ch/etf-profile.html?isin=US37950E2596 |
-| <ticker / ISIN> | <bond or money-market ETF needed> | Bonds / cash-like | <target %> | <min %> | <max %> | <exchange> | CHF | Conservative placeholder to satisfy asset-class coverage until approved. |
+|---|---|---|---:|---:|---:|---|---|---|
+| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 40 | 30 | 50 | LSE / IBKR-supported venue | USD | Core developed-market anchor; preferred iShares issuer. |
+| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 20 | 10 | 30 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer. |
+| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 20 | 10 | 30 | SIX | CHF | Swiss home-market sleeve; equal-weight tilt reduces single-name concentration. |
+| CASH-CHF | CHF cash balance | Bonds / cash-like | 20 | 10 | 30 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF 5000 scale. |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
@@ -107,7 +98,6 @@ ETF portfolio draft for Interactive Brokers, awaiting final onboarding details a
 - Require user approval for sales: yes unless auto_trade_limited is enabled
 
 ## Notes / Open Questions
-- Confirm broker account alias/reference.
-- Confirm initial capital and expected portfolio size.
-- Confirm investment horizon and maximum acceptable drawdown.
-- Confirm any excluded or already-held instruments.
+- ETF issuer preferences: prefer UBS and iShares; exclude Invesco.
+- Already-held instruments note: none
+- Defensive sleeve set to CHF cash for now; revisit a CHF money-market or short-duration bond ETF once portfolio size justifies it.

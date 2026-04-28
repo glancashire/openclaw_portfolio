@@ -1,5 +1,39 @@
 const { proposeTrades } = require('./tradeProposalEngine');
 const { readApprovedInstruments } = require('./approvedInstruments');
+const { estimateOrderSize } = require('./draftPricing');
+
+function buildInstrumentProposal(baseProposal, instrument, estimatedChf, extra = {}) {
+  const isCashSleeve = instrument.tickerOrIsin === 'CASH-CHF';
+  const sizing = isCashSleeve ? {
+    quantity: 0,
+    limitPrice: 0,
+    estimatedOrderChf: estimatedChf,
+    sizingNote: 'Cash sleeve retained directly in CHF.',
+    priceSource: 'cash_balance',
+  } : estimateOrderSize({ tickerOrIsin: instrument.tickerOrIsin, estimatedChf });
+
+  return {
+    ...baseProposal,
+    instrument: instrument.tickerOrIsin,
+    instrumentName: instrument.name,
+    currency: instrument.currency,
+    estimatedChf,
+    estimatedOrderChf: sizing.estimatedOrderChf,
+    quantity: sizing.quantity,
+    limitPrice: sizing.limitPrice,
+    blocked: baseProposal.blocked || (!isCashSleeve && sizing.quantity <= 0),
+    action: isCashSleeve ? 'hold' : baseProposal.action,
+    status: isCashSleeve ? 'planned' : baseProposal.status,
+    rationale: isCashSleeve
+      ? 'Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.'
+      : `Deploy available cash toward underweight ${baseProposal.assetClass} using ${instrument.name}.`,
+    riskNote: isCashSleeve
+      ? 'Planning entry only; no broker order required for the cash sleeve.'
+      : `Dry-run instrument proposal only; ${sizing.sizingNote}`,
+    priceSource: sizing.priceSource,
+    ...extra,
+  };
+}
 
 function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
   const assetClassProposals = proposeTrades({ portfolioPath, holdingsPath });
@@ -25,28 +59,15 @@ function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
       for (const instrument of weighted) {
         const share = instrument.target / totalTarget;
         const estimatedChf = Number((proposal.estimatedChf * share).toFixed(2));
-        proposals.push({
-          ...proposal,
-          instrument: instrument.tickerOrIsin,
-          instrumentName: instrument.name,
-          currency: instrument.currency,
-          estimatedChf,
-          blocked: proposal.blocked,
-        });
+        proposals.push(buildInstrumentProposal(proposal, instrument, estimatedChf));
       }
     } else {
       const share = 1 / eligible.length;
       for (const instrument of eligible) {
         const estimatedChf = Number((proposal.estimatedChf * share).toFixed(2));
-        proposals.push({
-          ...proposal,
-          instrument: instrument.tickerOrIsin,
-          instrumentName: instrument.name,
-          currency: instrument.currency,
-          estimatedChf,
-          blocked: proposal.blocked,
+        proposals.push(buildInstrumentProposal(proposal, instrument, estimatedChf, {
           rationale: `${proposal.rationale} Split equally across approved instruments for ${proposal.assetClass}.`,
-        });
+        }));
       }
     }
   }

@@ -8,7 +8,7 @@ function loadInteractiveBrokersConfig() {
   if (fs.existsSync(SECRET_PATH)) {
     file = JSON.parse(fs.readFileSync(SECRET_PATH, 'utf8'));
   }
-  const cfg = file.interactiveBrokers || {};
+  const cfg = file.interactiveBrokers || file || {};
   return {
     baseUrl: process.env.IBKR_BASE_URL || cfg.baseUrl || 'https://localhost:5000/v1/api',
     username: process.env.IBKR_USERNAME || cfg.username || '',
