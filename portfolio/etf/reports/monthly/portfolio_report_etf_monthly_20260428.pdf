@@ -1,0 +1,7 @@
+PDF export placeholder for portfolio_report_etf_monthly_20260428.md
+
+This file marks the intended PDF output path for the portfolio-manager MVP.
+A real PDF renderer is not wired yet.
+Until then, treat the paired Markdown report as the source of truth.
+
+Generated: 2026-04-28T22:02:34.224Z

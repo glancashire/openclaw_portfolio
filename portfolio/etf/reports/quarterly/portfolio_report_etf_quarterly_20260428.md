@@ -4,7 +4,7 @@
 - Report type: quarterly
 - Period start: 2026-04-01
 - Period end: 2026-04-28
-- Generated: 2026-04-28T21:58:28.313Z
+- Generated: 2026-04-28T22:02:34.260Z
 
 ## Executive Summary
 Latest snapshot: CHF 5000 total, CHF 5000 cash. Dry-run order planning is prepared but broker execution remains disabled.

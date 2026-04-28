@@ -17,4 +17,4 @@ const holdingsPath = path.join(portfolioDir, 'holdings.md');
 appendHistorySnapshot(historyPath, holdingsPath, 'end_of_day', `${period} report cycle snapshot`);
 regenerateDashboard(portfolioDir);
 const report = generateAndWriteReport({ portfolioDir, period, dateStamp });
-console.log(JSON.stringify({ report }, null, 2));
+console.log(JSON.stringify(report, null, 2));

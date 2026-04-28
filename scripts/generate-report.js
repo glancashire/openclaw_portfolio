@@ -10,4 +10,4 @@ if (!portfolioDir) {
 }
 
 const out = generateAndWriteReport({ portfolioDir, period, dateStamp });
-console.log(JSON.stringify({ report: out }, null, 2));
+console.log(JSON.stringify(out, null, 2));

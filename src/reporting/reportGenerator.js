@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { recentTrades, latestHistory } = require('./portfolioData');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
+const { markdownReportToPdfStub } = require('./pdfExport');
 
 function defaultPeriodBounds(period, latestSnapshot) {
   const end = latestSnapshot?.date || new Date().toISOString().slice(0, 10);
@@ -104,7 +105,9 @@ function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
     latestSnapshot,
     executionPlan,
   });
-  return writeReport({ portfolioDir, period, dateStamp, content });
+  const markdownPath = writeReport({ portfolioDir, period, dateStamp, content });
+  const pdfPath = markdownReportToPdfStub(markdownPath);
+  return { markdownPath, pdfPath };
 }
 
 module.exports = { formatReport, writeReport, generateAndWriteReport };

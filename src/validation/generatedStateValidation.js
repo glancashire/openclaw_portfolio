@@ -18,6 +18,7 @@ function validateGeneratedState(portfolioDir) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const dashboardPath = path.join(portfolioDir, 'dashboard.md');
   const historyPath = path.join(portfolioDir, 'history.md');
+  const reportsDir = path.join(portfolioDir, 'reports');
 
   const holdings = read(holdingsPath);
   const trades = read(tradesPath);
@@ -45,6 +46,23 @@ function validateGeneratedState(portfolioDir) {
   }
   if (!/report cycle snapshot|Initial dry-run funded state/.test(history)) {
     issues.push({ severity: 'info', message: 'History file does not show expected report-cycle or funding-state notes.' });
+  }
+
+  if (fs.existsSync(reportsDir)) {
+    const markdownReports = [];
+    for (const period of ['weekly', 'monthly', 'quarterly']) {
+      const periodDir = path.join(reportsDir, period);
+      if (!fs.existsSync(periodDir)) continue;
+      for (const file of fs.readdirSync(periodDir)) {
+        if (file.endsWith('.md')) markdownReports.push(path.join(periodDir, file));
+      }
+    }
+    for (const markdownPath of markdownReports) {
+      const pdfPath = markdownPath.replace(/\.md$/i, '.pdf');
+      if (!fs.existsSync(pdfPath)) {
+        issues.push({ severity: 'warning', message: `Missing PDF companion for report ${path.basename(markdownPath)}.` });
+      }
+    }
   }
 
   return issues;
