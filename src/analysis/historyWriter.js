@@ -19,6 +19,11 @@ function appendHistorySnapshot(historyPath, holdingsPath, snapshot = 'end_of_day
   const row = `| ${date} | ${snapshot} | ${summary.total} | ${summary.invested} | ${summary.cash} | 0 | 0 | ${notes} |`;
 
   let text = fs.readFileSync(historyPath, 'utf8').trimEnd();
+  const lines = text.split(/\r?\n/);
+  const duplicate = lines.find((line) => line.trim() === row.trim());
+  if (duplicate) {
+    return { appended: false, row, duplicate: true };
+  }
   text += `\n${row}\n`;
   fs.writeFileSync(historyPath, text);
   return { appended: true, row };

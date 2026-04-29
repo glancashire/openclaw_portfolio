@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { recentTrades, latestHistory } = require('./portfolioData');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
-const { markdownReportToPdfStub } = require('./pdfExport');
-const { summarizeReadiness } = require('../brokers/interactive-brokers/readiness');
+const { renderPdf } = require('./pdfExport');
+const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 
 function defaultPeriodBounds(period, latestSnapshot) {
   const end = latestSnapshot?.date || new Date().toISOString().slice(0, 10);
@@ -94,7 +94,7 @@ function writeReport({ portfolioDir, period, dateStamp, content }) {
   return outPath;
 }
 
-function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
+async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
@@ -104,9 +104,7 @@ function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
   const portfolioName = path.basename(portfolioDir);
   const bounds = defaultPeriodBounds(period, latestSnapshot);
   const executionPlan = buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(latestSnapshot?.totalValue || 0) });
-  const holdingsText = fs.readFileSync(holdingsPath, 'utf8');
-  const brokerUnavailable = /Pricing source: simulated/.test(holdingsText) || /Source: simulated/.test(holdingsText);
-  const brokerReadiness = summarizeReadiness({ config: { ok: true }, auth: { ok: !brokerUnavailable, reason: brokerUnavailable ? 'http_error' : 'ready' } });
+  const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const content = formatReport({
     portfolioName,
     period,
@@ -119,8 +117,8 @@ function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
     brokerReadiness,
   });
   const markdownPath = writeReport({ portfolioDir, period, dateStamp, content });
-  const pdfPath = markdownReportToPdfStub(markdownPath);
-  return { markdownPath, pdfPath };
+  const pdf = renderPdf(markdownPath);
+  return { markdownPath, pdfPath: pdf.pdfPath, pdfMode: pdf.mode, htmlPath: pdf.htmlPath || null };
 }
 
 module.exports = { formatReport, writeReport, generateAndWriteReport };

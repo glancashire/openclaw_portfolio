@@ -4,7 +4,7 @@ const { analyzeAllocation } = require('../analysis/allocationAnalysis');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { recentTrades, latestTradeProposals, latestHistory } = require('./portfolioData');
-const { summarizeReadiness } = require('../brokers/interactive-brokers/readiness');
+const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -137,7 +137,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
-function regenerateDashboard(portfolioDir) {
+async function regenerateDashboard(portfolioDir) {
   const portfolioName = path.basename(portfolioDir);
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
@@ -148,8 +148,7 @@ function regenerateDashboard(portfolioDir) {
   const allocations = analyzeAllocation({ portfolioPath, holdingsPath });
   const approvedInstruments = readApprovedInstruments(portfolioPath);
   const latestProposals = latestTradeProposals(tradesPath);
-  const brokerUnavailable = /Pricing source: simulated/.test(holdingsText) || /Source: simulated/.test(holdingsText);
-  const brokerReadiness = summarizeReadiness({ config: { ok: true }, auth: { ok: !brokerUnavailable, reason: brokerUnavailable ? 'http_error' : 'ready' } });
+  const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const dashboard = generateDashboard({
     portfolioName,
     holdingsText,

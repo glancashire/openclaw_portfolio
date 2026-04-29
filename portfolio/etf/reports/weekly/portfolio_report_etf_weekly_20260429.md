@@ -4,7 +4,7 @@
 - Report type: weekly
 - Period start: 2026-04-29
 - Period end: 2026-04-29
-- Generated: 2026-04-29T10:10:43.587Z
+- Generated: 2026-04-29T22:22:43.075Z
 
 ## Executive Summary
 Latest snapshot: CHF 5000 total, CHF 5000 cash. Dry-run order planning is prepared but broker execution remains disabled.
@@ -36,7 +36,7 @@ Latest snapshot: CHF 5000 total, CHF 5000 cash. Dry-run order planning is prepar
 - On strategy: yes, draft state matches approved dry-run plan
 - Rebalance needed: yes
 - Risk limits breached: no
-- Broker readiness: Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.
+- Broker readiness: Interactive Brokers read-only connectivity is available.
 
 ## Execution Plan
 - IE00B5BMR087: action buy, quantity 3, limit 600, executable CHF 1620, target 40%
@@ -49,10 +49,10 @@ Latest snapshot: CHF 5000 total, CHF 5000 cash. Dry-run order planning is prepar
 - The dry-run portfolio state, trade log, and dashboard are all consistent enough to review as one workflow.
 
 ## What Did Not Work
-- Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.
+- Live broker pricing and order quoting are not connected yet.
 
 ## Recommended Changes
-- Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.
+- Connect live broker pricing to replace draft assumptions before enabling execution.
 
 ## Next Actions
-- Validate Interactive Brokers gateway/session reachability before treating any proposal as broker-backed.
+- Approve or revise the current dry-run order set, then validate live read-only broker connectivity.
