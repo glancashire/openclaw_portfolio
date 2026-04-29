@@ -18,7 +18,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 | 11. Broker adapter interface | partial | Interface is represented in docs and partial IBKR scaffolding; implementation depth is still incomplete. |
 | 12. Interactive Brokers adapter MVP | partial | Native TWS / IB Gateway socket connectivity now authenticates successfully in live read-only mode, and shallow session/account functions respond. Durable holdings/account-summary/contract-details/market-data behavior remains incomplete. |
 | 13. Portfolio creation workflow | partial | Create/bootstrap/apply-answers/next-questions workflow exists, now clears the final excluded-instruments onboarding gap cleanly, and inspects real draft state. |
-| 14. Strategy and ETF selection workflow | partial | Approved instruments, validation, and instrument-level dry-run proposal plumbing exist, but shortlist/scoring workflow is still light. |
+| 14. Strategy and ETF selection workflow | partial | Approved instruments, validation, shortlist generation, and instrument-level dry-run proposal plumbing exist, but shortlist write-back/approval flow is still light. |
 | 15. Market entry workflow | partial | Staged-entry policy is modeled in Markdown and dry-run trade planning reaches instrument-level proposals; broker-aware execution remains incomplete. |
 | 16. Rebalancing workflow | partial | Allocation analysis, proposal generation, dashboard updates, and safety checks exist. |
 | 17. Reporting | partial | Weekly/monthly/quarterly Markdown reports and PDF placeholder files are generated. |
@@ -90,3 +90,4 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Client Portal gateway/browser-session investigation is now complete enough to justify a pivot toward native TWS / IB Gateway socket API transport for durable read-only automation.
 - Native IB Gateway live login, socket bring-up, and read-only readiness checks are now green enough to support connectivity validation, even though market-data and contract lookup remain blocked.
 - Draft onboarding now reaches zero remaining questions for the ETF portfolio after explicitly recording excluded instruments as `none`.
+- ETF shortlist generation now exists as a first-class workflow with ranking, rationale, risks, and suggested target splits derived from the current portfolio strategy.

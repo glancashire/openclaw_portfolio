@@ -51,6 +51,8 @@ Implement a proper shortlist workflow that:
 - produces approval-ready rationale and trade-offs
 - writes approved selections back into `Approved Instruments`
 
+Status: partially complete — shortlist generation and ranking now exist via `scripts/suggest-etf-shortlist.js`; automatic write-back to `Approved Instruments` still remains intentionally manual/approval-gated.
+
 ### Phase 17 — Dry-run order generation refinement
 Improve order-prep logic so it:
 - converts asset-class proposals into instrument-level draft orders
