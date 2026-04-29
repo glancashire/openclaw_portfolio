@@ -36,20 +36,35 @@ function classifyAssetClass(name) {
   return 'Global equities';
 }
 
+function parseMetadata(notes) {
+  const out = {};
+  const matches = String(notes || '').matchAll(/\b([a-zA-Z0-9_\-]+)\s*=\s*([^;|,]+)\b/g);
+  for (const match of matches) out[match[1]] = match[2].trim();
+  return out;
+}
+
 function readApprovedInstruments(portfolioPath) {
   const text = fs.readFileSync(portfolioPath, 'utf8');
   const rows = parseRows(extractSection(text, 'Approved Instruments'));
-  return rows.map((row) => ({
-    tickerOrIsin: row[0] || '',
-    name: row[1] || '',
-    assetClass: row[2] && row[2] !== 'Equity' ? row[2] : classifyAssetClass(row[1] || row[0]),
-    target: cleanPercent(row[3]),
-    min: cleanPercent(row[4]),
-    max: cleanPercent(row[5]),
-    exchange: row[6] || '',
-    currency: row[7] || 'CHF',
-    notes: row[8] || '',
-  }));
+  return rows.map((row) => {
+    const notes = row[8] || '';
+    const metadata = parseMetadata(notes);
+    return {
+      tickerOrIsin: row[0] || '',
+      name: row[1] || '',
+      assetClass: row[2] && row[2] !== 'Equity' ? row[2] : classifyAssetClass(row[1] || row[0]),
+      target: cleanPercent(row[3]),
+      min: cleanPercent(row[4]),
+      max: cleanPercent(row[5]),
+      exchange: row[6] || '',
+      currency: row[7] || 'CHF',
+      notes,
+      metadata,
+      ibkrConid: metadata.ibkr_conid || metadata.conid || null,
+      ibkrSymbol: metadata.ibkr_symbol || metadata.symbol || null,
+      fxToChfHint: metadata.fx_to_chf ? Number(metadata.fx_to_chf) : null,
+    };
+  });
 }
 
-module.exports = { readApprovedInstruments };
+module.exports = { readApprovedInstruments, parseMetadata };

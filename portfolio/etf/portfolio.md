@@ -45,9 +45,9 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 ## Approved Instruments
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
 |---|---|---|---:|---:|---:|---|---|---|
-| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 40 | 30 | 50 | LSE / IBKR-supported venue | USD | Core developed-market anchor; preferred iShares issuer. |
-| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 20 | 10 | 30 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer. |
-| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 20 | 10 | 30 | SIX | CHF | Swiss home-market sleeve; equal-weight tilt reduces single-name concentration. |
+| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 40 | 30 | 50 | LSE / IBKR-supported venue | USD | Core developed-market anchor; preferred iShares issuer; ibkr_symbol=CSPX; fx_to_chf=0.9 |
+| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 20 | 10 | 30 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer; ibkr_symbol=EMUAA; fx_to_chf=0.96 |
+| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 20 | 10 | 30 | SIX | CHF | Swiss home-market sleeve; equal-weight tilt reduces single-name concentration; ibkr_symbol=UBSSLI; fx_to_chf=1 |
 | CASH-CHF | CHF cash balance | Bonds / cash-like | 20 | 10 | 30 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF 5000 scale. |
 
 ## Excluded Instruments

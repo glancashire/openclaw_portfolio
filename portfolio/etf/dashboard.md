@@ -5,9 +5,10 @@
 - Cash: CHF 5000
 - Invested: CHF 0
 - Number of holdings: 0
-- Strategy status: rebalance_needed
+- Strategy status: blocked
 - Last sync: 2026-04-28 18:02:00
-- Last rebalance check: 2026-04-28 21:58:28
+- Last rebalance check: 2026-04-29 10:10:43
+- Broker readiness: Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.
 
 ## Allocation vs Target
 | Asset class | Current % | Target % | Drift % | Status |
@@ -25,13 +26,14 @@
 | CASH-CHF | CHF cash balance | 1000 | 20 | 20 | 0 | hold 1000 CHF (0 @ 0) |
 
 ## Recommended Actions
-1. Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
-2. Keep the defensive sleeve in CHF cash for now, and leave residual tradable cash of CHF 440.8 unallocated until live pricing is available.
+1. Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
+2. Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 440.8 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: quarterly report cycle snapshot
+- Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.
+- Latest history note: weekly report cycle snapshot
 
 ## Execution Plan
 - IE00B5BMR087: target 40% | intended CHF 1620 | executable CHF 1620 | gap CHF 0

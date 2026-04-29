@@ -4,6 +4,7 @@ const { analyzeAllocation } = require('../analysis/allocationAnalysis');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { recentTrades, latestTradeProposals, latestHistory } = require('./portfolioData');
+const { summarizeReadiness } = require('../brokers/interactive-brokers/readiness');
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -31,7 +32,8 @@ function countHoldingRows(text) {
   return count;
 }
 
-function strategyStatus(allocations) {
+function strategyStatus(allocations, brokerReadiness) {
+  if (brokerReadiness?.fallbackRequired) return 'blocked';
   if (allocations.some((row) => row.status === 'out_of_bounds')) return 'rebalance_needed';
   if (allocations.some((row) => row.status === 'drifted')) return 'minor_drift';
   return 'on_track';
@@ -75,12 +77,20 @@ function formatInstrumentOverviewRows(approvedInstruments = [], latestProposals 
     const target = Number(instrument.target || 0);
     const drift = Number((plannedPct - target).toFixed(2));
     const quantityText = proposal?.quantity ? ` (${proposal.quantity} @ ${proposal.limitPrice})` : '';
-    const action = proposal ? `${proposal.action} ${plannedValue} CHF${quantityText}` : 'watch';
+    const sourceText = proposal?.priceSource ? ` via ${proposal.priceSource}` : '';
+    const action = proposal ? `${proposal.action} ${plannedValue} CHF${quantityText}${sourceText}` : 'watch';
     return `| ${instrument.tickerOrIsin} | ${instrument.name} | ${plannedValue} | ${plannedPct} | ${target} | ${drift} | ${action} |`;
   }).join('\n');
 }
 
-function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0) {
+function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0, brokerReadiness = null) {
+  if (brokerReadiness?.fallbackRequired) {
+    return [
+      'Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.',
+      'Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.',
+    ];
+  }
+
   if (!existingTrades.length) {
     return [
       'Generate initial dry-run instrument proposals from the current cash balance.',
@@ -105,7 +115,7 @@ function formatExecutionPlan(plan = { rows: [], totals: { intendedChf: 0, execut
   return lines.join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null }) {
+function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -120,10 +130,11 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   if (proposalTotals.residualTradableCash > 0) {
     warnings.push(`- Whole-share draft sizing leaves CHF ${proposalTotals.residualTradableCash} unallocated beyond the intentional CHF cash sleeve.`);
   }
+  if (brokerReadiness?.fallbackRequired) warnings.push(`- ${brokerReadiness.message}`);
   if (latestSnapshot?.notes) warnings.push(`- Latest history note: ${latestSnapshot.notes}`);
-  const actions = recommendedActions(existingTrades, latestProposals, totalValue);
+  const actions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness);
 
-  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
+  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
 function regenerateDashboard(portfolioDir) {
@@ -137,6 +148,8 @@ function regenerateDashboard(portfolioDir) {
   const allocations = analyzeAllocation({ portfolioPath, holdingsPath });
   const approvedInstruments = readApprovedInstruments(portfolioPath);
   const latestProposals = latestTradeProposals(tradesPath);
+  const brokerUnavailable = /Pricing source: simulated/.test(holdingsText) || /Source: simulated/.test(holdingsText);
+  const brokerReadiness = summarizeReadiness({ config: { ok: true }, auth: { ok: !brokerUnavailable, reason: brokerUnavailable ? 'http_error' : 'ready' } });
   const dashboard = generateDashboard({
     portfolioName,
     holdingsText,
@@ -146,6 +159,7 @@ function regenerateDashboard(portfolioDir) {
     latestProposals,
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
+    brokerReadiness,
   });
   fs.writeFileSync(dashboardPath, dashboard);
   return dashboardPath;

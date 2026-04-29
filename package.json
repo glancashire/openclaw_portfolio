@@ -18,6 +18,9 @@
     "check:safety": "node scripts/check-safety-controls.js portfolio/etf",
     "propose:instrument-trades": "node scripts/propose-instrument-trades.js portfolio/etf/portfolio.md portfolio/etf/holdings.md",
     "ibkr:search": "node scripts/search-interactive-brokers-instruments.js",
-    "ibkr:price": "node scripts/fetch-interactive-brokers-price.js"
+    "ibkr:price": "node scripts/fetch-interactive-brokers-price.js",
+    "ibkr:readiness": "node scripts/check-interactive-brokers-readiness.js",
+    "ibkr:resolve-conids": "node scripts/resolve-interactive-brokers-conids.js portfolio/etf/portfolio.md",
+    "propose:instrument-trades:live": "node scripts/propose-instrument-trades-live-priced.js portfolio/etf/portfolio.md portfolio/etf/holdings.md"
   }
 }

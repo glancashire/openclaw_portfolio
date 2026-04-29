@@ -66,6 +66,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - `scripts/test-interactive-brokers-auth.js`
 - `scripts/check-interactive-brokers-config.js`
 - `scripts/sync-interactive-brokers-holdings.js`
+- `scripts/search-interactive-brokers-instruments.js`
+- `scripts/fetch-interactive-brokers-price.js`
+- `scripts/resolve-interactive-brokers-conids.js`
 - `src/brokers/interactive-brokers/*`
 - `src/brokers/shared/*`
 
@@ -73,7 +76,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 1. The first real portfolio is still `draft`, not safely activatable.
 2. Holdings/pricing are still simulated in the generated state unless IBKR sync is used successfully.
-3. Interactive Brokers instrument lookup, price lookup, and order-quote depth are still incomplete.
+3. Interactive Brokers instrument lookup and price lookup scaffolding now exist, but contract resolution and order-quote depth are still incomplete.
 4. PDF export is a placeholder companion file, not a real renderer.
 5. Trade proposal logic reaches instrument-level sizing, but is still not fully broker-quoted execution.
 
@@ -82,3 +85,4 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Draft-question detection now evaluates the actual portfolio document state more carefully, so onboarding asks only for genuinely unresolved fields.
 - The repo has been narrowed to Interactive Brokers-only scope for the active MVP.
 - Interactive Brokers holdings sync no longer depends on IG code and now extracts CHF cash from the broker ledger when available.
+- Interactive Brokers instrument search and market-snapshot pricing scaffolding are now present, with proposal sizing able to fall back safely when broker-linked contract metadata is still missing.
