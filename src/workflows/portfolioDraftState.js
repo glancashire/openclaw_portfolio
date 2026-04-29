@@ -62,7 +62,9 @@ function hasConcreteApprovedInstruments(text) {
 }
 
 function hasConcreteExcludedInstruments(text) {
-  return hasNonEmptyDataRow(extractSection(text, 'Excluded Instruments'));
+  const section = extractSection(text, 'Excluded Instruments');
+  if (/\|\s*none\s*\|\s*none\s*\|/i.test(section)) return true;
+  return hasNonEmptyDataRow(section);
 }
 
 function hasMeaningfulTargetTable(text, heading) {
@@ -100,7 +102,7 @@ function collectDraftState(filePath) {
     esgPreference: extractLineValue(text, 'ESG preference'),
     issuerPreferences: notesContain(text, 'ETF issuer preferences:') || hasConcreteApprovedInstruments(text) ? 'provided' : null,
     rebalancingTolerance: extractLineValue(text, 'Rebalance threshold'),
-    automatedExecutionAllowed: extractLineValue(text, 'Execute trades automatically'),
+    automatedExecutionAllowed: extractLineValue(text, 'Generate trade proposals automatically'),
     stagedMarketEntryDesired: extractLineValue(text, 'Initial deployment mode'),
     excludedInstruments: hasConcreteExcludedInstruments(text) || notesContain(text, 'Excluded instruments') ? 'provided' : null,
     alreadyHeldInstruments: notesContain(text, 'Already-held instruments note:') ? 'provided' : null,

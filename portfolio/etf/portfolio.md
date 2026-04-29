@@ -53,7 +53,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
 |---|---|
-
+| none | none |
 
 ## Rebalancing Policy
 - Check frequency: daily
