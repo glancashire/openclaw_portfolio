@@ -4,7 +4,7 @@
 - Report type: weekly
 - Period start: 2026-04-29
 - Period end: 2026-04-29
-- Generated: 2026-04-29T22:22:43.075Z
+- Generated: 2026-04-29T22:26:17.534Z
 
 ## Executive Summary
 Latest snapshot: CHF 5000 total, CHF 5000 cash. Dry-run order planning is prepared but broker execution remains disabled.

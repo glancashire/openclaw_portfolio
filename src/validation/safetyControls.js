@@ -12,7 +12,11 @@ function hasOpenQuestions(portfolioText) {
   const sectionMatch = portfolioText.match(/## Notes \/ Open Questions([\s\S]*)$/);
   if (!sectionMatch) return false;
   const body = sectionMatch[1];
-  return /-\s+/.test(body.trim());
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('- '))
+    .some((line) => /\?|confirm|todo|tbd|resolve|decide|open question/i.test(line));
 }
 
 function extractExecutionMode(portfolioText) {
