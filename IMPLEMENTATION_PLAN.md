@@ -7,49 +7,79 @@
 3. Markdown parser/generator foundation
 4. Portfolio-folder contract validation
 5. Draft bootstrap helper for portfolio creation from structured input
+6. Strategy validation for status, execution modes, allocations, placeholders, and broker/base-currency constraints
+7. Interactive draft workflow helpers for applying answers and asking next questions
+8. Dry-run Interactive Brokers adapter/auth/holdings scaffolding
+9. Holdings sync simulation plus generated-state checks
+10. Dashboard regeneration
+11. Trade proposal and trade-log writing helpers
+12. History snapshot writing
+13. Weekly/monthly/quarterly Markdown report generation with PDF placeholder export
+14. Safety-control checks for draft/live-readiness review
+
+## Current repository capabilities
+
+### Workflow and validation
+- Validate portfolio Markdown structure and required sections
+- Validate strategy coherence and activation blockers
+- Detect draft-state gaps and suggest next onboarding questions
+- Apply structured onboarding answers into `portfolio.md`
+- Check generated holdings/history/dashboard state consistency
+- Check safety controls before treating output as execution-ready
+
+### Analysis and reporting
+- Analyze allocation drift from current holdings
+- Propose dry-run trades from underweight allocations and available cash
+- Write trade proposals into append-only trade logs
+- Regenerate dashboards from current portfolio state
+- Append history snapshots
+- Run weekly/monthly/quarterly report cycles and emit Markdown + PDF placeholder outputs
+
+### Broker scaffolding
+- Interactive Brokers adapter/auth/read-only test scaffolding
+- IG adapter design docs and auth test scaffolding
+- Safe config checks for broker secrets presence without exposing them
 
 ## Next phases
 
-### Phase 4 — Strategy validation
-Implement validators for:
-- unresolved placeholders
-- missing investor profile details
-- invalid execution modes
-- out-of-range allocation targets
-- inconsistent min/target/max values
-- missing risk limits
-- missing approved instruments for active portfolios
+### Phase 15 — ETF suggestion workflow hardening
+Implement a proper shortlist workflow that:
+- derives missing exposures from `portfolio.md`
+- scores candidate ETFs against CHF-first / availability / simplicity constraints
+- produces approval-ready rationale and trade-offs
+- writes approved selections back into `Approved Instruments`
 
-### Phase 5 — Interactive portfolio creation workflow
-Add a workflow layer that:
-- asks only for missing answers
-- writes/update `portfolio/<name>/portfolio.md`
-- leaves unresolved questions explicit
-- can resume from an existing draft
+### Phase 16 — Dry-run order generation refinement
+Improve order-prep logic so it:
+- converts asset-class proposals into instrument-level draft orders
+- uses broker-aware pricing/quotes when available
+- handles residual cash and minimum-trade-size constraints explicitly
+- keeps all execution paths confirmation-gated by default
 
-### Phase 6 — IG adapter design skeleton
-Create:
-- normalized account/holding/order shapes
-- adapter interface code stubs
-- safe logging rules
-- read-only + dry-run first workflow
-
-### Phase 7 — Dashboard/report regeneration helpers
-Add generation logic for:
-- allocation summaries
-- drift analysis placeholders
-- report skeleton emission by period
+### Phase 17 — Read-only broker connectivity deepening
+Advance broker integration by:
+- hardening Interactive Brokers holdings/account normalization
+- implementing the IG read-only adapter interface described in the spec
+- keeping dry-run/live gating explicit and testable
 
 ## Current command surface
 
-- `node scripts/validate-portfolio.js <portfolio.md>`
-- `node scripts/validate-portfolio-folder.js <portfolio-folder>`
+- `node scripts/validate-portfolio.js <portfolio.md> [...portfolio.md]`
+- `node scripts/validate-strategy.js <portfolio.md>`
+- `node scripts/check-portfolio-activation.js <portfolio.md>`
+- `node scripts/check-generated-state.js <portfolio-dir>`
+- `node scripts/check-safety-controls.js <portfolio-dir>`
 - `node scripts/create-portfolio.js <portfolio-name>`
 - `node scripts/bootstrap-portfolio-from-json.js <seed.json>`
+- `node scripts/next-portfolio-questions.js <portfolio.md>`
+- `node scripts/apply-portfolio-answers.js <portfolio.md> <answers.json>`
+- `node scripts/propose-trades.js <portfolio.md> <holdings.md>`
+- `node scripts/run-report-cycle.js <portfolio-dir> <weekly|monthly|quarterly> [YYYYMMDD]`
 
 ## Guardrails
 
 - No secrets in Markdown.
 - No live trading shortcuts.
 - Keep ETF-only / CHF-first MVP scope.
-- Unknown or unresolved strategy details should block activation and trading.
+- Unknown holdings or unresolved strategy details should block activation and trading.
+- Broker connectivity remains read-only/dry-run until explicitly validated and enabled.

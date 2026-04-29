@@ -19,12 +19,6 @@ function notesContain(text, needle) {
   return text.includes(needle);
 }
 
-function approvedInstrumentsAnswered(text) {
-  const section = extractSection(text, 'Approved Instruments');
-  const rows = section.split(/\r?\n/).filter((line) => line.startsWith('|') && !line.includes('---') && !line.includes('Ticker / ISIN'));
-  return rows.some((line) => !line.includes('<') && line.replace(/[|\s]/g, '').length > 0);
-}
-
 function extractSection(text, heading) {
   const lines = text.split(/\r?\n/);
   const start = lines.findIndex((line) => line.trim() === `## ${heading}`);
@@ -39,27 +33,77 @@ function extractSection(text, heading) {
   return lines.slice(start, end).join('\n');
 }
 
+function extractStrategySummary(text) {
+  const section = extractSection(text, 'Strategy Summary');
+  return section
+    .split(/\r?\n/)
+    .slice(1)
+    .join(' ')
+    .trim();
+}
+
+function hasNonEmptyDataRow(section, { ignoreValues = [] } = {}) {
+  const rows = section
+    .split(/\r?\n/)
+    .filter((line) => line.trim().startsWith('|') && !line.includes('---'))
+    .slice(1);
+
+  return rows.some((line) => {
+    const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
+    if (!cells.length) return false;
+    const meaningfulCells = cells.filter((cell) => cell && !ignoreValues.includes(cell));
+    if (!meaningfulCells.length) return false;
+    return meaningfulCells.some((cell) => !hasPlaceholderValue(cell));
+  });
+}
+
+function hasConcreteApprovedInstruments(text) {
+  return hasNonEmptyDataRow(extractSection(text, 'Approved Instruments'));
+}
+
+function hasConcreteExcludedInstruments(text) {
+  return hasNonEmptyDataRow(extractSection(text, 'Excluded Instruments'));
+}
+
+function hasMeaningfulTargetTable(text, heading) {
+  const section = extractSection(text, heading);
+  const rows = section
+    .split(/\r?\n/)
+    .filter((line) => line.trim().startsWith('|') && !line.includes('---'))
+    .slice(1);
+
+  return rows.some((line) => {
+    const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
+    if (!cells.length) return false;
+    const label = cells[0] || '';
+    const metrics = cells.slice(1);
+    return label && metrics.some((cell) => !hasPlaceholderValue(cell));
+  });
+}
+
 function collectDraftState(filePath) {
   const text = read(filePath);
+  const strategySummary = extractStrategySummary(text);
+
   return {
     portfolioName: (text.match(/^# Portfolio:\s*(.+)$/m) || [null, null])[1],
     broker: extractLineValue(text, 'Broker'),
     brokerAccountReference: extractLineValue(text, 'Broker account reference'),
     baseCurrency: extractLineValue(text, 'Base currency'),
-    initialCapital: notesContain(text, 'Confirm initial capital and expected portfolio size.') ? null : 'provided',
+    initialCapital: /approximately CHF\s*\d/i.test(strategySummary) ? 'provided' : null,
     investmentHorizon: extractLineValue(text, 'Investment horizon'),
     riskLevel: extractLineValue(text, 'Risk level'),
     maximumAcceptableDrawdown: extractLineValue(text, 'Maximum acceptable drawdown'),
-    targetAssetClasses: extractSection(text, 'Allocation Targets').includes('| Global equities |') ? 'present' : null,
-    geographicPreferences: extractSection(text, 'Geographic Targets').includes('| Switzerland |') ? 'present' : null,
-    sectorPreferences: extractSection(text, 'Industry / Sector Constraints').includes('| Technology |') ? 'present' : null,
+    targetAssetClasses: hasMeaningfulTargetTable(text, 'Allocation Targets') ? 'provided' : null,
+    geographicPreferences: hasMeaningfulTargetTable(text, 'Geographic Targets') ? 'provided' : null,
+    sectorPreferences: hasMeaningfulTargetTable(text, 'Industry / Sector Constraints') ? 'provided' : null,
     esgPreference: extractLineValue(text, 'ESG preference'),
-    issuerPreferences: approvedInstrumentsAnswered(text) ? 'provided' : null,
+    issuerPreferences: notesContain(text, 'ETF issuer preferences:') || hasConcreteApprovedInstruments(text) ? 'provided' : null,
     rebalancingTolerance: extractLineValue(text, 'Rebalance threshold'),
     automatedExecutionAllowed: extractLineValue(text, 'Execute trades automatically'),
     stagedMarketEntryDesired: extractLineValue(text, 'Initial deployment mode'),
-    excludedInstruments: extractSection(text, 'Excluded Instruments').includes('|') ? 'present' : null,
-    alreadyHeldInstruments: notesContain(text, 'Confirm any excluded or already-held instruments.') ? null : 'provided',
+    excludedInstruments: hasConcreteExcludedInstruments(text) || notesContain(text, 'Excluded instruments') ? 'provided' : null,
+    alreadyHeldInstruments: notesContain(text, 'Already-held instruments note:') ? 'provided' : null,
   };
 }
 

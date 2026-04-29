@@ -14,4 +14,5 @@ These are the intended report-cycle commands for the portfolio-manager MVP.
 ## Notes
 - Run after holdings refresh when possible.
 - The current implementation appends a history snapshot, regenerates the dashboard, then writes the report.
-- PDF export is not implemented yet.
+- Run `node scripts/check-safety-controls.js portfolio/etf` before treating any report as execution-ready.
+- PDF export currently writes placeholder companion files at the expected output paths.
