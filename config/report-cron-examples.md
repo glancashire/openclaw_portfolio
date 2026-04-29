@@ -1,23 +1,58 @@
 # Report Cron Examples
 
-These are example cron expressions for the portfolio-manager MVP.
+These examples show how to schedule the portfolio-manager report workflow with OpenClaw cron jobs.
 
 ## Weekly report
-- Expression: `0 17 * * 5`
-- Meaning: every Friday at 17:00 UTC
-- Command: `node scripts/run-report-cycle.js portfolio/etf weekly`
+
+```json
+{
+  "name": "portfolio-etf-weekly-report",
+  "schedule": { "kind": "cron", "expr": "0 18 * * 5", "tz": "UTC" },
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Run `node scripts/run-report-cycle.js portfolio/etf weekly`, verify the dashboard/report artifacts regenerated cleanly, then summarize only meaningful blockers.",
+    "timeoutSeconds": 900
+  },
+  "sessionTarget": "isolated",
+  "delivery": { "mode": "announce" }
+}
+```
 
 ## Monthly report
-- Expression: `0 17 28-31 * *`
-- Meaning: late-month reporting window; an outer scheduler should guard for last business day if needed
-- Command: `node scripts/run-report-cycle.js portfolio/etf monthly`
+
+```json
+{
+  "name": "portfolio-etf-monthly-report",
+  "schedule": { "kind": "cron", "expr": "0 18 1 * *", "tz": "UTC" },
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Run `node scripts/run-report-cycle.js portfolio/etf monthly`, verify the generated artifacts, and flag any safety/readiness blockers before sharing results.",
+    "timeoutSeconds": 1200
+  },
+  "sessionTarget": "isolated",
+  "delivery": { "mode": "announce" }
+}
+```
 
 ## Quarterly report
-- Expression: `0 17 28-31 3,6,9,12 *`
-- Meaning: quarter-end reporting window; an outer scheduler should guard for last business day if needed
-- Command: `node scripts/run-report-cycle.js portfolio/etf quarterly`
 
-## Notes
-- These examples are operational scaffolding, not live cron jobs.
-- For production use, tie scheduling to confirmed market calendars and broker/data availability.
-- Keep report runs behind read-only / dry-run assumptions until live broker paths are validated.
+```json
+{
+  "name": "portfolio-etf-quarterly-report",
+  "schedule": { "kind": "cron", "expr": "0 18 1 1,4,7,10 *", "tz": "UTC" },
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Run `node scripts/run-report-cycle.js portfolio/etf quarterly`, validate the generated report/dashboard state, and surface only material issues or completed outputs.",
+    "timeoutSeconds": 1200
+  },
+  "sessionTarget": "isolated",
+  "delivery": { "mode": "announce" }
+}
+```
+
+## Safety-first notes
+
+- Prefer isolated cron runs so report jobs do not pollute the active chat session.
+- Keep holdings sync/readiness checks separate from report generation if broker connectivity is unstable.
+- Run `node scripts/check-safety-controls.js portfolio/etf` when treating any generated output as execution-relevant.
+- Current IBKR market-data/contract lookup remains blocked, so scheduled reports still rely on simulated pricing assumptions when live pricing is unavailable.
