@@ -60,8 +60,10 @@ Improve order-prep logic so it:
 
 ### Phase 18 — Read-only broker connectivity deepening
 Advance broker integration by:
+- replacing the fragile Client Portal cookie/session path with a native TWS / IB Gateway socket API transport
 - hardening Interactive Brokers holdings/account normalization
-- adding Interactive Brokers instrument lookup and latest-price support
+- stabilizing the subset of native API functions that already authenticate/connect successfully
+- adding durable Interactive Brokers instrument lookup and latest-price support once the live Gateway session yields contract-details / delayed market-data responses
 - keeping dry-run/live gating explicit and testable
 
 ## Current command surface

@@ -48,7 +48,7 @@ The first supported assets are **widely traded ETFs only**, denominated or track
 
 - Multiple portfolios.
 - One broker account per portfolio.
-- Interactive Brokers Web API adapter.
+- Interactive Brokers adapter, preferably via a durable local integration mode such as the native TWS / IB Gateway socket API when the Client Portal Web API path is unreliable for automation.
 - ETF-only portfolios.
 - CHF base currency.
 - Portfolio creation workflow.
@@ -695,7 +695,7 @@ The MVP is acceptable when:
 1. A new ETF portfolio can be created from a workflow into valid Markdown files.
 2. The portfolio remains blocked from live action until required questions are resolved.
 3. Interactive Brokers account connectivity works in read-only mode.
-4. Holdings sync produces valid `holdings.md`.
+4. Holdings sync produces valid `holdings.md` once the chosen Interactive Brokers transport yields usable holdings/account data, not just session/auth connectivity.
 5. Rebalance analysis explains what is off-target and why.
 6. Dry-run trade proposals are generated and logged.
 7. Dashboard updates correctly after state changes.
