@@ -8,5 +8,11 @@ console.log(JSON.stringify({
   hasPassword: status.hasPassword,
   hasAccountId: status.hasAccountId,
   secretPath: status.secretPath,
+  mode: cfg.mode,
+  runtime: cfg.runtime,
+  host: cfg.host,
+  port: cfg.port,
+  clientId: cfg.clientId,
+  readonly: cfg.readonly,
   baseUrl: cfg.baseUrl,
 }, null, 2));

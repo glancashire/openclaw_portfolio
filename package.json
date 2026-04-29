@@ -20,7 +20,12 @@
     "ibkr:search": "node scripts/search-interactive-brokers-instruments.js",
     "ibkr:price": "node scripts/fetch-interactive-brokers-price.js",
     "ibkr:readiness": "node scripts/check-interactive-brokers-readiness.js",
+    "ibkr:test-native": "node scripts/test-interactive-brokers-native-client.js",
     "ibkr:resolve-conids": "node scripts/resolve-interactive-brokers-conids.js portfolio/etf/portfolio.md",
     "propose:instrument-trades:live": "node scripts/propose-instrument-trades-live-priced.js portfolio/etf/portfolio.md portfolio/etf/holdings.md"
+  },
+  "dependencies": {
+    "@stoqey/ib": "^1.5.3",
+    "playwright": "^1.59.1"
   }
 }

@@ -1,11 +1,13 @@
 const { loadInteractiveBrokersConfig, validateInteractiveBrokersConfig } = require('./config');
 const { logBrokerEvent } = require('../shared/safeLogger');
+const { InteractiveBrokersNativeClient } = require('./nativeClient');
 
 class InteractiveBrokersClient {
   constructor(options = {}) {
     this.options = options;
     this.config = loadInteractiveBrokersConfig();
     this.baseUrl = this.config.baseUrl;
+    this.native = this.config.mode === 'native' ? new InteractiveBrokersNativeClient(this.config) : null;
   }
 
   configurationStatus() {
@@ -18,8 +20,37 @@ class InteractiveBrokersClient {
       return blocked('missing_config', status.missing, this.options.portfolio);
     }
 
-    // IBKR Client Portal / Gateway auth is session-based and commonly fronted by a local gateway.
-    // For the MVP, we validate reachability and auth-status endpoints before trading/account operations.
+    if (this.native) {
+      try {
+        const nativeStatus = await this.native.authenticate();
+        return {
+          ok: true,
+          mode: 'native-socket',
+          authStatus: nativeStatus,
+          log: logBrokerEvent({
+            broker: 'interactive-brokers',
+            operation: 'authenticate',
+            status: 'ok',
+            summary: { connected: nativeStatus?.connected ?? null, mode: 'native' },
+            portfolio: this.options.portfolio,
+          }),
+        };
+      } catch (error) {
+        return {
+          ok: false,
+          reason: 'native_error',
+          error: error.message,
+          log: logBrokerEvent({
+            broker: 'interactive-brokers',
+            operation: 'authenticate',
+            status: 'native_error',
+            summary: { message: error.message },
+            portfolio: this.options.portfolio,
+          }),
+        };
+      }
+    }
+
     try {
       const authStatus = await this.request('/iserver/auth/status');
       return {
@@ -51,19 +82,29 @@ class InteractiveBrokersClient {
   }
 
   async request(path, { method = 'GET', body } = {}) {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    const text = await response.text();
-    if (!response.ok) {
-      throw new Error(`IBKR request failed (${response.status}): ${text}`);
+    const previousTls = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    const relaxTls = this.baseUrl.startsWith('https://localhost') || this.baseUrl.startsWith('https://127.0.0.1');
+    if (relaxTls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    try {
+      const response = await fetch(`${this.baseUrl}${path}`, {
+        method,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(`IBKR request failed (${response.status}): ${text}`);
+      }
+      return safeJson(text);
+    } finally {
+      if (relaxTls) {
+        if (previousTls === undefined) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+        else process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousTls;
+      }
     }
-    return safeJson(text);
   }
 
   async sessionStatus() {
@@ -75,11 +116,13 @@ class InteractiveBrokersClient {
   }
 
   async fetchAccounts() {
+    if (this.native) return this.native.fetchAccounts();
     return this.request('/portfolio/accounts');
   }
 
   async fetchLedger(accountId) {
     if (!accountId) throw new Error('fetchLedger requires accountId');
+    if (this.native) return this.native.fetchLedger(accountId);
     return this.request(`/portfolio/${encodeURIComponent(accountId)}/ledger`);
   }
 
@@ -96,6 +139,7 @@ class InteractiveBrokersClient {
   }
 
   async fetchPositions(accountId) {
+    if (this.native) return this.native.fetchPositions(accountId);
     if (!accountId) throw new Error('fetchPositions requires accountId');
     return this.request(`/portfolio/${encodeURIComponent(accountId)}/positions/0`);
   }
