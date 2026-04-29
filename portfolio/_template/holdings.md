@@ -3,7 +3,7 @@
 ## Last Sync
 - Date/time: YYYY-MM-DD HH:mm:ss
 - Source: simulated
-- Broker: ig
+- Broker: interactive-brokers
 - Base currency: CHF
 - Total value CHF: 0
 - Cash CHF: 0

@@ -6,7 +6,7 @@ Create a new OpenClaw instance that manages investment portfolios across broker/
 
 The system should help enforce a defined portfolio strategy with disciplined allocation, monitoring, gradual deployment of capital, rebalancing, audit reporting, and clear human approval gates.
 
-The first supported brokers are **IG / IG Bank / ig.com** and **Interactive Brokers**. The architecture must allow additional brokers later, such as **Swissquote**.
+The first supported broker is **Interactive Brokers**. The architecture should allow additional brokers later, such as **Swissquote**, but the MVP implementation should stay focused on Interactive Brokers only.
 
 The first supported assets are **widely traded ETFs only**, denominated or tracked in **CHF** where possible. No options, leverage products, CFDs, derivatives, crypto, structured products, or short selling in the first version.
 
@@ -48,7 +48,6 @@ The first supported assets are **widely traded ETFs only**, denominated or track
 
 - Multiple portfolios.
 - One broker account per portfolio.
-- IG / ig.com broker adapter.
 - Interactive Brokers Web API adapter.
 - ETF-only portfolios.
 - CHF base currency.
@@ -110,11 +109,6 @@ portfolio/
  quarterly/
 
 brokers/
- ig/
- adapter.md
- auth.md
- instruments.md
- orders.md
  interactive-brokers/
  adapter.md
  auth.md
@@ -157,7 +151,7 @@ Purpose: define the portfolio strategy, broker link, execution rules, asset univ
 - Created: YYYY-MM-DD
 - Last reviewed: YYYY-MM-DD
 - Base currency: CHF
-- Broker: ig
+- Broker: interactive-brokers
 - Broker account reference: <account_alias_or_safe_identifier>
 - Execution mode: propose_only | require_confirmation | auto_trade_limited | auto_trade_full
 - Asset scope: ETF only
@@ -228,7 +222,7 @@ Short human-readable description of the portfolio strategy.
 - Stop trading if broker/API errors occur: true
 
 ## Broker Access
-- Broker adapter: ig
+- Broker adapter: interactive-brokers
 - Credentials source: environment variables or secret store only
 - Never store API keys in Markdown: true
 - Account matching rule: <account alias / account id mapping>
@@ -268,7 +262,7 @@ This file must be updated:
 ## Last Sync
 - Date/time: YYYY-MM-DD HH:mm:ss
 - Source: broker_api | manual | simulated
-- Broker: ig
+- Broker: interactive-brokers
 - Base currency: CHF
 - Total value CHF: <amount>
 - Cash CHF: <amount>
@@ -433,14 +427,14 @@ normalise_broker_order(raw_order)
 
 ---
 
-## 12. IG Broker Adapter — MVP Requirements
+## 12. Interactive Brokers Adapter — MVP Requirements
 
-The first broker adapters should support IG / ig.com and Interactive Brokers.
-You can find the documentation here [IG Labs | Trading APIs](https://labs.ig.com/) and [IBKR Web API | IBKR Campus](https://www.interactivebrokers.eu/campus/ibkr-api-page/web-api/)
+The first broker adapter should support Interactive Brokers.
+You can find the documentation here [IBKR Web API | IBKR Campus](https://www.interactivebrokers.eu/campus/ibkr-api-page/web-api/)
 ### Required capabilities
 
 - Authenticate using secure credential storage.
-- List available IG accounts.
+- List available Interactive Brokers accounts.
 - Select the correct investment account.
 - Read cash balance.
 - Read current holdings/positions.
@@ -607,263 +601,116 @@ portfolio/<name>/reports/monthly/
 portfolio/<name>/reports/quarterly/
 ```
 
-### Report filename format
+### Required report contents
 
-```text
-portfolio_report_<portfolio_name>_<period>_<YYYYMMDD>.md
-portfolio_report_<portfolio_name>_<period>_<YYYYMMDD>.pdf
-```
-
-### Required report sections
-
-```markdown
-# Portfolio Report: <portfolio_name>
-
-## Period
-- Report type: weekly | monthly | quarterly
-- Period start:
-- Period end:
-- Generated:
-
-## Executive Summary
-Short summary of performance, allocation, trades, risks, and recommended changes.
-
-## Performance
-| Metric | Value |
-|---|---:|
-| Start value CHF | |
-| End value CHF | |
-| Change CHF | |
-| Change % | |
-
-## Allocation Review
-| Asset class | Start % | End % | Target % | Drift % |
-|---|---:|---:|---:|---:|
-
-## Trades During Period
-| Date | Action | Instrument | Amount CHF | Reason |
-|---|---|---|---:|---|
-
-## Strategy Compliance
-- On strategy: yes/no
-- Rebalance needed: yes/no
-- Risk limits breached: yes/no
-
-## What Worked
-- <point>
-
-## What Did Not Work
-- <point>
-
-## Recommended Changes
-- <recommendation>
-
-## Next Actions
-- <action>
-```
+1. Period covered.
+2. Portfolio value start/end.
+3. Cash level.
+4. Holdings summary.
+5. Allocation drift summary.
+6. Trades proposed/executed.
+7. Strategy compliance review.
+8. What worked.
+9. What did not work.
+10. Recommended changes.
+11. Next actions.
 
 ---
 
 ## 18. Scheduling
 
-Create configurable schedules in `config/schedules.md`.
+Use OpenClaw schedules/config to support:
+- daily holdings sync,
+- daily rebalance check,
+- weekly report generation,
+- monthly report generation,
+- quarterly report generation.
 
-### Default schedules
-
-```markdown
-# Schedules
-
-## Daily
-- Sync holdings: start of trading day
-- Sync holdings: end of trading day
-- Update history
-- Regenerate dashboard
-- Check rebalance drift
-
-## Weekly
-- Generate weekly report
-- Review open trade proposals
-- Review data quality warnings
-
-## Monthly
-- Generate monthly report
-- Check rebalancing need
-- Review approved ETF universe
-
-## Quarterly
-- Generate quarterly report
-- Review strategy assumptions
-- Review risk profile
-- Review whether allocations should change
-```
+All scheduled actions must remain safe under read-only/dry-run constraints.
 
 ---
 
-## 19. Safety Controls
+## 19. Safety / Operational Rules
 
-### Must-have controls
-
-- Dry-run mode.
-- Read-only mode.
-- Human approval by default.
-- No trading when data is stale.
-- No trading when broker account cannot be matched.
-- No trading if holdings contain unknown instruments.
-- No trading if strategy file has unresolved questions.
-- No trading if risk limits are missing.
-- No trading if proposed trade would violate allocation limits.
-- No trading if market is closed unless explicitly supported.
-- No repeated failed order submission.
-- No storing secrets in Markdown.
-- No leverage.
-- No derivatives.
-- No short selling.
-
-### Approval levels
-
-```markdown
-Execution mode:
-- propose_only: generate proposals only, never execute.
-- require_confirmation: prepare trades, ask user before each execution.
-- auto_trade_limited: execute only within strict predefined limits.
-- auto_trade_full: execute rebalancing automatically within strategy constraints.
-```
-
-Default mode: `require_confirmation`.
+1. Never store broker credentials in Markdown files.
+2. Never execute live trades by default.
+3. Never trade instruments outside approved ETF scope.
+4. Never trade when unresolved portfolio questions remain.
+5. Never trade when holdings sync is stale or failed.
+6. Never trade when broker authentication is broken.
+7. Never ignore min/max allocation constraints.
+8. Never hide automation state from the user.
+9. Always preserve human-readable audit logs.
+10. Always allow dry-run simulation before any live execution path.
 
 ---
 
-## 20. Error Handling
+## 20. Error Handling Requirements
 
-All errors must be logged with:
-- timestamp,
-- portfolio,
-- broker,
-- operation,
-- severity,
-- safe summary,
-- suggested resolution.
-
-### Severity levels
-
-- info
-- warning
-- error
-- critical
-
-### Critical errors must pause trading
-
-Examples:
-- authentication failure,
-- broker account mismatch,
-- unknown holdings,
-- stale price data,
-- failed order confirmation,
-- inconsistent portfolio valuation,
-- missing strategy constraints.
+- Broker/API failures must be logged safely.
+- Partial data should produce warnings, not silent success.
+- Unknown holdings should block automated trading.
+- Missing price data should block order generation.
+- Repeated broker errors should stop automation until reviewed.
 
 ---
 
 ## 21. Template Portfolio
 
-Generate `portfolio/_template/` with valid placeholder files.
-
-The template should include:
-- a conservative sample ETF strategy,
-- sample target allocation,
-- example approved instruments section,
-- empty holdings table,
-- empty trades table,
-- empty history table,
-- dashboard skeleton,
-- report folder README.
-
-The template must be safe to copy and rename.
+Provide a default starter portfolio at `portfolio/etf/` showing:
+- CHF base currency,
+- Interactive Brokers account linkage,
+- diversified ETF allocation,
+- staged deployment,
+- explicit safety/approval settings,
+- clear open questions until the portfolio is activation-ready.
 
 ---
 
 ## 22. MVP Build Order
 
-Build in this order:
-
-1. Create folder/file scaffolding.
-2. Create portfolio template.
-3. Implement structured Markdown parser/writer.
-4. Implement portfolio creation workflow.
-5. Implement strategy validation.
-6. Implement IG broker adapter in read-only mode.
-7. Implement holdings sync.
-8. Implement dashboard generation.
-9. Implement ETF suggestion workflow.
-10. Implement trade proposal engine.
-11. Implement dry-run order generation.
-12. Implement trade log updates.
-13. Implement history snapshots.
-14. Implement weekly/monthly/quarterly reports.
-15. Implement PDF export.
-16. Add live execution only after dry-run validation.
+1. Folder/file scaffolding.
+2. Template portfolio.
+3. Structured Markdown parser/writer.
+4. Portfolio creation workflow.
+5. Strategy validation.
+6. Interactive Brokers adapter in read-only mode.
+7. Holdings sync.
+8. Dashboard generation.
+9. ETF suggestion workflow.
+10. Trade proposal engine.
+11. Dry-run order generation.
+12. Trade log updates.
+13. History snapshots.
+14. Reports.
+15. PDF export.
+16. Live execution only after dry-run validation.
 
 ---
 
-## 23. Acceptance Criteria
+## 23. Acceptance Criteria for MVP
 
-The system is acceptable when:
+The MVP is acceptable when:
 
-- A new portfolio can be created interactively.
-- The required Markdown files are generated correctly.
-- Strategy validation identifies missing or unclear data.
-- IG account can be connected in read-only mode.
-- Current holdings can be synced into `holdings.md`.
-- Portfolio valuation is calculated in CHF.
-- Dashboard is regenerated correctly.
-- ETF suggestions are generated and explained.
-- Trade proposals are generated but not executed by default.
-- Trades are logged append-only.
-- History snapshots are written daily.
-- Weekly, monthly, and quarterly reports are generated.
-- PDF reports are generated.
-- No secrets are written to Markdown files.
-- Live trading is blocked until explicitly enabled.
+1. A new ETF portfolio can be created from a workflow into valid Markdown files.
+2. The portfolio remains blocked from live action until required questions are resolved.
+3. Interactive Brokers account connectivity works in read-only mode.
+4. Holdings sync produces valid `holdings.md`.
+5. Rebalance analysis explains what is off-target and why.
+6. Dry-run trade proposals are generated and logged.
+7. Dashboard updates correctly after state changes.
+8. Weekly/monthly/quarterly reports can be generated.
+9. All outputs remain human-readable and auditable.
+10. No credentials are stored in Markdown.
 
 ---
 
 ## 24. First Portfolio to Create
 
-Create the first real portfolio folder:
-
-```text
-portfolio/etf/
-```
-
-Initial settings:
-
-```markdown
-# Portfolio: ETF
-
-## Status
-- Status: draft
-- Base currency: CHF
-- Broker: interactive-brokers
-- Asset scope: ETF only
-- Execution mode: require_confirmation
-```
-
-OpenClaw should then walk the user through the missing strategy and broker-account details before activating the portfolio.
-
----
-
-## 25. Final Instruction to OpenClaw
-
-Build this as a disciplined, modular portfolio-management system.
-
-Optimise for:
-- safety,
-- clarity,
-- auditability,
-- low token use,
-- reusable portfolio templates,
-- broker portability,
-- minimal hidden state,
-- simple Markdown-based data storage.
-
-Do not prioritise clever market timing. Prioritise strategy discipline, risk control, transparent decisions, and reliable execution.
+The first real portfolio should be a simple long-only ETF portfolio with:
+- CHF base currency,
+- broad developed-market core,
+- Swiss home-market sleeve,
+- defensive CHF sleeve,
+- staged capital deployment,
+- strict approval before live trading.

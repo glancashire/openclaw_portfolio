@@ -15,7 +15,7 @@ Use this skill as the top-level coordinator for portfolio-manager work.
 - Prefer transparent Markdown state over hidden runtime state.
 - When work touches repo structure or templates, read `references/repo-plan.md`.
 - When work touches portfolio file formats, read `../portfolio-markdown-contracts/references/file-contracts.md`.
-- When work touches IG integration, read `../ig-broker-adapter/references/ig-mvp.md`.
+- Keep broker implementation work focused on Interactive Brokers unless the spec changes again.
 
 ## Workflow
 
@@ -24,7 +24,7 @@ Use this skill as the top-level coordinator for portfolio-manager work.
    - scaffolding/templates
    - markdown parser/writer and validation
    - portfolio workflow logic
-   - IG adapter work
+   - Interactive Brokers adapter work
    - reporting/scheduling
 3. Read only the relevant reference file(s) for that lane.
 4. Produce or update implementation assets in small, auditable steps.
@@ -40,7 +40,7 @@ Prefer this implementation order unless the user explicitly asks to skip ahead:
 3. Structured Markdown parser/writer
 4. Portfolio creation workflow
 5. Strategy validation
-6. IG adapter in read-only mode
+6. Interactive Brokers adapter in read-only mode
 7. Holdings sync
 8. Dashboard generation
 9. ETF suggestion workflow

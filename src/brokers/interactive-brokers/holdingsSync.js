@@ -1,5 +1,5 @@
 const path = require('path');
-const { writeHoldingsSnapshot } = require('../ig/holdingsSync');
+const { writeHoldingsSnapshot } = require('../shared/holdingsSnapshot');
 const { InteractiveBrokersClient } = require('./client');
 const { normaliseHolding } = require('./types');
 
@@ -16,19 +16,23 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     return { ok: false, reason: 'no_account_id', accounts };
   }
 
+  const ledger = await client.fetchLedger(resolvedAccountId);
   const positions = await client.fetchPositions(resolvedAccountId);
   const holdings = Array.isArray(positions) ? positions.map(normaliseHolding) : [];
+  const cashChf = extractCashChf(ledger);
   const result = writeHoldingsSnapshot({
     portfolioDir,
     holdings,
-    cashChf: 0,
+    cashChf,
     source: 'broker_api',
     broker: 'interactive-brokers',
+    normaliseHolding: (h) => h,
   });
 
   return {
     ok: true,
     accountId: resolvedAccountId,
+    cashChf,
     count: holdings.length,
     result,
   };
@@ -42,4 +46,17 @@ function firstAccountId(accounts) {
   return null;
 }
 
-module.exports = { syncInteractiveBrokersHoldings };
+function extractCashChf(ledger) {
+  if (!ledger || typeof ledger !== 'object') return 0;
+  const chf = ledger.CHF || ledger.chf || null;
+  if (chf && typeof chf === 'object') {
+    const candidates = [chf.cashbalance, chf.cashBalance, chf.settledcash, chf.settledCash, chf.netliquidationvalue, chf.netLiquidationValue];
+    for (const candidate of candidates) {
+      const value = Number(candidate);
+      if (Number.isFinite(value)) return value;
+    }
+  }
+  return 0;
+}
+
+module.exports = { syncInteractiveBrokersHoldings, extractCashChf };

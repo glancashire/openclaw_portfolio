@@ -1,4 +1,4 @@
-const { writeHoldingsSnapshot } = require('../src/brokers/ig/holdingsSync');
+const { writeHoldingsSnapshot } = require('../src/brokers/shared/holdingsSnapshot');
 
 const portfolioDir = process.argv[2];
 if (!portfolioDir) {
@@ -9,8 +9,9 @@ if (!portfolioDir) {
 const result = writeHoldingsSnapshot({
   portfolioDir,
   source: 'simulated',
-  broker: 'ig',
+  broker: 'interactive-brokers',
   cashChf: 5000,
+  normaliseHolding: (holding) => holding,
   holdings: [
     { isin: 'CH0032912732', name: 'UBS SLI ETF', assetClass: 'Swiss equities', quantity: 10, price: 100, currency: 'CHF', marketValue: 1000 },
     { isin: 'IE00B5BMR087', name: 'iShares Core S&P 500', assetClass: 'Global equities', quantity: 20, price: 200, currency: 'CHF', marketValue: 4000 },

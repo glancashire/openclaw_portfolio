@@ -11,7 +11,7 @@ portfolio/
   _template/
   etf/
 brokers/
-  ig/
+  interactive-brokers/
   swissquote/
 runtime/
   logs/
@@ -39,10 +39,10 @@ Create:
 - `portfolio/etf/reports/weekly/`
 - `portfolio/etf/reports/monthly/`
 - `portfolio/etf/reports/quarterly/`
-- `brokers/ig/adapter.md`
-- `brokers/ig/auth.md`
-- `brokers/ig/instruments.md`
-- `brokers/ig/orders.md`
+- `brokers/interactive-brokers/adapter.md`
+- `brokers/interactive-brokers/auth.md`
+- `brokers/interactive-brokers/instruments.md`
+- `brokers/interactive-brokers/orders.md`
 - `brokers/swissquote/adapter.md`
 - `config/openclaw.md`
 - `config/schedules.md`
@@ -60,7 +60,7 @@ Suggested implementation modules:
 - trade proposal engine
 - report generator
 - broker adapter interface
-- IG implementation
+- Interactive Brokers implementation
 
 ## Design guardrails
 

@@ -22,7 +22,7 @@ let text = fs.readFileSync(portfolioPath, 'utf8');
 
 const replacements = [
   ['Status: draft', `Status: ${raw.status || 'draft'}`],
-  ['Broker: ig', `Broker: ${raw.broker || 'ig'}`],
+  ['Broker: interactive-brokers', `Broker: ${raw.broker || 'interactive-brokers'}`],
   ['Base currency: CHF', `Base currency: ${raw.baseCurrency || 'CHF'}`],
   ['Broker account reference: <account_alias_or_safe_identifier>', `Broker account reference: ${raw.brokerAccountReference || '<account_alias_or_safe_identifier>'}`],
   ['Execution mode: require_confirmation', `Execution mode: ${raw.executionMode || 'require_confirmation'}`],

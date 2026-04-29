@@ -78,6 +78,23 @@ class InteractiveBrokersClient {
     return this.request('/portfolio/accounts');
   }
 
+  async fetchLedger(accountId) {
+    if (!accountId) throw new Error('fetchLedger requires accountId');
+    return this.request(`/portfolio/${encodeURIComponent(accountId)}/ledger`);
+  }
+
+  async searchContracts(query) {
+    if (!query) throw new Error('searchContracts requires query');
+    return this.request(`/iserver/secdef/search?symbol=${encodeURIComponent(query)}`);
+  }
+
+  async fetchMarketSnapshot(conids, fields = ['31', '84', '85', '86']) {
+    const list = Array.isArray(conids) ? conids.filter(Boolean).join(',') : String(conids || '');
+    if (!list) throw new Error('fetchMarketSnapshot requires at least one conid');
+    const fieldList = Array.isArray(fields) ? fields.join(',') : String(fields || '31,84,85,86');
+    return this.request(`/iserver/marketdata/snapshot?conids=${encodeURIComponent(list)}&fields=${encodeURIComponent(fieldList)}`);
+  }
+
   async fetchPositions(accountId) {
     if (!accountId) throw new Error('fetchPositions requires accountId');
     return this.request(`/portfolio/${encodeURIComponent(accountId)}/positions/0`);

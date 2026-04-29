@@ -21,7 +21,7 @@ Default first live portfolio:
 - name: ETF
 - status: draft
 - base currency: CHF
-- broker: ig
+- broker: interactive-brokers
 - asset scope: ETF only
 - execution mode: require_confirmation
 

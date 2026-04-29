@@ -15,6 +15,9 @@
     "report:quarterly": "node scripts/run-report-cycle.js portfolio/etf quarterly",
     "next:questions": "node scripts/next-portfolio-questions.js portfolio/etf/portfolio.md",
     "apply:answers": "node scripts/apply-portfolio-answers.js portfolio/etf/portfolio.md /tmp/answers.json",
-    "check:safety": "node scripts/check-safety-controls.js portfolio/etf"
+    "check:safety": "node scripts/check-safety-controls.js portfolio/etf",
+    "propose:instrument-trades": "node scripts/propose-instrument-trades.js portfolio/etf/portfolio.md portfolio/etf/holdings.md",
+    "ibkr:search": "node scripts/search-interactive-brokers-instruments.js",
+    "ibkr:price": "node scripts/fetch-interactive-brokers-price.js"
   }
 }

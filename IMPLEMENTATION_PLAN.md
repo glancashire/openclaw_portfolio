@@ -16,6 +16,7 @@
 12. History snapshot writing
 13. Weekly/monthly/quarterly Markdown report generation with PDF placeholder export
 14. Safety-control checks for draft/live-readiness review
+15. Interactive Brokers-only repo narrowing and holdings-sync decoupling from the removed IG path
 
 ## Current repository capabilities
 
@@ -30,6 +31,7 @@
 ### Analysis and reporting
 - Analyze allocation drift from current holdings
 - Propose dry-run trades from underweight allocations and available cash
+- Propose instrument-level dry-run trades from approved instruments
 - Write trade proposals into append-only trade logs
 - Regenerate dashboards from current portfolio state
 - Append history snapshots
@@ -37,29 +39,29 @@
 
 ### Broker scaffolding
 - Interactive Brokers adapter/auth/read-only test scaffolding
-- IG adapter design docs and auth test scaffolding
+- Interactive Brokers holdings sync with ledger-aware CHF cash extraction
 - Safe config checks for broker secrets presence without exposing them
 
 ## Next phases
 
-### Phase 15 — ETF suggestion workflow hardening
+### Phase 16 — ETF suggestion workflow hardening
 Implement a proper shortlist workflow that:
 - derives missing exposures from `portfolio.md`
 - scores candidate ETFs against CHF-first / availability / simplicity constraints
 - produces approval-ready rationale and trade-offs
 - writes approved selections back into `Approved Instruments`
 
-### Phase 16 — Dry-run order generation refinement
+### Phase 17 — Dry-run order generation refinement
 Improve order-prep logic so it:
 - converts asset-class proposals into instrument-level draft orders
 - uses broker-aware pricing/quotes when available
 - handles residual cash and minimum-trade-size constraints explicitly
 - keeps all execution paths confirmation-gated by default
 
-### Phase 17 — Read-only broker connectivity deepening
+### Phase 18 — Read-only broker connectivity deepening
 Advance broker integration by:
 - hardening Interactive Brokers holdings/account normalization
-- implementing the IG read-only adapter interface described in the spec
+- adding Interactive Brokers instrument lookup and latest-price support
 - keeping dry-run/live gating explicit and testable
 
 ## Current command surface
@@ -74,7 +76,9 @@ Advance broker integration by:
 - `node scripts/next-portfolio-questions.js <portfolio.md>`
 - `node scripts/apply-portfolio-answers.js <portfolio.md> <answers.json>`
 - `node scripts/propose-trades.js <portfolio.md> <holdings.md>`
+- `node scripts/propose-instrument-trades.js <portfolio.md> <holdings.md>`
 - `node scripts/run-report-cycle.js <portfolio-dir> <weekly|monthly|quarterly> [YYYYMMDD]`
+- `node scripts/sync-interactive-brokers-holdings.js <portfolio-dir> [accountId]`
 
 ## Guardrails
 
@@ -83,3 +87,4 @@ Advance broker integration by:
 - Keep ETF-only / CHF-first MVP scope.
 - Unknown holdings or unresolved strategy details should block activation and trading.
 - Broker connectivity remains read-only/dry-run until explicitly validated and enabled.
+- Keep broker scope focused on Interactive Brokers only for the current MVP.

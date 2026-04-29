@@ -5,7 +5,7 @@
 - Created: YYYY-MM-DD
 - Last reviewed: YYYY-MM-DD
 - Base currency: CHF
-- Broker: ig
+- Broker: interactive-brokers
 - Broker account reference: <account_alias_or_safe_identifier>
 - Execution mode: require_confirmation
 - Asset scope: ETF only
@@ -80,7 +80,7 @@ Conservative sample ETF strategy used as a safe template. Replace with portfolio
 - Stop trading if broker/API errors occur: true
 
 ## Broker Access
-- Broker adapter: ig
+- Broker adapter: interactive-brokers
 - Credentials source: environment variables or secret store only
 - Never store API keys in Markdown: true
 - Account matching rule: <account alias / account id mapping>
