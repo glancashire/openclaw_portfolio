@@ -1,4 +1,4 @@
-const { IBApi, EventName } = require('@stoqey/ib');
+const { IBApi, EventName, IBApiTickType } = require('@stoqey/ib');
 
 class InteractiveBrokersNativeClient {
   constructor(config) {
@@ -37,7 +37,30 @@ class InteractiveBrokersNativeClient {
   async fetchLedger(accountId) {
     return this.withApi(async ({ api, connected }) => {
       await connected;
-      return waitForAccountSummary(api, accountId || 'All');
+      const requestedGroup = !accountId || accountId === 'All' ? 'All' : 'All';
+      const rows = await waitForAccountSummary(api, requestedGroup);
+      if (!accountId || accountId === 'All') return rows;
+      return rows.filter((row) => row.account === accountId);
+    });
+  }
+
+  async searchContracts(query) {
+    return this.withApi(async ({ api, connected }) => {
+      await connected;
+      return searchContractsViaDetails(api, query);
+    });
+  }
+
+  async fetchMarketSnapshot(conids) {
+    const list = Array.isArray(conids) ? conids.filter(Boolean) : [conids].filter(Boolean);
+    if (!list.length) throw new Error('fetchMarketSnapshot requires at least one conid');
+    return this.withApi(async ({ api, connected }) => {
+      await connected;
+      const results = [];
+      for (const conid of list) {
+        results.push(await waitForMarketSnapshot(api, buildConidContract(conid)));
+      }
+      return results;
     });
   }
 
@@ -81,7 +104,9 @@ function waitForManagedAccounts(api) {
 function waitForPositions(api) {
   return new Promise((resolve, reject) => {
     const positions = [];
+    let sawPosition = false;
     const onPosition = (account, contract, position, avgCost) => {
+      sawPosition = true;
       positions.push({ account, contract, position, avgCost });
     };
     const onEnd = () => {
@@ -89,6 +114,7 @@ function waitForPositions(api) {
       resolve(positions);
     };
     const onError = (err, code, reqId) => {
+      if (isIgnorableCode(code)) return;
       cleanup();
       reject(normalizeError(err, code, reqId));
     };
@@ -101,7 +127,7 @@ function waitForPositions(api) {
     };
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error('Timed out waiting for positions'));
+      resolve(sawPosition ? positions : []);
     }, 15000);
     api.on(EventName.position, onPosition);
     api.on(EventName.positionEnd, onEnd);
@@ -112,7 +138,7 @@ function waitForPositions(api) {
 
 function waitForAccountSummary(api, accountGroup) {
   return new Promise((resolve, reject) => {
-    const reqId = 9001;
+    const reqId = nextReqId();
     const rows = [];
     const tags = 'AccountType,NetLiquidation,TotalCashValue,SettledCash,BuyingPower,AvailableFunds,CashBalance';
     const onSummary = (incomingReqId, account, tag, value, currency) => {
@@ -126,6 +152,7 @@ function waitForAccountSummary(api, accountGroup) {
     };
     const onError = (err, code, incomingReqId) => {
       if (incomingReqId && incomingReqId !== reqId) return;
+      if (isIgnorableCode(code)) return;
       cleanup();
       reject(normalizeError(err, code, incomingReqId));
     };
@@ -138,12 +165,117 @@ function waitForAccountSummary(api, accountGroup) {
     };
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error('Timed out waiting for account summary'));
+      resolve(rows);
     }, 15000);
     api.on(EventName.accountSummary, onSummary);
     api.on(EventName.accountSummaryEnd, onEnd);
     api.on(EventName.error, onError);
     api.reqAccountSummary(reqId, accountGroup, tags);
+  });
+}
+
+async function searchContractsViaDetails(api, query) {
+  const attempts = buildSearchContracts(query);
+  const all = [];
+  const seen = new Set();
+  for (const contract of attempts) {
+    const rows = await waitForContractDetails(api, contract);
+    for (const row of rows) {
+      const key = String(row.conid || '') || JSON.stringify([row.symbol, row.exchange, row.currency, row.name]);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      all.push(row);
+    }
+    if (all.length) break;
+  }
+  return all;
+}
+
+function waitForContractDetails(api, contract) {
+  return new Promise((resolve, reject) => {
+    const reqId = nextReqId();
+    const rows = [];
+    const onDetails = (incomingReqId, details) => {
+      if (incomingReqId !== reqId) return;
+      rows.push(normalizeContractDetails(details));
+    };
+    const onEnd = (incomingReqId) => {
+      if (incomingReqId !== reqId) return;
+      cleanup();
+      resolve(rows);
+    };
+    const onError = (err, code, incomingReqId) => {
+      if (incomingReqId && incomingReqId !== reqId) return;
+      if (isIgnorableCode(code)) return;
+      cleanup();
+      reject(normalizeError(err, code, incomingReqId));
+    };
+    const cleanup = () => {
+      clearTimeout(timer);
+      api.off(EventName.contractDetails, onDetails);
+      api.off(EventName.contractDetailsEnd, onEnd);
+      api.off(EventName.error, onError);
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      resolve(rows);
+    }, 15000);
+    api.on(EventName.contractDetails, onDetails);
+    api.on(EventName.contractDetailsEnd, onEnd);
+    api.on(EventName.error, onError);
+    api.reqContractDetails(reqId, contract);
+  });
+}
+
+function waitForMarketSnapshot(api, contract) {
+  return new Promise((resolve, reject) => {
+    const reqId = nextReqId();
+    const state = { conid: String(contract.conId), currency: contract.currency || null };
+    const onTickPrice = (incomingReqId, tickType, price) => {
+      if (incomingReqId !== reqId) return;
+      if (!Number.isFinite(price) || price <= 0) return;
+      if (tickType === IBApiTickType.LAST || tickType === IBApiTickType.DELAYED_LAST) state['31'] = price;
+      if (tickType === IBApiTickType.BID || tickType === IBApiTickType.DELAYED_BID) state['84'] = price;
+      if (tickType === IBApiTickType.ASK || tickType === IBApiTickType.DELAYED_ASK) state['86'] = price;
+      if (tickType === IBApiTickType.CLOSE) state.close = price;
+    };
+    const onTickString = (incomingReqId, tickType, value) => {
+      if (incomingReqId !== reqId) return;
+      if (tickType === 45) state.lastTimestamp = value;
+    };
+    const onSnapshotEnd = (incomingReqId) => {
+      if (incomingReqId !== reqId) return;
+      cleanup();
+      if (!state['31'] && state.close) state['31'] = state.close;
+      state['85'] = state.currency || null;
+      resolve(state);
+    };
+    const onError = (err, code, incomingReqId) => {
+      if (incomingReqId && incomingReqId !== reqId) return;
+      if (isIgnorableCode(code)) return;
+      cleanup();
+      reject(normalizeError(err, code, incomingReqId));
+    };
+    const cleanup = () => {
+      clearTimeout(timer);
+      try { api.cancelMktData(reqId); } catch {}
+      api.off(EventName.tickPrice, onTickPrice);
+      api.off(EventName.tickString, onTickString);
+      api.off(EventName.tickSnapshotEnd, onSnapshotEnd);
+      api.off(EventName.error, onError);
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      if (!state['31'] && state.close) state['31'] = state.close;
+      state['85'] = state.currency || null;
+      resolve(state);
+    }, 15000);
+    api.on(EventName.tickPrice, onTickPrice);
+    api.on(EventName.tickString, onTickString);
+    api.on(EventName.tickSnapshotEnd, onSnapshotEnd);
+    api.on(EventName.error, onError);
+    api.reqMarketDataType(3);
+    api.reqMktData(reqId, contract, '', true, false);
   });
 }
 
@@ -169,6 +301,56 @@ function waitForEvent(api, eventName, timeoutMs) {
     api.on(eventName, onEvent);
     api.on(EventName.error, onError);
   });
+}
+
+function buildSearchContracts(query) {
+  const symbol = String(query || '').trim().toUpperCase();
+  return [
+    { symbol, secType: 'STK', exchange: 'SMART' },
+    { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'LSEETF' },
+    { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'LSE' },
+    { symbol, secType: 'STK', exchange: 'LSEETF' },
+    { symbol, secType: 'STK', exchange: 'LSE' },
+    { symbol, secType: 'STK', exchange: 'AEB' },
+    { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'AEB' },
+    { localSymbol: symbol, secType: 'STK', exchange: 'LSEETF' },
+    { localSymbol: symbol, secType: 'STK', exchange: 'LSE' },
+    { localSymbol: symbol, secType: 'STK', exchange: 'AEB' },
+    { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'EBS' },
+    { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'SWB' },
+  ];
+}
+
+function buildConidContract(conid) {
+  return {
+    conId: Number(conid),
+    exchange: 'SMART',
+    secType: 'STK',
+  };
+}
+
+function normalizeContractDetails(details) {
+  const summary = details?.summary || details?.contract || {};
+  return {
+    conid: summary.conId || null,
+    symbol: summary.symbol || null,
+    name: details?.longName || summary.description || summary.localSymbol || summary.symbol || null,
+    description: summary.localSymbol || details?.marketName || null,
+    exchange: summary.primaryExch || summary.exchange || null,
+    currency: summary.currency || null,
+    secType: summary.secType || null,
+    raw: details,
+  };
+}
+
+function isIgnorableCode(code) {
+  return [2104, 2106, 2158].includes(Number(code));
+}
+
+let reqCounter = 9100;
+function nextReqId() {
+  reqCounter += 1;
+  return reqCounter;
 }
 
 function normalizeError(err, code, reqId) {
