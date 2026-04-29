@@ -4,6 +4,10 @@ function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
 
+function includesSimulatedPricing(holdingsText) {
+  return /Pricing source:\s*simulated/i.test(holdingsText) || /Simulated pricing assumptions/i.test(holdingsText);
+}
+
 function hasOpenQuestions(portfolioText) {
   const sectionMatch = portfolioText.match(/## Notes \/ Open Questions([\s\S]*)$/);
   if (!sectionMatch) return false;
@@ -32,7 +36,7 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
   if (/Unmatched holdings: (?!none)/.test(holdingsText)) {
     blockers.push({ severity: 'error', message: 'Holdings contain unmatched instruments.' });
   }
-  if (/Pricing source: simulated/.test(holdingsText)) {
+  if (includesSimulatedPricing(holdingsText)) {
     blockers.push({ severity: 'warning', message: 'Holdings and pricing are still simulated.' });
   }
   const executionMode = extractExecutionMode(portfolioText);
