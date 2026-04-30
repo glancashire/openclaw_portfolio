@@ -65,8 +65,15 @@ Advance broker integration by:
 - replacing the fragile Client Portal cookie/session path with a native TWS / IB Gateway socket API transport
 - hardening Interactive Brokers holdings/account normalization
 - stabilizing the subset of native API functions that already authenticate/connect successfully
-- adding durable Interactive Brokers instrument lookup and latest-price support once the live Gateway session yields contract-details / delayed market-data responses
+- fixing contract search so approved ETF symbols resolve to usable conids in the live native session
+- adding durable Interactive Brokers latest-price support only after native readiness is consistently green again
 - keeping dry-run/live gating explicit and testable
+
+Current state:
+- native client code exists and dry-run live-priced proposal code paths are wired
+- current readiness check returns `native_error`, so broker-backed pricing falls back to draft assumptions
+- conid resolution for the current approved ETF symbols (`CSPX`, `EMUAA`, `UBSSLI`) returns zero matches via the native search path
+- therefore the safe portfolio state remains simulated holdings + draft pricing until native search/pricing is repaired
 
 ## Current command surface
 

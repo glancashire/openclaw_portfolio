@@ -1,15 +1,15 @@
 const { InteractiveBrokersClient } = require('./client');
+const { InteractiveBrokersBrowserSessionClient } = require('./browserSessionClient');
 const { logBrokerEvent } = require('../shared/safeLogger');
 
-async function fetchLatestPrice({ conid, portfolio = 'etf' }) {
+async function fetchLatestPrice({ conid, portfolio = 'etf', appCode = null, preferBrowserSession = false }) {
   const client = new InteractiveBrokersClient({ portfolio });
   const auth = await client.authenticate();
-  if (!auth.ok) {
-    return { ok: false, reason: 'auth_failed', auth };
-  }
 
   try {
-    const raw = await client.fetchMarketSnapshot([conid]);
+    const raw = auth.ok && !preferBrowserSession
+      ? await client.fetchMarketSnapshot([conid])
+      : await fetchViaBrowserSession({ conid, portfolio, appCode, auth });
     const first = Array.isArray(raw) ? raw[0] : raw;
     const price = parseNumeric(readField(first, '31'));
     const bid = parseNumeric(readField(first, '84'));
@@ -36,8 +36,9 @@ async function fetchLatestPrice({ conid, portfolio = 'etf' }) {
   } catch (error) {
     return {
       ok: false,
-      reason: 'http_error',
+      reason: auth.ok ? 'http_error' : 'auth_failed',
       error: error.message,
+      auth,
       log: logBrokerEvent({
         broker: 'interactive-brokers',
         operation: 'get_latest_price',
@@ -47,6 +48,18 @@ async function fetchLatestPrice({ conid, portfolio = 'etf' }) {
       }),
     };
   }
+}
+
+async function fetchViaBrowserSession({ conid, portfolio, appCode, auth }) {
+  if (!appCode) {
+    throw new Error('Interactive Brokers browser-session pricing requires appCode');
+  }
+  const browserClient = new InteractiveBrokersBrowserSessionClient({ portfolio });
+  const response = await browserClient.fetchMarketSnapshot([conid], ['31', '84', '85', '86'], appCode);
+  if (!response.ok) {
+    throw new Error(`IBKR browser-session pricing failed (${response.status}): ${response.text}`);
+  }
+  return response.json;
 }
 
 function readField(object, key) {
