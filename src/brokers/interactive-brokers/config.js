@@ -27,6 +27,23 @@ function loadInteractiveBrokersConfig() {
   };
 }
 
+function redactInteractiveBrokersConfig(config = loadInteractiveBrokersConfig()) {
+  return {
+    mode: config.mode,
+    runtime: config.runtime,
+    baseUrl: config.baseUrl,
+    host: config.host,
+    port: config.port,
+    clientId: config.clientId,
+    readonly: config.readonly,
+    hasUsername: Boolean(config.username),
+    hasPassword: Boolean(config.password),
+    hasAccountId: Boolean(config.accountId),
+    accountIdSuffix: config.accountId ? String(config.accountId).slice(-4) : '',
+    secretPath: config.secretPath,
+  };
+}
+
 function validateInteractiveBrokersConfig(config = loadInteractiveBrokersConfig()) {
   const missing = [];
   if (config.mode === 'native') {
@@ -52,4 +69,4 @@ function validateInteractiveBrokersConfig(config = loadInteractiveBrokersConfig(
   };
 }
 
-module.exports = { loadInteractiveBrokersConfig, validateInteractiveBrokersConfig };
+module.exports = { loadInteractiveBrokersConfig, redactInteractiveBrokersConfig, validateInteractiveBrokersConfig };

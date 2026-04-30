@@ -1,15 +1,32 @@
 const { InteractiveBrokersClient } = require('./client');
+const { InteractiveBrokersBrowserSessionClient } = require('./browserSessionClient');
 const { logBrokerEvent } = require('../shared/safeLogger');
 
-async function searchEtfInstruments({ query, portfolio = 'etf' }) {
+async function searchEtfInstruments({ query, portfolio = 'etf', appCode = null, preferBrowserSession = false }) {
   const client = new InteractiveBrokersClient({ portfolio });
   const auth = await client.authenticate();
-  if (!auth.ok) {
-    return { ok: false, reason: 'auth_failed', auth };
+
+  if (!auth.ok && !preferBrowserSession) {
+    return {
+      ok: false,
+      query,
+      reason: 'auth_failed',
+      error: auth.error || 'Interactive Brokers authentication failed',
+      auth,
+      log: logBrokerEvent({
+        broker: 'interactive-brokers',
+        operation: 'search_instruments',
+        status: 'auth_failed',
+        summary: { query, message: auth.error || auth.reason || 'authentication failed' },
+        portfolio,
+      }),
+    };
   }
 
   try {
-    const raw = await client.searchContracts(query);
+    const raw = preferBrowserSession
+      ? await searchViaBrowserSession({ query, portfolio, appCode, auth })
+      : await client.searchContracts(query);
     const rows = normalizeSearchResults(raw).filter((row) => isLikelyEtf(row));
     return {
       ok: true,
@@ -27,17 +44,30 @@ async function searchEtfInstruments({ query, portfolio = 'etf' }) {
   } catch (error) {
     return {
       ok: false,
-      reason: 'http_error',
+      reason: preferBrowserSession ? 'browser_session_error' : 'http_error',
       error: error.message,
+      auth,
       log: logBrokerEvent({
         broker: 'interactive-brokers',
         operation: 'search_instruments',
-        status: 'http_error',
+        status: preferBrowserSession ? 'browser_session_error' : 'http_error',
         summary: { query, message: error.message },
         portfolio,
       }),
     };
   }
+}
+
+async function searchViaBrowserSession({ query, portfolio, appCode, auth }) {
+  if (!appCode) {
+    throw new Error('Interactive Brokers browser-session search requires appCode');
+  }
+  const browserClient = new InteractiveBrokersBrowserSessionClient({ portfolio });
+  const response = await browserClient.searchContracts(query, appCode);
+  if (!response.ok) {
+    throw new Error(`IBKR browser-session search failed (${response.status}): ${response.text}`);
+  }
+  return response.json;
 }
 
 function normalizeSearchResults(raw) {
