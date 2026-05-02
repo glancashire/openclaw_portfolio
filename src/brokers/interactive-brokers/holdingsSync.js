@@ -47,10 +47,22 @@ function firstAccountId(accounts) {
 }
 
 function extractCashChf(ledger) {
-  if (!ledger || typeof ledger !== 'object') return 0;
+  if (!ledger) return 0;
+
+  if (Array.isArray(ledger)) {
+    const preferred = ['TotalCashValue', 'SettledCash', 'CashBalance', 'AvailableFunds', 'NetLiquidation'];
+    for (const tag of preferred) {
+      const row = ledger.find((entry) => entry && entry.currency === 'CHF' && entry.tag === tag);
+      const value = Number(row?.value);
+      if (Number.isFinite(value)) return value;
+    }
+    return 0;
+  }
+
+  if (typeof ledger !== 'object') return 0;
   const chf = ledger.CHF || ledger.chf || null;
   if (chf && typeof chf === 'object') {
-    const candidates = [chf.cashbalance, chf.cashBalance, chf.settledcash, chf.settledCash, chf.netliquidationvalue, chf.netLiquidationValue];
+    const candidates = [chf.cashbalance, chf.cashBalance, chf.settledcash, chf.settledCash, chf.totalcashvalue, chf.totalCashValue, chf.availablefunds, chf.availableFunds, chf.netliquidationvalue, chf.netLiquidationValue];
     for (const candidate of candidates) {
       const value = Number(candidate);
       if (Number.isFinite(value)) return value;

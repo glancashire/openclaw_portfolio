@@ -17,6 +17,8 @@
 13. Weekly/monthly/quarterly Markdown report generation with PDF placeholder export
 14. Safety-control checks for draft/live-readiness review
 15. Interactive Brokers-only repo narrowing and holdings-sync decoupling from the removed IG path
+16. Native Interactive Brokers read-only connectivity, live holdings sync, and live-priced dry-run proposal refresh for the ETF portfolio
+17. ETF portfolio moved from draft to active while remaining confirmation-gated and read-only
 
 ## Current repository capabilities
 
@@ -53,27 +55,32 @@ Implement a proper shortlist workflow that:
 
 Status: partially complete — shortlist generation and ranking now exist via `scripts/suggest-etf-shortlist.js`; automatic write-back to `Approved Instruments` still remains intentionally manual/approval-gated.
 
-### Phase 17 — Dry-run order generation refinement
+### Phase 18 — Dry-run order generation refinement
 Improve order-prep logic so it:
 - converts asset-class proposals into instrument-level draft orders
 - uses broker-aware pricing/quotes when available
 - handles residual cash and minimum-trade-size constraints explicitly
 - keeps all execution paths confirmation-gated by default
 
-### Phase 18 — Read-only broker connectivity deepening
+Current state:
+- instrument-level proposal sizing is working for the ETF portfolio
+- Interactive Brokers-backed pricing is now being used for EMUAA and UBSSLI in the current dry-run proposal set
+- the current plan still leaves residual tradable cash after whole-share sizing and keeps the defensive CHF cash sleeve explicit
+- proposal refreshes still append duplicate proposal rows instead of superseding an earlier dry-run plan snapshot
+
+### Phase 19 — Read-only broker connectivity hardening and execution-surface completion
 Advance broker integration by:
-- replacing the fragile Client Portal cookie/session path with a native TWS / IB Gateway socket API transport
-- hardening Interactive Brokers holdings/account normalization
-- stabilizing the subset of native API functions that already authenticate/connect successfully
-- fixing contract search so approved ETF symbols resolve to usable conids in the live native session
-- adding durable Interactive Brokers latest-price support only after native readiness is consistently green again
+- keeping the native TWS / IB Gateway socket API path as the primary transport
+- hardening Interactive Brokers holdings/account normalization and quote retrieval
+- making contract lookup and latest-price retrieval durable across the approved ETF universe
+- implementing the remaining order-surface depth needed for quote, submit, status, and cancel flows while preserving read-only/dry-run safety by default
 - keeping dry-run/live gating explicit and testable
 
 Current state:
-- native client code exists and dry-run live-priced proposal code paths are wired
-- current readiness check returns `native_error`, so broker-backed pricing falls back to draft assumptions
-- conid resolution for the current approved ETF symbols (`CSPX`, `EMUAA`, `UBSSLI`) returns zero matches via the native search path
-- therefore the safe portfolio state remains simulated holdings + draft pricing until native search/pricing is repaired
+- native client code exists and the readiness check is green again
+- live read-only holdings sync succeeds for account `U25624150`
+- the ETF portfolio is active, but execution remains `require_confirmation` and broker use remains read-only
+- safe MVP state is now live-read-only + dry-run proposals, not simulated holdings
 
 ## Current command surface
 

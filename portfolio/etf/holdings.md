@@ -1,8 +1,8 @@
-# Holdings: ETF
+# Holdings: etf
 
 ## Last Sync
-- Date/time: 2026-04-28 18:02:00
-- Source: simulated
+- Date/time: 2026-05-02 10:20:02
+- Source: broker_api
 - Broker: interactive-brokers
 - Base currency: CHF
 - Total value CHF: 5000
@@ -13,6 +13,7 @@
 | Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | Allocation % | Target % | Drift % |
 |---|---|---|---:|---:|---|---:|---:|---:|---:|---:|
 
+
 ## Cash
 | Currency | Amount | FX rate to CHF | Value CHF |
 |---|---:|---:|---:|
@@ -21,6 +22,6 @@
 ## Data Quality
 - All holdings matched to approved instruments: yes
 - Unmatched holdings: none
-- Pricing source: simulated
+- Pricing source: broker_api
 - Warnings:
- - Starting dry-run state: portfolio funded with CHF cash and no holdings yet.
+ - No holdings yet.

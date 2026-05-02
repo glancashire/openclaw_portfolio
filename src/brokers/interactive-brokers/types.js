@@ -11,16 +11,23 @@ function normaliseAccount(raw = {}) {
 }
 
 function normaliseHolding(raw = {}) {
+  const contract = raw.contract || raw.summary || {};
+  const symbol = raw.symbol || contract.symbol || contract.localSymbol || null;
+  const conid = raw.conid || contract.conId || null;
+  const quantity = Number(raw.position ?? raw.quantity ?? 0);
+  const price = Number(raw.mktPrice ?? raw.price ?? raw.marketPrice ?? 0);
+  const marketValue = Number(raw.mktValue ?? raw.marketValue ?? (Number.isFinite(price) ? price * quantity : 0));
+
   return {
     broker: 'interactive-brokers',
-    identifier: raw.conid || raw.isin || raw.symbol || null,
-    ticker: raw.symbol || null,
+    identifier: conid || raw.isin || symbol || null,
+    ticker: symbol,
     isin: raw.isin || null,
-    name: raw.description || raw.name || raw.contractDesc || null,
-    quantity: Number(raw.position ?? raw.quantity ?? 0),
-    price: Number(raw.mktPrice ?? raw.price ?? 0),
-    currency: raw.currency || 'CHF',
-    marketValue: Number(raw.mktValue ?? raw.marketValue ?? 0),
+    name: raw.description || raw.name || raw.contractDesc || contract.description || contract.localSymbol || symbol || null,
+    quantity,
+    price,
+    currency: raw.currency || contract.currency || 'CHF',
+    marketValue,
     raw,
   };
 }

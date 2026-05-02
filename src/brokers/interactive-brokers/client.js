@@ -182,6 +182,54 @@ class InteractiveBrokersClient {
     if (!accountId) throw new Error('fetchPositions requires accountId');
     return this.request(`/portfolio/${encodeURIComponent(accountId)}/positions/0`);
   }
+
+  assertWritable(action = 'broker write') {
+    if (this.config.readonly) {
+      throw new Error(`Interactive Brokers is configured readonly=true; refusing ${action}`);
+    }
+  }
+
+  async getOrderQuote(order) {
+    this.assertWritable('order quote');
+    return {
+      ok: false,
+      reason: 'not_implemented',
+      message: 'Interactive Brokers order quoting is not implemented yet.',
+      order,
+    };
+  }
+
+  async placeOrder(order, { dryRun = true } = {}) {
+    if (dryRun !== true) this.assertWritable('live order placement');
+    return {
+      ok: false,
+      reason: 'not_implemented',
+      dryRun,
+      message: dryRun
+        ? 'Interactive Brokers dry-run order placement is not implemented yet.'
+        : 'Interactive Brokers live order placement is not implemented yet.',
+      order,
+    };
+  }
+
+  async getOrderStatus(orderId) {
+    return {
+      ok: false,
+      reason: 'not_implemented',
+      message: 'Interactive Brokers order status lookup is not implemented yet.',
+      orderId,
+    };
+  }
+
+  async cancelOrder(orderId) {
+    this.assertWritable('order cancellation');
+    return {
+      ok: false,
+      reason: 'not_implemented',
+      message: 'Interactive Brokers order cancellation is not implemented yet.',
+      orderId,
+    };
+  }
 }
 
 function safeJson(text) {

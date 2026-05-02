@@ -38,7 +38,7 @@ All CLIs support connection overrides using flags or env vars.
 Environment variables:
 
 - `IBKR_HOST` (default `127.0.0.1`)
-- `IBKR_PORT` (default `7497`)
+- `IBKR_PORT` (default `4001`)
 - `IBKR_CLIENT_ID` (default `1`)
 - `IBKR_ACCOUNT` (optional)
 

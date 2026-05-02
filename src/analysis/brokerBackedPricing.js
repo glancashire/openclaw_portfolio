@@ -31,7 +31,8 @@ async function estimateOrderSizeWithBrokerFallback({ instrument, estimatedChf, p
 
 function estimateFromBrokerQuote({ instrument, estimatedChf, brokerQuote }) {
   if (!brokerQuote?.ok) return null;
-  const limitPrice = Number(brokerQuote.ask ?? brokerQuote.price ?? brokerQuote.last);
+  const candidatePrice = brokerQuote.ask || brokerQuote.price || brokerQuote.last;
+  const limitPrice = Number(candidatePrice);
   if (!Number.isFinite(limitPrice) || limitPrice <= 0) return null;
 
   const currency = brokerQuote.currency || instrument.currency || 'CHF';

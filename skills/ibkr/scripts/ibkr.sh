@@ -2,10 +2,21 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 CLI="$SCRIPT_DIR/ibkr_cli.py"
+VENV_PYTHON="$SKILL_DIR/.venv/bin/python"
+PYTHON_BIN="${IBKR_PYTHON:-}"
+
+if [[ -z "$PYTHON_BIN" ]]; then
+  if [[ -x "$VENV_PYTHON" ]]; then
+    PYTHON_BIN="$VENV_PYTHON"
+  else
+    PYTHON_BIN="python3"
+  fi
+fi
 
 if [[ $# -eq 0 ]]; then
-  cat <<'EOF'
+  cat <<EOF
 Usage: ibkr.sh <command> [args]
 
 Commands:
@@ -23,6 +34,9 @@ Commands:
   contract-details     lookup contract metadata
   scanner              run scanner query
 
+Python:
+  $PYTHON_BIN
+
 Examples:
   ibkr.sh account --account DU123456
   ibkr.sh quote --symbol AAPL --sec-type STK --market-data-type 3
@@ -35,13 +49,17 @@ fi
 cmd="$1"
 shift
 
+run_cli() {
+  "$PYTHON_BIN" "$CLI" "$@"
+}
+
 case "$cmd" in
   account)
-    python3 "$CLI" account-summary "$@"
-    python3 "$CLI" positions "$@"
+    run_cli account-summary "$@"
+    run_cli positions "$@"
     ;;
   account-summary|positions|portfolio|pnl|quote|historical|place-order|cancel-order|open-orders|executions|contract-details|scanner)
-    python3 "$CLI" "$cmd" "$@"
+    run_cli "$cmd" "$@"
     ;;
   *)
     echo "Unknown command: $cmd" >&2

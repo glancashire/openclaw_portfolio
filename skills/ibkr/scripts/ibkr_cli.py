@@ -10,7 +10,7 @@ This CLI supports common TWS/Gateway API workflows:
 
 Connection defaults can be overridden via env vars:
 - IBKR_HOST (default: 127.0.0.1)
-- IBKR_PORT (default: 7497)
+- IBKR_PORT (default: 4001)
 - IBKR_CLIENT_ID (default: 1)
 - IBKR_ACCOUNT (optional)
 """
@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import socket
 import sys
 from dataclasses import dataclass
 from typing import Any, Iterable, Optional
@@ -97,14 +98,25 @@ def create_connection_config(args: argparse.Namespace) -> ConnectionConfig:
 
 def connect_ib(config: ConnectionConfig) -> Any:
     ib = IB()
-    ib.connect(
-        host=config.host,
-        port=config.port,
-        clientId=config.client_id,
-        timeout=config.timeout,
-        readonly=config.readonly,
-        account=config.account or "",
-    )
+    try:
+        ib.connect(
+            host=config.host,
+            port=config.port,
+            clientId=config.client_id,
+            timeout=config.timeout,
+            readonly=config.readonly,
+            account=config.account or "",
+        )
+    except (ConnectionRefusedError, socket.timeout, TimeoutError, OSError) as exc:
+        host = config.host
+        port = config.port
+        raise RuntimeError(
+            "Unable to reach Interactive Brokers API at "
+            f"{host}:{port}. TWS or IB Gateway does not appear to be running or API access is disabled. "
+            "If you do not have access to TWS/IB Gateway on this machine, you will need a reachable IBKR API host/port. "
+            "You can override defaults with --host/--port or IBKR_HOST/IBKR_PORT. "
+            f"Original error: {exc}"
+        ) from exc
     return ib
 
 
@@ -217,7 +229,7 @@ def wait_for_terminal_status(ib: Any, trade: Trade, wait_seconds: float) -> None
 
 def add_shared_connection_flags(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--host", default=os.getenv("IBKR_HOST", "127.0.0.1"))
-    parser.add_argument("--port", type=int, default=int(os.getenv("IBKR_PORT", "7497")))
+    parser.add_argument("--port", type=int, default=int(os.getenv("IBKR_PORT", "4001")))
     parser.add_argument("--client-id", type=int, default=int(os.getenv("IBKR_CLIENT_ID", "1")))
     parser.add_argument("--account", default=os.getenv("IBKR_ACCOUNT", ""))
     parser.add_argument("--readonly", action="store_true", help="Request read-only mode")
