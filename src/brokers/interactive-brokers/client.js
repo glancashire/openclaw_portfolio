@@ -1,5 +1,6 @@
 const { loadInteractiveBrokersConfig, validateInteractiveBrokersConfig } = require('./config');
 const { logBrokerEvent } = require('../shared/safeLogger');
+const { normaliseOrder, normaliseOrderQuote, normaliseCancelResult } = require('./types');
 const { InteractiveBrokersNativeClient } = require('./nativeClient');
 const { InteractiveBrokersSkillClient } = require('./skillClient');
 
@@ -190,45 +191,263 @@ class InteractiveBrokersClient {
   }
 
   async getOrderQuote(order) {
-    this.assertWritable('order quote');
-    return {
-      ok: false,
-      reason: 'not_implemented',
-      message: 'Interactive Brokers order quoting is not implemented yet.',
-      order,
-    };
+    const contract = resolveOrderContract(order);
+    try {
+      const snapshot = await this.fetchMarketSnapshot([contract.conid]);
+      const first = Array.isArray(snapshot) ? snapshot[0] : snapshot;
+      const bid = asNumber(first?.['84']);
+      const ask = asNumber(first?.['86']);
+      const last = asNumber(first?.['31']);
+      const currency = first?.['85'] || contract.currency || 'CHF';
+      const referencePrice = preferredReferencePrice({ bid, ask, last, action: order?.action });
+      const quantity = Number(order?.quantity || 0);
+      const estimatedValue = Number.isFinite(referencePrice) ? Number((referencePrice * quantity).toFixed(2)) : null;
+      const quote = normaliseOrderQuote({
+        ok: true,
+        identifier: contract.conid || contract.symbol,
+        symbol: contract.symbol || null,
+        currency,
+        action: order?.action || null,
+        orderType: order?.orderType || 'LMT',
+        quantity,
+        referencePrice,
+        bid,
+        ask,
+        last,
+        estimatedValue,
+        priceSource: 'interactive-brokers-marketdata',
+        warning: !Number.isFinite(referencePrice) ? 'No positive quote reference price available.' : null,
+      });
+      return {
+        ok: true,
+        quote,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'get_order_quote',
+          status: 'ok',
+          summary: {
+            identifier: quote.identifier,
+            quantity: quote.quantity,
+            referencePrice: quote.referencePrice,
+            estimatedValue: quote.estimatedValue,
+            currency: quote.currency,
+          },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        reason: 'quote_error',
+        error: error.message,
+        order,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'get_order_quote',
+          status: 'quote_error',
+          summary: { message: error.message, identifier: contract.conid || contract.symbol || null },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    }
   }
 
-  async placeOrder(order, { dryRun = true } = {}) {
+  async placeOrder(order, { dryRun = true, revocableOnly = true } = {}) {
     if (dryRun !== true) this.assertWritable('live order placement');
-    return {
-      ok: false,
-      reason: 'not_implemented',
-      dryRun,
-      message: dryRun
-        ? 'Interactive Brokers dry-run order placement is not implemented yet.'
-        : 'Interactive Brokers live order placement is not implemented yet.',
-      order,
-    };
+    const quoteResult = await this.getOrderQuote(order);
+    if (dryRun === true) {
+      const preview = normaliseOrder({
+        orderId: null,
+        status: quoteResult.ok ? 'simulated' : 'quote_unavailable',
+        action: order?.action || null,
+        identifier: order?.conid || order?.symbol || null,
+        symbol: order?.symbol || null,
+        quantity: order?.quantity || 0,
+        limitPrice: order?.limitPrice || quoteResult.quote?.referencePrice || null,
+        estimatedValue: quoteResult.quote?.estimatedValue || 0,
+        currency: quoteResult.quote?.currency || order?.currency || 'CHF',
+        transmit: false,
+      });
+      return {
+        ok: true,
+        dryRun: true,
+        order: preview,
+        quote: quoteResult.quote || null,
+        message: 'Interactive Brokers dry-run order preview generated; no broker write attempted.',
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'place_order',
+          status: 'dry_run',
+          summary: {
+            identifier: preview.identifier,
+            action: preview.action,
+            quantity: preview.quantity,
+            estimatedValue: preview.estimatedValue,
+            currency: preview.currency,
+          },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    }
+
+    if (!revocableOnly) {
+      return {
+        ok: false,
+        reason: 'policy_blocked',
+        message: 'Non-revocable live order paths are blocked by policy.',
+        order,
+      };
+    }
+    if (!this.skill || typeof this.skill.placeOrder !== 'function') {
+      return {
+        ok: false,
+        reason: 'not_available',
+        message: 'Revocable non-transmitted live submission scaffold is only available via the skill-backed client right now.',
+        order,
+      };
+    }
+    const action = String(order?.action || '').toUpperCase();
+    const orderType = String(order?.orderType || 'LMT').toUpperCase();
+    if (action === 'BUY' && orderType === 'MKT') {
+      return {
+        ok: false,
+        reason: 'policy_blocked',
+        message: 'Market buy orders are blocked; use a revocable limit-style path only.',
+        order,
+      };
+    }
+    try {
+      const placed = await this.skill.placeOrder(order, { transmit: false });
+      return {
+        ok: true,
+        dryRun: false,
+        submitted: false,
+        order: normaliseOrder(placed.trade || {}),
+        brokerErrors: placed.errors || [],
+        quote: quoteResult.quote || null,
+        message: 'Interactive Brokers non-transmitted order scaffold created; order was not transmitted.',
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'place_order',
+          status: 'staged_not_transmitted',
+          summary: {
+            symbol: order?.symbol || null,
+            action,
+            quantity: Number(order?.quantity || 0),
+            orderType,
+          },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        reason: 'submit_error',
+        error: error.message,
+        order,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'place_order',
+          status: 'submit_error',
+          summary: { message: error.message, symbol: order?.symbol || null },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    }
   }
 
   async getOrderStatus(orderId) {
-    return {
-      ok: false,
-      reason: 'not_implemented',
-      message: 'Interactive Brokers order status lookup is not implemented yet.',
-      orderId,
-    };
+    const reader = this.native && typeof this.native.fetchOpenOrders === 'function'
+      ? this.native
+      : this.skill && typeof this.skill.fetchOpenOrders === 'function'
+        ? this.skill
+        : null;
+    if (!reader) {
+      return {
+        ok: false,
+        reason: 'not_available',
+        message: 'Interactive Brokers open-order status lookup is not available for the current broker client mode.',
+        orderId,
+      };
+    }
+    try {
+      const orders = await reader.fetchOpenOrders();
+      const match = orders.find((row) => String(row.orderId) === String(orderId));
+      if (!match) {
+        return {
+          ok: false,
+          reason: 'not_found',
+          orderId,
+          message: 'No matching open order found.',
+        };
+      }
+      return {
+        ok: true,
+        order: normaliseOrder(match),
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'get_order_status',
+          status: 'ok',
+          summary: { orderId: match.orderId, status: match.status, symbol: match.symbol || null },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        reason: 'status_error',
+        error: error.message,
+        orderId,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'get_order_status',
+          status: 'status_error',
+          summary: { orderId, message: error.message },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    }
   }
 
   async cancelOrder(orderId) {
     this.assertWritable('order cancellation');
-    return {
-      ok: false,
-      reason: 'not_implemented',
-      message: 'Interactive Brokers order cancellation is not implemented yet.',
-      orderId,
-    };
+    if (!this.skill || typeof this.skill.cancelOrder !== 'function') {
+      return {
+        ok: false,
+        reason: 'not_available',
+        message: 'Interactive Brokers order cancellation is only available via the skill-backed client right now.',
+        orderId,
+      };
+    }
+    try {
+      const result = await this.skill.cancelOrder(orderId);
+      const cancel = normaliseCancelResult(result);
+      return {
+        ok: true,
+        cancel,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'cancel_order',
+          status: 'ok',
+          summary: { orderId: cancel.orderId, status: cancel.status },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        reason: 'cancel_error',
+        error: error.message,
+        orderId,
+        log: logBrokerEvent({
+          broker: 'interactive-brokers',
+          operation: 'cancel_order',
+          status: 'cancel_error',
+          summary: { orderId, message: error.message },
+          portfolio: this.options.portfolio,
+        }),
+      };
+    }
   }
 }
 
@@ -253,6 +472,33 @@ function blocked(reason, missing, portfolio) {
       portfolio,
     }),
   };
+}
+
+function resolveOrderContract(order = {}) {
+  return {
+    conid: order.conid || order.ibkrConid || order.identifier || null,
+    symbol: order.symbol || order.ticker || null,
+    currency: order.currency || null,
+  };
+}
+
+function asNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function preferredReferencePrice({ bid, ask, last, action }) {
+  const normalizedAction = String(action || '').toUpperCase();
+  if (normalizedAction === 'BUY') return firstPositive([ask, last, bid]);
+  if (normalizedAction === 'SELL') return firstPositive([bid, last, ask]);
+  return firstPositive([last, ask, bid]);
+}
+
+function firstPositive(values) {
+  for (const value of values) {
+    if (Number.isFinite(value) && value > 0) return value;
+  }
+  return null;
 }
 
 module.exports = { InteractiveBrokersClient };

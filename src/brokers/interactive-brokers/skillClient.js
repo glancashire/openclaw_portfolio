@@ -100,6 +100,54 @@ class InteractiveBrokersSkillClient {
     return out;
   }
 
+  async fetchOpenOrders() {
+    const result = await this.run(['open-orders', '--json']);
+    if (!result.ok) throw new Error(result.error);
+    return Array.isArray(result.data) ? result.data : [];
+  }
+
+  async placeOrder(order, { transmit = true } = {}) {
+    const args = [
+      'place-order',
+      '--symbol', String(order.symbol),
+      '--sec-type', String(order.secType || 'STK'),
+      '--exchange', String(order.exchange || 'SMART'),
+      '--currency', String(order.currency || 'USD'),
+      '--action', String(order.action || 'BUY').toUpperCase(),
+      '--quantity', String(order.quantity),
+      '--order-type', String(order.orderType || 'LMT').toUpperCase(),
+      '--json',
+    ];
+    if (order.primaryExchange) args.push('--primary-exchange', String(order.primaryExchange));
+    if (order.limitPrice != null) args.push('--limit-price', String(order.limitPrice));
+    if (order.stopPrice != null) args.push('--stop-price', String(order.stopPrice));
+    if (order.tif) args.push('--tif', String(order.tif));
+    if (order.outsideRth) args.push('--outside-rth');
+    if (transmit === false) args.push('--no-transmit');
+    const result = await this.run(args);
+    if (!result.ok) throw new Error(result.error);
+    const row = result.data?.trade || null;
+    return {
+      ok: true,
+      trade: row,
+      errors: Array.isArray(result.data?.errors) ? result.data.errors : [],
+      raw: result.data,
+    };
+  }
+
+  async cancelOrder(orderId) {
+    const result = await this.run(['cancel-order', '--order-id', String(orderId), '--json']);
+    if (!result.ok) throw new Error(result.error);
+    const row = Array.isArray(result.data) ? result.data[0] : null;
+    return {
+      ok: true,
+      orderId: row?.orderId ?? Number(orderId),
+      status: row?.status || 'cancel_requested',
+      message: 'Interactive Brokers cancel request sent.',
+      raw: row,
+    };
+  }
+
   run(args) {
     return new Promise((resolve) => {
       const baseArgs = [this.cliPath, ...args, '--host', this.config.host, '--port', String(this.config.port), '--client-id', String(this.config.clientId)];

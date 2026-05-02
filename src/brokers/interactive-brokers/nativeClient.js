@@ -44,6 +44,13 @@ class InteractiveBrokersNativeClient {
     });
   }
 
+  async fetchOpenOrders() {
+    return this.withApi(async ({ api, connected }) => {
+      await connected;
+      return waitForOpenOrders(api);
+    });
+  }
+
   async searchContracts(query) {
     return this.withApi(async ({ api, connected }) => {
       await connected;
@@ -98,6 +105,55 @@ function waitForManagedAccounts(api) {
     api.on(EventName.managedAccounts, onManaged);
     api.on(EventName.error, onError);
     api.reqManagedAccts();
+  });
+}
+
+function waitForOpenOrders(api) {
+  return new Promise((resolve, reject) => {
+    const rows = [];
+    const seen = new Set();
+    const onOpenOrder = (orderId, contract, order, orderState) => {
+      const key = String(orderId);
+      if (seen.has(key)) return;
+      seen.add(key);
+      rows.push({
+        orderId,
+        permId: order?.permId ?? null,
+        symbol: contract?.symbol || null,
+        secType: contract?.secType || null,
+        action: order?.action || null,
+        orderType: order?.orderType || null,
+        quantity: Number(order?.totalQuantity ?? 0),
+        status: orderState?.status || null,
+        filled: 0,
+        remaining: Number(order?.totalQuantity ?? 0),
+        limitPrice: Number.isFinite(Number(order?.lmtPrice)) ? Number(order.lmtPrice) : null,
+        stopPrice: Number.isFinite(Number(order?.auxPrice)) ? Number(order.auxPrice) : null,
+      });
+    };
+    const onEnd = () => {
+      cleanup();
+      resolve(rows);
+    };
+    const onError = (err, code, reqId) => {
+      if (isIgnorableCode(code)) return;
+      cleanup();
+      reject(normalizeError(err, code, reqId));
+    };
+    const cleanup = () => {
+      clearTimeout(timer);
+      api.off(EventName.openOrder, onOpenOrder);
+      api.off(EventName.openOrderEnd, onEnd);
+      api.off(EventName.error, onError);
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      resolve(rows);
+    }, 15000);
+    api.on(EventName.openOrder, onOpenOrder);
+    api.on(EventName.openOrderEnd, onEnd);
+    api.on(EventName.error, onError);
+    api.reqOpenOrders();
   });
 }
 

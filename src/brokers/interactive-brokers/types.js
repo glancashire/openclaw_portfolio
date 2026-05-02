@@ -36,14 +36,61 @@ function normaliseOrder(raw = {}) {
   return {
     broker: 'interactive-brokers',
     orderId: raw.orderId || raw.id || null,
+    permId: raw.permId || null,
     status: raw.status || null,
     action: raw.side || raw.action || null,
-    identifier: raw.conid || raw.identifier || null,
+    identifier: raw.conid || raw.identifier || raw.symbol || null,
+    symbol: raw.symbol || null,
+    secType: raw.secType || null,
     quantity: Number(raw.quantity ?? raw.size ?? 0),
+    filled: Number(raw.filled ?? 0),
+    remaining: Number(raw.remaining ?? 0),
+    limitPrice: numberOrNull(raw.limitPrice),
+    stopPrice: numberOrNull(raw.stopPrice),
+    avgFillPrice: numberOrNull(raw.avgFillPrice),
+    lastFillPrice: numberOrNull(raw.lastFillPrice),
     estimatedValue: Number(raw.estimatedValue ?? raw.amount ?? 0),
     currency: raw.currency || 'CHF',
+    transmit: raw.transmit === false ? false : true,
     raw,
   };
 }
 
-module.exports = { normaliseAccount, normaliseHolding, normaliseOrder };
+function normaliseOrderQuote(raw = {}) {
+  return {
+    broker: 'interactive-brokers',
+    ok: raw.ok !== false,
+    identifier: raw.identifier || raw.conid || raw.symbol || null,
+    symbol: raw.symbol || null,
+    currency: raw.currency || 'CHF',
+    action: raw.action || null,
+    orderType: raw.orderType || null,
+    quantity: Number(raw.quantity ?? 0),
+    referencePrice: numberOrNull(raw.referencePrice),
+    bid: numberOrNull(raw.bid),
+    ask: numberOrNull(raw.ask),
+    last: numberOrNull(raw.last),
+    estimatedValue: numberOrNull(raw.estimatedValue),
+    priceSource: raw.priceSource || null,
+    warning: raw.warning || null,
+    raw,
+  };
+}
+
+function normaliseCancelResult(raw = {}) {
+  return {
+    broker: 'interactive-brokers',
+    ok: raw.ok !== false,
+    orderId: raw.orderId || null,
+    status: raw.status || null,
+    message: raw.message || null,
+    raw,
+  };
+}
+
+function numberOrNull(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+module.exports = { normaliseAccount, normaliseHolding, normaliseOrder, normaliseOrderQuote, normaliseCancelResult };

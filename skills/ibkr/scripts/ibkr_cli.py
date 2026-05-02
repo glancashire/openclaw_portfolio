@@ -438,6 +438,8 @@ def build_order(args: argparse.Namespace) -> Any:
         order.outsideRth = True
     if args.account:
         order.account = args.account
+    if getattr(args, 'no_transmit', False):
+        order.transmit = False
 
     return order
 
@@ -480,6 +482,9 @@ def cmd_place_order(args: argparse.Namespace) -> int:
             "remaining": trade.orderStatus.remaining,
             "avgFillPrice": trade.orderStatus.avgFillPrice,
             "lastFillPrice": trade.orderStatus.lastFillPrice,
+            "limitPrice": getattr(trade.order, 'lmtPrice', None),
+            "stopPrice": getattr(trade.order, 'auxPrice', None),
+            "transmit": getattr(trade.order, 'transmit', True),
         }
 
         if args.json:
@@ -682,6 +687,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--tif", default="", help="DAY, GTC, IOC, FOK, OPG, etc")
     p.add_argument("--outside-rth", action="store_true")
     p.add_argument("--wait", type=float, default=8.0, help="Seconds to wait for terminal status")
+    p.add_argument("--no-transmit", action="store_true", help="Create the order locally at IBKR without transmitting it")
     p.set_defaults(func=cmd_place_order)
 
     p = sub.add_parser("cancel-order", help="Cancel an open order by order id")
