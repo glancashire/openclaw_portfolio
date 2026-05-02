@@ -34,14 +34,15 @@
 - Analyze allocation drift from current holdings
 - Propose dry-run trades from underweight allocations and available cash
 - Propose instrument-level dry-run trades from approved instruments
-- Write trade proposals into append-only trade logs
+- Write trade proposals into append-only trade logs with latest-plan supersession support
 - Regenerate dashboards from current portfolio state
 - Append history snapshots
-- Run weekly/monthly/quarterly report cycles and emit Markdown + PDF placeholder outputs
+- Run weekly/monthly/quarterly report cycles and emit Markdown + PDF outputs
 
 ### Broker scaffolding
 - Interactive Brokers adapter/auth/read-only test scaffolding
 - Interactive Brokers holdings sync with ledger-aware CHF cash extraction
+- Normalized broker-backed order quote, dry-run preview, open-order status lookup, and cancel-path scaffolding
 - Safe config checks for broker secrets presence without exposing them
 
 ## Next phases
@@ -66,7 +67,7 @@ Current state:
 - instrument-level proposal sizing is working for the ETF portfolio
 - Interactive Brokers-backed pricing is now being used for EMUAA and UBSSLI in the current dry-run proposal set
 - the current plan still leaves residual tradable cash after whole-share sizing and keeps the defensive CHF cash sleeve explicit
-- proposal refreshes still append duplicate proposal rows instead of superseding an earlier dry-run plan snapshot
+- the latest dry-run proposal era now supersedes equivalent older pending proposal rows so the current plan is cleaner to review
 
 ### Phase 19 — Read-only broker connectivity hardening and execution-surface completion
 Advance broker integration by:
@@ -80,6 +81,7 @@ Current state:
 - native client code exists and the readiness check is green again
 - live read-only holdings sync succeeds for account `U25624150`
 - the ETF portfolio is active, but execution remains `require_confirmation` and broker use remains read-only
+- normalized order quote, dry-run preview, open-order status lookup, and cancel-path scaffolding now exist at the repo broker-client layer
 - safe MVP state is now live-read-only + dry-run proposals, not simulated holdings
 
 ## Current command surface

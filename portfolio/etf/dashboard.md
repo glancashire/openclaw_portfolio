@@ -7,7 +7,7 @@
 - Number of holdings: 0
 - Strategy status: rebalance_needed
 - Last sync: 2026-05-02 10:20:02
-- Last rebalance check: 2026-05-02 10:25:27
+- Last rebalance check: 2026-05-02 20:02:55
 - Broker readiness: Interactive Brokers read-only connectivity is available.
 
 ## Allocation vs Target
@@ -48,4 +48,4 @@
 | 2026-05-02 10:25:27 | buy | UBS SLI ETF (SMI gleichgewichtet) | 942.48 | proposed |
 | 2026-05-02 10:25:27 | buy | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 970.82 | proposed |
 | 2026-05-02 10:25:27 | buy | iShares Core S&P 500 UCITS ETF USD (Acc) | 1620 | proposed |
-| 2026-05-02 10:05:00 | hold | CHF cash balance | 1000 | planned |
+| 2026-05-02 10:05:00 | buy | UBS SLI ETF (SMI gleichgewichtet) | 960 | proposed |

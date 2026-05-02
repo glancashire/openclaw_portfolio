@@ -55,4 +55,5 @@ These examples show how to schedule the portfolio-manager report workflow with O
 - Prefer isolated cron runs so report jobs do not pollute the active chat session.
 - Keep holdings sync/readiness checks separate from report generation if broker connectivity is unstable.
 - Run `node scripts/check-safety-controls.js portfolio/etf` when treating any generated output as execution-relevant.
-- Current IBKR market-data/contract lookup remains blocked, so scheduled reports still rely on simulated pricing assumptions when live pricing is unavailable.
+- The current ETF workflow is live-read-only for holdings/readiness, while execution remains confirmation-gated and broker readonly.
+- Current IBKR market-data coverage is partial, so scheduled reports may still mix broker-backed pricing with fallback assumptions when some instruments lack live pricing.

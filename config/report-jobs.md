@@ -14,6 +14,7 @@ These are the intended report-cycle commands for the portfolio-manager MVP.
 ## Notes
 - Run after holdings refresh when possible.
 - The current implementation appends a history snapshot only when the exact same snapshot row is not already present, regenerates the dashboard with the current IBKR readiness probe, then writes the report.
+- Current production schedule is wired through OpenClaw cron jobs: `portfolio-etf-weekly-report`, `portfolio-etf-monthly-report`, and `portfolio-etf-quarterly-report`.
 - Run `node scripts/check-safety-controls.js portfolio/etf` before treating any report as execution-ready.
 - PDF export now attempts local HTML-to-PDF rendering first and falls back to a placeholder companion file if the renderer/browser runtime is unavailable.
 - See `config/report-cron-examples.md` for OpenClaw cron payload examples that match the current async report-cycle workflow.
