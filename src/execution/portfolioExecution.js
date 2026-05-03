@@ -7,7 +7,9 @@ const { getInteractiveBrokersReadiness } = require('../brokers/interactive-broke
 const { appendTradeProposals } = require('../analysis/tradeLogWriter');
 const { appendHistorySnapshot } = require('../analysis/historyWriter');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
+const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-brokers/holdingsSync');
 const { markTradeApproved, reconcileOrderStatus, appendTradeEvent } = require('./tradeState');
+const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
 
 function parsePortfolioStatus(text) {
   return captureLine(text, 'Status');
@@ -91,8 +93,10 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const context = buildPolicyContext({ portfolioPath, holdingsPath });
-  const readiness = await getInteractiveBrokersReadiness({ portfolio: path.basename(portfolioDir) });
+  const portfolioName = path.basename(portfolioDir);
+  const readiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const instrument = approvedInstrumentForOrder(order, context.approvedInstruments);
+  const errorState = brokerErrorStatus(portfolioName);
 
   const blockers = [];
   if (!instrument) blockers.push('Requested instrument is not in Approved Instruments.');
@@ -107,6 +111,7 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
   if (context.holdingsHealth.hasUnmatched) blockers.push(`Holdings contain unmatched instruments: ${context.holdingsHealth.unmatched}`);
   if (context.holdingsHealth.simulatedPricing) blockers.push('Holdings still use simulated pricing.');
   if (live && !readiness.authenticated) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
+  if (live && errorState.stopAutomation) blockers.push(`Broker automation is paused after ${errorState.consecutive} consecutive broker errors.`);
   for (const blocker of context.safetyBlockers) blockers.push(blocker.message);
 
   return {
@@ -120,6 +125,7 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
       executionMode: context.executionMode,
       accountReference: context.accountReference,
       holdingsHealth: context.holdingsHealth,
+      errorState,
     },
   };
 }
@@ -169,14 +175,21 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
   const brokerResult = await client.placeOrder(order, { dryRun, revocableOnly });
   if (!brokerResult.ok) {
+    const errorState = recordBrokerError({
+      portfolio: path.basename(portfolioDir),
+      reason: brokerResult.reason || 'broker_error',
+      message: brokerResult.error || brokerResult.message || 'Broker order staging failed.',
+    });
     return {
       ok: false,
       reason: brokerResult.reason || 'broker_error',
       error: brokerResult.error || brokerResult.message || 'Broker order staging failed.',
       policy,
       brokerResult,
+      errorState,
     };
   }
++  clearBrokerErrors(path.basename(portfolioDir));
 
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
@@ -209,24 +222,70 @@ async function approvePortfolioTrade({ portfolioDir, selector, approval = 'user_
   return { ok: result.updated > 0, ...result };
 }
 
-async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, reasonNote = '' }) {
-  const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
+async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, reasonNote = '', refreshHoldingsOnFill = true }) {
+  const portfolioName = path.basename(portfolioDir);
+  const client = new InteractiveBrokersClient({ portfolio: portfolioName });
   const statusResult = await client.getOrderStatus(orderId);
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const historyPath = path.join(portfolioDir, 'history.md');
+  const holdingsPath = path.join(portfolioDir, 'holdings.md');
+
   if (!statusResult.ok) {
+    const knownMissing = statusResult.reason === 'not_found';
+    const errorState = knownMissing
+      ? null
+      : recordBrokerError({
+          portfolio: portfolioName,
+          reason: statusResult.reason || 'status_error',
+          message: statusResult.error || statusResult.message || 'Unable to fetch broker order status.',
+        });
+
+    if (knownMissing) {
+      const reconcile = reconcileOrderStatus(
+        tradesPath,
+        { ...selector, orderId },
+        { orderId, status: 'not_found', notFound: true },
+        { reasonNote: reasonNote || 'Broker order status lookup returned not_found.' }
+      );
+      if (reconcile.updated > 0) {
+        appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: not_found`);
+        await regenerateDashboard(portfolioDir);
+      }
+      return {
+        ok: reconcile.updated > 0,
+        reason: 'not_found',
+        statusResult,
+        reconcile,
+      };
+    }
+
     return {
       ok: false,
       reason: statusResult.reason || 'status_error',
       error: statusResult.error || statusResult.message || 'Unable to fetch broker order status.',
       statusResult,
+      errorState,
     };
   }
 
-  const tradesPath = path.join(portfolioDir, 'trades.md');
-  const historyPath = path.join(portfolioDir, 'history.md');
-  const holdingsPath = path.join(portfolioDir, 'holdings.md');
+  clearBrokerErrors(portfolioName);
   const reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, statusResult.order, { reasonNote });
+  let holdingsSync = null;
+  const mappedStatus = statusResult.order.status || 'submitted';
   if (reconcile.updated > 0) {
-    const mappedStatus = statusResult.order.status || 'submitted';
+    const lowered = String(mappedStatus).toLowerCase();
+    if (refreshHoldingsOnFill && ['filled', 'partially_filled'].includes(lowered)) {
+      holdingsSync = await syncInteractiveBrokersHoldings({ portfolioDir });
+      if (!holdingsSync.ok) {
+        recordBrokerError({
+          portfolio: portfolioName,
+          reason: holdingsSync.reason || holdingsSync.auth?.reason || 'holdings_sync_error',
+          message: holdingsSync.auth?.error || holdingsSync.reason || 'Holdings sync failed after fill reconciliation.',
+        });
+      } else {
+        clearBrokerErrors(portfolioName);
+      }
+    }
     appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: ${mappedStatus}`);
     await regenerateDashboard(portfolioDir);
   }
@@ -235,6 +294,7 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
     ok: reconcile.updated > 0,
     statusResult,
     reconcile,
+    holdingsSync,
   };
 }
 

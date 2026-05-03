@@ -118,12 +118,15 @@ function reconcileOrderStatus(tradesPath, selector, brokerOrder = {}, options = 
 
 function mapBrokerOrderStatus(status, brokerOrder = {}) {
   const raw = String(status || '').trim().toLowerCase();
-  if (!raw) return brokerOrder.orderId ? 'submitted' : 'approved';
+  if (!raw) {
+    if (brokerOrder.notFound === true) return 'failed';
+    return brokerOrder.orderId ? 'submitted' : 'approved';
+  }
   if (['submitted', 'presubmitted', 'api_pending', 'pending_submit', 'pendingcancel'].includes(raw)) return 'submitted';
   if (['partially_filled', 'partial', 'partial_fill'].includes(raw)) return 'partially_filled';
   if (raw === 'filled') return 'filled';
   if (['cancelled', 'canceled', 'cancel_requested', 'pending_cancel'].includes(raw)) return 'cancelled';
-  if (['inactive', 'rejected', 'failed', 'error'].includes(raw)) return 'failed';
+  if (['inactive', 'rejected', 'failed', 'error', 'not_found', 'missing'].includes(raw)) return 'failed';
   if (raw === 'simulated') return 'simulated';
   if (raw === 'quote_unavailable') return 'planned';
   if (Number(brokerOrder.filled || 0) > 0 && Number(brokerOrder.remaining || 0) > 0) return 'partially_filled';
@@ -171,4 +174,5 @@ module.exports = {
   markTradeApproved,
   reconcileOrderStatus,
   mapBrokerOrderStatus,
+  appendReasonNote,
 };
