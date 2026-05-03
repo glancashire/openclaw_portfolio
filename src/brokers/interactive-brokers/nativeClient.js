@@ -1,4 +1,16 @@
-const { IBApi, EventName, IBApiTickType } = require('@stoqey/ib');
+let ibModule = null;
+
+function loadIbModule() {
+  if (!ibModule) {
+    try {
+      ibModule = require('@stoqey/ib');
+    } catch (error) {
+      error.message = `Missing optional native IB dependency @stoqey/ib: ${error.message}`;
+      throw error;
+    }
+  }
+  return ibModule;
+}
 
 class InteractiveBrokersNativeClient {
   constructor(config) {
@@ -72,6 +84,7 @@ class InteractiveBrokersNativeClient {
   }
 
   async withApi(fn) {
+    const { IBApi, EventName } = loadIbModule();
     const api = new IBApi({ host: this.config.host, port: this.config.port });
     const connected = waitForEvent(api, EventName.nextValidId, 10000);
     try {
@@ -95,6 +108,7 @@ function waitForManagedAccounts(api) {
     };
     const cleanup = () => {
       clearTimeout(timer);
+      const { EventName } = loadIbModule();
       api.off(EventName.managedAccounts, onManaged);
       api.off(EventName.error, onError);
     };
@@ -102,6 +116,7 @@ function waitForManagedAccounts(api) {
       cleanup();
       reject(new Error('Timed out waiting for managed accounts'));
     }, 10000);
+    const { EventName } = loadIbModule();
     api.on(EventName.managedAccounts, onManaged);
     api.on(EventName.error, onError);
     api.reqManagedAccts();
@@ -142,6 +157,7 @@ function waitForOpenOrders(api) {
     };
     const cleanup = () => {
       clearTimeout(timer);
+      const { EventName } = loadIbModule();
       api.off(EventName.openOrder, onOpenOrder);
       api.off(EventName.openOrderEnd, onEnd);
       api.off(EventName.error, onError);
@@ -150,6 +166,7 @@ function waitForOpenOrders(api) {
       cleanup();
       resolve(rows);
     }, 15000);
+    const { EventName } = loadIbModule();
     api.on(EventName.openOrder, onOpenOrder);
     api.on(EventName.openOrderEnd, onEnd);
     api.on(EventName.error, onError);
@@ -177,6 +194,7 @@ function waitForPositions(api) {
     const cleanup = () => {
       clearTimeout(timer);
       try { api.cancelPositions(); } catch {}
+      const { EventName } = loadIbModule();
       api.off(EventName.position, onPosition);
       api.off(EventName.positionEnd, onEnd);
       api.off(EventName.error, onError);
@@ -185,6 +203,7 @@ function waitForPositions(api) {
       cleanup();
       resolve(sawPosition ? positions : []);
     }, 15000);
+    const { EventName } = loadIbModule();
     api.on(EventName.position, onPosition);
     api.on(EventName.positionEnd, onEnd);
     api.on(EventName.error, onError);
@@ -215,6 +234,7 @@ function waitForAccountSummary(api, accountGroup) {
     const cleanup = () => {
       clearTimeout(timer);
       try { api.cancelAccountSummary(reqId); } catch {}
+      const { EventName } = loadIbModule();
       api.off(EventName.accountSummary, onSummary);
       api.off(EventName.accountSummaryEnd, onEnd);
       api.off(EventName.error, onError);
@@ -223,6 +243,7 @@ function waitForAccountSummary(api, accountGroup) {
       cleanup();
       resolve(rows);
     }, 15000);
+    const { EventName } = loadIbModule();
     api.on(EventName.accountSummary, onSummary);
     api.on(EventName.accountSummaryEnd, onEnd);
     api.on(EventName.error, onError);
@@ -268,6 +289,7 @@ function waitForContractDetails(api, contract) {
     };
     const cleanup = () => {
       clearTimeout(timer);
+      const { EventName } = loadIbModule();
       api.off(EventName.contractDetails, onDetails);
       api.off(EventName.contractDetailsEnd, onEnd);
       api.off(EventName.error, onError);
@@ -276,6 +298,7 @@ function waitForContractDetails(api, contract) {
       cleanup();
       resolve(rows);
     }, 15000);
+    const { EventName } = loadIbModule();
     api.on(EventName.contractDetails, onDetails);
     api.on(EventName.contractDetailsEnd, onEnd);
     api.on(EventName.error, onError);
@@ -290,6 +313,7 @@ function waitForMarketSnapshot(api, contract) {
     const onTickPrice = (incomingReqId, tickType, price) => {
       if (incomingReqId !== reqId) return;
       if (!Number.isFinite(price) || price <= 0) return;
+      const { IBApiTickType } = loadIbModule();
       if (tickType === IBApiTickType.LAST || tickType === IBApiTickType.DELAYED_LAST) state['31'] = price;
       if (tickType === IBApiTickType.BID || tickType === IBApiTickType.DELAYED_BID) state['84'] = price;
       if (tickType === IBApiTickType.ASK || tickType === IBApiTickType.DELAYED_ASK) state['86'] = price;
@@ -315,6 +339,7 @@ function waitForMarketSnapshot(api, contract) {
     const cleanup = () => {
       clearTimeout(timer);
       try { api.cancelMktData(reqId); } catch {}
+      const { EventName } = loadIbModule();
       api.off(EventName.tickPrice, onTickPrice);
       api.off(EventName.tickString, onTickString);
       api.off(EventName.tickSnapshotEnd, onSnapshotEnd);
@@ -326,6 +351,7 @@ function waitForMarketSnapshot(api, contract) {
       state['85'] = state.currency || null;
       resolve(state);
     }, 15000);
+    const { EventName } = loadIbModule();
     api.on(EventName.tickPrice, onTickPrice);
     api.on(EventName.tickString, onTickString);
     api.on(EventName.tickSnapshotEnd, onSnapshotEnd);
@@ -347,6 +373,7 @@ function waitForEvent(api, eventName, timeoutMs) {
     };
     const cleanup = () => {
       clearTimeout(timer);
+      const { EventName } = loadIbModule();
       api.off(eventName, onEvent);
       api.off(EventName.error, onError);
     };
@@ -354,6 +381,7 @@ function waitForEvent(api, eventName, timeoutMs) {
       cleanup();
       reject(new Error(`Timed out waiting for ${eventName}`));
     }, timeoutMs);
+    const { EventName } = loadIbModule();
     api.on(eventName, onEvent);
     api.on(EventName.error, onError);
   });
