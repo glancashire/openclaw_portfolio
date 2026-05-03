@@ -1,3 +1,18 @@
 .openclaw/
 MEMORY.md
 secrets/
+
+# Local environment / dependencies
+node_modules/
+.env*
+
+# Local assistant memory and tool state
+memory/
+.clawhub/
+
+# Disposable artifacts
+tmp/
+backups/
+
+# Local skill installs / experiments
+skills/ibkr-trader/
