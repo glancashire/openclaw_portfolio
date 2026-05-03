@@ -25,7 +25,7 @@ function proposalDistribution(assetClassProposals, instruments) {
       for (const instrument of weighted) {
         const share = instrument.target / totalTarget;
         const estimatedChf = Number((proposal.estimatedChf * share).toFixed(2));
-        proposals.push({ proposal, instrument, estimatedChf });
+        proposals.push({ proposal, instrument, estimatedChf, share });
       }
     } else {
       const share = 1 / eligible.length;
@@ -38,6 +38,7 @@ function proposalDistribution(assetClassProposals, instruments) {
           },
           instrument,
           estimatedChf,
+          share,
         });
       }
     }
@@ -56,9 +57,33 @@ function buildInstrumentProposal(baseProposal, instrument, estimatedChf, sizing,
   const totalValueChf = Number(merged.totalValueChf || 0);
   const targetPct = Number(instrument.target || merged.allocationTargetPct || 0);
   const executableChf = Number(sizing.estimatedOrderChf || 0);
-  const allocationAfterPct = totalValueChf > 0 ? Number(((executableChf / totalValueChf) * 100).toFixed(2)) : Number(merged.allocationBeforePct || 0);
+  const allocationBeforePct = Number(merged.allocationBeforePct || 0);
+  const incrementalAllocationPct = totalValueChf > 0 ? Number(((executableChf / totalValueChf) * 100).toFixed(2)) : 0;
+  const allocationAfterPct = Number((allocationBeforePct + incrementalAllocationPct).toFixed(2));
   const driftAfter = Number((allocationAfterPct - targetPct).toFixed(2));
   const driftCorrected = Number((Math.abs(merged.driftBefore || 0) - Math.abs(driftAfter)).toFixed(2));
+  const residualCashChf = Number(((estimatedChf || 0) - executableChf).toFixed(2));
+  const minTradeSizeChf = Number(merged.minTradeSize || 0);
+  const belowMin = !isCashSleeve && executableChf > 0 && minTradeSizeChf > 0 && executableChf < minTradeSizeChf;
+  const quantityBlocked = !isCashSleeve && Number(sizing.quantity || 0) <= 0;
+  const blocked = Boolean(merged.blocked || belowMin || quantityBlocked);
+
+  const rationaleParts = [];
+  if (isCashSleeve) {
+    rationaleParts.push('Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.');
+  } else {
+    rationaleParts.push(`Deploy available cash toward underweight ${merged.assetClass} using ${instrument.name}.`);
+    if (residualCashChf > 0) rationaleParts.push(`Whole-share sizing leaves CHF ${residualCashChf.toFixed(2)} unallocated for this leg.`);
+  }
+
+  const riskParts = [];
+  if (isCashSleeve) {
+    riskParts.push('Planning entry only; no broker order required for the cash sleeve.');
+  } else {
+    riskParts.push(`Dry-run instrument proposal only; ${sizing.sizingNote}`);
+    if (belowMin) riskParts.push(`Executable size CHF ${executableChf.toFixed(2)} is below the configured minimum trade size of CHF ${minTradeSizeChf.toFixed(2)}.`);
+    if (residualCashChf > 0) riskParts.push(`Residual CHF ${residualCashChf.toFixed(2)} remains due to whole-share constraints.`);
+  }
 
   return {
     ...merged,
@@ -67,25 +92,34 @@ function buildInstrumentProposal(baseProposal, instrument, estimatedChf, sizing,
     currency: sizing.currency || instrument.currency,
     estimatedChf,
     estimatedOrderChf: executableChf,
+    residualCashChf,
     quantity: sizing.quantity,
     limitPrice: sizing.limitPrice,
     allocationTargetPct: targetPct,
+    allocationBeforePct,
     allocationAfterPct,
     driftAfter,
     driftCorrected,
-    blocked: merged.blocked || (!isCashSleeve && sizing.quantity <= 0),
+    blocked,
     action: isCashSleeve ? 'hold' : merged.action,
     status: isCashSleeve ? 'planned' : merged.status,
-    rationale: isCashSleeve
-      ? 'Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.'
-      : `Deploy available cash toward underweight ${merged.assetClass} using ${instrument.name}.`,
-    riskNote: isCashSleeve
-      ? 'Planning entry only; no broker order required for the cash sleeve.'
-      : `Dry-run instrument proposal only; ${sizing.sizingNote}`,
+    rationale: rationaleParts.join(' '),
+    riskNote: riskParts.join(' '),
     priceSource: sizing.priceSource,
     ibkrConid: instrument.ibkrConid || null,
     fxToChf: sizing.fxToChf || instrument.fxToChfHint || null,
   };
+}
+
+function summariseInstrumentProposals(proposals) {
+  const residualCashChf = Number(proposals.reduce((sum, proposal) => sum + Number(proposal.residualCashChf || 0), 0).toFixed(2));
+  const blockedCount = proposals.filter((proposal) => proposal.blocked).length;
+  const belowMinCount = proposals.filter((proposal) => Number(proposal.estimatedOrderChf || 0) > 0 && Number(proposal.minTradeSize || 0) > 0 && Number(proposal.estimatedOrderChf || 0) < Number(proposal.minTradeSize || 0)).length;
+  const notes = [];
+  if (residualCashChf > 0) notes.push(`Whole-share sizing leaves CHF ${residualCashChf.toFixed(2)} residual cash across the current proposal set.`);
+  if (belowMinCount > 0) notes.push(`${belowMinCount} instrument proposal(s) remain below the configured minimum trade size.`);
+  if (blockedCount > 0) notes.push(`${blockedCount} instrument proposal(s) are blocked and should not be treated as execution-ready.`);
+  return { residualCashChf, blockedCount, belowMinCount, notes };
 }
 
 function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
@@ -107,9 +141,13 @@ function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
     return buildInstrumentProposal(proposal, instrument, estimatedChf, sizing);
   });
 
+  const summary = summariseInstrumentProposals(proposals);
   return {
     ...assetClassProposals,
     proposals,
+    residualCashChf: summary.residualCashChf,
+    proposalWarnings: summary.notes,
+    notes: [...(assetClassProposals.notes || []), ...summary.notes],
   };
 }
 
@@ -124,10 +162,14 @@ async function proposeInstrumentTradesLivePriced({ portfolioPath, holdingsPath, 
     proposals.push(buildInstrumentProposal(proposal, instrument, estimatedChf, sizing));
   }
 
+  const summary = summariseInstrumentProposals(proposals);
   return {
     ...assetClassProposals,
     proposals,
+    residualCashChf: summary.residualCashChf,
+    proposalWarnings: summary.notes,
+    notes: [...(assetClassProposals.notes || []), ...summary.notes],
   };
 }
 
-module.exports = { proposeInstrumentTrades, proposeInstrumentTradesLivePriced, buildInstrumentProposal, proposalDistribution };
+module.exports = { proposeInstrumentTrades, proposeInstrumentTradesLivePriced, buildInstrumentProposal, proposalDistribution, summariseInstrumentProposals };

@@ -255,6 +255,8 @@ function suggestEtfShortlist(portfolioPath) {
         exchange: ranked.candidate.exchange,
         currency: ranked.candidate.currency,
         score: ranked.score,
+        approved: context.approved.includes(ranked.candidate.tickerOrIsin),
+        notes: buildInstrumentNotes(ranked.candidate),
         reason: `${ranked.candidate.rationale} (${ranked.reasons.join('; ')})`,
         keyRisks: ranked.candidate.risks,
       });
@@ -266,6 +268,62 @@ function suggestEtfShortlist(portfolioPath) {
     issuerPreferences: context.issuerNote || 'none',
     suggestions,
   };
+}
+
+function buildInstrumentNotes(candidate) {
+  const notes = [];
+  if (candidate.rationale) notes.push(candidate.rationale);
+  if (candidate.symbol) notes.push(`ibkr_symbol=${candidate.symbol}`);
+  if (candidate.currency === 'CHF') notes.push('fx_to_chf=1');
+  return notes.join('; ');
+}
+
+function buildApprovedInstrumentRows(result, { topPerAssetClass = 1 } = {}) {
+  const selected = new Map();
+  for (const item of result.suggestions) {
+    if (!selected.has(item.assetClass)) selected.set(item.assetClass, []);
+    const rows = selected.get(item.assetClass);
+    if (rows.length < topPerAssetClass && item.suggestedTargetPct > 0) rows.push(item);
+  }
+
+  const ordered = [];
+  for (const items of selected.values()) ordered.push(...items);
+  return ordered.map((item) => [
+    item.tickerOrIsin,
+    item.name,
+    item.assetClass,
+    formatPercent(item.suggestedTargetPct),
+    '',
+    '',
+    item.exchange,
+    item.currency,
+    item.notes || '',
+  ]);
+}
+
+function replaceApprovedInstrumentsSection(portfolioText, rows) {
+  const lines = portfolioText.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === '## Approved Instruments');
+  if (start === -1) throw new Error('Approved Instruments section not found');
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].startsWith('## ')) {
+      end = i;
+      break;
+    }
+  }
+  const replacement = [
+    '## Approved Instruments',
+    '| Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |',
+    '|---|---|---|---:|---:|---:|---|---|---|',
+    ...rows.map((row) => `| ${row.join(' | ')} |`),
+  ];
+  return [...lines.slice(0, start), ...replacement, ...lines.slice(end)].join('\n');
+}
+
+function formatPercent(value) {
+  if (!Number.isFinite(Number(value))) return '';
+  return String(Number(value));
 }
 
 function formatShortlistMarkdown(result) {
@@ -286,4 +344,10 @@ function formatShortlistMarkdown(result) {
   return `${lines.join('\n')}\n`;
 }
 
-module.exports = { ETF_CATALOG, suggestEtfShortlist, formatShortlistMarkdown };
+module.exports = {
+  ETF_CATALOG,
+  suggestEtfShortlist,
+  formatShortlistMarkdown,
+  buildApprovedInstrumentRows,
+  replaceApprovedInstrumentsSection,
+};
