@@ -156,13 +156,23 @@ function buildBrokerReasonNote(brokerOrder, mappedStatus) {
   return `Execution reconciliation: ${parts.join(', ')}`;
 }
 
-function appendReasonNote(existing, note) {
+function appendReasonNote(existing, note, maxSegments = 3) {
   const cleanExisting = String(existing || '').trim();
   const cleanNote = String(note || '').trim();
   if (!cleanNote) return cleanExisting;
   if (!cleanExisting) return cleanNote;
-  if (cleanExisting.includes(cleanNote)) return cleanExisting;
-  return `${cleanExisting}; ${cleanNote}`;
+
+  const segments = cleanExisting
+    .split(/;\s+/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  if (segments.includes(cleanNote)) return cleanExisting;
+  segments.push(cleanNote);
+
+  const head = segments.filter((segment, idx) => idx === 0);
+  const tail = segments.slice(1).slice(-Math.max(maxSegments - 1, 0));
+  return [...head, ...tail].join('; ');
 }
 
 function numberText(value) {

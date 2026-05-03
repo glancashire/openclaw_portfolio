@@ -10,6 +10,7 @@ const checks = [
   'test-interactive-brokers-completed-order-surface.js',
   'test-portfolio-order-lifecycle-e2e.js',
   'test-history-snapshot-types.js',
+  'test-dashboard-execution-summary.js',
 ];
 
 function run(script) {

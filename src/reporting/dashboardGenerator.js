@@ -3,7 +3,7 @@ const path = require('path');
 const { analyzeAllocation } = require('../analysis/allocationAnalysis');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
-const { recentTrades, latestTradeProposals, latestHistory } = require('./portfolioData');
+const { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary } = require('./portfolioData');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 
 function parseHoldingsSummary(text) {
@@ -83,11 +83,25 @@ function formatInstrumentOverviewRows(approvedInstruments = [], latestProposals 
   }).join('\n');
 }
 
-function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0, brokerReadiness = null) {
+function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0, brokerReadiness = null, lifecycleSummary = null) {
   if (brokerReadiness?.fallbackRequired) {
     return [
       'Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.',
       'Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.',
+    ];
+  }
+
+  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) {
+    return [
+      'Monitor submitted and partially filled orders before generating fresh proposals.',
+      'Reconcile broker order status back into trades, holdings, and history before acting on new execution plans.',
+    ];
+  }
+
+  if ((lifecycleSummary?.approved || 0) > 0) {
+    return [
+      'Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.',
+      'Keep unapproved proposals separate from broker-ready approved trades to avoid execution confusion.',
     ];
   }
 
@@ -115,7 +129,21 @@ function formatExecutionPlan(plan = { rows: [], totals: { intendedChf: 0, execut
   return lines.join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null }) {
+function formatExecutionLifecycle(summary = {}) {
+  return [
+    `- Proposed: ${summary.proposed || 0}`,
+    `- Approved: ${summary.approved || 0}`,
+    `- Submitted: ${summary.submitted || 0}`,
+    `- Partially filled: ${summary.partiallyFilled || 0}`,
+    `- Filled: ${summary.filled || 0}`,
+    `- Cancelled: ${summary.cancelled || 0}`,
+    `- Failed: ${summary.failed || 0}`,
+    `- Planned-only entries: ${summary.planned || 0}`,
+    `- Rows with broker order id: ${summary.withBrokerOrderId || 0}`,
+  ].join('\n');
+}
+
+function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -131,10 +159,12 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     warnings.push(`- Whole-share draft sizing leaves CHF ${proposalTotals.residualTradableCash} unallocated beyond the intentional CHF cash sleeve.`);
   }
   if (brokerReadiness?.fallbackRequired) warnings.push(`- ${brokerReadiness.message}`);
+  if ((lifecycleSummary?.failed || 0) > 0) warnings.push(`- ${lifecycleSummary.failed} trade log row(s) are currently marked failed and may need manual review.`);
+  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) warnings.push('- There are in-flight broker order states; avoid overlapping execution plans until reconciliation is current.');
   if (latestSnapshot?.notes) warnings.push(`- Latest history note: ${latestSnapshot.notes}`);
-  const actions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness);
+  const actions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
 
-  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
+  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
 async function regenerateDashboard(portfolioDir) {
@@ -159,9 +189,10 @@ async function regenerateDashboard(portfolioDir) {
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
     brokerReadiness,
+    lifecycleSummary: executionLifecycleSummary(tradesPath),
   });
   fs.writeFileSync(dashboardPath, dashboard);
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle };
