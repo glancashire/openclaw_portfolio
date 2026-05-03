@@ -7,6 +7,7 @@ const { getInteractiveBrokersReadiness } = require('../brokers/interactive-broke
 const { appendTradeProposals } = require('../analysis/tradeLogWriter');
 const { appendHistorySnapshot } = require('../analysis/historyWriter');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
+const { markTradeApproved, reconcileOrderStatus, appendTradeEvent } = require('./tradeState');
 
 function parsePortfolioStatus(text) {
   return captureLine(text, 'Status');
@@ -201,6 +202,114 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
   };
 }
 
+async function approvePortfolioTrade({ portfolioDir, selector, approval = 'user_approved' }) {
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const result = markTradeApproved(tradesPath, selector, approval);
+  if (result.updated > 0) await regenerateDashboard(portfolioDir);
+  return { ok: result.updated > 0, ...result };
+}
+
+async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, reasonNote = '' }) {
+  const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
+  const statusResult = await client.getOrderStatus(orderId);
+  if (!statusResult.ok) {
+    return {
+      ok: false,
+      reason: statusResult.reason || 'status_error',
+      error: statusResult.error || statusResult.message || 'Unable to fetch broker order status.',
+      statusResult,
+    };
+  }
+
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const historyPath = path.join(portfolioDir, 'history.md');
+  const holdingsPath = path.join(portfolioDir, 'holdings.md');
+  const reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, statusResult.order, { reasonNote });
+  if (reconcile.updated > 0) {
+    const mappedStatus = statusResult.order.status || 'submitted';
+    appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: ${mappedStatus}`);
+    await regenerateDashboard(portfolioDir);
+  }
+
+  return {
+    ok: reconcile.updated > 0,
+    statusResult,
+    reconcile,
+  };
+}
+
+async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, userApproved = false }) {
+  if (!userApproved) {
+    return {
+      ok: false,
+      reason: 'policy_blocked',
+      blockers: ['Order cancellation requires explicit user approval flag.'],
+      policy: null,
+    };
+  }
+
+  const portfolioPath = path.join(portfolioDir, 'portfolio.md');
+  const holdingsPath = path.join(portfolioDir, 'holdings.md');
+  const context = buildPolicyContext({ portfolioPath, holdingsPath });
+  const readiness = await getInteractiveBrokersReadiness({ portfolio: path.basename(portfolioDir) });
+  const blockers = [];
+  if (context.portfolioStatus !== 'active') blockers.push(`Portfolio status is ${context.portfolioStatus || 'unknown'}, not active.`);
+  if (!readiness.authenticated) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
+  for (const blocker of context.safetyBlockers) blockers.push(blocker.message);
+  if (blockers.length > 0) {
+    return {
+      ok: false,
+      reason: 'policy_blocked',
+      blockers,
+      policy: {
+        ok: false,
+        live: true,
+        instrument: null,
+        blockers,
+        readiness,
+        context: {
+          portfolioStatus: context.portfolioStatus,
+          executionMode: context.executionMode,
+          accountReference: context.accountReference,
+          holdingsHealth: context.holdingsHealth,
+        },
+      },
+    };
+  }
+
+  const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
+  const cancelResult = await client.cancelOrder(orderId);
+  if (!cancelResult.ok) {
+    return {
+      ok: false,
+      reason: cancelResult.reason || 'cancel_error',
+      error: cancelResult.error || cancelResult.message || 'Unable to cancel broker order.',
+      cancelResult,
+    };
+  }
+
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, { orderId, status: cancelResult.cancel?.status || 'cancelled' }, { reasonNote: cancelResult.cancel?.message || 'Broker cancel requested.' });
+  if (reconcile.updated === 0) {
+    appendTradeEvent(tradesPath, {
+      status: 'cancelled',
+      action: selector.action || '',
+      tickerOrIsin: selector.tickerOrIsin || '',
+      name: selector.name || '',
+      reason: cancelResult.cancel?.message || 'Broker cancel requested.',
+      approval: 'cancelled',
+      brokerOrderId: String(orderId),
+    });
+  }
+  await regenerateDashboard(portfolioDir);
+
+  return {
+    ok: true,
+    cancelResult,
+    reconcile,
+  };
+}
+
 module.exports = {
   parsePortfolioStatus,
   parseExecutionMode,
@@ -208,4 +317,7 @@ module.exports = {
   parseHoldingsHealth,
   evaluateExecutionPolicy,
   stagePortfolioOrder,
+  approvePortfolioTrade,
+  syncPortfolioOrderStatus,
+  cancelPortfolioOrder,
 };
