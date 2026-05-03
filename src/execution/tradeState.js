@@ -149,6 +149,10 @@ function buildBrokerReasonNote(brokerOrder, mappedStatus) {
   if (brokerOrder.filled != null) parts.push(`filled ${brokerOrder.filled}`);
   if (brokerOrder.remaining != null) parts.push(`remaining ${brokerOrder.remaining}`);
   if (brokerOrder.avgFillPrice != null) parts.push(`avg fill ${brokerOrder.avgFillPrice}`);
+  if (brokerOrder.lastFillPrice != null) parts.push(`last fill ${brokerOrder.lastFillPrice}`);
+  if (brokerOrder.execId) parts.push(`exec id ${brokerOrder.execId}`);
+  if (brokerOrder.executedAt) parts.push(`executed at ${brokerOrder.executedAt}`);
+  if (brokerOrder.completedStatus) parts.push(`completed status ${brokerOrder.completedStatus}`);
   return `Execution reconciliation: ${parts.join(', ')}`;
 }
 

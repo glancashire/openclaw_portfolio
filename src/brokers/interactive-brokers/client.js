@@ -408,6 +408,25 @@ class InteractiveBrokersClient {
         }
       }
 
+      if (this.skill && typeof this.skill.fetchCompletedOrders === 'function') {
+        const completedOrders = await this.skill.fetchCompletedOrders();
+        const completedMatch = completedOrders.find((row) => String(row.orderId) === String(orderId));
+        if (completedMatch) {
+          return {
+            ok: true,
+            order: normaliseOrder(completedMatch),
+            source: 'completed_orders',
+            log: logBrokerEvent({
+              broker: 'interactive-brokers',
+              operation: 'get_order_status',
+              status: 'ok',
+              summary: { orderId: completedMatch.orderId, status: completedMatch.status, symbol: completedMatch.symbol || null, source: 'completed_orders' },
+              portfolio: this.options.portfolio,
+            }),
+          };
+        }
+      }
+
       return {
         ok: false,
         reason: 'not_found',

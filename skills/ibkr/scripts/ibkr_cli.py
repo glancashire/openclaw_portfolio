@@ -569,6 +569,43 @@ def cmd_executions(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_completed_orders(args: argparse.Namespace) -> int:
+    ib = connect_ib(create_connection_config(args))
+    try:
+        trades = ib.reqCompletedOrders(False)
+        rows = []
+        for trade in trades:
+            fills = getattr(trade, "fills", []) or []
+            filled = sum(getattr(f.execution, "shares", 0) for f in fills)
+            avg_fill = None
+            if filled:
+                total_value = sum(getattr(f.execution, "shares", 0) * getattr(f.execution, "price", 0) for f in fills)
+                avg_fill = total_value / filled if filled else None
+            rows.append(
+                {
+                    "orderId": trade.order.orderId,
+                    "permId": trade.order.permId,
+                    "symbol": trade.contract.symbol,
+                    "secType": trade.contract.secType,
+                    "action": trade.order.action,
+                    "orderType": trade.order.orderType,
+                    "quantity": trade.order.totalQuantity,
+                    "status": trade.orderStatus.status or trade.orderState.status or trade.orderState.completedStatus,
+                    "filled": filled,
+                    "remaining": max(float(trade.order.totalQuantity or 0) - float(filled or 0), 0),
+                    "limitPrice": getattr(trade.order, "lmtPrice", None),
+                    "avgFillPrice": avg_fill,
+                    "lastFillPrice": getattr(fills[-1].execution, "price", None) if fills else None,
+                    "completedTime": trade.orderState.completedTime,
+                    "completedStatus": trade.orderState.completedStatus,
+                }
+            )
+        print_rows(rows, args.json)
+    finally:
+        ib.disconnect()
+    return 0
+
+
 def cmd_contract_details(args: argparse.Namespace) -> int:
     ib = connect_ib(create_connection_config(args))
     try:
@@ -702,6 +739,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("executions", help="List execution fills currently available in session")
     add_shared_connection_flags(p)
     p.set_defaults(func=cmd_executions)
+
+    p = sub.add_parser("completed-orders", help="List completed orders currently available in session")
+    add_shared_connection_flags(p)
+    p.set_defaults(func=cmd_completed_orders)
 
     p = sub.add_parser("contract-details", help="Resolve contract details")
     add_shared_connection_flags(p)
