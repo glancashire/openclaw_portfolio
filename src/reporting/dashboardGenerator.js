@@ -69,16 +69,32 @@ function proposalSummary(latestProposals = [], totalValue = 0) {
 function formatInstrumentOverviewRows(approvedInstruments = [], latestProposals = [], totalValue = 0) {
   if (!approvedInstruments.length) return '| <ticker> | <name> | 0 | 0 | 0 | 0 | blocked |';
 
-  const proposalMap = new Map(latestProposals.map((proposal) => [proposal.tickerOrIsin, proposal]));
+  const latestRowsByInstrument = new Map();
+  for (const proposal of latestProposals) {
+    latestRowsByInstrument.set(proposal.tickerOrIsin, proposal);
+  }
+
   return approvedInstruments.map((instrument) => {
-    const proposal = proposalMap.get(instrument.tickerOrIsin);
+    const proposal = latestRowsByInstrument.get(instrument.tickerOrIsin);
     const plannedValue = Number(proposal?.estimatedChf || 0);
     const plannedPct = totalValue > 0 ? Number(((plannedValue / totalValue) * 100).toFixed(2)) : 0;
     const target = Number(instrument.target || 0);
     const drift = Number((plannedPct - target).toFixed(2));
     const quantityText = proposal?.quantity ? ` (${proposal.quantity} @ ${proposal.limitPrice})` : '';
     const sourceText = proposal?.priceSource ? ` via ${proposal.priceSource}` : '';
-    const action = proposal ? `${proposal.action} ${plannedValue} CHF${quantityText}${sourceText}` : 'watch';
+    const status = String(proposal?.status || '').trim().toLowerCase();
+    const statusPrefix = status === 'approved'
+      ? 'approved'
+      : status === 'submitted' || status === 'partially_filled' || status === 'filled'
+        ? 'in_flight'
+        : status === 'proposed'
+          ? 'proposal'
+          : status === 'planned'
+            ? 'planned'
+            : 'watch';
+    const action = proposal
+      ? `${statusPrefix}: ${proposal.action} ${plannedValue} CHF${quantityText}${sourceText}`
+      : 'watch';
     return `| ${instrument.tickerOrIsin} | ${instrument.name} | ${plannedValue} | ${plannedPct} | ${target} | ${drift} | ${action} |`;
   }).join('\n');
 }

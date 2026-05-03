@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { recentTrades, latestHistory } = require('./portfolioData');
+const { recentTrades, latestHistory, executionLifecycleSummary } = require('./portfolioData');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { renderPdf } = require('./pdfExport');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
@@ -17,13 +17,15 @@ function defaultPeriodBounds(period, latestSnapshot) {
   return { start: end, end };
 }
 
-function formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness }) {
+function formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness, lifecycleSummary }) {
   const hasPending = trades.some((trade) => trade.status === 'proposed' || trade.status === 'planned');
+  const hasInflight = (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0;
   return {
     onStrategy: latestSnapshot ? 'yes, draft state matches approved dry-run plan' : 'unknown',
     rebalanceNeeded: hasPending ? 'yes' : 'no',
     riskLimitsBreached: executionPlan.totals.executionGapChf > 0 ? 'no, but draft sizing leaves residual cash' : 'no',
     brokerReadiness: brokerReadiness?.message || 'unknown',
+    inflightOrders: hasInflight ? 'yes' : 'no',
   };
 }
 
@@ -57,31 +59,50 @@ function formatExecutionPlanSection(executionPlan) {
   return rows.join('\n');
 }
 
-function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null }) {
+function formatExecutionLifecycleSection(lifecycleSummary = {}) {
+  return [
+    `- Proposed: ${lifecycleSummary.proposed || 0}`,
+    `- Approved: ${lifecycleSummary.approved || 0}`,
+    `- Submitted: ${lifecycleSummary.submitted || 0}`,
+    `- Partially filled: ${lifecycleSummary.partiallyFilled || 0}`,
+    `- Filled: ${lifecycleSummary.filled || 0}`,
+    `- Cancelled: ${lifecycleSummary.cancelled || 0}`,
+    `- Failed: ${lifecycleSummary.failed || 0}`,
+    `- Rows with broker order id: ${lifecycleSummary.withBrokerOrderId || 0}`,
+  ].join('\n');
+}
+
+function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null }) {
   const tradeRows = trades.length
     ? trades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.reason} |`).join('\n')
     : '| YYYY-MM-DD | <action> | <instrument> | 0 | No trades recorded |';
-  const compliance = formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness });
+  const compliance = formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness, lifecycleSummary });
   const whatWorked = latestSnapshot
-    ? '- The dry-run portfolio state, trade log, and dashboard are all consistent enough to review as one workflow.'
+    ? '- The dry-run portfolio state, trade log, dashboard, and execution lifecycle summary are consistent enough to review as one workflow.'
     : '- Initial reporting scaffold is in place.';
   const whatDidNotWork = brokerReadiness?.fallbackRequired
     ? `- ${brokerReadiness.message}`
-    : executionPlan.totals.executionGapChf > 0
-      ? `- Draft order sizing still leaves CHF ${executionPlan.totals.executionGapChf} below intended executable deployment.`
-      : '- Live broker pricing and order quoting are not connected yet.';
+    : (lifecycleSummary?.failed || 0) > 0
+      ? `- ${lifecycleSummary.failed} execution row(s) are marked failed and still need operator review.`
+      : executionPlan.totals.executionGapChf > 0
+        ? `- Draft order sizing still leaves CHF ${executionPlan.totals.executionGapChf} below intended executable deployment.`
+        : '- Live broker pricing and order quoting are not connected yet.';
   const recommendedChanges = brokerReadiness?.fallbackRequired
     ? '- Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.'
-    : executionPlan.totals.executionGapChf > 0
-      ? '- Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.'
-      : '- Connect live broker pricing to replace draft assumptions before enabling execution.';
+    : (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0
+      ? '- Reconcile in-flight orders before approving overlapping new plans or revising allocations.'
+      : executionPlan.totals.executionGapChf > 0
+        ? '- Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.'
+        : '- Connect live broker pricing to replace draft assumptions before enabling execution.';
   const nextActions = brokerReadiness?.fallbackRequired
     ? '- Validate Interactive Brokers gateway/session reachability before treating any proposal as broker-backed.'
-    : executionPlan.rows.length
-      ? '- Approve or revise the current dry-run order set, then validate live read-only broker connectivity.'
-      : '- Generate the next dry-run proposal set after holdings or strategy changes.';
+    : (lifecycleSummary?.approved || 0) > 0
+      ? '- Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.'
+      : executionPlan.rows.length
+        ? '- Approve or revise the current dry-run order set, then validate live read-only broker connectivity.'
+        : '- Generate the next dry-run proposal set after holdings or strategy changes.';
 
-  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${latestSnapshot ? `Latest snapshot: CHF ${latestSnapshot.totalValue} total, CHF ${latestSnapshot.cash} cash. Dry-run order planning is prepared but broker execution remains disabled.` : 'Short summary pending performance and allocation engine implementation.'}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
+  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${latestSnapshot ? `Latest snapshot: CHF ${latestSnapshot.totalValue} total, CHF ${latestSnapshot.cash} cash. Execution lifecycle state is tracked in Markdown, but broker execution remains disabled for real writes.` : 'Short summary pending performance and allocation engine implementation.'}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n- In-flight orders: ${compliance.inflightOrders}\n\n## Execution Lifecycle\n${formatExecutionLifecycleSection(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
 }
 
 function writeReport({ portfolioDir, period, dateStamp, content }) {
@@ -97,7 +118,6 @@ function writeReport({ portfolioDir, period, dateStamp, content }) {
 async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
-  const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
   const trades = recentTrades(tradesPath);
   const latestSnapshot = latestHistory(historyPath);
@@ -105,6 +125,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
   const bounds = defaultPeriodBounds(period, latestSnapshot);
   const executionPlan = buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(latestSnapshot?.totalValue || 0) });
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
+  const lifecycleSummary = executionLifecycleSummary(tradesPath);
   const content = formatReport({
     portfolioName,
     period,
@@ -115,10 +136,11 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
     latestSnapshot,
     executionPlan,
     brokerReadiness,
+    lifecycleSummary,
   });
   const markdownPath = writeReport({ portfolioDir, period, dateStamp, content });
   const pdf = renderPdf(markdownPath);
   return { markdownPath, pdfPath: pdf.pdfPath, pdfMode: pdf.mode, htmlPath: pdf.htmlPath || null };
 }
 
-module.exports = { formatReport, writeReport, generateAndWriteReport };
+module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection };

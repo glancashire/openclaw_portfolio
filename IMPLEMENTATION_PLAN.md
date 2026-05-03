@@ -19,6 +19,10 @@
 15. Interactive Brokers-only repo narrowing and holdings-sync decoupling from the removed IG path
 16. Native Interactive Brokers read-only connectivity, live holdings sync, and live-priced dry-run proposal refresh for the ETF portfolio
 17. ETF portfolio moved from draft to active while remaining confirmation-gated and read-only
+18. Portfolio-aware execution gating and staged-order scaffolding
+19. Trade lifecycle reconciliation into Markdown state (`approved/submitted/partially_filled/filled/cancelled/failed`)
+20. Post-fill holdings refresh hook, broker error pause state, and completed-order status fallback
+21. Typed execution history snapshots, dashboard execution lifecycle visibility, bundled execution verification, and safe demo execution flow
 
 ## Current repository capabilities
 
@@ -29,60 +33,52 @@
 - Apply structured onboarding answers into `portfolio.md`
 - Check generated holdings/history/dashboard state consistency
 - Check safety controls before treating output as execution-ready
+- Run bundled execution-surface verification via `npm run verify:execution`
 
-### Analysis and reporting
+### Analysis, execution state, and reporting
 - Analyze allocation drift from current holdings
 - Propose dry-run trades from underweight allocations and available cash
 - Propose instrument-level dry-run trades from approved instruments
 - Write trade proposals into append-only trade logs with latest-plan supersession support
-- Regenerate dashboards from current portfolio state
-- Append history snapshots
+- Approve trades and reconcile broker status transitions back into `trades.md`
+- Regenerate dashboards from current portfolio state, including execution lifecycle summary
+- Append typed history snapshots for execution events
 - Run weekly/monthly/quarterly report cycles and emit Markdown + PDF outputs
+- Demonstrate a safe disposable execution lifecycle with `scripts/demo-portfolio-execution-flow.js`
 
 ### Broker scaffolding
 - Interactive Brokers adapter/auth/read-only test scaffolding
 - Interactive Brokers holdings sync with ledger-aware CHF cash extraction
-- Normalized broker-backed order quote, dry-run preview, open-order status lookup, and cancel-path scaffolding
+- Normalized broker-backed order quote, dry-run preview, open-order status lookup, execution-fill fallback, completed-order lookup, and cancel-path scaffolding
 - Safe config checks for broker secrets presence without exposing them
 
 ## Next phases
 
-### Phase 16 — ETF suggestion workflow hardening
-Implement a proper shortlist workflow that:
-- derives missing exposures from `portfolio.md`
-- scores candidate ETFs against CHF-first / availability / simplicity constraints
-- produces approval-ready rationale and trade-offs
-- writes approved selections back into `Approved Instruments`
-
-Status: partially complete — shortlist generation and ranking now exist via `scripts/suggest-etf-shortlist.js`; automatic write-back to `Approved Instruments` still remains intentionally manual/approval-gated.
-
-### Phase 18 — Dry-run order generation refinement
-Improve order-prep logic so it:
-- converts asset-class proposals into instrument-level draft orders
-- uses broker-aware pricing/quotes when available
-- handles residual cash and minimum-trade-size constraints explicitly
-- keeps all execution paths confirmation-gated by default
+### Phase 22 — execution-aware reporting polish
+Improve report/dashboard presentation so it:
+- distinguishes proposals from approved/submitted/in-flight states more clearly
+- reflects execution lifecycle counts and current operational posture
+- highlights failed/in-flight rows without obscuring strategy-level review
 
 Current state:
-- instrument-level proposal sizing is working for the ETF portfolio
-- Interactive Brokers-backed pricing is now being used for EMUAA and UBSSLI in the current dry-run proposal set
-- the current plan still leaves residual tradable cash after whole-share sizing and keeps the defensive CHF cash sleeve explicit
-- the latest dry-run proposal era now supersedes equivalent older pending proposal rows so the current plan is cleaner to review
+- dashboard execution lifecycle summary now exists
+- reports still need richer execution-state surfacing
+- proposal-vs-approved separation can still improve in some views
 
-### Phase 19 — Read-only broker connectivity hardening and execution-surface completion
+### Phase 23 — writable execution enablement preparation
 Advance broker integration by:
 - keeping the native TWS / IB Gateway socket API path as the primary transport
-- hardening Interactive Brokers holdings/account normalization and quote retrieval
-- making contract lookup and latest-price retrieval durable across the approved ETF universe
-- implementing the remaining order-surface depth needed for quote, submit, status, and cancel flows while preserving read-only/dry-run safety by default
+- preparing a true writable `placeOrder` path behind strict explicit safety gates
+- hardening live `cancelOrder` and real broker reconciliation behavior
+- ensuring unresolved draft/onboarding holes block any write path cleanly
 - keeping dry-run/live gating explicit and testable
 
 Current state:
-- native client code exists and the readiness check is green again
+- native client code exists and the readiness check is green again for read-only use
 - live read-only holdings sync succeeds for account `U25624150`
 - the ETF portfolio is active, but execution remains `require_confirmation` and broker use remains read-only
-- normalized order quote, dry-run preview, open-order status lookup, and cancel-path scaffolding now exist at the repo broker-client layer
-- safe MVP state is now live-read-only + dry-run proposals, not simulated holdings
+- normalized order quote, dry-run preview, open-order status lookup, execution-fill fallback, completed-order lookup, cancel scaffolding, and Markdown reconciliation now exist at the repo layer
+- safe MVP state is now live-read-only + dry-run/reconciled execution planning, not simulated holdings
 
 ## Current command surface
 
@@ -99,6 +95,11 @@ Current state:
 - `node scripts/propose-instrument-trades.js <portfolio.md> <holdings.md>`
 - `node scripts/run-report-cycle.js <portfolio-dir> <weekly|monthly|quarterly> [YYYYMMDD]`
 - `node scripts/sync-interactive-brokers-holdings.js <portfolio-dir> [accountId]`
+- `node scripts/approve-portfolio-trade.js <portfolio-dir> <selector-json>`
+- `node scripts/sync-portfolio-order-status.js <portfolio-dir> <order-id> [selector-json]`
+- `node scripts/cancel-portfolio-order.js <portfolio-dir> <order-id> [selector-json]`
+- `node scripts/demo-portfolio-execution-flow.js`
+- `npm run verify:execution`
 
 ## Guardrails
 
