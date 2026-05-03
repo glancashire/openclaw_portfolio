@@ -357,12 +357,12 @@ class InteractiveBrokersClient {
   }
 
   async getOrderStatus(orderId) {
-    const reader = this.native && typeof this.native.fetchOpenOrders === 'function'
+    const openOrderReader = this.native && typeof this.native.fetchOpenOrders === 'function'
       ? this.native
       : this.skill && typeof this.skill.fetchOpenOrders === 'function'
         ? this.skill
         : null;
-    if (!reader) {
+    if (!openOrderReader) {
       return {
         ok: false,
         reason: 'not_available',
@@ -371,26 +371,48 @@ class InteractiveBrokersClient {
       };
     }
     try {
-      const orders = await reader.fetchOpenOrders();
-      const match = orders.find((row) => String(row.orderId) === String(orderId));
-      if (!match) {
+      const orders = await openOrderReader.fetchOpenOrders();
+      const openMatch = orders.find((row) => String(row.orderId) === String(orderId));
+      if (openMatch) {
         return {
-          ok: false,
-          reason: 'not_found',
-          orderId,
-          message: 'No matching open order found.',
+          ok: true,
+          order: normaliseOrder(openMatch),
+          source: 'open_orders',
+          log: logBrokerEvent({
+            broker: 'interactive-brokers',
+            operation: 'get_order_status',
+            status: 'ok',
+            summary: { orderId: openMatch.orderId, status: openMatch.status, symbol: openMatch.symbol || null, source: 'open_orders' },
+            portfolio: this.options.portfolio,
+          }),
         };
       }
+
+      if (this.skill && typeof this.skill.fetchExecutions === 'function') {
+        const executions = await this.skill.fetchExecutions();
+        const fills = executions.filter((row) => String(row.orderId) === String(orderId));
+        if (fills.length > 0) {
+          const aggregated = aggregateExecutionFills(fills, orderId);
+          return {
+            ok: true,
+            order: normaliseOrder(aggregated),
+            source: 'executions',
+            log: logBrokerEvent({
+              broker: 'interactive-brokers',
+              operation: 'get_order_status',
+              status: 'ok',
+              summary: { orderId: aggregated.orderId, status: aggregated.status, symbol: aggregated.symbol || null, source: 'executions' },
+              portfolio: this.options.portfolio,
+            }),
+          };
+        }
+      }
+
       return {
-        ok: true,
-        order: normaliseOrder(match),
-        log: logBrokerEvent({
-          broker: 'interactive-brokers',
-          operation: 'get_order_status',
-          status: 'ok',
-          summary: { orderId: match.orderId, status: match.status, symbol: match.symbol || null },
-          portfolio: this.options.portfolio,
-        }),
+        ok: false,
+        reason: 'not_found',
+        orderId,
+        message: 'No matching open order or execution fill found.',
       };
     } catch (error) {
       return {
@@ -501,4 +523,34 @@ function firstPositive(values) {
   return null;
 }
 
-module.exports = { InteractiveBrokersClient };
+function aggregateExecutionFills(fills, orderId) {
+  const ordered = [...fills].sort((a, b) => String(a.time || '').localeCompare(String(b.time || '')));
+  const totalShares = ordered.reduce((sum, row) => sum + Number(row.shares || 0), 0);
+  const totalValue = ordered.reduce((sum, row) => sum + (Number(row.shares || 0) * Number(row.price || 0)), 0);
+  const avgFillPrice = totalShares > 0 ? Number((totalValue / totalShares).toFixed(6)) : null;
+  const last = ordered[ordered.length - 1] || {};
+  return {
+    orderId,
+    symbol: last.symbol || null,
+    secType: last.secType || null,
+    side: last.side || null,
+    status: 'Filled',
+    quantity: totalShares,
+    filled: totalShares,
+    remaining: 0,
+    avgFillPrice,
+    lastFillPrice: numberOrNull(last.price),
+    estimatedValue: Number(totalValue.toFixed(2)),
+    currency: last.currency || 'CHF',
+    time: last.time || null,
+    execId: last.execId || null,
+    raw: { fills: ordered },
+  };
+}
+
+function numberOrNull(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+module.exports = { InteractiveBrokersClient, aggregateExecutionFills };

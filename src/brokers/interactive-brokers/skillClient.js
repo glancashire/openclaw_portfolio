@@ -106,6 +106,12 @@ class InteractiveBrokersSkillClient {
     return Array.isArray(result.data) ? result.data : [];
   }
 
+  async fetchExecutions() {
+    const result = await this.run(['executions', '--json']);
+    if (!result.ok) throw new Error(result.error);
+    return Array.isArray(result.data) ? result.data : [];
+  }
+
   async placeOrder(order, { transmit = true } = {}) {
     const args = [
       'place-order',

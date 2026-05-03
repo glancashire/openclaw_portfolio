@@ -33,6 +33,9 @@ function normaliseHolding(raw = {}) {
 }
 
 function normaliseOrder(raw = {}) {
+  const quantity = Number(raw.quantity ?? raw.size ?? raw.shares ?? 0);
+  const filled = Number(raw.filled ?? raw.shares ?? 0);
+  const avgFillPrice = numberOrNull(raw.avgFillPrice ?? raw.price);
   return {
     broker: 'interactive-brokers',
     orderId: raw.orderId || raw.id || null,
@@ -42,16 +45,18 @@ function normaliseOrder(raw = {}) {
     identifier: raw.conid || raw.identifier || raw.symbol || null,
     symbol: raw.symbol || null,
     secType: raw.secType || null,
-    quantity: Number(raw.quantity ?? raw.size ?? 0),
-    filled: Number(raw.filled ?? 0),
-    remaining: Number(raw.remaining ?? 0),
+    quantity,
+    filled,
+    remaining: Number(raw.remaining ?? Math.max(quantity - filled, 0) ?? 0),
     limitPrice: numberOrNull(raw.limitPrice),
     stopPrice: numberOrNull(raw.stopPrice),
-    avgFillPrice: numberOrNull(raw.avgFillPrice),
-    lastFillPrice: numberOrNull(raw.lastFillPrice),
-    estimatedValue: Number(raw.estimatedValue ?? raw.amount ?? 0),
+    avgFillPrice,
+    lastFillPrice: numberOrNull(raw.lastFillPrice ?? raw.price),
+    estimatedValue: Number(raw.estimatedValue ?? raw.amount ?? (Number.isFinite(avgFillPrice) ? avgFillPrice * filled : 0)),
     currency: raw.currency || 'CHF',
     transmit: raw.transmit === false ? false : true,
+    executedAt: raw.executedAt || raw.time || null,
+    execId: raw.execId || null,
     raw,
   };
 }
