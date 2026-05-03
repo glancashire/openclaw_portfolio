@@ -189,7 +189,7 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
       errorState,
     };
   }
-+  clearBrokerErrors(path.basename(portfolioDir));
+  clearBrokerErrors(path.basename(portfolioDir));
 
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
@@ -217,9 +217,15 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
 
 async function approvePortfolioTrade({ portfolioDir, selector, approval = 'user_approved' }) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
+  const historyPath = path.join(portfolioDir, 'history.md');
+  const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const result = markTradeApproved(tradesPath, selector, approval);
-  if (result.updated > 0) await regenerateDashboard(portfolioDir);
-  return { ok: result.updated > 0, ...result };
+  let historyAppend = null;
+  if (result.updated > 0) {
+    historyAppend = appendHistorySnapshot(historyPath, holdingsPath, 'execution_approved', 'Trade approved for broker execution.', { executionStatus: 'approved' });
+    await regenerateDashboard(portfolioDir);
+  }
+  return { ok: result.updated > 0, historyAppend, ...result };
 }
 
 async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, reasonNote = '', refreshHoldingsOnFill = true }) {
@@ -248,7 +254,7 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
         { reasonNote: reasonNote || 'Broker order status lookup returned not_found.' }
       );
       if (reconcile.updated > 0) {
-        appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: not_found`);
+        appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: not_found`, { executionStatus: 'not_found' });
         await regenerateDashboard(portfolioDir);
       }
       return {
@@ -286,7 +292,7 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
         clearBrokerErrors(portfolioName);
       }
     }
-    appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: ${mappedStatus}`);
+    appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: ${mappedStatus}`, { executionStatus: lowered });
     await regenerateDashboard(portfolioDir);
   }
 
@@ -349,7 +355,9 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
   }
 
   const tradesPath = path.join(portfolioDir, 'trades.md');
-  const reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, { orderId, status: cancelResult.cancel?.status || 'cancelled' }, { reasonNote: cancelResult.cancel?.message || 'Broker cancel requested.' });
+  const historyPath = path.join(portfolioDir, 'history.md');
+  const cancelStatus = cancelResult.cancel?.status || 'cancelled';
+  const reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, { orderId, status: cancelStatus }, { reasonNote: cancelResult.cancel?.message || 'Broker cancel requested.' });
   if (reconcile.updated === 0) {
     appendTradeEvent(tradesPath, {
       status: 'cancelled',
@@ -361,6 +369,7 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
       brokerOrderId: String(orderId),
     });
   }
+  appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} cancel result: ${cancelStatus}`, { executionStatus: cancelStatus });
   await regenerateDashboard(portfolioDir);
 
   return {

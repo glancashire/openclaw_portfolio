@@ -23,7 +23,8 @@
     "ibkr:readiness": "node scripts/check-interactive-brokers-readiness.js",
     "ibkr:test-native": "node scripts/test-interactive-brokers-native-client.js",
     "ibkr:resolve-conids": "node scripts/resolve-interactive-brokers-conids.js portfolio/etf/portfolio.md",
-    "propose:instrument-trades:live": "node scripts/propose-instrument-trades-live-priced.js portfolio/etf/portfolio.md portfolio/etf/holdings.md"
+    "propose:instrument-trades:live": "node scripts/propose-instrument-trades-live-priced.js portfolio/etf/portfolio.md portfolio/etf/holdings.md",
+    "verify:execution": "node scripts/verify-execution-surface.js"
   },
   "dependencies": {
     "@stoqey/ib": "^1.5.3",
