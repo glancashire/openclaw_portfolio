@@ -46,13 +46,21 @@ function parseHoldingsHealth(holdingsText) {
   const unmatchedMatch = holdingsText.match(/- Unmatched holdings:\s*(.+)/);
   const pricingMatch = holdingsText.match(/- Pricing source:\s*(.+)/);
   const syncTimeMatch = holdingsText.match(/- Date\/time:\s*(.+)/);
+  const investedMatch = holdingsText.match(/- Invested value CHF:\s*(.+)/);
+  const holdingRows = holdingsText
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith('|') && !line.includes('|---|') && !line.includes('| Ticker / ISIN |') && !line.includes('| Currency |'));
   const unmatched = unmatchedMatch ? unmatchedMatch[1].trim() : 'unknown';
   const pricingSource = pricingMatch ? pricingMatch[1].trim() : 'unknown';
   const syncTime = syncTimeMatch ? syncTimeMatch[1].trim() : null;
+  const investedValue = investedMatch ? Number(String(investedMatch[1]).replace(/[^0-9.-]/g, '')) : NaN;
+  const hasInvestedCapital = Number.isFinite(investedValue) ? investedValue > 0 : holdingRows.length > 0;
   return {
     unmatched,
     pricingSource,
     syncTime,
+    investedValue: Number.isFinite(investedValue) ? investedValue : null,
+    hasInvestedCapital,
     hasUnmatched: unmatched && !/^none$/i.test(unmatched),
     simulatedPricing: /^simulated$/i.test(pricingSource),
   };
@@ -83,6 +91,8 @@ function buildPolicyContext({ portfolioPath, holdingsPath }) {
     executionMode: parseExecutionMode(portfolioText),
     accountReference: parseBrokerAccountReference(portfolioText),
     requireFirstTradeConfirmation: parseBooleanLine(portfolioText, 'Require confirmation before first live trade'),
+    requireFirstPurchaseApproval: parseBooleanLine(portfolioText, 'Require user approval for first purchase'),
+    requireSalesApproval: parseBooleanLine(portfolioText, 'Require user approval for sales'),
     approvedInstruments: readApprovedInstruments(portfolioPath),
     safetyBlockers: evaluateSafetyControls({ portfolioPath, holdingsPath }),
     holdingsHealth: parseHoldingsHealth(holdingsText),
@@ -107,6 +117,13 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
   }
   if (live && context.requireFirstTradeConfirmation === true && order?.userApproved !== true) {
     blockers.push('Portfolio requires confirmation before first live trade.');
+  }
+  const normalizedAction = normalizeAction(order?.action);
+  if (live && normalizedAction === 'BUY' && context.requireFirstPurchaseApproval === true && !context.holdingsHealth.hasInvestedCapital && order?.userApproved !== true) {
+    blockers.push('Portfolio requires explicit user approval before the first live purchase.');
+  }
+  if (live && normalizedAction === 'SELL' && context.requireSalesApproval === true && order?.userApproved !== true) {
+    blockers.push('Portfolio requires explicit user approval before live sales.');
   }
   if (context.holdingsHealth.hasUnmatched) blockers.push(`Holdings contain unmatched instruments: ${context.holdingsHealth.unmatched}`);
   if (context.holdingsHealth.simulatedPricing) blockers.push('Holdings still use simulated pricing.');
