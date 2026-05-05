@@ -91,11 +91,15 @@ function appendTradeEvent(tradesPath, event, timestamp = new Date().toISOString(
 }
 
 function markTradeApproved(tradesPath, selector, approval = 'user_approved') {
-  return updateTradeRows(tradesPath, selector, (row) => ({
-    ...row,
-    Status: row.Status === 'proposed' || row.Status === 'planned' ? 'approved' : row.Status,
-    Approval: approval,
-  }));
+  return updateTradeRows(tradesPath, selector, (row) => {
+    const status = String(row.Status || '').trim().toLowerCase();
+    if (!['proposed', 'planned'].includes(status)) return null;
+    return {
+      ...row,
+      Status: 'approved',
+      Approval: approval,
+    };
+  });
 }
 
 function reconcileOrderStatus(tradesPath, selector, brokerOrder = {}, options = {}) {
