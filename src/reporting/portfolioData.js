@@ -40,8 +40,17 @@ function recentTrades(tradesPath, limit = 5) {
 function latestTradeProposals(tradesPath) {
   const rows = tableRowsFromFile(tradesPath, '## Trade Log').map(parseTradeRow);
   if (!rows.length) return [];
-  const latestDate = rows[rows.length - 1].date;
-  return rows.filter((row) => row.date === latestDate);
+
+  const latestByInstrument = new Map();
+  for (const row of rows) {
+    const key = `${row.tickerOrIsin}::${row.action}`;
+    latestByInstrument.set(key, row);
+  }
+
+  return Array.from(latestByInstrument.values()).filter((row) => {
+    const status = String(row.status || '').trim().toLowerCase();
+    return ['proposed', 'planned', 'approved', 'submitted', 'partially_filled'].includes(status);
+  });
 }
 
 function latestHistory(historyPath) {

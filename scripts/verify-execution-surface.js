@@ -11,6 +11,7 @@ const checks = [
   'test-portfolio-order-lifecycle-e2e.js',
   'test-history-snapshot-types.js',
   'test-dashboard-execution-summary.js',
+  'test-latest-trade-proposals-dedup.js',
 ];
 
 function run(script) {
