@@ -8,7 +8,7 @@ const { appendTradeProposals } = require('../analysis/tradeLogWriter');
 const { appendHistorySnapshot } = require('../analysis/historyWriter');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-brokers/holdingsSync');
-const { markTradeApproved, reconcileOrderStatus, appendTradeEvent } = require('./tradeState');
+const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent } = require('./tradeState');
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
 
 function parsePortfolioStatus(text) {
@@ -261,6 +261,19 @@ async function approvePortfolioTrade({ portfolioDir, selector, approval = 'user_
   return { ok: result.updated > 0, historyAppend, ...result };
 }
 
+async function rejectPortfolioTrade({ portfolioDir, selector, approval = 'user_rejected' }) {
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const historyPath = path.join(portfolioDir, 'history.md');
+  const holdingsPath = path.join(portfolioDir, 'holdings.md');
+  const result = rejectTradeProposal(tradesPath, selector, approval);
+  let historyAppend = null;
+  if (result.updated > 0) {
+    historyAppend = appendHistorySnapshot(historyPath, holdingsPath, 'execution_rejected', 'Trade rejected and blocked from execution.', { executionStatus: 'rejected' });
+    await regenerateDashboard(portfolioDir);
+  }
+  return { ok: result.updated > 0, historyAppend, ...result };
+}
+
 async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, reasonNote = '', refreshHoldingsOnFill = true }) {
   const portfolioName = path.basename(portfolioDir);
   const client = new InteractiveBrokersClient({ portfolio: portfolioName });
@@ -420,6 +433,7 @@ module.exports = {
   evaluateExecutionPolicy,
   stagePortfolioOrder,
   approvePortfolioTrade,
+  rejectPortfolioTrade,
   syncPortfolioOrderStatus,
   cancelPortfolioOrder,
 };

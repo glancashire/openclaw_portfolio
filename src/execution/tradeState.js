@@ -222,11 +222,37 @@ function numberText(value) {
   return String(Number(n.toFixed(2)));
 }
 
+function rejectTradeProposal(tradesPath, selector, approval = 'user_rejected') {
+  const table = readTradesTable(tradesPath);
+  let updated = 0;
+
+  table.rows.forEach((row, idx) => {
+    if (!matchesTradeSelector(row, selector)) return;
+    const status = String(row.Status || '').trim().toLowerCase();
+    if (!['proposed', 'planned', 'approved'].includes(status)) return;
+
+    const rowDate = String(row['Date/time'] || '').trim();
+    const latestDate = latestPendingProposalDate(table.rows, row);
+    if (['proposed', 'planned'].includes(status) && latestDate && rowDate !== latestDate) return;
+
+    table.lines[table.rowIndexes[idx]] = formatTradeLine({
+      ...row,
+      Status: 'rejected',
+      Approval: approval,
+    });
+    updated += 1;
+  });
+
+  if (updated > 0) fs.writeFileSync(tradesPath, table.lines.join('\n'));
+  return { updated };
+}
+
 module.exports = {
   readTradesTable,
   updateTradeRows,
   appendTradeEvent,
   markTradeApproved,
+  rejectTradeProposal,
   reconcileOrderStatus,
   mapBrokerOrderStatus,
   appendReasonNote,
