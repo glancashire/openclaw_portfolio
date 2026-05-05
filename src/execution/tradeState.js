@@ -118,19 +118,24 @@ function reconcileOrderStatus(tradesPath, selector, brokerOrder = {}, options = 
 
 function mapBrokerOrderStatus(status, brokerOrder = {}) {
   const raw = String(status || '').trim().toLowerCase();
+  const filled = Number(brokerOrder.filled || 0);
+  const remaining = Number(brokerOrder.remaining || 0);
+  const hasPartialFill = filled > 0 && remaining > 0;
+  const hasCompleteFill = filled > 0 && remaining <= 0;
+
   if (!raw) {
     if (brokerOrder.notFound === true) return 'failed';
+    if (hasPartialFill) return 'partially_filled';
+    if (hasCompleteFill) return 'filled';
     return brokerOrder.orderId ? 'submitted' : 'approved';
   }
+  if (['partially_filled', 'partial', 'partial_fill'].includes(raw) || hasPartialFill) return 'partially_filled';
+  if (raw === 'filled' || hasCompleteFill) return 'filled';
   if (['submitted', 'presubmitted', 'api_pending', 'pending_submit', 'pendingcancel'].includes(raw)) return 'submitted';
-  if (['partially_filled', 'partial', 'partial_fill'].includes(raw)) return 'partially_filled';
-  if (raw === 'filled') return 'filled';
   if (['cancelled', 'canceled', 'cancel_requested', 'pending_cancel'].includes(raw)) return 'cancelled';
   if (['inactive', 'rejected', 'failed', 'error', 'not_found', 'missing'].includes(raw)) return 'failed';
   if (raw === 'simulated') return 'simulated';
   if (raw === 'quote_unavailable') return 'planned';
-  if (Number(brokerOrder.filled || 0) > 0 && Number(brokerOrder.remaining || 0) > 0) return 'partially_filled';
-  if (Number(brokerOrder.filled || 0) > 0 && Number(brokerOrder.remaining || 0) <= 0) return 'filled';
   return 'submitted';
 }
 
