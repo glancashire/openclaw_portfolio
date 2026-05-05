@@ -12,6 +12,7 @@ const checks = [
   'test-history-snapshot-types.js',
   'test-dashboard-execution-summary.js',
   'test-latest-trade-proposals-dedup.js',
+  'test-duplicate-submission-guard.js',
 ];
 
 function run(script) {

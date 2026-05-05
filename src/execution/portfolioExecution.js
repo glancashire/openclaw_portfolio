@@ -161,6 +161,30 @@ function toTradeProposalRow(order, policy, brokerResult) {
   };
 }
 
+function hasConflictingOpenTrade(tradesPath, order) {
+  if (!fs.existsSync(tradesPath)) return false;
+  const text = fs.readFileSync(tradesPath, 'utf8');
+  const lines = text.split(/\r?\n/);
+  const targetIds = new Set([
+    String(order?.identifier || '').trim().toUpperCase(),
+    String(order?.conid || '').trim().toUpperCase(),
+    String(order?.ibkrConid || '').trim().toUpperCase(),
+    String(order?.symbol || '').trim().toUpperCase(),
+  ].filter(Boolean));
+  if (!targetIds.size) return false;
+
+  for (const line of lines) {
+    if (!line.startsWith('| ') || line.includes('|---|') || line.includes('| Date/time |')) continue;
+    const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
+    const status = String(cells[1] || '').toLowerCase();
+    if (!['approved', 'submitted', 'partially_filled'].includes(status)) continue;
+    const ticker = String(cells[3] || '').trim().toUpperCase();
+    if (targetIds.has(ticker)) return true;
+  }
+
+  return false;
+}
+
 async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocableOnly = true }) {
   const policy = await evaluateExecutionPolicy({ portfolioDir, order, live: !dryRun, requireApproval: true });
   if (!policy.ok) {
@@ -168,6 +192,16 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
       ok: false,
       reason: 'policy_blocked',
       blockers: policy.blockers,
+      policy,
+    };
+  }
+
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  if (hasConflictingOpenTrade(tradesPath, order)) {
+    return {
+      ok: false,
+      reason: 'duplicate_submission_blocked',
+      blockers: ['Existing approved or in-flight trade for this instrument must be reconciled before staging a new order.'],
       policy,
     };
   }
@@ -191,7 +225,6 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
   }
   clearBrokerErrors(path.basename(portfolioDir));
 
-  const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const tradeProposal = toTradeProposalRow(order, policy, brokerResult);
