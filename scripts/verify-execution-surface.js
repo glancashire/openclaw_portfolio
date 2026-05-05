@@ -9,6 +9,7 @@ const checks = [
   'test-interactive-brokers-filled-order-surface.js',
   'test-interactive-brokers-completed-order-surface.js',
   'test-portfolio-order-lifecycle-e2e.js',
+  'test-partial-fill-status-inference.js',
   'test-history-snapshot-types.js',
   'test-dashboard-execution-summary.js',
   'test-latest-trade-proposals-dedup.js',
