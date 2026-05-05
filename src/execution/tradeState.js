@@ -90,16 +90,48 @@ function appendTradeEvent(tradesPath, event, timestamp = new Date().toISOString(
   return { appended: true, row };
 }
 
+function latestPendingProposalDate(rows, row) {
+  const ticker = String(row['Ticker / ISIN'] || '').trim();
+  const action = String(row.Action || '').trim().toLowerCase();
+  let latest = null;
+
+  for (const candidate of rows) {
+    const candidateStatus = String(candidate.Status || '').trim().toLowerCase();
+    const candidateApproval = String(candidate.Approval || '').trim();
+    if (!['proposed', 'planned'].includes(candidateStatus)) continue;
+    if (candidateApproval !== 'pending_user_approval') continue;
+    if (String(candidate['Ticker / ISIN'] || '').trim() !== ticker) continue;
+    if (String(candidate.Action || '').trim().toLowerCase() !== action) continue;
+    const date = String(candidate['Date/time'] || '').trim();
+    if (!latest || date > latest) latest = date;
+  }
+
+  return latest;
+}
+
 function markTradeApproved(tradesPath, selector, approval = 'user_approved') {
-  return updateTradeRows(tradesPath, selector, (row) => {
+  const table = readTradesTable(tradesPath);
+  let updated = 0;
+
+  table.rows.forEach((row, idx) => {
+    if (!matchesTradeSelector(row, selector)) return;
     const status = String(row.Status || '').trim().toLowerCase();
-    if (!['proposed', 'planned'].includes(status)) return null;
-    return {
+    if (!['proposed', 'planned'].includes(status)) return;
+
+    const rowDate = String(row['Date/time'] || '').trim();
+    const latestDate = latestPendingProposalDate(table.rows, row);
+    if (latestDate && rowDate !== latestDate) return;
+
+    table.lines[table.rowIndexes[idx]] = formatTradeLine({
       ...row,
       Status: 'approved',
       Approval: approval,
-    };
+    });
+    updated += 1;
   });
+
+  if (updated > 0) fs.writeFileSync(tradesPath, table.lines.join('\n'));
+  return { updated };
 }
 
 function reconcileOrderStatus(tradesPath, selector, brokerOrder = {}, options = {}) {
