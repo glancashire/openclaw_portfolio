@@ -254,7 +254,7 @@ function listOpenBrokerOrderRows(tradesPath) {
     .filter((row) => {
       const status = String(row.Status || '').trim().toLowerCase();
       const orderId = String(row['Broker order id'] || '').trim();
-      return orderId && ['approved', 'submitted', 'partially_filled'].includes(status);
+      return orderId && ['approved', 'submitted', 'partially_filled'].includes(status) && String(row.Approval || '').trim() !== 'cancelled';
     })
     .map((row) => ({
       dateTime: row['Date/time'],
