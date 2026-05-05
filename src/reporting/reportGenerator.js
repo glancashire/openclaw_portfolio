@@ -19,7 +19,7 @@ function defaultPeriodBounds(period, latestSnapshot) {
 
 function formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness, lifecycleSummary }) {
   const hasPending = trades.some((trade) => trade.status === 'proposed' || trade.status === 'planned');
-  const hasInflight = (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0;
+  const hasInflight = (lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0;
   return {
     onStrategy: latestSnapshot ? 'yes, draft state matches approved dry-run plan' : 'unknown',
     rebalanceNeeded: hasPending ? 'yes' : 'no',
@@ -63,6 +63,7 @@ function formatExecutionLifecycleSection(lifecycleSummary = {}) {
   return [
     `- Proposed: ${lifecycleSummary.proposed || 0}`,
     `- Approved: ${lifecycleSummary.approved || 0}`,
+    `- Staged: ${lifecycleSummary.staged || 0}`,
     `- Submitted: ${lifecycleSummary.submitted || 0}`,
     `- Partially filled: ${lifecycleSummary.partiallyFilled || 0}`,
     `- Filled: ${lifecycleSummary.filled || 0}`,
@@ -89,7 +90,7 @@ function formatReport({ portfolioName, period, start = '', end = '', generated =
         : '- Live broker pricing and order quoting are not connected yet.';
   const recommendedChanges = brokerReadiness?.fallbackRequired
     ? '- Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.'
-    : (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0
+    : (lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0
       ? '- Reconcile in-flight orders before approving overlapping new plans or revising allocations.'
       : executionPlan.totals.executionGapChf > 0
         ? '- Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.'
