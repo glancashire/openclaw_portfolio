@@ -1,0 +1,164 @@
+# Consolidated Roadmap Checklist
+
+A phased execution plan that consolidates the remaining open work from `spec-outstanding-checklist.md` into a tighter implementation sequence.
+
+## Status key
+- [ ] not started
+- [~] in progress / partially complete
+- [x] complete
+
+## Phase 1 — Writable execution completion
+Goal: make live submission safe end-to-end.
+
+- [~] Complete explicitly writable-mode order submission path
+- [~] Make post-submission tracking durable
+- [~] Finish cancel flow in writable mode
+- [~] Keep staged broker orders anchored across submit / resync / cancel
+- [~] Reconcile terminal states consistently for submitted / partially-filled / cancelled / filled orders
+- [~] Strengthen broker-write logging and audit trail
+- [ ] Add focused end-to-end writable submission verification
+
+## Phase 2 — Lifecycle reconciliation consistency
+Goal: keep Markdown state and broker state aligned without duplicate or stale transitions.
+
+- [~] Sync broker execution results back into Markdown state
+- [~] Make resync idempotent after restart / crash
+- [~] Prevent stale proposals from becoming actionable
+- [~] Keep partial fills, failures, cancels, and retries consistent
+- [~] Ensure terminal rows stay terminal
+- [ ] Verify reconciliation behavior against staged broker orders in all terminal paths
+
+## Phase 3 — Trade blocking and safety hardening
+Goal: stop bad live trades before they reach broker state.
+
+- [ ] Block trading when unresolved strategy questions remain
+- [ ] Validate approved instruments vs excluded instruments consistency
+- [ ] Block stale price data
+- [~] Tighten broker/account mismatch or uncertain broker-state blocking
+- [~] Tighten risk-limit breach blocking before proposal / execution
+- [x] Preserve confirmation workflow before any real buy / sell
+- [x] Enforce first-purchase approval handling
+- [x] Enforce sales approval handling
+
+## Phase 4 — Operator actions and state transitions
+Goal: make human-controlled execution paths predictable and safe.
+
+- [~] Implement proposal -> approval -> submission state transitions
+- [~] Define and enforce `trades.md` update rules for approvals and executions
+- [~] Add clear operator actions for approve / reject / cancel / resync
+- [x] Prevent duplicate submission
+- [x] Guard approval transitions to valid proposal states only
+- [x] Reject approval of stale proposal eras
+- [x] Guard staged orders from proposal-transition flows
+
+## Phase 5 — History, dashboard, and reporting freshness
+Goal: keep output artifacts trustworthy after material events.
+
+- [~] Guarantee `history.md` snapshots on schedule
+- [ ] Guarantee `history.md` snapshots after material events
+- [x] Regenerate dashboard after holdings sync
+- [ ] Regenerate dashboard after trade execution
+- [x] Regenerate dashboard after rebalance analysis
+- [x] Regenerate dashboard before report generation
+- [ ] Detect and report stale dashboard state
+- [~] Ensure reports reflect latest holdings / trades / history
+- [~] Ensure weekly / monthly / quarterly reports include all required sections
+- [ ] Verify report narrative quality and consistency
+- [ ] Surface report generation failures clearly
+
+## Phase 6 — Rebalancing hardening
+Goal: improve proposal quality and reduce avoidable churn.
+
+- [ ] Enforce absolute drift thresholds
+- [ ] Enforce relative drift thresholds
+- [ ] Enforce min/max allocation breach handling
+- [~] Enforce cash-drag checks
+- [~] Prefer new cash before selling
+- [ ] Suppress tiny trades below minimum trade size
+- [ ] Avoid excessive turnover
+- [~] Include explicit rationale for each rebalance proposal
+
+## Phase 7 — ETF suggestion workflow
+Goal: finish shortlist generation and approval gating.
+
+- [ ] Implement ETF search + shortlist workflow
+- [ ] Filter by asset class
+- [ ] Filter by geography
+- [ ] Filter by currency
+- [ ] Filter by exchange availability
+- [ ] Filter by liquidity
+- [ ] Filter by total expense ratio
+- [ ] Filter by fund size
+- [ ] Filter by replication method
+- [ ] Filter by domicile
+- [ ] Filter by distribution vs accumulation
+- [ ] Filter by broker availability
+- [ ] Filter by spread where available
+- [~] Require approval before adding to Approved Instruments
+
+## Phase 8 — Portfolio creation workflow
+Goal: make initial setup clean and safe.
+
+- [ ] Implement guided question flow for required inputs
+- [~] Generate all required files for a new portfolio
+- [~] Capture open questions before activation
+- [~] Enforce clean draft -> active transition rules
+
+## Phase 9 — Scheduling and operational reliability
+Goal: make automation robust and restart-safe.
+
+- [~] Verify daily workflow matches spec
+- [~] Verify weekly workflow matches spec
+- [~] Verify monthly workflow matches spec
+- [~] Verify quarterly workflow matches spec
+- [ ] Add failure alerts / observability for broken runs
+- [ ] Ensure safe resume behavior after restart
+- [~] Preserve separation between read-only automation and write-enabled automation
+
+## Phase 10 — Broker adapter completeness audit
+Goal: finish the broker integration surface area.
+
+- [~] Verify `authenticate()` completeness
+- [~] Verify `list_accounts()` completeness
+- [~] Verify `select_account()` completeness
+- [~] Verify `get_cash_balances()` completeness
+- [~] Verify `get_holdings()` completeness
+- [~] Verify `get_instrument_details()` completeness
+- [ ] Verify `search_instruments()` completeness
+- [~] Verify `get_latest_price()` completeness
+- [~] Verify `get_order_quote()` completeness
+- [~] Verify `place_order()` completeness
+- [~] Verify `get_order_status()` completeness
+- [~] Verify `cancel_order()` completeness
+- [~] Verify normalization helper completeness
+
+## Phase 11 — End-to-end acceptance
+Goal: prove the full workflow works under realistic conditions.
+
+- [ ] Create a new draft portfolio end-to-end
+- [ ] Approve instruments end-to-end
+- [x] Sync empty holdings from broker end-to-end
+- [~] Generate staged buy plan end-to-end
+- [~] Produce dry-run orders end-to-end
+- [ ] Approve one order end-to-end
+- [ ] Submit one order in writable mode end-to-end
+- [ ] Reconcile fill / cancel / failure end-to-end
+- [~] Update holdings / history / dashboard / trades end-to-end
+- [~] Generate weekly / monthly / quarterly reports end-to-end
+- [x] Verify safety blocks prevent bad trades end-to-end
+
+## Recommended working order
+1. Phase 1 — Writable execution completion
+2. Phase 2 — Lifecycle reconciliation consistency
+3. Phase 3 — Trade blocking and safety hardening
+4. Phase 5 — History, dashboard, and reporting freshness
+5. Phase 6 — Rebalancing hardening
+6. Phase 7 — ETF suggestion workflow
+7. Phase 8 — Portfolio creation workflow
+8. Phase 9 — Scheduling and operational reliability
+9. Phase 10 — Broker adapter completeness audit
+10. Phase 11 — End-to-end acceptance
+
+## Current focus
+- Biggest remaining gap: fully safe live submission plus terminal reconciliation consistency around staged broker orders.
+- Best immediate path: finish Phase 1 and Phase 2 before broadening scope.
