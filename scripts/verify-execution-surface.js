@@ -21,6 +21,7 @@ const checks = [
   'test-resync-idempotent-open-order-filter.js',
   'test-resync-latest-row-only.js',
   'test-first-purchase-sales-approval-gates.js',
+  'test-stage-live-order-records-broker-order-id.js',
 ];
 
 function run(script) {

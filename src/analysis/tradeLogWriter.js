@@ -16,7 +16,8 @@ function buildReason(proposal) {
 }
 
 function proposalRow(proposal, timestamp) {
-  const approval = proposal.blocked ? 'blocked_by_min_trade_size' : 'pending_user_approval';
+  const approval = proposal.approval || (proposal.blocked ? 'blocked_by_min_trade_size' : 'pending_user_approval');
+  const brokerOrderId = proposal.brokerOrderId || '';
   const tickerOrIsin = proposal.instrument || proposal.assetClass;
   const name = proposal.instrumentName || `${proposal.assetClass} basket`;
   const quantity = proposal.quantity || 0;
@@ -24,7 +25,7 @@ function proposalRow(proposal, timestamp) {
   const status = proposal.status || 'proposed';
   const estimatedOrderChf = proposal.estimatedOrderChf || proposal.estimatedChf;
   const reason = buildReason(proposal);
-  return `| ${timestamp} | ${status} | ${proposal.action} | ${tickerOrIsin} | ${name} | ${quantity} | ${limitPrice} | ${estimatedOrderChf} | 0 | ${reason} | ${approval} | |`;
+  return `| ${timestamp} | ${status} | ${proposal.action} | ${tickerOrIsin} | ${name} | ${quantity} | ${limitPrice} | ${estimatedOrderChf} | 0 | ${reason} | ${approval} | ${brokerOrderId} |`;
 }
 
 function stripLatestPendingPlanRows(text) {

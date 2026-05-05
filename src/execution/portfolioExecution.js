@@ -152,6 +152,10 @@ function toTradeProposalRow(order, policy, brokerResult) {
   const referencePrice = brokerResult?.quote?.referencePrice || order.limitPrice || 0;
   const estimatedValue = brokerResult?.quote?.estimatedValue || (Number(order.quantity || 0) * Number(referencePrice || 0));
   const action = normalizeAction(order.action) === 'SELL' ? 'sell' : normalizeAction(order.action) === 'HOLD' ? 'hold' : 'buy';
+  const brokerOrderId = brokerResult?.order?.orderId != null ? String(brokerResult.order.orderId) : '';
+  const approval = brokerResult?.dryRun === false
+    ? (brokerResult?.order?.transmit === false ? 'staged_not_transmitted' : 'submitted_to_broker')
+    : 'pending_user_approval';
   return {
     action,
     status: brokerResult?.dryRun === false ? 'approved' : 'planned',
@@ -169,6 +173,8 @@ function toTradeProposalRow(order, policy, brokerResult) {
     driftCorrected: order.driftCorrected ?? 'n/a',
     fundingSource: order.fundingSource || 'available_cash',
     blocked: false,
+    approval,
+    brokerOrderId,
     rationale: brokerResult?.dryRun === false
       ? 'Portfolio-approved staged broker order prepared but not transmitted.'
       : 'Portfolio-approved dry-run broker order preview generated.',
