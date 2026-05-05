@@ -24,6 +24,7 @@ const checks = [
   'test-stage-live-order-records-broker-order-id.js',
   'test-cancel-staged-order-reconciliation.js',
   'test-staged-order-approval-guard.js',
+  'test-writable-execution-handoff-e2e.js',
 ];
 
 function run(script) {
