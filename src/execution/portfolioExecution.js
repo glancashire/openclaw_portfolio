@@ -158,7 +158,7 @@ function toTradeProposalRow(order, policy, brokerResult) {
     : 'pending_user_approval';
   return {
     action,
-    status: brokerResult?.dryRun === false ? 'approved' : 'planned',
+    status: brokerResult?.dryRun === false ? 'submitted' : 'planned',
     instrument: instrument?.tickerOrIsin || order.symbol || order.identifier,
     instrumentName: instrument?.name || order.symbol || 'Unknown instrument',
     quantity: Number(order.quantity || 0),

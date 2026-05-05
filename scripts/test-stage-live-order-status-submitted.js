@@ -8,7 +8,7 @@ function assert(condition, message) {
 }
 
 async function main() {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stage-live-order-record-'));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stage-live-order-status-'));
   const portfolioDir = path.join(tempDir, 'portfolio');
   fs.mkdirSync(portfolioDir, { recursive: true });
 
@@ -26,7 +26,7 @@ async function main() {
     if (request.endsWith('../brokers/interactive-brokers/client') || request === '../brokers/interactive-brokers/client') {
       return {
         InteractiveBrokersClient: class FakeClient {
-          async placeOrder(order, { dryRun, revocableOnly }) {
+          async placeOrder(order, { dryRun }) {
             return {
               ok: true,
               dryRun,
