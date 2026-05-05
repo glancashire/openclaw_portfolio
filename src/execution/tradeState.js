@@ -256,7 +256,7 @@ function listOpenBrokerOrderRows(tradesPath) {
     const status = String(row.Status || '').trim().toLowerCase();
     const orderId = String(row['Broker order id'] || '').trim();
     if (!orderId) return;
-    if (!['approved', 'submitted', 'partially_filled'].includes(status)) return;
+    if (!['submitted', 'partially_filled'].includes(status)) return;
     if (String(row.Approval || '').trim() === 'cancelled') return;
 
     const current = latestByOrderId.get(orderId);
