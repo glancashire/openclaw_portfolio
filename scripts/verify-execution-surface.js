@@ -23,6 +23,7 @@ const checks = [
   'test-first-purchase-sales-approval-gates.js',
   'test-stage-live-order-records-broker-order-id.js',
   'test-cancel-staged-order-reconciliation.js',
+  'test-staged-order-approval-guard.js',
 ];
 
 function run(script) {
