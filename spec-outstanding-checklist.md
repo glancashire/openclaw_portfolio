@@ -8,27 +8,27 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] complete
 
 ## 1. Live execution lane
-- [ ] Implement explicitly writable-mode order submission path
+- [~] Implement explicitly writable-mode order submission path
 - [~] Implement durable order status tracking after submission
 - [~] Implement robust cancel flow in writable mode
 - [x] Preserve confirmation workflow before any real buy/sell
-- [ ] Handle partial fills / failed submissions / retries safely
+- [~] Handle partial fills / failed submissions / retries safely
 - [~] Strengthen broker-write logging and audit trail
 
 ## 2. Approval-gated execution workflow
 - [~] Implement proposal -> approval -> submission state transitions
 - [~] Define and enforce `trades.md` update rules for approvals and executions
-- [ ] Implement first-purchase approval handling
-- [ ] Implement sales approval handling
+- [x] Implement first-purchase approval handling
+- [x] Implement sales approval handling
 - [ ] Implement blocked-state behavior for unresolved strategy questions
-- [ ] Add clear operator actions for approve / reject / cancel / resync
+- [~] Add clear operator actions for approve / reject / cancel / resync
 
 ## 3. Order lifecycle hardening and reconciliation
 - [~] Add reconciliation for submitted / open / filled / cancelled orders
-- [ ] Sync broker execution results back into Markdown state
-- [ ] Prevent duplicate submission
+- [~] Sync broker execution results back into Markdown state
+- [x] Prevent duplicate submission
 - [~] Prevent execution of stale proposals
-- [ ] Make resync idempotent after restart/crash
+- [~] Make resync idempotent after restart/crash
 - [x] Block repeated trade attempts after uncertain broker/API failures without human review
 
 ## 4. Strategy validation and trade blocking
@@ -127,16 +127,15 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Verify safety blocks prevent bad trades end-to-end
 
 ## Working summary
-- Biggest remaining risk: moving from dry-run correctness to safe writable execution.
-- Current state: read-only IBKR connectivity, holdings sync, dry-run proposal generation, dashboard/report generation, and core safety controls are partially or substantially in place; writable execution and full end-to-end reconciliation remain the main gaps.
+- Biggest remaining risk: closing the final gap between staged broker orders and fully safe live submission / terminal reconciliation.
+- Current state: read-only IBKR connectivity, holdings sync, dry-run proposal generation, staged live broker orders, approval/rejection flows, duplicate-submission guards, partial-fill inference, resync hardening, dashboard/report generation, and core safety controls are all substantially in place; fully finished writable execution and end-to-end reconciliation remain the main gaps.
 - Suggested implementation order:
-  1. execution workflow + approval flow
-  2. order lifecycle reconciliation / idempotency
-  3. strategy/risk/blocking hardening
+  1. writable submission completion + terminal reconciliation consistency
+  2. unresolved-strategy / stale-data / broker-state trade blocking hardening
+  3. history/dashboard/report orchestration review
   4. rebalancing hardening
   5. ETF suggestion workflow
   6. portfolio creation workflow verification
-  7. history/dashboard/report orchestration review
-  8. scheduling/alerts/ops hardening
-  9. broker interface completeness audit
-  10. end-to-end acceptance testing
+  7. scheduling/alerts/ops hardening
+  8. broker interface completeness audit
+  9. end-to-end acceptance testing
