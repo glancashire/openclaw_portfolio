@@ -250,19 +250,28 @@ function rejectTradeProposal(tradesPath, selector, approval = 'user_rejected') {
 
 function listOpenBrokerOrderRows(tradesPath) {
   const table = readTradesTable(tradesPath);
-  return table.rows
-    .filter((row) => {
-      const status = String(row.Status || '').trim().toLowerCase();
-      const orderId = String(row['Broker order id'] || '').trim();
-      return orderId && ['approved', 'submitted', 'partially_filled'].includes(status) && String(row.Approval || '').trim() !== 'cancelled';
-    })
-    .map((row) => ({
-      dateTime: row['Date/time'],
-      tickerOrIsin: row['Ticker / ISIN'],
-      action: row.Action,
-      status: row.Status,
-      brokerOrderId: row['Broker order id'],
-    }));
+  const latestByOrderId = new Map();
+
+  table.rows.forEach((row) => {
+    const status = String(row.Status || '').trim().toLowerCase();
+    const orderId = String(row['Broker order id'] || '').trim();
+    if (!orderId) return;
+    if (!['approved', 'submitted', 'partially_filled'].includes(status)) return;
+    if (String(row.Approval || '').trim() === 'cancelled') return;
+
+    const current = latestByOrderId.get(orderId);
+    const rowDate = String(row['Date/time'] || '').trim();
+    const currentDate = current ? String(current['Date/time'] || '').trim() : '';
+    if (!current || rowDate >= currentDate) latestByOrderId.set(orderId, row);
+  });
+
+  return Array.from(latestByOrderId.values()).map((row) => ({
+    dateTime: row['Date/time'],
+    tickerOrIsin: row['Ticker / ISIN'],
+    action: row.Action,
+    status: row.Status,
+    brokerOrderId: row['Broker order id'],
+  }));
 }
 
 module.exports = {

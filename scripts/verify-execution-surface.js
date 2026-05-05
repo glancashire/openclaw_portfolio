@@ -19,6 +19,7 @@ const checks = [
   'test-reject-trade-transition.js',
   'test-open-order-row-list.js',
   'test-resync-idempotent-open-order-filter.js',
+  'test-resync-latest-row-only.js',
   'test-first-purchase-sales-approval-gates.js',
 ];
 
