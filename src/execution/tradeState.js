@@ -247,10 +247,29 @@ function rejectTradeProposal(tradesPath, selector, approval = 'user_rejected') {
   return { updated };
 }
 
+
+function listOpenBrokerOrderRows(tradesPath) {
+  const table = readTradesTable(tradesPath);
+  return table.rows
+    .filter((row) => {
+      const status = String(row.Status || '').trim().toLowerCase();
+      const orderId = String(row['Broker order id'] || '').trim();
+      return orderId && ['approved', 'submitted', 'partially_filled'].includes(status);
+    })
+    .map((row) => ({
+      dateTime: row['Date/time'],
+      tickerOrIsin: row['Ticker / ISIN'],
+      action: row.Action,
+      status: row.Status,
+      brokerOrderId: row['Broker order id'],
+    }));
+}
+
 module.exports = {
   readTradesTable,
   updateTradeRows,
   appendTradeEvent,
+  listOpenBrokerOrderRows,
   markTradeApproved,
   rejectTradeProposal,
   reconcileOrderStatus,

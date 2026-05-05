@@ -8,7 +8,7 @@ const { appendTradeProposals } = require('../analysis/tradeLogWriter');
 const { appendHistorySnapshot } = require('../analysis/historyWriter');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-brokers/holdingsSync');
-const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent } = require('./tradeState');
+const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows } = require('./tradeState');
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
 
 function parsePortfolioStatus(text) {
@@ -350,6 +350,36 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
   };
 }
 
+
+async function resyncPortfolioOrders({ portfolioDir, refreshHoldingsOnFill = true }) {
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const rows = fs.existsSync(tradesPath) ? listOpenBrokerOrderRows(tradesPath) : [];
+  const results = [];
+
+  for (const row of rows) {
+    const outcome = await syncPortfolioOrderStatus({
+      portfolioDir,
+      orderId: row.brokerOrderId,
+      selector: {
+        orderId: row.brokerOrderId,
+        dateTime: row.dateTime,
+        tickerOrIsin: row.tickerOrIsin,
+        action: row.action,
+      },
+      reasonNote: 'Automated resync of open broker order state.',
+      refreshHoldingsOnFill,
+    });
+    results.push({ row, outcome });
+  }
+
+  return {
+    ok: results.every((entry) => entry.outcome.ok || entry.outcome.reason === 'not_found'),
+    scanned: rows.length,
+    synced: results.filter((entry) => entry.outcome.ok).length,
+    results,
+  };
+}
+
 async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, userApproved = false }) {
   if (!userApproved) {
     return {
@@ -435,5 +465,6 @@ module.exports = {
   approvePortfolioTrade,
   rejectPortfolioTrade,
   syncPortfolioOrderStatus,
+  resyncPortfolioOrders,
   cancelPortfolioOrder,
 };
