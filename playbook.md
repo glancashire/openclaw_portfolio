@@ -4,13 +4,20 @@
 
 Use these project skills for work derived from `SPECIFICATION.md`:
 
-1. `skills/portfolio-orchestrator/`
+1. `skills/superpowers-openclaw/`
+   - OpenClaw-adapted spec/plan/verify workflow for software delivery
+   - use before non-trivial coding or multi-step implementation work
+
+2. `skills/portfolio-orchestrator/`
    - top-level coordination for implementation work
    - use for planning, sequencing, and scope checks
 
-2. `skills/portfolio-markdown-contracts/`
+3. `skills/portfolio-markdown-contracts/`
    - use when generating or editing portfolio Markdown control files
    - includes file-contract reference material
+
+4. `taskflow` (built-in skill)
+   - use for durable multi-step detached work with waits/child tasks
 
 Packaged copies are in `dist/`:
 - `dist/portfolio-orchestrator.skill`
@@ -19,8 +26,10 @@ Packaged copies are in `dist/`:
 ## Usage rule
 
 When implementing this repo:
-- start with `portfolio-orchestrator`
+- start with `superpowers-openclaw`
+- then use `portfolio-orchestrator`
 - switch to `portfolio-markdown-contracts` for file scaffolding/contracts
+- use `taskflow` for durable multi-step detached work
 - use the Interactive Brokers adapter docs/code directly for broker integration work
 
 ## Important guardrails
