@@ -458,14 +458,18 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
   const cancelStatus = cancelResult.cancel?.status || 'cancelled';
-  const reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, { orderId, status: cancelStatus }, { reasonNote: cancelResult.cancel?.message || 'Broker cancel requested.' });
+  const reasonNote = cancelResult.cancel?.message || 'Broker cancel requested.';
+  let reconcile = reconcileOrderStatus(tradesPath, { ...selector, orderId }, { orderId, status: cancelStatus }, { reasonNote });
+  if (reconcile.updated === 0) {
+    reconcile = reconcileOrderStatus(tradesPath, { orderId }, { orderId, status: cancelStatus }, { reasonNote });
+  }
   if (reconcile.updated === 0) {
     appendTradeEvent(tradesPath, {
       status: 'cancelled',
       action: selector.action || '',
       tickerOrIsin: selector.tickerOrIsin || '',
       name: selector.name || '',
-      reason: cancelResult.cancel?.message || 'Broker cancel requested.',
+      reason: reasonNote,
       approval: 'cancelled',
       brokerOrderId: String(orderId),
     });
