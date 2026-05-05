@@ -14,6 +14,11 @@ const checks = [
   'test-dashboard-execution-summary.js',
   'test-latest-trade-proposals-dedup.js',
   'test-duplicate-submission-guard.js',
+  'test-approval-transition-guard.js',
+  'test-stale-proposal-approval-guard.js',
+  'test-reject-trade-transition.js',
+  'test-open-order-row-list.js',
+  'test-resync-idempotent-open-order-filter.js',
 ];
 
 function run(script) {
