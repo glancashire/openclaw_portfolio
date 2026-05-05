@@ -22,6 +22,7 @@ const checks = [
   'test-resync-latest-row-only.js',
   'test-first-purchase-sales-approval-gates.js',
   'test-stage-live-order-records-broker-order-id.js',
+  'test-cancel-staged-order-reconciliation.js',
 ];
 
 function run(script) {
