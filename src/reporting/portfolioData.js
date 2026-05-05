@@ -49,7 +49,7 @@ function latestTradeProposals(tradesPath) {
 
   return Array.from(latestByInstrument.values()).filter((row) => {
     const status = String(row.status || '').trim().toLowerCase();
-    return ['proposed', 'planned', 'approved', 'submitted', 'partially_filled'].includes(status);
+    return ['proposed', 'planned', 'approved', 'staged', 'submitted', 'partially_filled'].includes(status);
   });
 }
 
@@ -74,6 +74,7 @@ function executionLifecycleSummary(tradesPath) {
   const summary = {
     proposed: 0,
     approved: 0,
+    staged: 0,
     submitted: 0,
     partiallyFilled: 0,
     filled: 0,
@@ -87,6 +88,7 @@ function executionLifecycleSummary(tradesPath) {
     const status = String(row.status || '').trim().toLowerCase();
     if (status === 'proposed') summary.proposed += 1;
     else if (status === 'approved') summary.approved += 1;
+    else if (status === 'staged') summary.staged += 1;
     else if (status === 'submitted') summary.submitted += 1;
     else if (status === 'partially_filled') summary.partiallyFilled += 1;
     else if (status === 'filled') summary.filled += 1;

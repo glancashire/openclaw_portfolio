@@ -158,7 +158,9 @@ function toTradeProposalRow(order, policy, brokerResult) {
     : 'pending_user_approval';
   return {
     action,
-    status: brokerResult?.dryRun === false ? 'submitted' : 'planned',
+    status: brokerResult?.dryRun === false
+      ? (brokerResult?.order?.transmit === false ? 'staged' : 'submitted')
+      : 'planned',
     instrument: instrument?.tickerOrIsin || order.symbol || order.identifier,
     instrumentName: instrument?.name || order.symbol || 'Unknown instrument',
     quantity: Number(order.quantity || 0),
@@ -200,7 +202,7 @@ function hasConflictingOpenTrade(tradesPath, order) {
     if (!line.startsWith('| ') || line.includes('|---|') || line.includes('| Date/time |')) continue;
     const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
     const status = String(cells[1] || '').toLowerCase();
-    if (!['approved', 'submitted', 'partially_filled'].includes(status)) continue;
+    if (!['approved', 'staged', 'submitted', 'partially_filled'].includes(status)) continue;
     const ticker = String(cells[3] || '').trim().toUpperCase();
     if (targetIds.has(ticker)) return true;
   }

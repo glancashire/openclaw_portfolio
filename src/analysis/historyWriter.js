@@ -48,6 +48,7 @@ function normalizeSnapshotType(snapshot, notes = '', options = {}) {
   const status = String(options.executionStatus || '').trim().toLowerCase();
   if (status) {
     if (status === 'approved') return 'execution_approved';
+    if (status === 'staged' || status === 'staged_not_transmitted') return 'execution_staged';
     if (status === 'submitted' || status === 'presubmitted') return 'execution_submitted';
     if (status === 'partially_filled') return 'execution_partially_filled';
     if (status === 'filled') return 'execution_filled';

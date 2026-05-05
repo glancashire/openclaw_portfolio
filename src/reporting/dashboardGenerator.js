@@ -85,7 +85,7 @@ function formatInstrumentOverviewRows(approvedInstruments = [], latestProposals 
     const status = String(proposal?.status || '').trim().toLowerCase();
     const statusPrefix = status === 'approved'
       ? 'approved'
-      : status === 'submitted' || status === 'partially_filled' || status === 'filled'
+      : status === 'staged' || status === 'submitted' || status === 'partially_filled' || status === 'filled'
         ? 'in_flight'
         : status === 'proposed'
           ? 'proposal'
@@ -107,9 +107,9 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
     ];
   }
 
-  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) {
+  if ((lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) {
     return [
-      'Monitor submitted and partially filled orders before generating fresh proposals.',
+      'Monitor staged, submitted, and partially filled orders before generating fresh proposals.',
       'Reconcile broker order status back into trades, holdings, and history before acting on new execution plans.',
     ];
   }
@@ -149,6 +149,7 @@ function formatExecutionLifecycle(summary = {}) {
   return [
     `- Proposed: ${summary.proposed || 0}`,
     `- Approved: ${summary.approved || 0}`,
+    `- Staged: ${summary.staged || 0}`,
     `- Submitted: ${summary.submitted || 0}`,
     `- Partially filled: ${summary.partiallyFilled || 0}`,
     `- Filled: ${summary.filled || 0}`,

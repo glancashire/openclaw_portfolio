@@ -167,7 +167,9 @@ function mapBrokerOrderStatus(status, brokerOrder = {}) {
   }
   if (['partially_filled', 'partial', 'partial_fill'].includes(raw) || hasPartialFill) return 'partially_filled';
   if (raw === 'filled' || hasCompleteFill) return 'filled';
-  if (['submitted', 'presubmitted', 'api_pending', 'pending_submit', 'pendingcancel'].includes(raw)) return 'submitted';
+  if (['submitted', 'presubmitted', 'api_pending', 'pending_submit', 'pendingcancel'].includes(raw)) {
+    return brokerOrder.transmit === false ? 'staged' : 'submitted';
+  }
   if (['cancelled', 'canceled', 'cancel_requested', 'pending_cancel'].includes(raw)) return 'cancelled';
   if (['inactive', 'rejected', 'failed', 'error', 'not_found', 'missing'].includes(raw)) return 'failed';
   if (raw === 'simulated') return 'simulated';
@@ -177,6 +179,7 @@ function mapBrokerOrderStatus(status, brokerOrder = {}) {
 
 function inferApproval(status, brokerOrder = {}) {
   if (status === 'approved') return 'user_approved';
+  if (status === 'staged') return 'staged_not_transmitted';
   if (status === 'submitted') return brokerOrder.transmit === false ? 'staged_not_transmitted' : 'submitted_to_broker';
   if (status === 'partially_filled' || status === 'filled') return 'broker_filled';
   if (status === 'cancelled') return 'cancelled';
@@ -256,7 +259,7 @@ function listOpenBrokerOrderRows(tradesPath) {
     const status = String(row.Status || '').trim().toLowerCase();
     const orderId = String(row['Broker order id'] || '').trim();
     if (!orderId) return;
-    if (!['submitted', 'partially_filled'].includes(status)) return;
+    if (!['staged', 'submitted', 'partially_filled'].includes(status)) return;
     if (String(row.Approval || '').trim() === 'cancelled') return;
 
     const current = latestByOrderId.get(orderId);

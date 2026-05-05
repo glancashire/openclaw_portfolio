@@ -93,7 +93,7 @@ async function main() {
     const rows = readTradesTable(path.join(portfolioDir, 'trades.md')).rows;
     assert(rows.length === 1, `Expected 1 trade row, got ${rows.length}`);
     const row = rows[0];
-    assert(row.Status === 'submitted', `Expected staged live row status submitted, got ${row.Status}`);
+    assert(row.Status === 'staged', `Expected staged live row status staged, got ${row.Status}`);
     assert(row.Approval === 'staged_not_transmitted', `Expected staged approval, got ${row.Approval}`);
     assert(row['Broker order id'] === '4242', `Expected broker order id 4242, got ${row['Broker order id']}`);
 
