@@ -20,7 +20,7 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [~] Define and enforce `trades.md` update rules for approvals and executions
 - [x] Implement first-purchase approval handling
 - [x] Implement sales approval handling
-- [ ] Implement blocked-state behavior for unresolved strategy questions
+- [x] Implement blocked-state behavior for unresolved strategy questions
 - [~] Add clear operator actions for approve / reject / cancel / resync
 
 ## 3. Order lifecycle hardening and reconciliation
@@ -32,12 +32,12 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Block repeated trade attempts after uncertain broker/API failures without human review
 
 ## 4. Strategy validation and trade blocking
-- [ ] Block trading when unresolved questions remain
-- [ ] Validate approved instruments / excluded instruments consistency
+- [x] Block trading when unresolved questions remain
+- [x] Validate approved instruments / excluded instruments consistency
 - [~] Detect and block on unmatched holdings
-- [ ] Detect and block on stale price data
+- [x] Detect and block on stale price data
 - [~] Detect and block on risk-limit breaches before proposal/execution
-- [~] Detect and block on broker/account mismatch or uncertain broker state
+- [x] Detect and block on broker/account mismatch or uncertain broker state
 
 ## 5. ETF suggestion workflow
 - [ ] Implement ETF search + shortlist workflow

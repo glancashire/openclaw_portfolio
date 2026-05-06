@@ -22,7 +22,7 @@
 18. Portfolio-aware execution gating and staged-order scaffolding
 19. Trade lifecycle reconciliation into Markdown state (`approved/submitted/partially_filled/filled/cancelled/failed`)
 20. Post-fill holdings refresh hook, broker error pause state, and completed-order status fallback
-21. Typed execution history snapshots, dashboard execution lifecycle visibility, bundled execution verification, and safe demo execution flow
+21. Typed execution history snapshots, dashboard execution lifecycle visibility, bundled execution verification, safe demo execution flow, and fail-closed pre-trade safety hardening for unresolved questions / stale data / excluded-instrument conflicts
 
 ## Current repository capabilities
 
@@ -54,24 +54,28 @@
 
 ## Next phases
 
-### Phase 22 — execution-aware reporting polish
-Improve report/dashboard presentation so it:
-- distinguishes proposals from approved/submitted/in-flight states more clearly
-- reflects execution lifecycle counts and current operational posture
-- highlights failed/in-flight rows without obscuring strategy-level review
+### Phase 22 — history, dashboard, and reporting freshness
+Improve output trustworthiness so it:
+- guarantees `history.md` snapshots after material execution/reporting events
+- regenerates dashboard artifacts after trade execution transitions, not only holdings sync/rebalance
+- detects and reports stale dashboard/report state clearly
+- keeps execution-state visibility aligned across dashboard and reports
 
 Current state:
 - dashboard execution lifecycle summary now exists
 - reports still need richer execution-state surfacing
-- proposal-vs-approved separation can still improve in some views
+- material-event refresh guarantees are still incomplete
 
-### Phase 23 — writable execution enablement preparation
-Advance broker integration by:
-- keeping the native TWS / IB Gateway socket API path as the primary transport
-- preparing a true writable `placeOrder` path behind strict explicit safety gates
-- hardening live `cancelOrder` and real broker reconciliation behavior
-- ensuring unresolved draft/onboarding holes block any write path cleanly
-- keeping dry-run/live gating explicit and testable
+### Phase 23 — rebalancing hardening
+Advance proposal quality by:
+- enforcing drift thresholds and min/max allocation breach handling consistently
+- preferring available cash before sells when feasible
+- suppressing tiny churn trades and excessive turnover
+- strengthening rationale so each proposal explains the governing rule clearly
+
+Current state:
+- dry-run proposals and allocation analysis exist
+- safety gating is stronger, but proposal-quality constraints still need hardening
 
 Current reconciliation state:
 - staged -> submitted -> partially_filled / filled / cancelled / not_found paths are now verified in automated tests

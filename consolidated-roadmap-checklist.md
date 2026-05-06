@@ -31,10 +31,10 @@ Goal: keep Markdown state and broker state aligned without duplicate or stale tr
 ## Phase 3 — Trade blocking and safety hardening
 Goal: stop bad live trades before they reach broker state.
 
-- [ ] Block trading when unresolved strategy questions remain
-- [ ] Validate approved instruments vs excluded instruments consistency
-- [ ] Block stale price data
-- [~] Tighten broker/account mismatch or uncertain broker-state blocking
+- [x] Block trading when unresolved strategy questions remain
+- [x] Validate approved instruments vs excluded instruments consistency
+- [x] Block stale price data
+- [x] Tighten broker/account mismatch or uncertain broker-state blocking
 - [~] Tighten risk-limit breach blocking before proposal / execution
 - [x] Preserve confirmation workflow before any real buy / sell
 - [x] Enforce first-purchase approval handling

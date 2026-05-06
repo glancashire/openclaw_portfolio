@@ -8,6 +8,10 @@ function includesSimulatedPricing(holdingsText) {
   return /Pricing source:\s*simulated/i.test(holdingsText) || /Simulated pricing assumptions/i.test(holdingsText);
 }
 
+function includesStalePricing(holdingsText) {
+  return /Pricing source:\s*stale/i.test(holdingsText) || /Warnings:\s*[\s\S]*stale price/i.test(holdingsText);
+}
+
 function hasOpenQuestions(portfolioText) {
   const sectionMatch = portfolioText.match(/## Notes \/ Open Questions([\s\S]*)$/);
   if (!sectionMatch) return false;
@@ -35,13 +39,16 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
   const blockers = [];
 
   if (hasOpenQuestions(portfolioText)) {
-    blockers.push({ severity: 'warning', message: 'Portfolio still has open questions; do not trade live yet.' });
+    blockers.push({ severity: 'error', message: 'Portfolio still has open questions; trade execution must remain blocked.' });
   }
   if (/Unmatched holdings: (?!none)/.test(holdingsText)) {
     blockers.push({ severity: 'error', message: 'Holdings contain unmatched instruments.' });
   }
   if (includesSimulatedPricing(holdingsText)) {
-    blockers.push({ severity: 'warning', message: 'Holdings and pricing are still simulated.' });
+    blockers.push({ severity: 'error', message: 'Holdings and pricing are still simulated.' });
+  }
+  if (includesStalePricing(holdingsText)) {
+    blockers.push({ severity: 'error', message: 'Holdings pricing is stale.' });
   }
   const executionMode = extractExecutionMode(portfolioText);
   if (executionMode && executionMode !== 'require_confirmation' && executionMode !== 'propose_only') {
@@ -57,4 +64,4 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
   return blockers;
 }
 
-module.exports = { evaluateSafetyControls };
+module.exports = { evaluateSafetyControls, hasOpenQuestions, includesSimulatedPricing, includesStalePricing };

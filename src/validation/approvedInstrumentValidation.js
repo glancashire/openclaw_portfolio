@@ -1,4 +1,4 @@
-const { readApprovedInstruments } = require('../analysis/approvedInstruments');
+const { readApprovedInstruments, readExcludedInstruments } = require('../analysis/approvedInstruments');
 
 const VALID_ASSET_CLASSES = new Set(['Global equities', 'Swiss equities', 'Bonds / cash-like']);
 
@@ -9,6 +9,9 @@ function validateApprovedInstruments(portfolioPath) {
     issues.push({ severity: 'warning', filePath: portfolioPath, message: 'No approved instruments defined.' });
     return issues;
   }
+
+  const excluded = readExcludedInstruments(portfolioPath);
+  const excludedIds = new Set(excluded.map((instrument) => String(instrument.tickerOrIsin || '').trim().toUpperCase()).filter(Boolean));
 
   for (const instrument of instruments) {
     if (!instrument.tickerOrIsin) {
@@ -29,6 +32,9 @@ function validateApprovedInstruments(portfolioPath) {
     }
     if (!instrument.exchange) {
       issues.push({ severity: 'info', filePath: portfolioPath, message: `Approved instrument ${instrument.tickerOrIsin || instrument.name} is missing exchange metadata.` });
+    }
+    if (excludedIds.has(String(instrument.tickerOrIsin || '').trim().toUpperCase())) {
+      issues.push({ severity: 'error', filePath: portfolioPath, message: `Approved instrument ${instrument.tickerOrIsin || instrument.name} also appears in Excluded Instruments.` });
     }
   }
 

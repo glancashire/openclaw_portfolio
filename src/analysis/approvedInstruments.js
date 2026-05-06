@@ -67,4 +67,15 @@ function readApprovedInstruments(portfolioPath) {
   });
 }
 
-module.exports = { readApprovedInstruments, parseMetadata };
+function readExcludedInstruments(portfolioPath) {
+  const text = fs.readFileSync(portfolioPath, 'utf8');
+  const rows = parseRows(extractSection(text, 'Excluded Instruments'));
+  return rows
+    .map((row) => ({
+      tickerOrIsin: row[0] || '',
+      reason: row[1] || '',
+    }))
+    .filter((row) => row.tickerOrIsin && String(row.tickerOrIsin).toLowerCase() !== 'none');
+}
+
+module.exports = { readApprovedInstruments, readExcludedInstruments, parseMetadata };

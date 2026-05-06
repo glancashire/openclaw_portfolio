@@ -12,19 +12,19 @@ Stop unsafe live or staged trade paths before they touch broker state by enforci
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect current safety validation and execution policy code paths.
-- [ ] Identify the minimum code changes needed for unresolved-question, consistency, stale-price, and broker-certainty blocking.
-- [ ] Implement or tighten the validation/execution blockers.
-- [ ] Add focused tests for:
-  - [ ] unresolved open questions blocking execution
-  - [ ] approved/excluded overlap blocking execution
-  - [ ] stale holdings pricing blocking execution
-  - [ ] simulated pricing blocking execution remains blocked
-  - [ ] broker/account uncertainty blocking execution
-- [ ] Run the targeted safety test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader execution/safety verification bundle.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect current safety validation and execution policy code paths.
+- [x] Identify the minimum code changes needed for unresolved-question, consistency, stale-price, and broker-certainty blocking.
+- [x] Implement or tighten the validation/execution blockers.
+- [x] Add focused tests for:
+  - [x] unresolved open questions blocking execution
+  - [x] approved/excluded overlap blocking execution
+  - [x] stale holdings pricing blocking execution
+  - [x] simulated pricing blocking execution remains blocked
+  - [x] broker/account uncertainty blocking execution
+- [x] Run the targeted safety test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader execution/safety verification bundle.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 

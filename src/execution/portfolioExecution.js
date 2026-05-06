@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { InteractiveBrokersClient } = require('../brokers/interactive-brokers/client');
-const { readApprovedInstruments } = require('../analysis/approvedInstruments');
+const { readApprovedInstruments, readExcludedInstruments } = require('../analysis/approvedInstruments');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 const { appendTradeProposals } = require('../analysis/tradeLogWriter');
@@ -94,6 +94,7 @@ function buildPolicyContext({ portfolioPath, holdingsPath }) {
     requireFirstPurchaseApproval: parseBooleanLine(portfolioText, 'Require user approval for first purchase'),
     requireSalesApproval: parseBooleanLine(portfolioText, 'Require user approval for sales'),
     approvedInstruments: readApprovedInstruments(portfolioPath),
+    excludedInstruments: readExcludedInstruments(portfolioPath),
     safetyBlockers: evaluateSafetyControls({ portfolioPath, holdingsPath }),
     holdingsHealth: parseHoldingsHealth(holdingsText),
   };
@@ -127,7 +128,14 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
   }
   if (context.holdingsHealth.hasUnmatched) blockers.push(`Holdings contain unmatched instruments: ${context.holdingsHealth.unmatched}`);
   if (context.holdingsHealth.simulatedPricing) blockers.push('Holdings still use simulated pricing.');
+  if (/stale/i.test(String(context.holdingsHealth.pricingSource || ''))) blockers.push('Holdings pricing source is stale.');
+  const excludedIds = new Set((context.excludedInstruments || []).map((instrument) => String(instrument.tickerOrIsin || '').trim().toUpperCase()).filter(Boolean));
+  if (instrument && excludedIds.has(String(instrument.tickerOrIsin || '').trim().toUpperCase())) {
+    blockers.push(`Requested instrument ${instrument.tickerOrIsin} is explicitly excluded.`);
+  }
   if (live && !readiness.authenticated) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
+  if (live && readiness.configured === false) blockers.push('Broker configuration is incomplete for live execution.');
+  if (live && context.accountReference && /^(<.*>|unknown)$/i.test(String(context.accountReference).trim())) blockers.push('Broker account reference is unresolved for live execution.');
   if (live && errorState.stopAutomation) blockers.push(`Broker automation is paused after ${errorState.consecutive} consecutive broker errors.`);
   for (const blocker of context.safetyBlockers) blockers.push(blocker.message);
 
