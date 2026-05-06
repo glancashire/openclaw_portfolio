@@ -73,6 +73,12 @@ Advance broker integration by:
 - ensuring unresolved draft/onboarding holes block any write path cleanly
 - keeping dry-run/live gating explicit and testable
 
+Current reconciliation state:
+- staged -> submitted -> partially_filled / filled / cancelled / not_found paths are now verified in automated tests
+- resync keeps only latest actionable broker-order rows
+- cancel failures now increment runtime broker error state and successful cancel clears that state
+- execution status changes append typed history snapshots and regenerate dashboard state
+
 Current state:
 - native client code exists and the readiness check is green again for read-only use
 - live read-only holdings sync succeeds for account `U25624150`

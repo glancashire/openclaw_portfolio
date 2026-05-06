@@ -21,12 +21,12 @@ Goal: make live submission safe end-to-end.
 ## Phase 2 — Lifecycle reconciliation consistency
 Goal: keep Markdown state and broker state aligned without duplicate or stale transitions.
 
-- [~] Sync broker execution results back into Markdown state
-- [~] Make resync idempotent after restart / crash
-- [~] Prevent stale proposals from becoming actionable
-- [~] Keep partial fills, failures, cancels, and retries consistent
-- [~] Ensure terminal rows stay terminal
-- [ ] Verify reconciliation behavior against staged broker orders in all terminal paths
+- [x] Sync broker execution results back into Markdown state
+- [x] Make resync idempotent after restart / crash
+- [x] Prevent stale proposals from becoming actionable
+- [x] Keep partial fills, failures, cancels, and retries consistent
+- [x] Ensure terminal rows stay terminal
+- [x] Verify reconciliation behavior against staged broker orders in all terminal paths
 
 ## Phase 3 — Trade blocking and safety hardening
 Goal: stop bad live trades before they reach broker state.

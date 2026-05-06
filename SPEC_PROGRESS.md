@@ -4,9 +4,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, and durable read-only broker integration; still intentionally not live-execution-ready.
+- Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, and durable read-only broker integration; still intentionally not live-execution-ready.
 - Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, and execution lifecycle reconciliation back into Markdown state.
-- Biggest remaining gaps: true writable execution enablement, final live-path operational hardening, and broader reporting/dashboard polish rather than missing core scaffolding.
+- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, trade-blocking hardening for unresolved strategy/stale data conditions, and broader reporting/dashboard polish rather than missing core scaffolding.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -19,7 +19,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 | 12. Interactive Brokers adapter MVP | partial | Native TWS / IB Gateway socket connectivity is working in read-only mode, holdings sync is live, current dry-run proposals use broker-backed pricing where available, and the repo now exposes normalized quote/dry-run/status/cancel scaffolding plus completed-order inspection. Remaining gap is fully enabled live writable execution. |
 | 13. Portfolio creation workflow | partial | Create/bootstrap/apply-answers/next-questions workflow exists and clears current ETF draft-state gaps cleanly. Workflow cohesion could still improve. |
 | 14. Strategy and ETF selection workflow | partial | Approved instruments, validation, shortlist generation, rationale, and approval-gated application support exist, but shortlist write-back/approval flow is still light. |
-| 15. Market entry workflow | partial | Portfolio-aware execution gating, approval transitions, status reconciliation, cancel scaffolding, and demo flow now exist. The remaining gap is actual writable live submission enablement after explicit operator approval. |
+| 15. Market entry workflow | partial | Portfolio-aware execution gating, approval transitions, durable status reconciliation, cancel scaffolding with runtime error handling, and demo flow now exist. The remaining gap is actual writable live submission enablement after explicit operator approval. |
 | 16. Rebalancing workflow | partial | Allocation analysis, proposal generation, dashboard updates, status reconciliation, and post-fill holdings refresh hook exist. Final live execution hardening still trails. |
 | 17. Reporting | partial | Weekly/monthly/quarterly Markdown reports and HTML/PDF artifacts are generated. Execution lifecycle visibility is now entering reporting, but operational/report polish still remains. |
 | 18. Scheduling | partial | Schedule docs exist and OpenClaw cron jobs are wired for daily maintenance plus weekly/monthly/quarterly report cycles. Remaining work is operational hardening and delivery/alert policy. |
@@ -95,4 +95,5 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Added execution-fill and completed-order fallback paths for broker status lookup.
 - Added typed execution history snapshots and richer dashboard execution lifecycle visibility.
 - Added reconciliation note compaction and a safe demo execution flow script.
-- Expanded verification coverage with lifecycle, snapshot-typing, and dashboard execution-summary tests.
+- Added cancel-path runtime broker error tracking and recovery clearing so cancel failures participate in the same safety pause posture as stage/status failures.
+- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, and staged-order handoff tests.

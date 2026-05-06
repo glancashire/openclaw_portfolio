@@ -24,11 +24,11 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [~] Add clear operator actions for approve / reject / cancel / resync
 
 ## 3. Order lifecycle hardening and reconciliation
-- [~] Add reconciliation for submitted / open / filled / cancelled orders
-- [~] Sync broker execution results back into Markdown state
+- [x] Add reconciliation for submitted / open / filled / cancelled orders
+- [x] Sync broker execution results back into Markdown state
 - [x] Prevent duplicate submission
-- [~] Prevent execution of stale proposals
-- [~] Make resync idempotent after restart/crash
+- [x] Prevent execution of stale proposals
+- [x] Make resync idempotent after restart/crash
 - [x] Block repeated trade attempts after uncertain broker/API failures without human review
 
 ## 4. Strategy validation and trade blocking

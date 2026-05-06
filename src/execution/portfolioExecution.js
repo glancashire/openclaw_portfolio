@@ -444,16 +444,24 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
     };
   }
 
-  const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
+  const portfolioName = path.basename(portfolioDir);
+  const client = new InteractiveBrokersClient({ portfolio: portfolioName });
   const cancelResult = await client.cancelOrder(orderId);
   if (!cancelResult.ok) {
+    const errorState = recordBrokerError({
+      portfolio: portfolioName,
+      reason: cancelResult.reason || 'cancel_error',
+      message: cancelResult.error || cancelResult.message || 'Unable to cancel broker order.',
+    });
     return {
       ok: false,
       reason: cancelResult.reason || 'cancel_error',
       error: cancelResult.error || cancelResult.message || 'Unable to cancel broker order.',
       cancelResult,
+      errorState,
     };
   }
+  clearBrokerErrors(portfolioName);
 
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
