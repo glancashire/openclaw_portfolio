@@ -11,28 +11,34 @@ Finish the ETF shortlist workflow by adding the remaining selection filters and 
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect the current shortlist engine and approval/application flow for remaining Phase 7 gaps.
-- [ ] Add shortlist filtering/scoring for:
-  - [ ] geography alignment
-  - [ ] exchange availability
-  - [ ] fund size
-  - [ ] domicile preference
-  - [ ] distribution vs accumulation preference
-  - [ ] broker availability
-  - [ ] spread quality where available
-- [ ] Tighten approval gating before applying shortlist output into Approved Instruments.
-- [ ] Improve shortlist markdown/rejection output so the new filters are visible and reviewable.
-- [ ] Add focused tests for:
-  - [ ] remaining ETF filters affecting suggestions/rejections
-  - [ ] approved-instrument application blocks unapproved shortlist rows
-  - [ ] existing approved instruments still remain visible appropriately
-- [ ] Run the targeted Phase 7 ETF completion test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect the current shortlist engine and approval/application flow for remaining Phase 7 gaps.
+- [x] Add shortlist filtering/scoring for:
+  - [x] geography alignment
+  - [x] exchange availability
+  - [x] fund size
+  - [x] domicile preference
+  - [x] distribution vs accumulation preference
+  - [x] broker availability
+  - [x] spread quality where available
+- [x] Tighten approval gating before applying shortlist output into Approved Instruments.
+- [x] Improve shortlist markdown/rejection output so the new filters are visible and reviewable.
+- [x] Add focused tests for:
+  - [x] remaining ETF filters affecting suggestions/rejections
+  - [x] approved-instrument application blocks unapproved shortlist rows
+  - [x] existing approved instruments still remain visible appropriately
+- [x] Run the targeted Phase 7 ETF completion test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
 ## Intended verification
 - New focused Phase 7 completion regression test(s)
 - Existing ETF shortlist and broader execution/report verification scripts
+
+## Verified outcomes
+- Shortlist filtering now covers geography, exchange, fund-size, domicile, distribution, broker-availability, and spread-quality dimensions.
+- Shortlist markdown/rejection output now makes those filters visible for operator review.
+- Applying shortlist output into Approved Instruments now requires explicit approval evidence instead of silently promoting unapproved rows.
+- Existing approved instruments remain surfaced appropriately even when newer preference filters are stricter.

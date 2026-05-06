@@ -42,18 +42,18 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 ## 5. ETF suggestion workflow
 - [x] Implement ETF search + shortlist workflow
 - [x] Filter by asset class
-- [ ] Filter by geography
+- [x] Filter by geography
 - [x] Filter by currency
-- [ ] Filter by exchange availability
+- [x] Filter by exchange availability
 - [x] Filter by liquidity
 - [x] Filter by total expense ratio
-- [ ] Filter by fund size
+- [x] Filter by fund size
 - [x] Filter by replication method
-- [ ] Filter by domicile
-- [ ] Filter by distribution vs accumulation
-- [ ] Filter by broker availability
-- [ ] Filter by spread where available
-- [~] Require approval before adding to Approved Instruments
+- [x] Filter by domicile
+- [x] Filter by distribution vs accumulation
+- [x] Filter by broker availability
+- [x] Filter by spread where available
+- [x] Require approval before adding to Approved Instruments
 
 ## 6. Portfolio creation workflow
 - [ ] Implement guided question flow for required inputs

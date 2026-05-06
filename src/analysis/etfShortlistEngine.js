@@ -8,11 +8,15 @@ const ETF_CATALOG = [
     name: 'iShares Core S&P 500 UCITS ETF USD (Acc)',
     assetClass: 'Global equities',
     region: 'Developed World ex-CH',
+    geography: 'US-heavy developed markets',
     currency: 'USD',
     exchange: 'LSE',
     issuer: 'iShares',
     accumulating: true,
     terPct: 0.07,
+    fundSize: 'large',
+    brokerAvailable: true,
+    spreadQuality: 'tight',
     domicile: 'Ireland',
     liquidity: 'high',
     replication: 'physical',
@@ -25,11 +29,15 @@ const ETF_CATALOG = [
     name: 'iShares Core MSCI World UCITS ETF USD (Acc)',
     assetClass: 'Global equities',
     region: 'Developed World ex-CH',
+    geography: 'Broad developed markets',
     currency: 'USD',
     exchange: 'LSE',
     issuer: 'iShares',
     accumulating: true,
     terPct: 0.2,
+    fundSize: 'large',
+    brokerAvailable: true,
+    spreadQuality: 'tight',
     domicile: 'Ireland',
     liquidity: 'high',
     replication: 'physical',
@@ -42,11 +50,15 @@ const ETF_CATALOG = [
     name: 'UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc',
     assetClass: 'Global equities',
     region: 'Developed World ex-CH',
+    geography: 'Continental Europe',
     currency: 'EUR',
     exchange: 'Xetra',
     issuer: 'UBS',
     accumulating: true,
     terPct: 0.12,
+    fundSize: 'medium',
+    brokerAvailable: true,
+    spreadQuality: 'acceptable',
     domicile: 'Luxembourg',
     liquidity: 'medium',
     replication: 'physical',
@@ -59,11 +71,15 @@ const ETF_CATALOG = [
     name: 'UBS SLI ETF (SMI gleichgewichtet)',
     assetClass: 'Swiss equities',
     region: 'Switzerland',
+    geography: 'Switzerland',
     currency: 'CHF',
     exchange: 'SIX',
     issuer: 'UBS',
     accumulating: false,
     terPct: 0.21,
+    fundSize: 'medium',
+    brokerAvailable: true,
+    spreadQuality: 'acceptable',
     domicile: 'Switzerland',
     liquidity: 'medium',
     replication: 'physical',
@@ -76,11 +92,15 @@ const ETF_CATALOG = [
     name: 'iShares Core SPI ETF (CH)',
     assetClass: 'Swiss equities',
     region: 'Switzerland',
+    geography: 'Switzerland',
     currency: 'CHF',
     exchange: 'SIX',
     issuer: 'iShares',
     accumulating: false,
     terPct: 0.1,
+    fundSize: 'large',
+    brokerAvailable: true,
+    spreadQuality: 'tight',
     domicile: 'Switzerland',
     liquidity: 'high',
     replication: 'physical',
@@ -93,11 +113,15 @@ const ETF_CATALOG = [
     name: 'iShares SBI AAA-BBB CHF Bond ETF (CH)',
     assetClass: 'Bonds / cash-like',
     region: 'Bonds / cash-like CHF',
+    geography: 'Switzerland',
     currency: 'CHF',
     exchange: 'SIX',
     issuer: 'iShares',
     accumulating: false,
     terPct: 0.15,
+    fundSize: 'medium',
+    brokerAvailable: true,
+    spreadQuality: 'acceptable',
     domicile: 'Switzerland',
     liquidity: 'medium',
     replication: 'physical',
@@ -110,16 +134,41 @@ const ETF_CATALOG = [
     name: 'CHF cash balance',
     assetClass: 'Bonds / cash-like',
     region: 'Bonds / cash-like CHF',
+    geography: 'Switzerland',
     currency: 'CHF',
     exchange: 'IBKR cash balance',
     issuer: 'cash',
     accumulating: true,
     terPct: 0,
+    fundSize: 'n/a',
+    brokerAvailable: true,
+    spreadQuality: 'n/a',
     domicile: 'Switzerland',
     liquidity: 'high',
     replication: 'n/a',
     rationale: 'Keeps the defensive sleeve maximally simple and avoids forcing tiny bond ETF trades at CHF 5000 scale.',
     risks: 'Cash drag if the portfolio remains underinvested for too long.',
+  },
+  {
+    tickerOrIsin: 'LU0000000001',
+    symbol: 'SYNTHX',
+    name: 'Synthetic World ETF Example',
+    assetClass: 'Global equities',
+    region: 'Developed World ex-CH',
+    geography: 'Broad developed markets',
+    currency: 'USD',
+    exchange: 'NYSE',
+    issuer: 'ExampleIssuer',
+    accumulating: false,
+    terPct: 0.35,
+    fundSize: 'small',
+    brokerAvailable: false,
+    spreadQuality: 'wide',
+    domicile: 'Luxembourg',
+    liquidity: 'low',
+    replication: 'synthetic',
+    rationale: 'Counterexample candidate used to exercise shortlist rejection logic.',
+    risks: 'Expensive, less liquid, and not a preferred execution venue.',
   },
 ];
 
@@ -150,17 +199,28 @@ function readStrategyContext(portfolioPath) {
   const allocationRows = parseRows(extractSection(text, 'Allocation Targets'));
   const approvedRows = parseRows(extractSection(text, 'Approved Instruments'));
   const notesSection = extractSection(text, 'Notes / Open Questions');
+  const geographicRows = parseRows(extractSection(text, 'Geographic Targets'));
   const excluded = readExcludedInstruments(portfolioPath);
   return {
     currencyPreference: (text.match(/- Currency preference:\s*(.+)/) || [null, ''])[1].trim(),
     esgPreference: (text.match(/- ESG preference:\s*(.+)/) || [null, ''])[1].trim(),
     issuerNote: (notesSection.match(/ETF issuer preferences:\s*(.+)/i) || [null, ''])[1].trim(),
+    distributionPreference: (notesSection.match(/Distribution preference:\s*(.+)/i) || [null, 'accumulating preferred'])[1].trim(),
+    domicilePreference: (notesSection.match(/Domicile preference:\s*(.+)/i) || [null, 'Switzerland or Ireland preferred'])[1].trim(),
+    exchangePreference: (notesSection.match(/Exchange preference:\s*(.+)/i) || [null, 'SIX, Xetra, or LSE'])[1].trim(),
+    minimumFundSize: (notesSection.match(/Minimum fund size:\s*(.+)/i) || [null, 'medium'])[1].trim(),
+    requireBrokerAvailability: !/Broker availability optional:\s*true/i.test(notesSection),
+    requireTightSpreads: !/Allow wide spreads:\s*true/i.test(notesSection),
     allocations: allocationRows.map((row) => ({
       assetClass: row[0],
       targetPct: Number(row[1]),
       minPct: Number(row[2]),
       maxPct: Number(row[3]),
       notes: row[4] || '',
+    })),
+    geographyTargets: geographicRows.map((row) => ({
+      region: row[0],
+      targetPct: Number(row[1] || 0),
     })),
     approved: approvedRows.map((row) => row[0]).filter(Boolean),
     excludedIds: new Set(excluded.map((row) => row.tickerOrIsin)),
@@ -176,14 +236,34 @@ function issuerPreferences(note) {
   };
 }
 
+function preferredExchanges(note) {
+  const lower = String(note || '').toLowerCase();
+  return ['six', 'xetra', 'lse'].filter((name) => lower.includes(name)).map((name) => name.toUpperCase());
+}
+
+function preferredDomiciles(note) {
+  const lower = String(note || '').toLowerCase();
+  return ['switzerland', 'ireland', 'luxembourg'].filter((name) => lower.includes(name)).map((name) => name.toLowerCase());
+}
+
+function minimumFundSizeRank(value) {
+  return { 'n/a': 0, small: 1, medium: 2, large: 3 }[String(value || '').toLowerCase()] || 0;
+}
+
 function scoreCandidate(candidate, context, allocation) {
   let score = 0;
   const reasons = [];
   const prefs = issuerPreferences(context.issuerNote);
+  const exchanges = preferredExchanges(context.exchangePreference);
+  const domiciles = preferredDomiciles(context.domicilePreference);
 
   if (candidate.assetClass === allocation.assetClass) {
     score += 35;
     reasons.push('matches required asset class');
+  }
+  if (matchesGeography(candidate, context, allocation)) {
+    score += 12;
+    reasons.push('aligns with geographic target');
   }
   if (context.currencyPreference.toLowerCase().includes('chf') && candidate.currency === 'CHF') {
     score += 20;
@@ -191,6 +271,10 @@ function scoreCandidate(candidate, context, allocation) {
   } else if (candidate.currency === 'EUR') {
     score += 8;
     reasons.push('keeps currency exposure closer to Europe than a USD-only option');
+  }
+  if (exchanges.includes(String(candidate.exchange || '').toUpperCase())) {
+    score += 8;
+    reasons.push('listed on a preferred exchange');
   }
   if (candidate.liquidity === 'high') {
     score += 15;
@@ -206,13 +290,36 @@ function scoreCandidate(candidate, context, allocation) {
     score += 6;
     reasons.push('reasonable TER');
   }
-  if (candidate.accumulating) {
+  if (candidate.accumulating && /acc/i.test(context.distributionPreference)) {
     score += 6;
-    reasons.push('accumulating structure');
+    reasons.push('matches accumulating preference');
+  }
+  if (!candidate.accumulating && /dist|income/i.test(context.distributionPreference)) {
+    score += 6;
+    reasons.push('matches distribution preference');
   }
   if (candidate.replication === 'physical') {
     score += 5;
     reasons.push('physical replication');
+  }
+  if (minimumFundSizeRank(candidate.fundSize) >= minimumFundSizeRank(context.minimumFundSize)) {
+    score += 6;
+    reasons.push('meets minimum fund size preference');
+  }
+  if (domiciles.includes(String(candidate.domicile || '').toLowerCase())) {
+    score += 5;
+    reasons.push('matches domicile preference');
+  }
+  if (candidate.brokerAvailable) {
+    score += 6;
+    reasons.push('broker-available');
+  }
+  if (candidate.spreadQuality === 'tight') {
+    score += 6;
+    reasons.push('tight spread profile');
+  } else if (candidate.spreadQuality === 'acceptable') {
+    score += 3;
+    reasons.push('acceptable spread profile');
   }
   if (prefs.preferUBS && candidate.issuer === 'UBS') {
     score += 10;
@@ -238,10 +345,26 @@ function scoreCandidate(candidate, context, allocation) {
   return { score, reasons };
 }
 
+function matchesGeography(candidate, context, allocation) {
+  if (!context.geographyTargets.length) return true;
+  if (allocation.assetClass === 'Swiss equities') return /switzerland/i.test(candidate.region) || /switzerland/i.test(candidate.geography);
+  if (allocation.assetClass === 'Bonds / cash-like') return /cash-like chf|switzerland/i.test(candidate.region);
+  return /developed world ex-ch/i.test(candidate.region) || /developed markets|europe/i.test(candidate.geography);
+}
+
 function rejectionReasons(candidate, context, allocation) {
   const reasons = [];
+  const exchanges = preferredExchanges(context.exchangePreference);
+  const domiciles = preferredDomiciles(context.domicilePreference);
   if (context.excludedIds.has(candidate.tickerOrIsin)) reasons.push('explicitly listed in Excluded Instruments');
   if (candidate.assetClass !== allocation.assetClass) reasons.push('asset class mismatch');
+  if (!matchesGeography(candidate, context, allocation)) reasons.push('geography does not match target region');
+  if (exchanges.length && !exchanges.includes(String(candidate.exchange || '').toUpperCase()) && candidate.exchange !== 'IBKR cash balance') reasons.push('exchange is outside preferred venues');
+  if (minimumFundSizeRank(candidate.fundSize) < minimumFundSizeRank(context.minimumFundSize) && candidate.fundSize !== 'n/a') reasons.push('fund size below preference');
+  if (domiciles.length && !domiciles.includes(String(candidate.domicile || '').toLowerCase())) reasons.push('domicile outside preference');
+  if (/acc/i.test(context.distributionPreference) && candidate.accumulating === false && candidate.tickerOrIsin !== 'CASH-CHF' && !context.approved.includes(candidate.tickerOrIsin)) reasons.push('distribution structure does not match accumulating preference');
+  if (context.requireBrokerAvailability && candidate.brokerAvailable === false) reasons.push('not confirmed as broker-available');
+  if (context.requireTightSpreads && candidate.spreadQuality === 'wide') reasons.push('spread quality too wide');
   return reasons;
 }
 
@@ -292,9 +415,10 @@ function suggestEtfShortlist(portfolioPath) {
         exchange: ranked.candidate.exchange,
         currency: ranked.candidate.currency,
         issuer: ranked.candidate.issuer,
-        score: ranked.score,
         approved: context.approved.includes(ranked.candidate.tickerOrIsin),
+        approvalRequired: !context.approved.includes(ranked.candidate.tickerOrIsin),
         excluded: false,
+        score: ranked.score,
         notes: buildInstrumentNotes(ranked.candidate),
         reason: `${ranked.candidate.rationale} (${ranked.reasons.join('; ')})`,
         keyRisks: ranked.candidate.risks,
@@ -304,10 +428,14 @@ function suggestEtfShortlist(portfolioPath) {
     rejections.push(...rejected);
   }
 
+  const excludedCount = rejections.filter((item) => item.rejectedReasons.some((reason) => /Excluded Instruments/i.test(reason))).length;
   return {
     currencyPreference: context.currencyPreference,
     issuerPreferences: context.issuerNote || 'none',
-    excludedCount: rejections.length,
+    distributionPreference: context.distributionPreference || 'n/a',
+    domicilePreference: context.domicilePreference || 'n/a',
+    exchangePreference: context.exchangePreference || 'n/a',
+    excludedCount,
     suggestions,
     rejections,
   };
@@ -321,9 +449,10 @@ function buildInstrumentNotes(candidate) {
   return notes.join('; ');
 }
 
-function buildApprovedInstrumentRows(result, { topPerAssetClass = 1 } = {}) {
+function buildApprovedInstrumentRows(result, { topPerAssetClass = 1, requireApproval = true } = {}) {
   const selected = new Map();
   for (const item of result.suggestions) {
+    if (requireApproval && item.approved !== true) continue;
     if (!selected.has(item.assetClass)) selected.set(item.assetClass, []);
     const rows = selected.get(item.assetClass);
     if (rows.length < topPerAssetClass && item.suggestedTargetPct > 0 && !item.excluded) rows.push(item);
@@ -344,7 +473,18 @@ function buildApprovedInstrumentRows(result, { topPerAssetClass = 1 } = {}) {
   ]);
 }
 
-function replaceApprovedInstrumentsSection(portfolioText, rows) {
+function replaceApprovedInstrumentsSection(portfolioText, rows, { approvalEvidence = [] } = {}) {
+  if (!rows.length) {
+    throw new Error('No approved shortlist rows available to apply.');
+  }
+  const approvedIds = new Set((approvalEvidence || []).map((row) => String(row).trim()).filter(Boolean));
+  if (approvedIds.size) {
+    const missing = rows.filter((row) => !approvedIds.has(String(row[0]).trim()));
+    if (missing.length) {
+      throw new Error(`Cannot apply unapproved shortlist rows: ${missing.map((row) => row[0]).join(', ')}`);
+    }
+  }
+
   const lines = portfolioText.split(/\r?\n/);
   const start = lines.findIndex((line) => line.trim() === '## Approved Instruments');
   if (start === -1) throw new Error('Approved Instruments section not found');
@@ -375,14 +515,17 @@ function formatShortlistMarkdown(result) {
     '',
     `- Currency preference: ${result.currencyPreference || 'n/a'}`,
     `- Issuer preferences: ${result.issuerPreferences || 'none'}`,
+    `- Distribution preference: ${result.distributionPreference || 'n/a'}`,
+    `- Domicile preference: ${result.domicilePreference || 'n/a'}`,
+    `- Exchange preference: ${result.exchangePreference || 'n/a'}`,
     `- Excluded candidates filtered: ${result.excludedCount || 0}`,
     '',
-    '| Rank | Ticker / ISIN | Name | Asset class | Issuer | Reason | Key risks | Suggested target % |',
-    '|---:|---|---|---|---|---|---|---:|',
+    '| Rank | Ticker / ISIN | Name | Asset class | Issuer | Approval | Reason | Key risks | Suggested target % |',
+    '|---:|---|---|---|---|---|---|---|---:|',
   ];
 
   for (const item of result.suggestions) {
-    lines.push(`| ${item.rank} | ${item.tickerOrIsin} | ${item.name} | ${item.assetClass} | ${item.issuer} | ${item.reason} | ${item.keyRisks} | ${item.suggestedTargetPct} |`);
+    lines.push(`| ${item.rank} | ${item.tickerOrIsin} | ${item.name} | ${item.assetClass} | ${item.issuer} | ${item.approved ? 'approved' : 'approval required'} | ${item.reason} | ${item.keyRisks} | ${item.suggestedTargetPct} |`);
   }
 
   if (result.rejections?.length) {

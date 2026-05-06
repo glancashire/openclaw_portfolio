@@ -57,12 +57,11 @@
 ### Phase 22 — portfolio workflow completeness polish
 Improve portfolio workflow completeness by:
 - tightening guided intake/question flow for incomplete drafts
-- hardening approval-gated shortlist/application transitions
 - clarifying end-to-end operator prompts and blockers in draft-to-active workflows
 - expanding focused verification around workflow continuity
 
 Current state:
-- portfolio draft readiness is much stronger, but workflow polish and guided continuity still remain lighter than ideal
+- portfolio draft readiness is much stronger, but guided continuity still remains lighter than ideal
 
 ### Phase 23 — end-to-end acceptance closure
 Advance proposal quality by:

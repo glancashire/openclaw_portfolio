@@ -83,18 +83,18 @@ Goal: finish shortlist generation and approval gating.
 
 - [x] Implement ETF search + shortlist workflow
 - [x] Filter by asset class
-- [ ] Filter by geography
+- [x] Filter by geography
 - [x] Filter by currency
-- [ ] Filter by exchange availability
+- [x] Filter by exchange availability
 - [x] Filter by liquidity
 - [x] Filter by total expense ratio
-- [ ] Filter by fund size
+- [x] Filter by fund size
 - [x] Filter by replication method
-- [ ] Filter by domicile
-- [ ] Filter by distribution vs accumulation
-- [ ] Filter by broker availability
-- [ ] Filter by spread where available
-- [~] Require approval before adding to Approved Instruments
+- [x] Filter by domicile
+- [x] Filter by distribution vs accumulation
+- [x] Filter by broker availability
+- [x] Filter by spread where available
+- [x] Require approval before adding to Approved Instruments
 
 ## Phase 8 — Portfolio creation workflow
 Goal: make initial setup clean and safe.
