@@ -43,6 +43,7 @@ class InteractiveBrokersClient {
           ok: false,
           reason: 'native_error',
           error: error.message,
+          diagnostics: brokerDiagnostics({ mode: 'native', operation: 'authenticate', reason: 'native_error', detail: error.message }),
           log: logBrokerEvent({
             broker: 'interactive-brokers',
             operation: 'authenticate',
@@ -74,6 +75,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'skill_error',
         error: skillStatus.error,
+        diagnostics: brokerDiagnostics({ mode: 'skill', operation: 'authenticate', reason: 'skill_error', detail: skillStatus.error }),
         log: logBrokerEvent({
           broker: 'interactive-brokers',
           operation: 'authenticate',
@@ -103,6 +105,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'http_error',
         error: error.message,
+        diagnostics: brokerDiagnostics({ mode: 'http', operation: 'authenticate', reason: 'http_error', detail: error.message }),
         log: logBrokerEvent({
           broker: 'interactive-brokers',
           operation: 'authenticate',
@@ -240,6 +243,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'quote_error',
         error: error.message,
+        diagnostics: brokerDiagnostics({ mode: activeMode(this), operation: 'get_order_quote', reason: 'quote_error', detail: error.message }),
         order,
         log: logBrokerEvent({
           broker: 'interactive-brokers',
@@ -271,8 +275,10 @@ class InteractiveBrokersClient {
       return {
         ok: true,
         dryRun: true,
+        mode: 'read_only_preview',
         order: preview,
         quote: quoteResult.quote || null,
+        diagnostics: quoteResult.ok ? null : brokerDiagnostics({ mode: activeMode(this), operation: 'place_order', reason: 'quote_unavailable', detail: quoteResult.error || 'Quote data unavailable during dry-run preview.' }),
         message: 'Interactive Brokers dry-run order preview generated; no broker write attempted.',
         log: logBrokerEvent({
           broker: 'interactive-brokers',
@@ -291,30 +297,36 @@ class InteractiveBrokersClient {
     }
 
     if (!revocableOnly) {
-      return {
-        ok: false,
+      return blockedBrokerOperation({
+        operation: 'place_order',
         reason: 'policy_blocked',
         message: 'Non-revocable live order paths are blocked by policy.',
+        mode: activeMode(this),
+        portfolio: this.options.portfolio,
         order,
-      };
+      });
     }
     if (!this.skill || typeof this.skill.placeOrder !== 'function') {
-      return {
-        ok: false,
+      return blockedBrokerOperation({
+        operation: 'place_order',
         reason: 'not_available',
         message: 'Revocable non-transmitted live submission scaffold is only available via the skill-backed client right now.',
+        mode: activeMode(this),
+        portfolio: this.options.portfolio,
         order,
-      };
+      });
     }
     const action = String(order?.action || '').toUpperCase();
     const orderType = String(order?.orderType || 'LMT').toUpperCase();
     if (action === 'BUY' && orderType === 'MKT') {
-      return {
-        ok: false,
+      return blockedBrokerOperation({
+        operation: 'place_order',
         reason: 'policy_blocked',
         message: 'Market buy orders are blocked; use a revocable limit-style path only.',
+        mode: activeMode(this),
+        portfolio: this.options.portfolio,
         order,
-      };
+      });
     }
     try {
       const placed = await this.skill.placeOrder(order, { transmit: false });
@@ -322,6 +334,7 @@ class InteractiveBrokersClient {
         ok: true,
         dryRun: false,
         submitted: false,
+        mode: 'staged_not_transmitted',
         order: normaliseOrder(placed.trade || {}),
         brokerErrors: placed.errors || [],
         quote: quoteResult.quote || null,
@@ -344,6 +357,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'submit_error',
         error: error.message,
+        diagnostics: brokerDiagnostics({ mode: activeMode(this), operation: 'place_order', reason: 'submit_error', detail: error.message }),
         order,
         log: logBrokerEvent({
           broker: 'interactive-brokers',
@@ -363,12 +377,14 @@ class InteractiveBrokersClient {
         ? this.skill
         : null;
     if (!openOrderReader) {
-      return {
-        ok: false,
+      return blockedBrokerOperation({
+        operation: 'get_order_status',
         reason: 'not_available',
         message: 'Interactive Brokers open-order status lookup is not available for the current broker client mode.',
+        mode: activeMode(this),
+        portfolio: this.options.portfolio,
         orderId,
-      };
+      });
     }
     try {
       const orders = await openOrderReader.fetchOpenOrders();
@@ -431,6 +447,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'not_found',
         orderId,
+        diagnostics: brokerDiagnostics({ mode: activeMode(this), operation: 'get_order_status', reason: 'not_found', detail: 'No matching open order, execution fill, or completed order found.' }),
         message: 'No matching open order or execution fill found.',
       };
     } catch (error) {
@@ -438,6 +455,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'status_error',
         error: error.message,
+        diagnostics: brokerDiagnostics({ mode: activeMode(this), operation: 'get_order_status', reason: 'status_error', detail: error.message }),
         orderId,
         log: logBrokerEvent({
           broker: 'interactive-brokers',
@@ -453,12 +471,14 @@ class InteractiveBrokersClient {
   async cancelOrder(orderId) {
     this.assertWritable('order cancellation');
     if (!this.skill || typeof this.skill.cancelOrder !== 'function') {
-      return {
-        ok: false,
+      return blockedBrokerOperation({
+        operation: 'cancel_order',
         reason: 'not_available',
         message: 'Interactive Brokers order cancellation is only available via the skill-backed client right now.',
+        mode: activeMode(this),
+        portfolio: this.options.portfolio,
         orderId,
-      };
+      });
     }
     try {
       const result = await this.skill.cancelOrder(orderId);
@@ -479,6 +499,7 @@ class InteractiveBrokersClient {
         ok: false,
         reason: 'cancel_error',
         error: error.message,
+        diagnostics: brokerDiagnostics({ mode: activeMode(this), operation: 'cancel_order', reason: 'cancel_error', detail: error.message }),
         orderId,
         log: logBrokerEvent({
           broker: 'interactive-brokers',
@@ -505,6 +526,7 @@ function blocked(reason, missing, portfolio) {
     ok: false,
     reason,
     missing,
+    diagnostics: brokerDiagnostics({ mode: 'unconfigured', operation: 'authenticate', reason, detail: `Missing configuration: ${(missing || []).join(', ')}` }),
     log: logBrokerEvent({
       broker: 'interactive-brokers',
       operation: 'authenticate',
@@ -513,6 +535,39 @@ function blocked(reason, missing, portfolio) {
       portfolio,
     }),
   };
+}
+
+function blockedBrokerOperation({ operation, reason, message, mode, portfolio, ...rest }) {
+  return {
+    ok: false,
+    reason,
+    message,
+    diagnostics: brokerDiagnostics({ mode, operation, reason, detail: message }),
+    ...rest,
+    log: logBrokerEvent({
+      broker: 'interactive-brokers',
+      operation,
+      status: reason,
+      summary: { message, mode },
+      portfolio,
+    }),
+  };
+}
+
+function brokerDiagnostics({ mode, operation, reason, detail }) {
+  return {
+    broker: 'interactive-brokers',
+    mode: mode || 'unknown',
+    operation,
+    reason,
+    detail,
+  };
+}
+
+function activeMode(client) {
+  if (client.skill) return 'skill';
+  if (client.native) return 'native';
+  return 'http';
 }
 
 function resolveOrderContract(order = {}) {
@@ -572,4 +627,4 @@ function numberOrNull(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-module.exports = { InteractiveBrokersClient, aggregateExecutionFills };
+module.exports = { InteractiveBrokersClient, aggregateExecutionFills, brokerDiagnostics, activeMode };

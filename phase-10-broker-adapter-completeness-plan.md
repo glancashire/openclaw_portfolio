@@ -11,20 +11,25 @@ Harden the Interactive Brokers adapter surface by auditing remaining edge cases,
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect broker adapter surface and existing broker-path tests for remaining gaps.
-- [ ] Tighten adapter normalization / diagnostics where operator-facing ambiguity remains.
-- [ ] Surface unsupported or degraded live-write paths more explicitly.
-- [ ] Add focused tests for:
-  - [ ] normalized broker-path edge-case reporting
-  - [ ] explicit unsupported live-write behavior surfacing
-  - [ ] compatibility with existing execution/readiness flows
-- [ ] Run the targeted broker audit test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect broker adapter surface and existing broker-path tests for remaining gaps.
+- [x] Tighten adapter normalization / diagnostics where operator-facing ambiguity remains.
+- [x] Surface unsupported or degraded live-write paths more explicitly.
+- [x] Add focused tests for:
+  - [x] normalized broker-path edge-case reporting
+  - [x] explicit unsupported live-write behavior surfacing
+  - [x] compatibility with existing execution/readiness flows
+- [x] Run the targeted broker audit test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
 ## Intended verification
 - New focused broker-audit regression test(s)
 - Existing Interactive Brokers / execution verification scripts
+
+## Verified outcomes
+- Broker-path blocked/not-available/error responses now expose more consistent diagnostics metadata.
+- Unsupported or policy-blocked live-write paths now surface clearer operator-facing messages and mode hints.
+- Existing execution/readiness verification remains green after the broker-surface hardening.

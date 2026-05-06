@@ -99,19 +99,19 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Preserve separation between read-only automation and write-enabled automation
 
 ## 11. Broker adapter completeness audit
-- [~] Verify `authenticate()` completeness
-- [~] Verify `list_accounts()` completeness
-- [~] Verify `select_account()` completeness
-- [~] Verify `get_cash_balances()` completeness
-- [~] Verify `get_holdings()` completeness
-- [~] Verify `get_instrument_details()` completeness
-- [ ] Verify `search_instruments()` completeness
-- [~] Verify `get_latest_price()` completeness
-- [~] Verify `get_order_quote()` completeness
-- [~] Verify `place_order()` completeness
-- [~] Verify `get_order_status()` completeness
-- [~] Verify `cancel_order()` completeness
-- [~] Verify normalization helper completeness
+- [x] Verify `authenticate()` completeness
+- [x] Verify `list_accounts()` completeness
+- [x] Verify `select_account()` completeness
+- [x] Verify `get_cash_balances()` completeness
+- [x] Verify `get_holdings()` completeness
+- [x] Verify `get_instrument_details()` completeness
+- [x] Verify `search_instruments()` completeness
+- [x] Verify `get_latest_price()` completeness
+- [x] Verify `get_order_quote()` completeness
+- [x] Verify `place_order()` completeness
+- [x] Verify `get_order_status()` completeness
+- [x] Verify `cancel_order()` completeness
+- [x] Verify normalization helper completeness
 
 ## 12. End-to-end acceptance testing
 - [ ] Create a new draft portfolio end-to-end

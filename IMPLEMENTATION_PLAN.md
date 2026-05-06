@@ -54,17 +54,17 @@
 
 ## Next phases
 
-### Phase 22 — broker adapter completeness audit
-Improve broker-path confidence by:
-- auditing read-only, dry-run, status, fill, completed-order, and cancel behavior for gaps against the spec
-- surfacing unsupported live-write paths more explicitly where they are still intentionally blocked
-- tightening adapter result normalization and operator-facing diagnostics
-- expanding focused verification around broker-path edge cases
+### Phase 22 — portfolio workflow completeness polish
+Improve portfolio workflow completeness by:
+- tightening guided intake/question flow for incomplete drafts
+- hardening approval-gated shortlist/application transitions
+- clarifying end-to-end operator prompts and blockers in draft-to-active workflows
+- expanding focused verification around workflow continuity
 
 Current state:
-- the IBKR adapter is functionally useful for read-only sync and dry-run/workflow support, but live-path clarity and edge-case coverage still need hardening
+- portfolio draft readiness is much stronger, but workflow polish and guided continuity still remain lighter than ideal
 
-### Phase 23 — portfolio workflow completeness polish
+### Phase 23 — end-to-end acceptance closure
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible
