@@ -5,6 +5,7 @@ const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { renderPdf } = require('./pdfExport');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 const { fileFreshnessSummary } = require('./dashboardGenerator');
+const { brokerErrorStatus } = require('../execution/runtimeState');
 
 function defaultPeriodBounds(period, latestSnapshot) {
   const end = latestSnapshot?.date || new Date().toISOString().slice(0, 10);
@@ -64,6 +65,7 @@ function formatExecutionLifecycleSection(lifecycleSummary = {}) {
   return [
     `- Proposed: ${lifecycleSummary.proposed || 0}`,
     `- Approved: ${lifecycleSummary.approved || 0}`,
+    `- Rejected: ${lifecycleSummary.rejected || 0}`,
     `- Staged: ${lifecycleSummary.staged || 0}`,
     `- Submitted: ${lifecycleSummary.submitted || 0}`,
     `- Partially filled: ${lifecycleSummary.partiallyFilled || 0}`,
@@ -99,7 +101,7 @@ function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, f
   return parts.join(' ');
 }
 
-function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null, freshness = null, generationMeta = null }) {
+function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null, freshness = null, generationMeta = null, brokerErrorState = null }) {
   const tradeRows = trades.length
     ? trades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.reason} |`).join('\n')
     : '| YYYY-MM-DD | <action> | <instrument> | 0 | No trades recorded |';
@@ -132,7 +134,7 @@ function formatReport({ portfolioName, period, start = '', end = '', generated =
         : '- Generate the next dry-run proposal set after holdings or strategy changes.';
   const executiveSummary = narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta });
 
-  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${executiveSummary}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n- In-flight orders: ${compliance.inflightOrders}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Generation Status\n${formatGenerationStatus(generationMeta)}\n\n## Execution Lifecycle\n${formatExecutionLifecycleSection(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
+  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${executiveSummary}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n- In-flight orders: ${compliance.inflightOrders}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Operator State\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n- Consecutive broker errors: ${brokerErrorState?.consecutive || 0}\n- Last broker error reason: ${brokerErrorState?.lastReason || 'none'}\n\n## Generation Status\n${formatGenerationStatus(generationMeta)}\n\n## Execution Lifecycle\n${formatExecutionLifecycleSection(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
 }
 
 function writeReport({ portfolioDir, period, dateStamp, content }) {
@@ -158,6 +160,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const lifecycleSummary = executionLifecycleSummary(tradesPath);
   const freshness = fileFreshnessSummary({ dashboardPath, sourcePaths: [portfolioPath, path.join(portfolioDir, 'holdings.md'), tradesPath, historyPath] });
+  const brokerErrorState = brokerErrorStatus(portfolioName);
   const markdownPath = writeReport({
     portfolioDir,
     period,
@@ -175,6 +178,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
       lifecycleSummary,
       freshness,
       generationMeta: { markdownWritten: true, pdfMode: 'pending', pdfPath: null, htmlPath: null, renderWarning: null },
+      brokerErrorState,
     }),
   });
   const pdf = renderPdf(markdownPath);
@@ -198,6 +202,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp }) {
     lifecycleSummary,
     freshness,
     generationMeta,
+    brokerErrorState,
   });
   fs.writeFileSync(markdownPath, finalContent);
   return {

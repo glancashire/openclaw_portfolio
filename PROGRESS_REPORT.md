@@ -17,7 +17,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - execution lifecycle reconciliation now flows back into `trades.md`, `history.md`, and `dashboard.md`
 - bundled execution verification exists and is passing
 
-The main reason the MVP is **not yet fully implemented** is that the broker execution surface is still intentionally incomplete in true writable mode. The system is now much more complete in dry-run/read-only/reconciliation behavior, but it still does not provide a fully enabled, operator-validated, durable live submit path.
+The main reason the MVP is **not yet fully implemented** is that the broker execution surface is still intentionally incomplete in true writable mode. The system is now much more complete in dry-run/read-only/reconciliation behavior, and the operator incident/runbook layer is stronger, but it still does not provide a fully enabled, operator-validated, durable live submit path.
 
 ## Validation snapshot
 

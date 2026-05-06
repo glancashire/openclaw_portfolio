@@ -21,11 +21,11 @@ Goal: introduce an explicitly opt-in transmitted live-order path with fail-close
 ## Phase 25 — Operator runbooks and incident handling
 Goal: make the system operable during degraded broker conditions, stale state, and execution incidents without relying on tribal knowledge.
 
-- [ ] Write operator runbooks for approve / reject / resync / cancel / broker-error pause / recovery
-- [ ] Document expected state transitions and failure cases with examples
-- [ ] Add CLI/helpful script surfaces where operator recovery is awkward today
-- [ ] Add verification for documented recovery workflows where practical
-- [ ] Tighten audit-trail visibility in Markdown/report artifacts for operator actions
+- [x] Write operator runbooks for approve / reject / resync / cancel / broker-error pause / recovery
+- [x] Document expected state transitions and failure cases with examples
+- [x] Add CLI/helpful script surfaces where operator recovery is awkward today
+- [x] Add verification for documented recovery workflows where practical
+- [x] Tighten audit-trail visibility in Markdown/report artifacts for operator actions
 
 ## Phase 26 — Production reporting and delivery polish
 Goal: make scheduled outputs more production-ready for real operator use.
