@@ -81,15 +81,15 @@ Goal: improve proposal quality and reduce avoidable churn.
 ## Phase 7 — ETF suggestion workflow
 Goal: finish shortlist generation and approval gating.
 
-- [ ] Implement ETF search + shortlist workflow
-- [ ] Filter by asset class
+- [x] Implement ETF search + shortlist workflow
+- [x] Filter by asset class
 - [ ] Filter by geography
-- [ ] Filter by currency
+- [x] Filter by currency
 - [ ] Filter by exchange availability
-- [ ] Filter by liquidity
-- [ ] Filter by total expense ratio
+- [x] Filter by liquidity
+- [x] Filter by total expense ratio
 - [ ] Filter by fund size
-- [ ] Filter by replication method
+- [x] Filter by replication method
 - [ ] Filter by domicile
 - [ ] Filter by distribution vs accumulation
 - [ ] Filter by broker availability

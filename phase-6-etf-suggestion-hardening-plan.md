@@ -12,23 +12,29 @@ Make ETF shortlist and instrument-proposal output more trustworthy by honoring e
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect ETF shortlist and instrument proposal engines for remaining workflow gaps.
-- [ ] Add exclusion-aware shortlist filtering.
-- [ ] Add explicit shortlist scoring/rejection explanation helpers.
-- [ ] Improve shortlist output metadata for preferences and approval state.
-- [ ] Tighten approved-instrument row generation from shortlist output.
-- [ ] Add focused tests for:
-  - [ ] excluded instruments are filtered from suggestions
-  - [ ] shortlist reasons explain preference/ranking decisions
-  - [ ] approved rows respect shortlisted target splits
-  - [ ] already-approved instruments are surfaced clearly without bypassing exclusions
-- [ ] Run the targeted ETF workflow test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect ETF shortlist and instrument proposal engines for remaining workflow gaps.
+- [x] Add exclusion-aware shortlist filtering.
+- [x] Add explicit shortlist scoring/rejection explanation helpers.
+- [x] Improve shortlist output metadata for preferences and approval state.
+- [x] Tighten approved-instrument row generation from shortlist output.
+- [x] Add focused tests for:
+  - [x] excluded instruments are filtered from suggestions
+  - [x] shortlist reasons explain preference/ranking decisions
+  - [x] approved rows respect shortlisted target splits
+  - [x] already-approved instruments are surfaced clearly without bypassing exclusions
+- [x] Run the targeted ETF workflow test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
 ## Intended verification
 - New focused `scripts/test-etf-suggestion-hardening.js`
 - Existing proposal/report/execution checks to ensure no regressions
+
+## Verified outcomes
+- Excluded instruments are now filtered out of shortlist suggestions and surfaced in explicit rejection output.
+- Shortlist reasoning now shows issuer/currency/liquidity/TER preference contributions more clearly.
+- Approved instruments remain visible in ranked shortlist output without bypassing exclusions.
+- Approved-instrument row generation now stays aligned with shortlisted target splits.

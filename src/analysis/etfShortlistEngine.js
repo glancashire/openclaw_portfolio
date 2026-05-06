@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { readExcludedInstruments } = require('./approvedInstruments');
 
 const ETF_CATALOG = [
   {
@@ -149,6 +150,7 @@ function readStrategyContext(portfolioPath) {
   const allocationRows = parseRows(extractSection(text, 'Allocation Targets'));
   const approvedRows = parseRows(extractSection(text, 'Approved Instruments'));
   const notesSection = extractSection(text, 'Notes / Open Questions');
+  const excluded = readExcludedInstruments(portfolioPath);
   return {
     currencyPreference: (text.match(/- Currency preference:\s*(.+)/) || [null, ''])[1].trim(),
     esgPreference: (text.match(/- ESG preference:\s*(.+)/) || [null, ''])[1].trim(),
@@ -161,6 +163,7 @@ function readStrategyContext(portfolioPath) {
       notes: row[4] || '',
     })),
     approved: approvedRows.map((row) => row[0]).filter(Boolean),
+    excludedIds: new Set(excluded.map((row) => row.tickerOrIsin)),
   };
 }
 
@@ -194,18 +197,22 @@ function scoreCandidate(candidate, context, allocation) {
     reasons.push('high liquidity');
   } else if (candidate.liquidity === 'medium') {
     score += 8;
+    reasons.push('acceptable liquidity');
   }
   if (candidate.terPct <= 0.1) {
     score += 12;
     reasons.push('very low TER');
   } else if (candidate.terPct <= 0.2) {
     score += 6;
+    reasons.push('reasonable TER');
   }
   if (candidate.accumulating) {
     score += 6;
+    reasons.push('accumulating structure');
   }
   if (candidate.replication === 'physical') {
     score += 5;
+    reasons.push('physical replication');
   }
   if (prefs.preferUBS && candidate.issuer === 'UBS') {
     score += 10;
@@ -217,6 +224,7 @@ function scoreCandidate(candidate, context, allocation) {
   }
   if (prefs.excludeInvesco && candidate.issuer === 'Invesco') {
     score -= 50;
+    reasons.push('penalized by issuer exclusion preference');
   }
   if (allocation.assetClass === 'Bonds / cash-like' && candidate.tickerOrIsin === 'CASH-CHF') {
     score += 12;
@@ -230,21 +238,50 @@ function scoreCandidate(candidate, context, allocation) {
   return { score, reasons };
 }
 
+function rejectionReasons(candidate, context, allocation) {
+  const reasons = [];
+  if (context.excludedIds.has(candidate.tickerOrIsin)) reasons.push('explicitly listed in Excluded Instruments');
+  if (candidate.assetClass !== allocation.assetClass) reasons.push('asset class mismatch');
+  return reasons;
+}
+
+function shortlistForAllocation(allocation, context) {
+  const considered = ETF_CATALOG
+    .filter((candidate) => candidate.assetClass === allocation.assetClass)
+    .map((candidate) => ({
+      candidate,
+      rejectedReasons: rejectionReasons(candidate, context, allocation),
+    }));
+
+  const accepted = considered
+    .filter((item) => item.rejectedReasons.length === 0)
+    .map((item) => ({ ...item, ...scoreCandidate(item.candidate, context, allocation) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  const rejected = considered
+    .filter((item) => item.rejectedReasons.length > 0)
+    .map((item) => ({
+      tickerOrIsin: item.candidate.tickerOrIsin,
+      name: item.candidate.name,
+      assetClass: item.candidate.assetClass,
+      rejectedReasons: item.rejectedReasons,
+    }));
+
+  return { accepted, rejected };
+}
+
 function suggestEtfShortlist(portfolioPath) {
   const context = readStrategyContext(portfolioPath);
   const suggestions = [];
+  const rejections = [];
 
   for (const allocation of context.allocations) {
-    const candidates = ETF_CATALOG
-      .filter((candidate) => candidate.assetClass === allocation.assetClass)
-      .map((candidate) => ({ candidate, ...scoreCandidate(candidate, context, allocation) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
-
-    const preferredCount = Math.max(1, Math.min(2, candidates.length, allocation.assetClass === 'Global equities' ? 2 : 1));
+    const { accepted, rejected } = shortlistForAllocation(allocation, context);
+    const preferredCount = Math.max(1, Math.min(2, accepted.length, allocation.assetClass === 'Global equities' ? 2 : 1));
     const splitTarget = Number((allocation.targetPct / preferredCount).toFixed(2));
 
-    for (const [index, ranked] of candidates.entries()) {
+    for (const [index, ranked] of accepted.entries()) {
       suggestions.push({
         rank: index + 1,
         tickerOrIsin: ranked.candidate.tickerOrIsin,
@@ -254,19 +291,25 @@ function suggestEtfShortlist(portfolioPath) {
         suggestedTargetPct: index < preferredCount ? splitTarget : 0,
         exchange: ranked.candidate.exchange,
         currency: ranked.candidate.currency,
+        issuer: ranked.candidate.issuer,
         score: ranked.score,
         approved: context.approved.includes(ranked.candidate.tickerOrIsin),
+        excluded: false,
         notes: buildInstrumentNotes(ranked.candidate),
         reason: `${ranked.candidate.rationale} (${ranked.reasons.join('; ')})`,
         keyRisks: ranked.candidate.risks,
       });
     }
+
+    rejections.push(...rejected);
   }
 
   return {
     currencyPreference: context.currencyPreference,
     issuerPreferences: context.issuerNote || 'none',
+    excludedCount: rejections.length,
     suggestions,
+    rejections,
   };
 }
 
@@ -283,7 +326,7 @@ function buildApprovedInstrumentRows(result, { topPerAssetClass = 1 } = {}) {
   for (const item of result.suggestions) {
     if (!selected.has(item.assetClass)) selected.set(item.assetClass, []);
     const rows = selected.get(item.assetClass);
-    if (rows.length < topPerAssetClass && item.suggestedTargetPct > 0) rows.push(item);
+    if (rows.length < topPerAssetClass && item.suggestedTargetPct > 0 && !item.excluded) rows.push(item);
   }
 
   const ordered = [];
@@ -332,13 +375,21 @@ function formatShortlistMarkdown(result) {
     '',
     `- Currency preference: ${result.currencyPreference || 'n/a'}`,
     `- Issuer preferences: ${result.issuerPreferences || 'none'}`,
+    `- Excluded candidates filtered: ${result.excludedCount || 0}`,
     '',
-    '| Rank | Ticker / ISIN | Name | Asset class | Reason | Key risks | Suggested target % |',
-    '|---:|---|---|---|---|---|---:|',
+    '| Rank | Ticker / ISIN | Name | Asset class | Issuer | Reason | Key risks | Suggested target % |',
+    '|---:|---|---|---|---|---|---|---:|',
   ];
 
   for (const item of result.suggestions) {
-    lines.push(`| ${item.rank} | ${item.tickerOrIsin} | ${item.name} | ${item.assetClass} | ${item.reason} | ${item.keyRisks} | ${item.suggestedTargetPct} |`);
+    lines.push(`| ${item.rank} | ${item.tickerOrIsin} | ${item.name} | ${item.assetClass} | ${item.issuer} | ${item.reason} | ${item.keyRisks} | ${item.suggestedTargetPct} |`);
+  }
+
+  if (result.rejections?.length) {
+    lines.push('', '## Rejected candidates', '', '| Ticker / ISIN | Name | Asset class | Rejection reasons |', '|---|---|---|---|');
+    for (const item of result.rejections) {
+      lines.push(`| ${item.tickerOrIsin} | ${item.name} | ${item.assetClass} | ${item.rejectedReasons.join('; ')} |`);
+    }
   }
 
   return `${lines.join('\n')}\n`;
@@ -350,4 +401,5 @@ module.exports = {
   formatShortlistMarkdown,
   buildApprovedInstrumentRows,
   replaceApprovedInstrumentsSection,
+  shortlistForAllocation,
 };

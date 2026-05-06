@@ -54,16 +54,16 @@
 
 ## Next phases
 
-### Phase 22 — ETF suggestion workflow
-Improve instrument recommendation quality by:
-- turning asset-class proposals into clearer ETF-level suggestions
-- strengthening issuer / exclusion / currency preference handling
-- making shortlist rationale and rejection reasons more explicit
-- tightening alignment between approved instruments and instrument proposal output
+### Phase 22 — portfolio creation workflow
+Make initial setup safer and more complete by:
+- tightening draft-state completeness checks
+- ensuring generated files and open-question capture align with spec
+- hardening clean draft -> active transition expectations
+- adding focused verification around bootstrap outputs
 
 Current state:
-- instrument shortlist/proposal scaffolding exists
-- asset-class proposal inputs are stronger, but ETF-level recommendation polish still lags
+- draft-state and question scaffolding exist
+- creation flow still needs stronger verification and guardrails
 
 ### Phase 23 — reporting completeness and polish
 Advance proposal quality by:
