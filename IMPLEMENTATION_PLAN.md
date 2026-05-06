@@ -83,6 +83,17 @@ Acceptance-closed MVP state:
 Intentional remaining limit:
 - the repo remains intentionally not live-writable-complete; Interactive Brokers execution is still confirmation-gated and read-only/dry-run first, so true transmitted live submission remains outside this closure milestone until explicitly enabled and hardened
 
+## Next post-MVP phases
+
+The accepted MVP is closed, but the repo still has meaningful follow-on work. The next phase set is tracked in `post-mvp-roadmap.md`:
+
+24. Transmitted live execution hardening
+25. Operator runbooks and incident handling
+26. Production reporting and delivery polish
+27. Risk, logging, and observability hardening
+
+These phases are intentionally post-MVP. They extend the guarded execution path and operational maturity without redefining what was accepted in the read-only + dry-run MVP closure.
+
 ## Current command surface
 
 - `node scripts/validate-portfolio.js <portfolio.md> [...portfolio.md]`

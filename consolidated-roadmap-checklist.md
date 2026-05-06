@@ -148,10 +148,12 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 - [x] Verify safety blocks prevent bad trades end-to-end
 
 ## Recommended follow-up order beyond acceptance closure
-1. Phase 1 — Writable execution completion
-2. Phase 4 — Operator actions and state transitions
-3. Final live-path drills and writable audit hardening
+1. Phase 24 — Transmitted live execution hardening
+2. Phase 25 — Operator runbooks and incident handling
+3. Phase 26 — Production reporting and delivery polish
+4. Phase 27 — Risk, logging, and observability hardening
 
 ## Current focus
 - Acceptance closure is complete for the in-scope read-only + dry-run MVP.
-- Biggest remaining gap is the separate writable-live lane: fully safe transmitted submission plus terminal reconciliation in live broker mode.
+- The next roadmap now shifts from MVP completion to post-MVP operational hardening.
+- The highest-value remaining lane is explicit opt-in transmitted live execution safeguards plus operator/observability polish.

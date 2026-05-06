@@ -128,9 +128,10 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 
 ## Working summary
 - Acceptance closure is complete for the in-scope read-only + dry-run MVP.
-- Biggest remaining risk is no longer broad MVP incompleteness; it is the separate writable-live lane between staged broker orders and fully safe transmitted submission / terminal reconciliation.
+- Biggest remaining risk is no longer broad MVP incompleteness; it is post-MVP operational hardening around explicit transmitted live enablement, operator handling, delivery polish, and observability.
 - Current state: read-only IBKR connectivity, holdings sync, dry-run proposal generation, staged live broker orders, approval/rejection flows, duplicate-submission guards, partial-fill inference, resync hardening, dashboard/report generation, core safety controls, and acceptance-sweep closure are all in place.
 - Suggested follow-up order:
-  1. writable submission completion + terminal reconciliation consistency
-  2. operator-action/live-path audit hardening
-  3. transmitted writable-mode end-to-end drills
+  1. transmitted live execution hardening
+  2. operator runbooks and incident handling
+  3. production reporting and delivery polish
+  4. risk, logging, and observability hardening

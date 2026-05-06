@@ -4,9 +4,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: read-only + dry-run MVP acceptance closure achieved, with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
+- Overall status: read-only + dry-run MVP acceptance closure achieved, with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; the repo now transitions into explicit post-MVP hardening phases.
 - Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, and end-to-end acceptance evidence for the in-scope workflow.
-- Biggest remaining gap: true writable execution enablement and its final operator/live-broker hardening, not missing MVP read-only/dry-run scaffolding.
+- Biggest remaining gap: operational maturity beyond the accepted MVP — especially opt-in transmitted live safeguards, operator runbooks, delivery polish, and observability hardening.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -78,11 +78,11 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Remaining limits beyond the accepted MVP closure
 
-1. Live broker submission/cancellation is still intentionally constrained by readonly posture and safety gating; this is correct for safety, but it means the repo is not yet live-writable-complete.
-2. Holdings are live-synced successfully from IBKR for the ETF portfolio; the remaining broker work is writable execution completion and live-path hardening, not basic connectivity.
+1. Transmitted live broker submission/cancellation is still intentionally constrained by readonly posture and safety gating; this is correct for safety, but it means the repo is not yet explicitly opt-in live-transmit complete.
+2. Holdings are live-synced successfully from IBKR for the ETF portfolio; the remaining broker work is post-MVP hardening, not basic connectivity.
 3. The fragile Client Portal gateway path has effectively been superseded by native TWS / IB Gateway socket transport for the active integration path.
-4. Interactive Brokers instrument lookup, price lookup, normalized quote preview, dry-run preview, open-order status lookup, execution/fill fallback, completed-order lookup, and cancel scaffolding now exist, but durable writable submit handling remains unfinished by design.
-5. Bundled execution verification exists and passes, but it mainly validates dry-run/reconciliation behavior rather than real writable broker writes.
+4. Interactive Brokers instrument lookup, price lookup, normalized quote preview, dry-run preview, open-order status lookup, execution/fill fallback, completed-order lookup, and cancel scaffolding now exist, but explicit transmitted-mode policy and runbook hardening remain unfinished by design.
+5. Bundled execution verification exists and passes, but further post-MVP work should deepen operator/observability evidence around transmitted-mode safeguards and reporting operations.
 
 ## Most recent improvements
 
@@ -109,3 +109,4 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Completed rebalancing closure so proposals now honor min/max bounds, cash-drag policy, and avoidable-turnover suppression in addition to thresholds and minimum size rules.
 - Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, execution-safety-closure, dashboard/report freshness, rebalancing-hardening, rebalancing-closure, ETF-suggestion-hardening, ETF-suggestion-completion, portfolio-creation-hardening, portfolio-guided-intake, reporting-completeness, scheduling-ops-reliability, broker-adapter-completeness, and optional-Playwright-fallback tests.
 - Closed the final acceptance sweep for the read-only + dry-run MVP and removed the remaining non-browser proposal-path regression caused by eager browser-session imports.
+- Defined the post-MVP roadmap covering transmitted live execution hardening, operator runbooks, production reporting/delivery polish, and risk/logging/observability hardening.
