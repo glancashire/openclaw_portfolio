@@ -81,13 +81,13 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Include explicit rationale for each rebalance proposal
 
 ## 9. Reporting completeness and polish
-- [~] Ensure weekly reports include all required sections
-- [~] Ensure monthly reports include all required sections
-- [~] Ensure quarterly reports include all required sections
-- [ ] Verify report narrative quality and consistency
+- [x] Ensure weekly reports include all required sections
+- [x] Ensure monthly reports include all required sections
+- [x] Ensure quarterly reports include all required sections
+- [x] Verify report narrative quality and consistency
 - [x] Ensure reports reflect latest holdings/trades/history
-- [ ] Surface report generation failures clearly
-- [~] Verify filename pattern and schedule behavior
+- [x] Surface report generation failures clearly
+- [x] Verify filename pattern and schedule behavior
 
 ## 10. Scheduling / automation reliability
 - [~] Verify daily workflow matches spec

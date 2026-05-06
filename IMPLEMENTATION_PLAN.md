@@ -54,18 +54,17 @@
 
 ## Next phases
 
-### Phase 22 — reporting completeness and polish
-Improve operator-facing reporting by:
-- verifying weekly / monthly / quarterly reports fully match required sections
-- tightening narrative quality and consistency
-- surfacing report-generation failures more clearly
-- expanding focused verification around report outputs
+### Phase 22 — scheduling and operational reliability
+Improve automation reliability by:
+- verifying daily / weekly / monthly / quarterly workflow coverage against the spec
+- surfacing broken-run / failure-alert conditions more explicitly
+- hardening safe resume behavior after restart or interrupted runs
+- preserving separation between read-only automation and write-enabled automation
 
 Current state:
-- report generation, freshness metadata, and execution lifecycle sections exist
-- remaining work is mostly completeness/polish rather than scaffolding
+- major workflow scripts exist, but operational guarantees and observability still need stronger verification
 
-### Phase 23 — scheduling and operational reliability
+### Phase 23 — broker adapter completeness audit
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible

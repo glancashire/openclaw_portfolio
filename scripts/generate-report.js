@@ -9,5 +9,11 @@ if (!portfolioDir) {
   process.exit(1);
 }
 
-const out = generateAndWriteReport({ portfolioDir, period, dateStamp });
-console.log(JSON.stringify(out, null, 2));
+generateAndWriteReport({ portfolioDir, period, dateStamp })
+  .then((out) => {
+    console.log(JSON.stringify(out, null, 2));
+  })
+  .catch((error) => {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  });

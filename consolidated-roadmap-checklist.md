@@ -62,9 +62,9 @@ Goal: keep output artifacts trustworthy after material events.
 - [x] Regenerate dashboard before report generation
 - [x] Detect and report stale dashboard state
 - [x] Ensure reports reflect latest holdings / trades / history
-- [~] Ensure weekly / monthly / quarterly reports include all required sections
-- [ ] Verify report narrative quality and consistency
-- [ ] Surface report generation failures clearly
+- [x] Ensure weekly / monthly / quarterly reports include all required sections
+- [x] Verify report narrative quality and consistency
+- [x] Surface report generation failures clearly
 
 ## Phase 6 — Rebalancing hardening
 Goal: improve proposal quality and reduce avoidable churn.
