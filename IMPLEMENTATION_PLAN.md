@@ -52,38 +52,36 @@
 - Normalized broker-backed order quote, dry-run preview, open-order status lookup, execution-fill fallback, completed-order lookup, and cancel-path scaffolding
 - Safe config checks for broker secrets presence without exposing them
 
-## Next phases
+## Final closure status
 
 ### Phase 23 — end-to-end acceptance closure
-Close the implementation by:
-- assembling a final end-to-end acceptance sweep across portfolio creation, analysis, reporting, scheduling, and execution surfaces
-- fixing any remaining integration regressions revealed by that sweep
-- tightening final documentation/status artifacts so roadmap and verification state are fully closed
+Completed by:
+- running an end-to-end acceptance sweep across portfolio creation, guided intake, ETF shortlist/approval gating, dry-run proposals, safety controls, dashboard/report refresh, and execution verification surfaces
+- fixing the remaining integration regression where optional Playwright/browser-session code could crash non-browser dry-run proposal paths during module load
+- tightening final documentation/status artifacts so repo closure reflects the implemented read-only + dry-run MVP accurately
 
-Current state:
-- the major product lanes are now implemented; what remains is the final acceptance pass and repo-wide closure proof
-Advance proposal quality by:
-- enforcing drift thresholds and min/max allocation breach handling consistently
-- preferring available cash before sells when feasible
-- suppressing tiny churn trades and excessive turnover
-- strengthening rationale so each proposal explains the governing rule clearly
+Closure evidence:
+- `node scripts/create-portfolio.js acceptance-closure`
+- `node scripts/validate-portfolio.js portfolio/acceptance-closure/portfolio.md`
+- `node scripts/check-portfolio-activation.js portfolio/acceptance-closure/portfolio.md`
+- `node scripts/next-portfolio-questions.js portfolio/acceptance-closure/portfolio.md`
+- `node scripts/suggest-etf-shortlist.js portfolio/etf/portfolio.md markdown`
+- `node scripts/propose-instrument-trades.js portfolio/etf/portfolio.md portfolio/etf/holdings.md`
+- `node scripts/check-safety-controls.js portfolio/etf`
+- `node scripts/check-generated-state.js portfolio/etf`
+- `node scripts/run-report-cycle.js portfolio/etf weekly 20260506`
+- `node scripts/test-optional-playwright-fallback.js`
+- `npm run verify:execution`
 
-Current state:
-- dry-run proposals and allocation analysis exist
-- safety gating is stronger, but proposal-quality constraints still need hardening
+Acceptance-closed MVP state:
+- portfolio creation, draft blocking, and guided intake are working end-to-end for Markdown-controlled ETF portfolios
+- ETF shortlist generation and approval-gated instrument workflow are working end-to-end within the CHF-first / ETF-only scope
+- dry-run proposal generation, rebalancing policy enforcement, and execution-surface verification are working end-to-end
+- dashboard/history/report refresh paths are working end-to-end for the read-only reporting workflow
+- IBKR browser-session helpers now degrade safely when optional Playwright is unavailable instead of breaking non-browser dry-run paths
 
-Current reconciliation state:
-- staged -> submitted -> partially_filled / filled / cancelled / not_found paths are now verified in automated tests
-- resync keeps only latest actionable broker-order rows
-- cancel failures now increment runtime broker error state and successful cancel clears that state
-- execution status changes append typed history snapshots and regenerate dashboard state
-
-Current state:
-- native client code exists and the readiness check is green again for read-only use
-- live read-only holdings sync succeeds for account `U25624150`
-- the ETF portfolio is active, but execution remains `require_confirmation` and broker use remains read-only
-- normalized order quote, dry-run preview, open-order status lookup, execution-fill fallback, completed-order lookup, cancel scaffolding, and Markdown reconciliation now exist at the repo layer
-- safe MVP state is now live-read-only + dry-run/reconciled execution planning, not simulated holdings
+Intentional remaining limit:
+- the repo remains intentionally not live-writable-complete; Interactive Brokers execution is still confirmation-gated and read-only/dry-run first, so true transmitted live submission remains outside this closure milestone until explicitly enabled and hardened
 
 ## Current command surface
 

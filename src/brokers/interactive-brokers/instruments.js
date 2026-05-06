@@ -1,5 +1,4 @@
 const { InteractiveBrokersClient } = require('./client');
-const { InteractiveBrokersBrowserSessionClient } = require('./browserSessionClient');
 const { logBrokerEvent } = require('../shared/safeLogger');
 
 async function searchEtfInstruments({ query, portfolio = 'etf', appCode = null, preferBrowserSession = false }) {
@@ -62,12 +61,24 @@ async function searchViaBrowserSession({ query, portfolio, appCode, auth }) {
   if (!appCode) {
     throw new Error('Interactive Brokers browser-session search requires appCode');
   }
+  const { InteractiveBrokersBrowserSessionClient } = loadBrowserSessionClient();
   const browserClient = new InteractiveBrokersBrowserSessionClient({ portfolio });
   const response = await browserClient.searchContracts(query, appCode);
   if (!response.ok) {
     throw new Error(`IBKR browser-session search failed (${response.status}): ${response.text}`);
   }
   return response.json;
+}
+
+function loadBrowserSessionClient() {
+  try {
+    return require('./browserSessionClient');
+  } catch (error) {
+    if (error && error.code === 'MODULE_NOT_FOUND' && String(error.message || '').includes("'playwright'")) {
+      throw new Error('Interactive Brokers browser-session search requires the optional playwright dependency to be installed.');
+    }
+    throw error;
+  }
 }
 
 function normalizeSearchResults(raw) {
@@ -90,4 +101,4 @@ function isLikelyEtf(row) {
   return haystack.includes('etf') || haystack.includes('fund') || row.secType === 'ETF';
 }
 
-module.exports = { searchEtfInstruments, normalizeSearchResults, isLikelyEtf };
+module.exports = { searchEtfInstruments, normalizeSearchResults, isLikelyEtf, loadBrowserSessionClient };

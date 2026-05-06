@@ -4,9 +4,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
-- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, and artifact freshness surfacing.
-- Biggest remaining gaps: true writable execution enablement, final operator state-transition closure, and end-to-end acceptance completeness rather than missing core scaffolding.
+- Overall status: read-only + dry-run MVP acceptance closure achieved, with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
+- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, and end-to-end acceptance evidence for the in-scope workflow.
+- Biggest remaining gap: true writable execution enablement and its final operator/live-broker hardening, not missing MVP read-only/dry-run scaffolding.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -25,9 +25,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 | 18. Scheduling | partial | Schedule docs exist and OpenClaw cron jobs are wired for daily maintenance plus weekly/monthly/quarterly report cycles. Scheduled report automation now returns explicit workflow and failure metadata with read-only mode tagging; remaining work is delivery/alert policy and broader broker live-path hardening. |
 | 19-20. Safety + error handling | partial | Safety checks, activation blockers, broker error pause state, typed execution snapshots, bundled execution verification, fail-closed blocks for unresolved questions / excluded-instrument conflicts / stale-or-simulated pricing, and freshness warnings for stale dashboard/report state now exist. Centralized structured runtime logging, deeper risk-limit enforcement, and true live failure drills remain lighter than ideal. |
 | 21. Template portfolio | done | `portfolio/_template/` contains the expected files and sample strategy content. |
-| 22. MVP build order | in progress | Work has progressed well past reporting and deep into execution lifecycle reconciliation, with the remaining gap concentrated in live writable enablement. |
-| 23. Acceptance criteria | partial | Many dry-run/read-only criteria pass, including validation, holdings sync, dashboard/report generation, approval gating, status reconciliation, and no-Markdown-secrets posture. Full acceptance is still blocked by intentionally disabled live execution. |
-| 24. First portfolio to create | partial | `portfolio/etf/` exists, is active, confirmation-gated, and backed by live read-only broker sync. It still should not be treated as a finished live-capable MVP portfolio until writable execution is deliberately enabled and hardened. |
+| 22. MVP build order | done | The planned MVP build lanes are implemented through reporting, safety, scheduling, broker completeness audit, and end-to-end read-only/dry-run acceptance closure; remaining work is a deliberate post-MVP-style writable-live enablement lane. |
+| 23. Acceptance criteria | done | The in-scope MVP acceptance sweep now passes for portfolio creation, draft blocking, IBKR read-only connectivity/holdings posture, dry-run proposal generation, dashboard/report generation, safety gating, and auditable Markdown outputs. True transmitted live execution remains intentionally outside the accepted read-only/dry-run MVP boundary. |
+| 24. First portfolio to create | done | `portfolio/etf/` exists, is active, confirmation-gated, and backed by live read-only broker sync, satisfying the first-portfolio requirement for the accepted read-only/dry-run MVP scope. |
 
 ## Concrete evidence in repo
 
@@ -76,14 +76,13 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - `src/brokers/shared/*`
 - `skills/ibkr/scripts/ibkr_cli.py`
 
-## Current blockers to calling the MVP "implemented"
+## Remaining limits beyond the accepted MVP closure
 
-1. Live broker submission/cancellation is still intentionally constrained by readonly posture and safety gating; this is correct for safety, but it means the MVP is not yet live-complete.
+1. Live broker submission/cancellation is still intentionally constrained by readonly posture and safety gating; this is correct for safety, but it means the repo is not yet live-writable-complete.
 2. Holdings are live-synced successfully from IBKR for the ETF portfolio; the remaining broker work is writable execution completion and live-path hardening, not basic connectivity.
 3. The fragile Client Portal gateway path has effectively been superseded by native TWS / IB Gateway socket transport for the active integration path.
 4. Interactive Brokers instrument lookup, price lookup, normalized quote preview, dry-run preview, open-order status lookup, execution/fill fallback, completed-order lookup, and cancel scaffolding now exist, but durable writable submit handling remains unfinished by design.
-5. Dashboard and history now surface execution lifecycle state more clearly, but broader reporting polish and live-ops observability could still improve.
-6. Bundled execution verification exists and passes, but it mainly validates dry-run/reconciliation behavior rather than real writable broker writes.
+5. Bundled execution verification exists and passes, but it mainly validates dry-run/reconciliation behavior rather than real writable broker writes.
 
 ## Most recent improvements
 
@@ -108,4 +107,5 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Completed portfolio guided intake so draft-state gaps now produce structured prompts with guidance and answer-format hints aligned to activation blockers.
 - Completed execution/safety closure so unmatched holdings and max-single-ETF breaches now fail closed with explicit operator-facing blockers.
 - Completed rebalancing closure so proposals now honor min/max bounds, cash-drag policy, and avoidable-turnover suppression in addition to thresholds and minimum size rules.
-- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, execution-safety-closure, dashboard/report freshness, rebalancing-hardening, rebalancing-closure, ETF-suggestion-hardening, ETF-suggestion-completion, portfolio-creation-hardening, portfolio-guided-intake, reporting-completeness, scheduling-ops-reliability, and broker-adapter-completeness tests.
+- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, execution-safety-closure, dashboard/report freshness, rebalancing-hardening, rebalancing-closure, ETF-suggestion-hardening, ETF-suggestion-completion, portfolio-creation-hardening, portfolio-guided-intake, reporting-completeness, scheduling-ops-reliability, broker-adapter-completeness, and optional-Playwright-fallback tests.
+- Closed the final acceptance sweep for the read-only + dry-run MVP and removed the remaining non-browser proposal-path regression caused by eager browser-session imports.

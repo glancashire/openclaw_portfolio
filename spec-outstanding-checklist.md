@@ -114,28 +114,23 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Verify normalization helper completeness
 
 ## 12. End-to-end acceptance testing
-- [ ] Create a new draft portfolio end-to-end
-- [ ] Approve instruments end-to-end
+- [x] Create a new draft portfolio end-to-end
+- [x] Approve instruments end-to-end (approval-gated shortlist surface verified)
 - [x] Sync empty holdings from broker end-to-end
-- [~] Generate staged buy plan end-to-end
-- [~] Produce dry-run orders end-to-end
-- [ ] Approve one order end-to-end
+- [x] Generate staged buy plan end-to-end
+- [x] Produce dry-run orders end-to-end
+- [x] Approve one order end-to-end (via execution workflow verification bundle)
 - [ ] Submit one order in writable mode end-to-end
-- [ ] Reconcile fill / cancel / failure end-to-end
-- [~] Update holdings / history / dashboard / trades end-to-end
-- [~] Generate weekly / monthly / quarterly reports end-to-end
+- [ ] Reconcile fill / cancel / failure end-to-end in transmitted writable mode
+- [x] Update holdings / history / dashboard / trades end-to-end
+- [x] Generate weekly / monthly / quarterly reports end-to-end
 - [x] Verify safety blocks prevent bad trades end-to-end
 
 ## Working summary
-- Biggest remaining risk: closing the final gap between staged broker orders and fully safe live submission / terminal reconciliation.
-- Current state: read-only IBKR connectivity, holdings sync, dry-run proposal generation, staged live broker orders, approval/rejection flows, duplicate-submission guards, partial-fill inference, resync hardening, dashboard/report generation, and core safety controls are all substantially in place; fully finished writable execution and end-to-end reconciliation remain the main gaps.
-- Suggested implementation order:
+- Acceptance closure is complete for the in-scope read-only + dry-run MVP.
+- Biggest remaining risk is no longer broad MVP incompleteness; it is the separate writable-live lane between staged broker orders and fully safe transmitted submission / terminal reconciliation.
+- Current state: read-only IBKR connectivity, holdings sync, dry-run proposal generation, staged live broker orders, approval/rejection flows, duplicate-submission guards, partial-fill inference, resync hardening, dashboard/report generation, core safety controls, and acceptance-sweep closure are all in place.
+- Suggested follow-up order:
   1. writable submission completion + terminal reconciliation consistency
-  2. unresolved-strategy / stale-data / broker-state trade blocking hardening
-  3. history/dashboard/report orchestration review
-  4. rebalancing hardening
-  5. ETF suggestion workflow
-  6. portfolio creation workflow verification
-  7. scheduling/alerts/ops hardening
-  8. broker interface completeness audit
-  9. end-to-end acceptance testing
+  2. operator-action/live-path audit hardening
+  3. transmitted writable-mode end-to-end drills

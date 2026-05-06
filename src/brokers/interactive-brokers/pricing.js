@@ -1,5 +1,4 @@
 const { InteractiveBrokersClient } = require('./client');
-const { InteractiveBrokersBrowserSessionClient } = require('./browserSessionClient');
 const { logBrokerEvent } = require('../shared/safeLogger');
 
 async function fetchLatestPrice({ conid, portfolio = 'etf', appCode = null, preferBrowserSession = false }) {
@@ -54,12 +53,24 @@ async function fetchViaBrowserSession({ conid, portfolio, appCode, auth }) {
   if (!appCode) {
     throw new Error('Interactive Brokers browser-session pricing requires appCode');
   }
+  const { InteractiveBrokersBrowserSessionClient } = loadBrowserSessionClient();
   const browserClient = new InteractiveBrokersBrowserSessionClient({ portfolio });
   const response = await browserClient.fetchMarketSnapshot([conid], ['31', '84', '85', '86'], appCode);
   if (!response.ok) {
     throw new Error(`IBKR browser-session pricing failed (${response.status}): ${response.text}`);
   }
   return response.json;
+}
+
+function loadBrowserSessionClient() {
+  try {
+    return require('./browserSessionClient');
+  } catch (error) {
+    if (error && error.code === 'MODULE_NOT_FOUND' && String(error.message || '').includes("'playwright'")) {
+      throw new Error('Interactive Brokers browser-session pricing requires the optional playwright dependency to be installed.');
+    }
+    throw error;
+  }
 }
 
 function readField(object, key) {
@@ -72,4 +83,4 @@ function parseNumeric(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-module.exports = { fetchLatestPrice, parseNumeric, readField };
+module.exports = { fetchLatestPrice, parseNumeric, readField, loadBrowserSessionClient };

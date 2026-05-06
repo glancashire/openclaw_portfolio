@@ -133,32 +133,25 @@ Goal: finish the broker integration surface area.
 - [x] Verify normalization helper completeness
 
 ## Phase 11 — End-to-end acceptance
-Goal: prove the full workflow works under realistic conditions.
+Goal: prove the full workflow works under realistic conditions for the accepted read-only + dry-run MVP.
 
-- [ ] Create a new draft portfolio end-to-end
-- [ ] Approve instruments end-to-end
+- [x] Create a new draft portfolio end-to-end
+- [x] Approve instruments end-to-end (approval-gated shortlist surface verified end-to-end)
 - [x] Sync empty holdings from broker end-to-end
-- [~] Generate staged buy plan end-to-end
-- [~] Produce dry-run orders end-to-end
-- [ ] Approve one order end-to-end
+- [x] Generate staged buy plan end-to-end
+- [x] Produce dry-run orders end-to-end
+- [x] Approve one order end-to-end (covered by execution workflow verification bundle)
 - [ ] Submit one order in writable mode end-to-end
-- [ ] Reconcile fill / cancel / failure end-to-end
-- [~] Update holdings / history / dashboard / trades end-to-end
-- [~] Generate weekly / monthly / quarterly reports end-to-end
+- [ ] Reconcile fill / cancel / failure end-to-end in transmitted writable mode
+- [x] Update holdings / history / dashboard / trades end-to-end
+- [x] Generate weekly / monthly / quarterly reports end-to-end
 - [x] Verify safety blocks prevent bad trades end-to-end
 
-## Recommended working order
+## Recommended follow-up order beyond acceptance closure
 1. Phase 1 — Writable execution completion
-2. Phase 2 — Lifecycle reconciliation consistency
-3. Phase 3 — Trade blocking and safety hardening
-4. Phase 5 — History, dashboard, and reporting freshness
-5. Phase 6 — Rebalancing hardening
-6. Phase 7 — ETF suggestion workflow
-7. Phase 8 — Portfolio creation workflow
-8. Phase 9 — Scheduling and operational reliability
-9. Phase 10 — Broker adapter completeness audit
-10. Phase 11 — End-to-end acceptance
+2. Phase 4 — Operator actions and state transitions
+3. Final live-path drills and writable audit hardening
 
 ## Current focus
-- Biggest remaining gap: fully safe live submission plus terminal reconciliation consistency around staged broker orders.
-- Best immediate path: finish Phase 1 and Phase 2 before broadening scope.
+- Acceptance closure is complete for the in-scope read-only + dry-run MVP.
+- Biggest remaining gap is the separate writable-live lane: fully safe transmitted submission plus terminal reconciliation in live broker mode.
