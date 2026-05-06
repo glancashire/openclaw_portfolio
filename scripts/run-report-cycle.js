@@ -15,10 +15,10 @@ async function main() {
 
   const historyPath = path.join(portfolioDir, 'history.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
-  appendHistorySnapshot(historyPath, holdingsPath, 'end_of_day', `${period} report cycle snapshot`);
-  await regenerateDashboard(portfolioDir);
+  const historyAppend = appendHistorySnapshot(historyPath, holdingsPath, 'end_of_day', `${period} report cycle snapshot`);
+  const dashboardPath = await regenerateDashboard(portfolioDir);
   const report = await generateAndWriteReport({ portfolioDir, period, dateStamp });
-  console.log(JSON.stringify(report, null, 2));
+  console.log(JSON.stringify({ historyAppend, dashboardPath, ...report }, null, 2));
 }
 
 main().catch((err) => {

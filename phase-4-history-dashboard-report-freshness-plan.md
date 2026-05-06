@@ -11,20 +11,26 @@ Make generated portfolio artifacts trustworthy after execution and reporting act
 - Add focused automated tests for each new freshness guarantee.
 - Update progress docs when verified.
 
+## Verified outcomes
+- Dashboard output now includes a dedicated freshness section plus stale-state warnings when source Markdown is newer.
+- Report output now includes freshness metadata tied to dashboard/source drift.
+- Report-cycle script now returns explicit history-append and dashboard-regeneration evidence.
+- Targeted freshness tests and the broader execution verification bundle both pass.
+
 ## Actionable checklist
-- [ ] Inspect current history-writing, dashboard-generation, and report-cycle code paths.
-- [ ] Identify the minimum shared freshness metadata/helpers needed.
-- [ ] Implement material-event freshness guarantees in execution/report flows.
-- [ ] Implement dashboard stale-state detection/reporting.
-- [ ] Add focused tests for:
-  - [ ] dashboard regeneration after execution material events
-  - [ ] report-cycle history/dashboard refresh behavior
-  - [ ] stale dashboard detection when source files are newer than dashboard
-  - [ ] freshness metadata surfacing in dashboard/report output
-- [ ] Run the targeted freshness test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect current history-writing, dashboard-generation, and report-cycle code paths.
+- [x] Identify the minimum shared freshness metadata/helpers needed.
+- [x] Implement material-event freshness guarantees in execution/report flows.
+- [x] Implement dashboard stale-state detection/reporting.
+- [x] Add focused tests for:
+  - [x] dashboard regeneration after execution material events
+  - [x] report-cycle history/dashboard refresh behavior
+  - [x] stale dashboard detection when source files are newer than dashboard
+  - [x] freshness metadata surfacing in dashboard/report output
+- [x] Run the targeted freshness test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 

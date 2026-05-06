@@ -54,14 +54,14 @@ Goal: make human-controlled execution paths predictable and safe.
 ## Phase 5 — History, dashboard, and reporting freshness
 Goal: keep output artifacts trustworthy after material events.
 
-- [~] Guarantee `history.md` snapshots on schedule
-- [ ] Guarantee `history.md` snapshots after material events
+- [x] Guarantee `history.md` snapshots on schedule
+- [x] Guarantee `history.md` snapshots after material events
 - [x] Regenerate dashboard after holdings sync
-- [ ] Regenerate dashboard after trade execution
+- [x] Regenerate dashboard after trade execution
 - [x] Regenerate dashboard after rebalance analysis
 - [x] Regenerate dashboard before report generation
-- [ ] Detect and report stale dashboard state
-- [~] Ensure reports reflect latest holdings / trades / history
+- [x] Detect and report stale dashboard state
+- [x] Ensure reports reflect latest holdings / trades / history
 - [~] Ensure weekly / monthly / quarterly reports include all required sections
 - [ ] Verify report narrative quality and consistency
 - [ ] Surface report generation failures clearly

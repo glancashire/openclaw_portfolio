@@ -54,19 +54,18 @@
 
 ## Next phases
 
-### Phase 22 — history, dashboard, and reporting freshness
-Improve output trustworthiness so it:
-- guarantees `history.md` snapshots after material execution/reporting events
-- regenerates dashboard artifacts after trade execution transitions, not only holdings sync/rebalance
-- detects and reports stale dashboard/report state clearly
-- keeps execution-state visibility aligned across dashboard and reports
+### Phase 22 — rebalancing hardening
+Advance proposal quality by:
+- enforcing drift thresholds and min/max allocation breach handling consistently
+- preferring available cash before sells when feasible
+- suppressing tiny churn trades and excessive turnover
+- strengthening rationale so each proposal explains the governing rule clearly
 
 Current state:
-- dashboard execution lifecycle summary now exists
-- reports still need richer execution-state surfacing
-- material-event refresh guarantees are still incomplete
+- dry-run proposals and allocation analysis exist
+- safety gating is stronger, but proposal-quality constraints still need hardening
 
-### Phase 23 — rebalancing hardening
+### Phase 23 — ETF suggestion workflow
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible

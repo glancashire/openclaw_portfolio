@@ -62,13 +62,13 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [~] Enforce clean draft -> active transition rules
 
 ## 7. History and dashboard refresh orchestration
-- [~] Guarantee `history.md` snapshots on schedule
-- [ ] Guarantee `history.md` snapshots after material events
+- [x] Guarantee `history.md` snapshots on schedule
+- [x] Guarantee `history.md` snapshots after material events
 - [x] Regenerate dashboard after holdings sync
-- [ ] Regenerate dashboard after trade execution
+- [x] Regenerate dashboard after trade execution
 - [x] Regenerate dashboard after rebalance analysis
 - [x] Regenerate dashboard before report generation
-- [ ] Detect and report stale dashboard state
+- [x] Detect and report stale dashboard state
 
 ## 8. Rebalancing engine hardening
 - [ ] Enforce absolute drift thresholds
@@ -85,7 +85,7 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [~] Ensure monthly reports include all required sections
 - [~] Ensure quarterly reports include all required sections
 - [ ] Verify report narrative quality and consistency
-- [~] Ensure reports reflect latest holdings/trades/history
+- [x] Ensure reports reflect latest holdings/trades/history
 - [ ] Surface report generation failures clearly
 - [~] Verify filename pattern and schedule behavior
 

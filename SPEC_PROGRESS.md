@@ -4,9 +4,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, and hardened pre-trade blocking; still intentionally not live-execution-ready.
-- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, and fail-closed execution safety gating.
-- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper risk-limit enforcement before proposal/execution, and broader reporting/dashboard polish rather than missing core scaffolding.
+- Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
+- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, and artifact freshness surfacing.
+- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper risk-limit enforcement before proposal/execution, and report/rebalance polish rather than missing core scaffolding.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -21,9 +21,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 | 14. Strategy and ETF selection workflow | partial | Approved instruments, validation, shortlist generation, rationale, and approval-gated application support exist, but shortlist write-back/approval flow is still light. |
 | 15. Market entry workflow | partial | Portfolio-aware execution gating, approval transitions, durable status reconciliation, cancel scaffolding with runtime error handling, and demo flow now exist. The remaining gap is actual writable live submission enablement after explicit operator approval. |
 | 16. Rebalancing workflow | partial | Allocation analysis, proposal generation, dashboard updates, status reconciliation, and post-fill holdings refresh hook exist. Final live execution hardening still trails. |
-| 17. Reporting | partial | Weekly/monthly/quarterly Markdown reports and HTML/PDF artifacts are generated. Execution lifecycle visibility is now entering reporting, but operational/report polish still remains. |
+| 17. Reporting | partial | Weekly/monthly/quarterly Markdown reports and HTML/PDF artifacts are generated. Reports now surface execution lifecycle and freshness metadata against dashboard/source drift, but narrative polish and failure surfacing still remain. |
 | 18. Scheduling | partial | Schedule docs exist and OpenClaw cron jobs are wired for daily maintenance plus weekly/monthly/quarterly report cycles. Remaining work is operational hardening and delivery/alert policy. |
-| 19-20. Safety + error handling | partial | Safety checks, activation blockers, broker error pause state, typed execution snapshots, bundled execution verification, and fail-closed blocks for unresolved questions / excluded-instrument conflicts / stale-or-simulated pricing now exist. Centralized structured runtime logging, deeper risk-limit enforcement, and true live failure drills remain lighter than ideal. |
+| 19-20. Safety + error handling | partial | Safety checks, activation blockers, broker error pause state, typed execution snapshots, bundled execution verification, fail-closed blocks for unresolved questions / excluded-instrument conflicts / stale-or-simulated pricing, and freshness warnings for stale dashboard/report state now exist. Centralized structured runtime logging, deeper risk-limit enforcement, and true live failure drills remain lighter than ideal. |
 | 21. Template portfolio | done | `portfolio/_template/` contains the expected files and sample strategy content. |
 | 22. MVP build order | in progress | Work has progressed well past reporting and deep into execution lifecycle reconciliation, with the remaining gap concentrated in live writable enablement. |
 | 23. Acceptance criteria | partial | Many dry-run/read-only criteria pass, including validation, holdings sync, dashboard/report generation, approval gating, status reconciliation, and no-Markdown-secrets posture. Full acceptance is still blocked by intentionally disabled live execution. |
@@ -97,4 +97,5 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Added reconciliation note compaction and a safe demo execution flow script.
 - Added cancel-path runtime broker error tracking and recovery clearing so cancel failures participate in the same safety pause posture as stage/status failures.
 - Hardened trade blocking so unresolved portfolio questions, excluded/approved instrument overlap, stale pricing, simulated pricing, and unresolved live account references fail closed before broker writes.
-- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, and trade-blocking safety tests.
+- Added dashboard/report freshness surfacing plus stale-state detection against source Markdown drift, and made report cycles return explicit history/dashboard refresh evidence.
+- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, and dashboard/report freshness tests.
