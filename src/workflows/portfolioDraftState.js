@@ -1,5 +1,8 @@
 const fs = require('fs');
+const path = require('path');
 const { QUESTION_FIELDS } = require('./portfolioQuestions');
+
+const REQUIRED_PORTFOLIO_FILES = ['portfolio.md', 'holdings.md', 'trades.md', 'history.md', 'dashboard.md'];
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
@@ -119,4 +122,62 @@ function nextQuestions(filePath) {
   });
 }
 
-module.exports = { collectDraftState, nextQuestions };
+function resolvePortfolioDir(targetPath) {
+  const resolved = path.resolve(targetPath);
+  return path.basename(resolved) === 'portfolio.md' ? path.dirname(resolved) : resolved;
+}
+
+function requiredFileStatus(targetPath) {
+  const portfolioDir = resolvePortfolioDir(targetPath);
+  return REQUIRED_PORTFOLIO_FILES.map((name) => {
+    const filePath = path.join(portfolioDir, name);
+    return {
+      name,
+      path: filePath,
+      exists: fs.existsSync(filePath),
+    };
+  });
+}
+
+function unresolvedPlaceholderLines(targetPath) {
+  const portfolioPath = path.basename(path.resolve(targetPath)) === 'portfolio.md'
+    ? path.resolve(targetPath)
+    : path.join(path.resolve(targetPath), 'portfolio.md');
+  const text = read(portfolioPath);
+  return text
+    .split(/\r?\n/)
+    .filter((line) => /<[^>]+>|YYYY-MM-DD|YYYY-MM-DD HH:mm:ss/.test(line.trim()));
+}
+
+function activationReadiness(targetPath) {
+  const portfolioPath = path.basename(path.resolve(targetPath)) === 'portfolio.md'
+    ? path.resolve(targetPath)
+    : path.join(path.resolve(targetPath), 'portfolio.md');
+  const questions = nextQuestions(portfolioPath);
+  const fileStatus = requiredFileStatus(portfolioPath);
+  const missingFiles = fileStatus.filter((item) => !item.exists).map((item) => item.name);
+  const placeholders = unresolvedPlaceholderLines(portfolioPath);
+  const blockers = [];
+
+  if (missingFiles.length) blockers.push(`Missing required generated files: ${missingFiles.join(', ')}`);
+  if (placeholders.length) blockers.push('Unresolved placeholders remain in portfolio.md.');
+  if (questions.length) blockers.push(`Unanswered draft questions remain: ${questions.map((q) => q.key).join(', ')}`);
+
+  return {
+    ready: blockers.length === 0,
+    blockers,
+    missingFiles,
+    unresolvedPlaceholders: placeholders,
+    pendingQuestionKeys: questions.map((q) => q.key),
+    requiredFiles: fileStatus,
+  };
+}
+
+module.exports = {
+  REQUIRED_PORTFOLIO_FILES,
+  collectDraftState,
+  nextQuestions,
+  requiredFileStatus,
+  unresolvedPlaceholderLines,
+  activationReadiness,
+};

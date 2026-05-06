@@ -54,18 +54,18 @@
 
 ## Next phases
 
-### Phase 22 — portfolio creation workflow
-Make initial setup safer and more complete by:
-- tightening draft-state completeness checks
-- ensuring generated files and open-question capture align with spec
-- hardening clean draft -> active transition expectations
-- adding focused verification around bootstrap outputs
+### Phase 22 — reporting completeness and polish
+Improve operator-facing reporting by:
+- verifying weekly / monthly / quarterly reports fully match required sections
+- tightening narrative quality and consistency
+- surfacing report-generation failures more clearly
+- expanding focused verification around report outputs
 
 Current state:
-- draft-state and question scaffolding exist
-- creation flow still needs stronger verification and guardrails
+- report generation, freshness metadata, and execution lifecycle sections exist
+- remaining work is mostly completeness/polish rather than scaffolding
 
-### Phase 23 — reporting completeness and polish
+### Phase 23 — scheduling and operational reliability
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible

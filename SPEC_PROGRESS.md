@@ -6,7 +6,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 - Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
 - Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, and artifact freshness surfacing.
-- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper min/max and risk-limit enforcement before proposal/execution, ETF metadata/broker-availability completeness, and report polish rather than missing core scaffolding.
+- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper min/max and risk-limit enforcement before proposal/execution, guided portfolio intake / broker-availability completeness, and report polish rather than missing core scaffolding.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -100,4 +100,5 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Added dashboard/report freshness surfacing plus stale-state detection against source Markdown drift, and made report cycles return explicit history/dashboard refresh evidence.
 - Hardened rebalancing proposal generation to honor configured thresholds, explain cash-first behavior, and surface exact below-minimum blocking reasons.
 - Hardened ETF shortlist generation so exclusions produce explicit rejections, approved instruments remain visible in ranked output, and shortlist reasons expose scoring drivers more clearly.
-- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, dashboard/report freshness, rebalancing-hardening, and ETF-suggestion-hardening tests.
+- Hardened portfolio draft/activation readiness so missing generated files, unresolved placeholders, and unanswered intake questions are surfaced explicitly before activation.
+- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, dashboard/report freshness, rebalancing-hardening, ETF-suggestion-hardening, and portfolio-creation-hardening tests.

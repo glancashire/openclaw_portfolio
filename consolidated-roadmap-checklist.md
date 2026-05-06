@@ -100,9 +100,9 @@ Goal: finish shortlist generation and approval gating.
 Goal: make initial setup clean and safe.
 
 - [ ] Implement guided question flow for required inputs
-- [~] Generate all required files for a new portfolio
-- [~] Capture open questions before activation
-- [~] Enforce clean draft -> active transition rules
+- [x] Generate all required files for a new portfolio
+- [x] Capture open questions before activation
+- [x] Enforce clean draft -> active transition rules
 
 ## Phase 9 — Scheduling and operational reliability
 Goal: make automation robust and restart-safe.

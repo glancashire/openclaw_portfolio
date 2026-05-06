@@ -57,9 +57,9 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 
 ## 6. Portfolio creation workflow
 - [ ] Implement guided question flow for required inputs
-- [~] Generate all required files for a new portfolio
-- [~] Capture open questions before activation
-- [~] Enforce clean draft -> active transition rules
+- [x] Generate all required files for a new portfolio
+- [x] Capture open questions before activation
+- [x] Enforce clean draft -> active transition rules
 
 ## 7. History and dashboard refresh orchestration
 - [x] Guarantee `history.md` snapshots on schedule
