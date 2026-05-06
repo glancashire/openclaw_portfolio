@@ -1,0 +1,17 @@
+{
+  "deliveryMode": "local_only",
+  "intendedChannels": ["repo_artifacts"],
+  "externalDeliveryEnabled": false,
+  "failureAlertMode": "local_operator_review",
+  "failureAlertTargets": ["dashboard", "markdown_report", "report_cycle_json"],
+  "pendingActionThresholds": {
+    "staleDashboard": true,
+    "failedTrades": 1,
+    "inFlightOrders": 1,
+    "brokerAutomationPaused": true
+  },
+  "notes": [
+    "This repository only validates reporting delivery posture locally by default.",
+    "Do not add real outbound delivery here without explicit operator approval and a separate side-effect review."
+  ]
+}

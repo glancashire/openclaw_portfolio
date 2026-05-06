@@ -30,11 +30,11 @@ Goal: make the system operable during degraded broker conditions, stale state, a
 ## Phase 26 — Production reporting and delivery polish
 Goal: make scheduled outputs more production-ready for real operator use.
 
-- [ ] Define report delivery policy and failure-alert policy
-- [ ] Harden scheduled report/digest metadata for operator consumption
-- [ ] Improve dashboard/report surfacing for freshness, failure, and pending-action state
-- [ ] Add verification for delivery-policy/readiness behavior that does not require external side effects
-- [ ] Update docs for production reporting operations and limits
+- [x] Define report delivery policy and failure-alert policy
+- [x] Harden scheduled report/digest metadata for operator consumption
+- [x] Improve dashboard/report surfacing for freshness, failure, and pending-action state
+- [x] Add verification for delivery-policy/readiness behavior that does not require external side effects
+- [x] Update docs for production reporting operations and limits
 
 ## Phase 27 — Risk, logging, and observability hardening
 Goal: improve trust in real operations through stronger runtime evidence, risk-limit visibility, and failure diagnosis.

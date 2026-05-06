@@ -31,17 +31,22 @@ async function main() {
   };
 
   try {
-    const { regenerateDashboard, fileFreshnessSummary } = require('../src/reporting/dashboardGenerator');
+    const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
+    const { fileFreshnessSummary } = require('../src/reporting/freshness');
     const { generateAndWriteReport, formatReport } = require('../src/reporting/reportGenerator');
 
     const dashboardPath = await regenerateDashboard(portfolioDir);
     const dashboard = fs.readFileSync(dashboardPath, 'utf8');
     assert(dashboard.includes('## Freshness'), 'Expected dashboard freshness section');
+    assert(dashboard.includes('## Delivery Status'), 'Expected dashboard delivery status section');
+    assert(dashboard.includes('## Pending Operator Actions'), 'Expected dashboard pending actions section');
     assert(dashboard.includes('Dashboard stale: no'), 'Expected fresh dashboard after regeneration');
 
     const report = await generateAndWriteReport({ portfolioDir, period: 'weekly', dateStamp: '20260505' });
     const reportText = fs.readFileSync(report.markdownPath, 'utf8');
     assert(reportText.includes('## Freshness'), 'Expected report freshness section');
+    assert(reportText.includes('## Delivery Status'), 'Expected report delivery status section');
+    assert(reportText.includes('## Pending Operator Actions'), 'Expected report pending actions section');
     assert(reportText.includes('Dashboard file present: yes'), 'Expected report to mention dashboard presence');
 
     const future = new Date(Date.now() + 60_000);
@@ -69,9 +74,21 @@ async function main() {
       brokerReadiness: { message: 'healthy', fallbackRequired: false },
       lifecycleSummary: { submitted: 1 },
       freshness,
+      deliveryStatus: {
+        deliveryMode: 'local_only',
+        intendedChannels: ['repo_artifacts'],
+        externalDeliveryEnabled: false,
+        failureAlertMode: 'local_operator_review',
+        failureAlertTargets: ['dashboard'],
+        overrideLoaded: true,
+        ready: false,
+        pendingActions: ['Dashboard/report freshness is stale relative to source state.'],
+      },
+      pendingActions: ['Dashboard/report freshness is stale relative to source state.'],
     });
     assert(staleRendered.includes('Dashboard stale: yes'), 'Expected stale freshness to render in report output');
     assert(staleRendered.includes('Newest source file:'), 'Expected report freshness metadata');
+    assert(staleRendered.includes('Delivery readiness: needs_operator_attention'), 'Expected delivery readiness metadata');
 
     console.log(JSON.stringify({ ok: true, dashboardPath, report }, null, 2));
   } finally {

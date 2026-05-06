@@ -157,4 +157,5 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 - Acceptance closure is complete for the in-scope read-only + dry-run MVP.
 - Phase 24 transmitted-live hardening is now closed with explicit opt-in `transmit-live` safeguards, a dedicated readiness check, and focused regression coverage.
 - Phase 25 operator incident/runbook maturity is now closed with a dedicated operator runbook, operator incident summary CLI, broker-error pause regression coverage, and richer dashboard/report operator-state surfacing.
-- The next highest-value lanes are production reporting/delivery polish plus observability hardening.
+- Phase 26 production reporting/delivery polish is now closed with a local-only delivery policy, a dedicated report-delivery readiness CLI, richer delivery/pending-action metadata in dashboard/report/report-cycle outputs, and focused regression coverage.
+- The next highest-value lane is observability hardening.

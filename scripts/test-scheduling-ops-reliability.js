@@ -25,6 +25,9 @@ async function main() {
   assert(okRun.workflow.length === 3, 'Expected three workflow steps');
   assert(okRun.workflow.every((step) => step.ok === true), 'Expected all workflow steps to succeed');
   assert(okRun.workflow[2].name === 'generate_report', 'Expected report generation step');
+  assert(okRun.workflow[2].deliveryMode === 'local_only', 'Expected local-only delivery mode metadata');
+  assert(Array.isArray(okRun.workflow[2].pendingActions), 'Expected pending-actions metadata');
+  assert(okRun.deliveryStatus && okRun.deliveryStatus.deliveryMode === 'local_only', 'Expected cycle result delivery status');
 
   const failDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sched-ops-fail-'));
   seedPortfolio(failDir);

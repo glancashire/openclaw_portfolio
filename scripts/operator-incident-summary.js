@@ -3,7 +3,7 @@ const path = require('path');
 const { executionLifecycleSummary, recentTrades } = require('../src/reporting/portfolioData');
 const { latestHistory } = require('../src/reporting/portfolioData');
 const { brokerErrorStatus } = require('../src/execution/runtimeState');
-const { fileFreshnessSummary } = require('../src/reporting/dashboardGenerator');
+const { fileFreshnessSummary } = require('../src/reporting/freshness');
 
 function main() {
   const [portfolioDirArg] = process.argv.slice(2);

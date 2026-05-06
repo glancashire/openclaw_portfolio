@@ -15,6 +15,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - Interactive Brokers read-only connectivity and holdings sync are working
 - portfolio-aware execution gating and order staging scaffolding exist
 - execution lifecycle reconciliation now flows back into `trades.md`, `history.md`, and `dashboard.md`
+- local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
 The main reason the MVP is **not yet fully implemented** is that the broker execution surface is still intentionally incomplete in true writable mode. The system is now much more complete in dry-run/read-only/reconciliation behavior, and the operator incident/runbook layer is stronger, but it still does not provide a fully enabled, operator-validated, durable live submit path.
@@ -62,8 +63,8 @@ Legend:
 | 14. Strategy and ETF Selection Workflow | partial | Strategy parsing, shortlist generation, rationale, and approval-gated application support exist. The shortlist approval/write-back workflow is still lighter than the specification implies. |
 | 15. Market Entry Workflow | partial | Staged-entry policy, portfolio-aware execution gating, approval transitions, status reconciliation, cancellation scaffolding, and demo flow are now present. Live writable execution after approval remains incomplete. |
 | 16. Rebalancing Workflow | partial | Holdings sync, drift analysis, trade proposal generation, dashboard refresh, and execution reconciliation exist. The final enabled execution leg still needs hardening. |
-| 17. Reporting | partial | Weekly/monthly/quarterly report generation exists, with Markdown and PDF outputs. Reporting is now being extended to surface execution lifecycle more clearly, but the work is not yet fully complete. |
-| 18. Scheduling | partial | Schedule docs and report-job docs exist, and cron wiring is in place. Operational alerting/delivery hardening remains light. |
+| 17. Reporting | done | Weekly/monthly/quarterly report generation exists, with Markdown and PDF outputs. Reporting now also surfaces delivery mode, readiness, pending operator actions, freshness, and generation/render state, with a dedicated local-only readiness check. |
+| 18. Scheduling | partial | Schedule docs and report-job docs exist, and cron wiring is in place. Report-cycle automation now emits workflow, failure, delivery-mode, readiness, and pending-action metadata, though broader observability/alerting remains light. |
 | 19. Safety / Operational Rules | partial | Key safeguards are implemented: no secrets in Markdown, read-only/dry-run posture, activation/safety checks, approval gating, broker error pause state, and execution verification bundle. |
 | 20. Error Handling Requirements | partial | Warnings/blocking behavior, execution reconciliation, and automation-stop behavior after repeated broker errors now exist. Centralized structured logging and live-failure handling can still mature further. |
 | 21. Template Portfolio | done | `portfolio/_template/` and the real ETF portfolio are in place and aligned with the intended starter shape. |
@@ -97,6 +98,7 @@ Legend:
 - dashboard regeneration exists
 - history snapshot writing exists with typed execution states
 - weekly/monthly/quarterly report generation exists
+- local-only report delivery readiness inspection exists
 - PDF export exists
 - safe demo execution flow exists
 
