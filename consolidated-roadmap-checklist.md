@@ -43,9 +43,9 @@ Goal: stop bad live trades before they reach broker state.
 ## Phase 4 — Operator actions and state transitions
 Goal: make human-controlled execution paths predictable and safe.
 
-- [~] Implement proposal -> approval -> submission state transitions
-- [~] Define and enforce `trades.md` update rules for approvals and executions
-- [~] Add clear operator actions for approve / reject / cancel / resync
+- [x] Implement proposal -> approval -> submission state transitions
+- [x] Define and enforce `trades.md` update rules for approvals and executions
+- [x] Add clear operator actions for approve / reject / cancel / resync
 - [x] Prevent duplicate submission
 - [x] Guard approval transitions to valid proposal states only
 - [x] Reject approval of stale proposal eras

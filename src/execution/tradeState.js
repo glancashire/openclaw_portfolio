@@ -109,7 +109,7 @@ function latestPendingProposalDate(rows, row) {
   return latest;
 }
 
-function markTradeApproved(tradesPath, selector, approval = 'user_approved') {
+function markTradeApproved(tradesPath, selector, approval = 'user_approved', options = {}) {
   const table = readTradesTable(tradesPath);
   let updated = 0;
 
@@ -126,6 +126,7 @@ function markTradeApproved(tradesPath, selector, approval = 'user_approved') {
       ...row,
       Status: 'approved',
       Approval: approval,
+      Reason: appendReasonNote(row.Reason, options.reasonNote || 'Operator approval recorded.'),
     });
     updated += 1;
   });
@@ -225,7 +226,7 @@ function numberText(value) {
   return String(Number(n.toFixed(2)));
 }
 
-function rejectTradeProposal(tradesPath, selector, approval = 'user_rejected') {
+function rejectTradeProposal(tradesPath, selector, approval = 'user_rejected', options = {}) {
   const table = readTradesTable(tradesPath);
   let updated = 0;
 
@@ -242,6 +243,7 @@ function rejectTradeProposal(tradesPath, selector, approval = 'user_rejected') {
       ...row,
       Status: 'rejected',
       Approval: approval,
+      Reason: appendReasonNote(row.Reason, options.reasonNote || 'Operator rejection recorded.'),
     });
     updated += 1;
   });

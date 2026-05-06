@@ -30,19 +30,19 @@ Already landed in recent commits:
 4. prove the operator command surfaces behave coherently end-to-end
 
 ## Actionable checklist
-- [ ] Inspect current operator transition code paths and `trades.md` mutations.
-- [ ] Identify the minimum missing audit/state evidence for approve/reject/cancel/resync.
-- [ ] Implement transition/audit hardening without weakening safety gates.
-- [ ] Add focused tests for:
-  - [ ] approval action records durable operator evidence
-  - [ ] rejection action records durable operator evidence
-  - [ ] cancel action remains broker-linked and auditable
-  - [ ] resync action remains idempotent and does not duplicate operator transitions
-  - [ ] operator CLI entrypoints return coherent success/failure surfaces
-- [ ] Run the targeted Phase 4 test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader execution verification bundle.
-- [ ] Update roadmap/checklist docs to reflect verified completion.
+- [x] Inspect current operator transition code paths and `trades.md` mutations.
+- [x] Identify the minimum missing audit/state evidence for approve/reject/cancel/resync.
+- [x] Implement transition/audit hardening without weakening safety gates.
+- [x] Add focused tests for:
+  - [x] approval action records durable operator evidence
+  - [x] rejection action records durable operator evidence
+  - [x] cancel action remains broker-linked and auditable
+  - [x] resync action remains idempotent and does not duplicate operator transitions
+  - [x] operator CLI entrypoints return coherent success/failure surfaces
+- [x] Run the targeted Phase 4 test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader execution verification bundle.
+- [x] Update roadmap/checklist docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
@@ -57,6 +57,12 @@ This phase is complete when:
 2. Operator transitions stay constrained to valid/latest rows and broker-linked rows where applicable.
 3. Operator CLI scripts behave consistently with the transition model.
 4. Focused tests and the broader execution verification bundle pass.
+
+## Verified outcomes
+- Approval and rejection actions now append durable operator-action notes into the affected `trades.md` rows instead of changing only status/approval cells.
+- Cancel and resync paths now leave explicit audit notes that distinguish broker cancellation from operator-triggered status refresh.
+- Existing selector/latest-era/staged-order guards remain intact while the new audit trail is added.
+- Focused operator-transition regressions and the full execution verification bundle both pass.
 
 ## Non-goals
 - New broker features beyond what is needed to close operator transitions.

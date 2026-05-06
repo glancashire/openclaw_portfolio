@@ -285,7 +285,7 @@ async function approvePortfolioTrade({ portfolioDir, selector, approval = 'user_
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
-  const result = markTradeApproved(tradesPath, selector, approval);
+  const result = markTradeApproved(tradesPath, selector, approval, { reasonNote: 'Operator approval recorded.' });
   let historyAppend = null;
   if (result.updated > 0) {
     historyAppend = appendHistorySnapshot(historyPath, holdingsPath, 'execution_approved', 'Trade approved for broker execution.', { executionStatus: 'approved' });
@@ -298,7 +298,7 @@ async function rejectPortfolioTrade({ portfolioDir, selector, approval = 'user_r
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
-  const result = rejectTradeProposal(tradesPath, selector, approval);
+  const result = rejectTradeProposal(tradesPath, selector, approval, { reasonNote: 'Operator rejection recorded.' });
   let historyAppend = null;
   if (result.updated > 0) {
     historyAppend = appendHistorySnapshot(historyPath, holdingsPath, 'execution_rejected', 'Trade rejected and blocked from execution.', { executionStatus: 'rejected' });
@@ -399,7 +399,7 @@ async function resyncPortfolioOrders({ portfolioDir, refreshHoldingsOnFill = tru
         tickerOrIsin: row.tickerOrIsin,
         action: row.action,
       },
-      reasonNote: 'Automated resync of open broker order state.',
+      reasonNote: 'Operator resync refreshed open broker order state.',
       refreshHoldingsOnFill,
     });
     results.push({ row, outcome });
