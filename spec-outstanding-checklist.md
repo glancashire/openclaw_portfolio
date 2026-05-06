@@ -71,14 +71,14 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Detect and report stale dashboard state
 
 ## 8. Rebalancing engine hardening
-- [ ] Enforce absolute drift thresholds
-- [ ] Enforce relative drift thresholds
+- [x] Enforce absolute drift thresholds
+- [x] Enforce relative drift thresholds
 - [ ] Enforce min/max allocation breach handling
 - [~] Enforce cash-drag checks
-- [~] Prefer new cash before selling
-- [ ] Suppress tiny trades below minimum trade size
+- [x] Prefer new cash before selling
+- [x] Suppress tiny trades below minimum trade size
 - [ ] Avoid excessive turnover
-- [~] Include explicit rationale for each rebalance proposal
+- [x] Include explicit rationale for each rebalance proposal
 
 ## 9. Reporting completeness and polish
 - [~] Ensure weekly reports include all required sections

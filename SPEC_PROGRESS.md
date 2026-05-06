@@ -6,7 +6,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 - Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
 - Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, and artifact freshness surfacing.
-- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper risk-limit enforcement before proposal/execution, and report/rebalance polish rather than missing core scaffolding.
+- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper min/max and risk-limit enforcement before proposal/execution, and report polish rather than missing core scaffolding.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -98,4 +98,5 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Added cancel-path runtime broker error tracking and recovery clearing so cancel failures participate in the same safety pause posture as stage/status failures.
 - Hardened trade blocking so unresolved portfolio questions, excluded/approved instrument overlap, stale pricing, simulated pricing, and unresolved live account references fail closed before broker writes.
 - Added dashboard/report freshness surfacing plus stale-state detection against source Markdown drift, and made report cycles return explicit history/dashboard refresh evidence.
-- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, and dashboard/report freshness tests.
+- Hardened rebalancing proposal generation to honor configured thresholds, explain cash-first behavior, and surface exact below-minimum blocking reasons.
+- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, dashboard/report freshness, and rebalancing-hardening tests.

@@ -54,18 +54,18 @@
 
 ## Next phases
 
-### Phase 22 — rebalancing hardening
-Advance proposal quality by:
-- enforcing drift thresholds and min/max allocation breach handling consistently
-- preferring available cash before sells when feasible
-- suppressing tiny churn trades and excessive turnover
-- strengthening rationale so each proposal explains the governing rule clearly
+### Phase 22 — ETF suggestion workflow
+Improve instrument recommendation quality by:
+- turning asset-class proposals into clearer ETF-level suggestions
+- strengthening issuer / exclusion / currency preference handling
+- making shortlist rationale and rejection reasons more explicit
+- tightening alignment between approved instruments and instrument proposal output
 
 Current state:
-- dry-run proposals and allocation analysis exist
-- safety gating is stronger, but proposal-quality constraints still need hardening
+- instrument shortlist/proposal scaffolding exists
+- asset-class proposal inputs are stronger, but ETF-level recommendation polish still lags
 
-### Phase 23 — ETF suggestion workflow
+### Phase 23 — reporting completeness and polish
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible

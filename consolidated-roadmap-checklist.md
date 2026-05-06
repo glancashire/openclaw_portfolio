@@ -69,14 +69,14 @@ Goal: keep output artifacts trustworthy after material events.
 ## Phase 6 — Rebalancing hardening
 Goal: improve proposal quality and reduce avoidable churn.
 
-- [ ] Enforce absolute drift thresholds
-- [ ] Enforce relative drift thresholds
+- [x] Enforce absolute drift thresholds
+- [x] Enforce relative drift thresholds
 - [ ] Enforce min/max allocation breach handling
 - [~] Enforce cash-drag checks
-- [~] Prefer new cash before selling
-- [ ] Suppress tiny trades below minimum trade size
+- [x] Prefer new cash before selling
+- [x] Suppress tiny trades below minimum trade size
 - [ ] Avoid excessive turnover
-- [~] Include explicit rationale for each rebalance proposal
+- [x] Include explicit rationale for each rebalance proposal
 
 ## Phase 7 — ETF suggestion workflow
 Goal: finish shortlist generation and approval gating.

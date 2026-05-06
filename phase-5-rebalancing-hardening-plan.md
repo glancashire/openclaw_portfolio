@@ -13,25 +13,31 @@ Make trade proposal generation more trustworthy by honoring configured rebalance
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect current proposal engine inputs, allocation analysis, and rebalancing policy parsing gaps.
-- [ ] Add shared parsing helpers for rebalancing threshold / avoid-unnecessary-trades / prefer-cash-first policy fields.
-- [ ] Implement threshold-aware underweight proposal filtering.
-- [ ] Implement cash-first behavior that avoids suggesting sells when available cash can cover eligible underweights.
-- [ ] Implement suppression or blocking metadata for tiny churn / below-minimum proposals.
-- [ ] Strengthen rationale / notes returned by `proposeTrades`.
-- [ ] Add focused tests for:
-  - [ ] drift below threshold produces no proposal
-  - [ ] drift above threshold produces proposal
-  - [ ] available cash prevents unnecessary sell recommendations
-  - [ ] below-minimum proposal rows are suppressed or clearly blocked
-  - [ ] notes/rationale explain the governing rule
-- [ ] Run the targeted rebalancing test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect current proposal engine inputs, allocation analysis, and rebalancing policy parsing gaps.
+- [x] Add shared parsing helpers for rebalancing threshold / avoid-unnecessary-trades / prefer-cash-first policy fields.
+- [x] Implement threshold-aware underweight proposal filtering.
+- [x] Implement cash-first behavior that avoids suggesting sells when available cash can cover eligible underweights.
+- [x] Implement suppression or blocking metadata for tiny churn / below-minimum proposals.
+- [x] Strengthen rationale / notes returned by `proposeTrades`.
+- [x] Add focused tests for:
+  - [x] drift below threshold produces no proposal
+  - [x] drift above threshold produces proposal
+  - [x] available cash prevents unnecessary sell recommendations
+  - [x] below-minimum proposal rows are suppressed or clearly blocked
+  - [x] notes/rationale explain the governing rule
+- [x] Run the targeted rebalancing test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
 ## Intended verification
 - New focused `scripts/test-rebalancing-hardening.js`
 - Existing proposal/execution safety scripts impacted by proposal generation
+
+## Verified outcomes
+- Trade proposals now parse and honor configured rebalance thresholds from `portfolio.md`.
+- Cash-first proposal behavior is explicit in returned rationale and notes.
+- Below-minimum proposal rows remain visible but are clearly blocked with exact reasons.
+- Proposal generation now avoids emitting churn for underweights that stay inside the configured threshold.
