@@ -99,7 +99,7 @@ Goal: finish shortlist generation and approval gating.
 ## Phase 8 — Portfolio creation workflow
 Goal: make initial setup clean and safe.
 
-- [ ] Implement guided question flow for required inputs
+- [x] Implement guided question flow for required inputs
 - [x] Generate all required files for a new portfolio
 - [x] Capture open questions before activation
 - [x] Enforce clean draft -> active transition rules

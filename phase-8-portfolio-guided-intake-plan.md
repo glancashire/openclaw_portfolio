@@ -11,21 +11,26 @@ Complete the portfolio creation workflow by adding a guided question flow for un
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect current portfolio draft/intake workflow for remaining guided-flow gaps.
-- [ ] Add structured guided question generation for unresolved required inputs.
-- [ ] Tighten continuity between next-question output and activation-readiness blockers.
-- [ ] Improve operator-facing prompt clarity for draft completion.
-- [ ] Add focused tests for:
-  - [ ] required unanswered inputs generate guided prompts
-  - [ ] answered/settled inputs stop generating redundant prompts
-  - [ ] activation blockers and guided questions stay aligned
-- [ ] Run the targeted Phase 8 guided-intake test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect current portfolio draft/intake workflow for remaining guided-flow gaps.
+- [x] Add structured guided question generation for unresolved required inputs.
+- [x] Tighten continuity between next-question output and activation-readiness blockers.
+- [x] Improve operator-facing prompt clarity for draft completion.
+- [x] Add focused tests for:
+  - [x] required unanswered inputs generate guided prompts
+  - [x] answered/settled inputs stop generating redundant prompts
+  - [x] activation blockers and guided questions stay aligned
+- [x] Run the targeted Phase 8 guided-intake test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
 ## Intended verification
 - New focused guided-intake regression test(s)
 - Existing portfolio-creation and broader verification scripts
+
+## Verified outcomes
+- Draft workflows now expose structured guided questions instead of only raw missing-field keys.
+- Guided questions now stay aligned with activation blockers and disappear cleanly once the draft is answered.
+- Operator-facing intake prompts now include concrete guidance and expected answer formats for common missing inputs.

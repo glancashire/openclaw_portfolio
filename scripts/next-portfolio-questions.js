@@ -1,4 +1,4 @@
-const { nextQuestions } = require('../src/workflows/portfolioDraftState');
+const { guidedQuestions } = require('../src/workflows/portfolioDraftState');
 
 const target = process.argv[2];
 if (!target) {
@@ -6,5 +6,5 @@ if (!target) {
   process.exit(1);
 }
 
-const questions = nextQuestions(target);
+const questions = guidedQuestions(target);
 console.log(JSON.stringify({ count: questions.length, questions }, null, 2));

@@ -4,6 +4,25 @@ const { QUESTION_FIELDS } = require('./portfolioQuestions');
 
 const REQUIRED_PORTFOLIO_FILES = ['portfolio.md', 'holdings.md', 'trades.md', 'history.md', 'dashboard.md'];
 
+const GUIDED_HINTS = {
+  brokerAccountReference: 'Use the concrete Interactive Brokers account alias/reference that should be matched for holdings sync and trade safety checks.',
+  baseCurrency: 'For this MVP, use the real portfolio base currency. CHF is the expected default unless you intentionally changed scope.',
+  initialCapital: 'Give the expected starting size or rough funding amount so trade sizing and starter recommendations stay realistic.',
+  investmentHorizon: 'Use years as a simple numeric answer, for example 10.',
+  riskLevel: 'Use a small set like low / medium / high so the draft stays consistent and easy to validate.',
+  maximumAcceptableDrawdown: 'Use a percentage such as 20% or 30% to make risk limits reviewable.',
+  targetAssetClasses: 'Confirm the target asset-class table reflects the real intended allocation before activation.',
+  geographicPreferences: 'Confirm the geographic target table if country or regional exposure matters.',
+  sectorPreferences: 'Confirm whether any sector caps or exclusions should remain in place.',
+  esgPreference: 'Use a simple answer such as none, moderate, or strict.',
+  issuerPreferences: 'List preferred ETF issuers or any issuer exclusions that should influence shortlist generation.',
+  rebalancingTolerance: 'Confirm the rebalance threshold wording so automated proposal logic follows the intended tolerance.',
+  automatedExecutionAllowed: 'Answer yes/no for automated proposal generation or execution permissions.',
+  stagedMarketEntryDesired: 'Answer with the intended entry mode, for example staged.',
+  excludedInstruments: 'List excluded tickers/ISINs, or answer none if there are no exclusions.',
+  alreadyHeldInstruments: 'List any already-held instruments, or answer none if this is a clean start.',
+};
+
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
@@ -122,6 +141,24 @@ function nextQuestions(filePath) {
   });
 }
 
+function guidedQuestions(filePath) {
+  const questions = nextQuestions(filePath);
+  return questions.map((field) => ({
+    ...field,
+    blocker: `Unanswered draft question: ${field.key}`,
+    guidance: GUIDED_HINTS[field.key] || `Provide a concrete answer for ${field.prompt.toLowerCase()}.`,
+    answerFormat: suggestedAnswerFormat(field.key),
+  }));
+}
+
+function suggestedAnswerFormat(key) {
+  if (['investmentHorizon', 'initialCapital'].includes(key)) return 'short numeric value';
+  if (['maximumAcceptableDrawdown'].includes(key)) return 'percentage';
+  if (['excludedInstruments', 'alreadyHeldInstruments'].includes(key)) return 'list or "none"';
+  if (['automatedExecutionAllowed'].includes(key)) return 'yes / no';
+  return 'short text answer';
+}
+
 function resolvePortfolioDir(targetPath) {
   const resolved = path.resolve(targetPath);
   return path.basename(resolved) === 'portfolio.md' ? path.dirname(resolved) : resolved;
@@ -153,7 +190,7 @@ function activationReadiness(targetPath) {
   const portfolioPath = path.basename(path.resolve(targetPath)) === 'portfolio.md'
     ? path.resolve(targetPath)
     : path.join(path.resolve(targetPath), 'portfolio.md');
-  const questions = nextQuestions(portfolioPath);
+  const questions = guidedQuestions(portfolioPath);
   const fileStatus = requiredFileStatus(portfolioPath);
   const missingFiles = fileStatus.filter((item) => !item.exists).map((item) => item.name);
   const placeholders = unresolvedPlaceholderLines(portfolioPath);
@@ -169,6 +206,7 @@ function activationReadiness(targetPath) {
     missingFiles,
     unresolvedPlaceholders: placeholders,
     pendingQuestionKeys: questions.map((q) => q.key),
+    guidedQuestions: questions,
     requiredFiles: fileStatus,
   };
 }
@@ -177,6 +215,7 @@ module.exports = {
   REQUIRED_PORTFOLIO_FILES,
   collectDraftState,
   nextQuestions,
+  guidedQuestions,
   requiredFileStatus,
   unresolvedPlaceholderLines,
   activationReadiness,

@@ -54,14 +54,15 @@
 
 ## Next phases
 
-### Phase 22 — portfolio workflow completeness polish
-Improve portfolio workflow completeness by:
-- tightening guided intake/question flow for incomplete drafts
-- clarifying end-to-end operator prompts and blockers in draft-to-active workflows
-- expanding focused verification around workflow continuity
+### Phase 22 — execution and safety closure
+Improve execution completeness by:
+- finishing explicitly writable-mode submission and cancel-path durability
+- tightening remaining risk-limit and unmatched-holdings blocking behavior
+- hardening operator-controlled state transitions end-to-end
+- expanding focused verification around writable/live-path safety edges
 
 Current state:
-- portfolio draft readiness is much stronger, but guided continuity still remains lighter than ideal
+- read-only, dry-run, staged-order, reconciliation, reporting, scheduling, broker diagnostics, ETF workflow, and portfolio intake are now strong; the biggest remaining gaps are live-write closure and end-to-end execution acceptance
 
 ### Phase 23 — end-to-end acceptance closure
 Advance proposal quality by:

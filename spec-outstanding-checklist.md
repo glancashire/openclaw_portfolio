@@ -56,7 +56,7 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Require approval before adding to Approved Instruments
 
 ## 6. Portfolio creation workflow
-- [ ] Implement guided question flow for required inputs
+- [x] Implement guided question flow for required inputs
 - [x] Generate all required files for a new portfolio
 - [x] Capture open questions before activation
 - [x] Enforce clean draft -> active transition rules
