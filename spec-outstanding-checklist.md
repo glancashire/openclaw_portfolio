@@ -34,9 +34,9 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 ## 4. Strategy validation and trade blocking
 - [x] Block trading when unresolved questions remain
 - [x] Validate approved instruments / excluded instruments consistency
-- [~] Detect and block on unmatched holdings
+- [x] Detect and block on unmatched holdings
 - [x] Detect and block on stale price data
-- [~] Detect and block on risk-limit breaches before proposal/execution
+- [x] Detect and block on risk-limit breaches before proposal/execution
 - [x] Detect and block on broker/account mismatch or uncertain broker state
 
 ## 5. ETF suggestion workflow

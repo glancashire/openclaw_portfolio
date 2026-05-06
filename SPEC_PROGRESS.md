@@ -6,7 +6,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 - Overall status: strong MVP foundation with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, and fresher dashboard/report orchestration; still intentionally not live-execution-ready.
 - Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, and artifact freshness surfacing.
-- Biggest remaining gaps: true writable execution enablement beyond staged/non-transmitted handoff, deeper min/max and risk-limit enforcement before proposal/execution, and end-to-end acceptance completeness rather than missing core scaffolding.
+- Biggest remaining gap: true writable execution enablement and end-to-end acceptance completeness rather than missing core scaffolding.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -106,4 +106,5 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Hardened broker-path diagnostics so blocked, unavailable, and degraded Interactive Brokers operations return more explicit mode/operation/reason metadata for operators and automation.
 - Completed the ETF suggestion workflow with richer screening filters and explicit approval gating before shortlist rows can rewrite Approved Instruments.
 - Completed portfolio guided intake so draft-state gaps now produce structured prompts with guidance and answer-format hints aligned to activation blockers.
-- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, dashboard/report freshness, rebalancing-hardening, ETF-suggestion-hardening, ETF-suggestion-completion, portfolio-creation-hardening, portfolio-guided-intake, reporting-completeness, scheduling-ops-reliability, and broker-adapter-completeness tests.
+- Completed execution/safety closure so unmatched holdings and max-single-ETF breaches now fail closed with explicit operator-facing blockers.
+- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, execution-safety-closure, dashboard/report freshness, rebalancing-hardening, ETF-suggestion-hardening, ETF-suggestion-completion, portfolio-creation-hardening, portfolio-guided-intake, reporting-completeness, scheduling-ops-reliability, and broker-adapter-completeness tests.

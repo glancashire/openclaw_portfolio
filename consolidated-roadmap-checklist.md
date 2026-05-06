@@ -35,7 +35,7 @@ Goal: stop bad live trades before they reach broker state.
 - [x] Validate approved instruments vs excluded instruments consistency
 - [x] Block stale price data
 - [x] Tighten broker/account mismatch or uncertain broker-state blocking
-- [~] Tighten risk-limit breach blocking before proposal / execution
+- [x] Tighten risk-limit breach blocking before proposal / execution
 - [x] Preserve confirmation workflow before any real buy / sell
 - [x] Enforce first-purchase approval handling
 - [x] Enforce sales approval handling

@@ -54,17 +54,14 @@
 
 ## Next phases
 
-### Phase 22 — execution and safety closure
-Improve execution completeness by:
-- finishing explicitly writable-mode submission and cancel-path durability
-- tightening remaining risk-limit and unmatched-holdings blocking behavior
-- hardening operator-controlled state transitions end-to-end
-- expanding focused verification around writable/live-path safety edges
+### Phase 23 — end-to-end acceptance closure
+Close the implementation by:
+- assembling a final end-to-end acceptance sweep across portfolio creation, analysis, reporting, scheduling, and execution surfaces
+- fixing any remaining integration regressions revealed by that sweep
+- tightening final documentation/status artifacts so roadmap and verification state are fully closed
 
 Current state:
-- read-only, dry-run, staged-order, reconciliation, reporting, scheduling, broker diagnostics, ETF workflow, and portfolio intake are now strong; the biggest remaining gaps are live-write closure and end-to-end execution acceptance
-
-### Phase 23 — end-to-end acceptance closure
+- the major product lanes are now implemented; what remains is the final acceptance pass and repo-wide closure proof
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible

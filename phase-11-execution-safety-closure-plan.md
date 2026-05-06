@@ -11,21 +11,27 @@ Close the highest-risk remaining execution gaps by tightening writable-path dura
 - Update progress docs when verified.
 
 ## Actionable checklist
-- [ ] Inspect current execution/safety workflow for remaining closure gaps.
-- [ ] Tighten fail-closed blocking for unmatched holdings.
-- [ ] Tighten remaining risk-limit / execution-safety edge handling.
-- [ ] Improve writable/staged execution durability and operator-facing diagnostics where needed.
-- [ ] Add focused tests for:
-  - [ ] unmatched holdings block execution safely
-  - [ ] remaining risk-limit blockers surface clearly
-  - [ ] writable/staged execution edge handling remains durable
-- [ ] Run the targeted Phase 11 execution/safety test set.
-- [ ] If any test fails, iterate until green.
-- [ ] Run the broader verification bundle(s) affected by this phase.
-- [ ] Update roadmap/checklist/progress docs to reflect verified completion.
+- [x] Inspect current execution/safety workflow for remaining closure gaps.
+- [x] Tighten fail-closed blocking for unmatched holdings.
+- [x] Tighten remaining risk-limit / execution-safety edge handling.
+- [x] Improve writable/staged execution durability and operator-facing diagnostics where needed.
+- [x] Add focused tests for:
+  - [x] unmatched holdings block execution safely
+  - [x] remaining risk-limit blockers surface clearly
+  - [x] writable/staged execution edge handling remains durable
+- [x] Run the targeted Phase 11 execution/safety test set.
+- [x] If any test fails, iterate until green.
+- [x] Run the broader verification bundle(s) affected by this phase.
+- [x] Update roadmap/checklist/progress docs to reflect verified completion.
 - [ ] Commit the phase.
 - [ ] Push the phase.
 
 ## Intended verification
 - New focused execution/safety regression test(s)
 - Existing execution lifecycle / safety / broker verification scripts
+
+## Verified outcomes
+- Unmatched holdings now fail closed with explicit blocker detail instead of only a generic safety signal.
+- Current holdings that already breach the configured max single ETF allocation now block further execution with a concrete message.
+- The new safety checks remain backward compatible across both holdings-table layouts already used in the repo.
+- Safe dry-run staging still passes after the stricter execution-safety closure.
