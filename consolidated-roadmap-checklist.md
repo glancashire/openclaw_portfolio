@@ -107,13 +107,13 @@ Goal: make initial setup clean and safe.
 ## Phase 9 — Scheduling and operational reliability
 Goal: make automation robust and restart-safe.
 
-- [~] Verify daily workflow matches spec
-- [~] Verify weekly workflow matches spec
-- [~] Verify monthly workflow matches spec
-- [~] Verify quarterly workflow matches spec
-- [ ] Add failure alerts / observability for broken runs
-- [ ] Ensure safe resume behavior after restart
-- [~] Preserve separation between read-only automation and write-enabled automation
+- [x] Verify daily workflow matches spec
+- [x] Verify weekly workflow matches spec
+- [x] Verify monthly workflow matches spec
+- [x] Verify quarterly workflow matches spec
+- [x] Add failure alerts / observability for broken runs
+- [x] Ensure safe resume behavior after restart
+- [x] Preserve separation between read-only automation and write-enabled automation
 
 ## Phase 10 — Broker adapter completeness audit
 Goal: finish the broker integration surface area.

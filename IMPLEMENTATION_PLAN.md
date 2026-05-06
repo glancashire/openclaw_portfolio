@@ -54,17 +54,17 @@
 
 ## Next phases
 
-### Phase 22 — scheduling and operational reliability
-Improve automation reliability by:
-- verifying daily / weekly / monthly / quarterly workflow coverage against the spec
-- surfacing broken-run / failure-alert conditions more explicitly
-- hardening safe resume behavior after restart or interrupted runs
-- preserving separation between read-only automation and write-enabled automation
+### Phase 22 — broker adapter completeness audit
+Improve broker-path confidence by:
+- auditing read-only, dry-run, status, fill, completed-order, and cancel behavior for gaps against the spec
+- surfacing unsupported live-write paths more explicitly where they are still intentionally blocked
+- tightening adapter result normalization and operator-facing diagnostics
+- expanding focused verification around broker-path edge cases
 
 Current state:
-- major workflow scripts exist, but operational guarantees and observability still need stronger verification
+- the IBKR adapter is functionally useful for read-only sync and dry-run/workflow support, but live-path clarity and edge-case coverage still need hardening
 
-### Phase 23 — broker adapter completeness audit
+### Phase 23 — portfolio workflow completeness polish
 Advance proposal quality by:
 - enforcing drift thresholds and min/max allocation breach handling consistently
 - preferring available cash before sells when feasible

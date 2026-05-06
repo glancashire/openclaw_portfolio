@@ -90,13 +90,13 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Verify filename pattern and schedule behavior
 
 ## 10. Scheduling / automation reliability
-- [~] Verify daily workflow matches spec
-- [~] Verify weekly workflow matches spec
-- [~] Verify monthly workflow matches spec
-- [~] Verify quarterly workflow matches spec
-- [ ] Add failure alerts / observability for broken runs
-- [ ] Ensure safe resume behavior after restart
-- [~] Preserve separation between read-only automation and write-enabled automation
+- [x] Verify daily workflow matches spec
+- [x] Verify weekly workflow matches spec
+- [x] Verify monthly workflow matches spec
+- [x] Verify quarterly workflow matches spec
+- [x] Add failure alerts / observability for broken runs
+- [x] Ensure safe resume behavior after restart
+- [x] Preserve separation between read-only automation and write-enabled automation
 
 ## 11. Broker adapter completeness audit
 - [~] Verify `authenticate()` completeness
