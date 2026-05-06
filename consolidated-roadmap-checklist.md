@@ -179,14 +179,15 @@ Goal: generate machine-readable artifacts for future UI and compact digest surfa
 ### Phase 30 — Multi-portfolio overview board
 Goal: provide one top-level operational view across portfolios.
 
-- [ ] Build portfolio index aggregation across all portfolio folders
-- [ ] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
-- [ ] Add a recommended-action summary across portfolios
-- [ ] Generate Markdown and/or HTML multi-portfolio overview output
-- [ ] Add tests for aggregation and missing-data edge cases
+- [x] Build portfolio index aggregation across all portfolio folders
+- [x] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
+- [x] Add a recommended-action summary across portfolios
+- [x] Generate Markdown and/or HTML multi-portfolio overview output
+- [x] Add tests for aggregation and missing-data edge cases
 
 ### Current focus
 - Expanded follow-on roadmap is now active beyond Phase 27.
 - Phase 28 command-center dashboard is closed with explicit health, blockers, pending-actions, material-events, and recommended-next-step surfaces.
 - Phase 29 structured UI summary artifacts is now closed with per-portfolio summaries plus repo-level portfolio-index and pending-actions JSON artifacts.
-- Next up: Phase 30 multi-portfolio overview board.
+- Phase 30 multi-portfolio overview board is now closed with generated Markdown/HTML board outputs layered on top of the Phase 29 artifacts.
+- Next up: Phase 31 unified approvals and pending-actions queue.

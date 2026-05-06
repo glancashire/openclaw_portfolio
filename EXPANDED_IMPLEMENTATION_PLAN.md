@@ -58,11 +58,11 @@ Goal: generate machine-readable artifacts that can power a future UI or compact 
 ### Phase 30 — Multi-portfolio overview board
 Goal: provide one top-level operational overview across portfolios.
 
-- [~] Build portfolio index aggregation across all portfolio folders
-- [ ] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
-- [ ] Add a recommended-action summary across portfolios
-- [ ] Generate Markdown and/or HTML multi-portfolio overview output
-- [ ] Add tests for aggregation and missing-data edge cases
+- [x] Build portfolio index aggregation across all portfolio folders
+- [x] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
+- [x] Add a recommended-action summary across portfolios
+- [x] Generate Markdown and/or HTML multi-portfolio overview output
+- [x] Add tests for aggregation and missing-data edge cases
 
 ### Phase 31 — Unified approvals and pending-actions queue
 Goal: make pending work obvious and reviewable.

@@ -1,0 +1,86 @@
+const fs = require('fs');
+const path = require('path');
+const { markdownToBasicHtml } = require('./pdfExport');
+const { generateOverviewArtifacts } = require('./summaryArtifacts');
+
+function classifyPortfolioKind(item = {}) {
+  const name = String(item.portfolio || '').toLowerCase();
+  if (name.startsWith('_')) return 'template';
+  if (name.includes('template')) return 'template';
+  if (name.includes('acceptance') || name.includes('demo') || name.includes('closure')) return 'demo_like';
+  return 'active';
+}
+
+function formatDriftSummary(driftStatuses = []) {
+  if (!Array.isArray(driftStatuses) || !driftStatuses.length) return 'n/a';
+  const severe = driftStatuses.filter((row) => row.status === 'out_of_bounds');
+  const minor = driftStatuses.filter((row) => row.status === 'drifted');
+  if (severe.length) return `${severe.length} out_of_bounds`;
+  if (minor.length) return `${minor.length} drifted`;
+  return 'on_track';
+}
+
+function summarizeOverview(index = {}, pending = {}) {
+  const portfolios = Array.isArray(index.portfolios) ? index.portfolios : [];
+  const totals = {
+    portfolioCount: portfolios.length,
+    totalValueChf: Number(index.totalValueChf || 0),
+    healthyCount: portfolios.filter((item) => item.status === 'healthy').length,
+    warningCount: portfolios.filter((item) => item.status === 'warning' || item.status === 'attention_needed').length,
+    blockedCount: portfolios.filter((item) => item.status === 'blocked').length,
+    pendingApprovals: portfolios.reduce((sum, item) => sum + Number(item.pendingApprovals || 0), 0),
+    pendingActions: Array.isArray(pending.items) ? pending.items.length : 0,
+    activeCount: portfolios.filter((item) => classifyPortfolioKind(item) === 'active').length,
+    demoLikeCount: portfolios.filter((item) => classifyPortfolioKind(item) === 'demo_like').length,
+  };
+  return totals;
+}
+
+function buildRecommendedActionRows(pending = {}) {
+  const items = Array.isArray(pending.items) ? pending.items : [];
+  if (!items.length) return '1. No pending cross-portfolio actions.';
+  return items.slice(0, 10).map((item, index) => `${index + 1}. [${item.severity}/${item.status}] ${item.portfolio}: ${item.summary} — ${item.recommendedOperatorAction}`).join('\n');
+}
+
+function buildPortfolioTable(index = {}) {
+  const portfolios = Array.isArray(index.portfolios) ? index.portfolios : [];
+  if (!portfolios.length) {
+    return '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | no portfolios discovered |\n';
+  }
+  return portfolios.map((item) => `| ${item.portfolio} | ${classifyPortfolioKind(item)} | ${item.totalValueChf} | ${item.status} | ${formatDriftSummary(item.driftStatuses)} | ${item.blockers} | ${item.pendingApprovals} | ${item.pendingActions} | ${item.recommendedNextStep} |`).join('\n');
+}
+
+function formatOverviewMarkdown({ index, pending }) {
+  const totals = summarizeOverview(index, pending);
+  return `# Multi-Portfolio Overview\n\n## Summary\n- Generated at: ${index.generatedAt || new Date().toISOString()}\n- Portfolios discovered: ${totals.portfolioCount}\n- Active portfolios: ${totals.activeCount}\n- Demo-like portfolios: ${totals.demoLikeCount}\n- Total value CHF: ${totals.totalValueChf}\n- Healthy portfolios: ${totals.healthyCount}\n- Warning / attention portfolios: ${totals.warningCount}\n- Blocked portfolios: ${totals.blockedCount}\n- Pending approvals: ${totals.pendingApprovals}\n- Pending actions: ${totals.pendingActions}\n\n## Portfolio Board\n| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | Recommended next step |\n|---|---|---:|---|---|---:|---:|---:|---|\n${buildPortfolioTable(index)}\n\n## Cross-Portfolio Recommended Actions\n${buildRecommendedActionRows(pending)}\n\n## Notes\n- This board is generated from Phase 29 structured summary artifacts rather than by re-deriving state directly from Markdown.\n- Demo-like portfolios are surfaced explicitly so they do not silently disappear from operator review.\n`;
+}
+
+async function generateOverviewBoard({ repoRoot = process.cwd(), writeFiles = true } = {}) {
+  const { portfolioIndex, pendingActions } = await generateOverviewArtifacts({ repoRoot, writeFiles: true });
+  const markdown = formatOverviewMarkdown({ index: portfolioIndex, pending: pendingActions });
+  const overviewDir = path.join(repoRoot, 'runtime', 'overview');
+  const markdownPath = path.join(overviewDir, 'portfolio-overview.md');
+  const htmlPath = path.join(overviewDir, 'portfolio-overview.html');
+  if (writeFiles) {
+    fs.mkdirSync(overviewDir, { recursive: true });
+    fs.writeFileSync(markdownPath, markdown);
+    fs.writeFileSync(htmlPath, markdownToBasicHtml(markdown));
+  }
+  return {
+    markdown,
+    markdownPath,
+    htmlPath,
+    portfolioIndex,
+    pendingActions,
+  };
+}
+
+module.exports = {
+  classifyPortfolioKind,
+  formatDriftSummary,
+  summarizeOverview,
+  buildRecommendedActionRows,
+  buildPortfolioTable,
+  formatOverviewMarkdown,
+  generateOverviewBoard,
+};

@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now underway, and Phases 28-29 have been completed to turn the per-portfolio dashboard into a more operator-centric command-center surface and to generate structured UI-ready summary artifacts for portfolios, portfolio indexing, and pending actions. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now underway, and Phases 28-30 have been completed to turn the per-portfolio dashboard into a more operator-centric command-center surface, generate structured UI-ready summary artifacts for portfolios/portfolio indexing/pending actions, and layer a generated multi-portfolio overview board on top of those artifacts. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
 
 ## Validation snapshot
 
@@ -98,6 +98,7 @@ Legend:
 - dashboard regeneration exists
 - command-center dashboard sections now surface health snapshot, blockers, pending actions, recent material events, and one recommended next step
 - structured summary artifacts now generate `portfolio/<name>/summary.json`, `runtime/overview/portfolio-index.json`, and `runtime/overview/pending-actions.json`
+- multi-portfolio board artifacts now generate `runtime/overview/portfolio-overview.md` and `runtime/overview/portfolio-overview.html`
 - history snapshot writing exists with typed execution states
 - weekly/monthly/quarterly report generation exists
 - local-only report delivery readiness inspection exists
@@ -173,10 +174,10 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-After the structured-summary-artifacts uplift, the next most valuable follow-up is:
-- build a polished multi-portfolio overview board on top of `summary.json` and `portfolio-index.json`
-- then unify approvals and pending actions into one more explicit queue surface across operator-facing outputs
-- then continue with decision-oriented reporting and workflow polish
+After the multi-portfolio-overview uplift, the next most valuable follow-up is:
+- unify approvals and pending actions into one more explicit queue surface across operator-facing outputs
+- then continue with decision-oriented reporting polish
+- then continue with guided workflow and onboarding polish
 
 ## Known environment caveat
 
