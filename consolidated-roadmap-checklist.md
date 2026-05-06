@@ -169,12 +169,12 @@ Goal: turn the per-portfolio dashboard into a clearer operator command center.
 ### Phase 29 — Structured UI summary artifacts
 Goal: generate machine-readable artifacts for future UI and compact digest surfaces.
 
-- [ ] Generate `portfolio/<name>/summary.json`
-- [ ] Generate `runtime/overview/portfolio-index.json`
-- [ ] Generate `runtime/overview/pending-actions.json`
-- [ ] Define stable schemas for these artifacts
-- [ ] Ensure artifacts stay aligned with Markdown/dashboard state
-- [ ] Add focused artifact/schema verification tests
+- [x] Generate `portfolio/<name>/summary.json`
+- [x] Generate `runtime/overview/portfolio-index.json`
+- [x] Generate `runtime/overview/pending-actions.json`
+- [x] Define stable schemas for these artifacts
+- [x] Ensure artifacts stay aligned with Markdown/dashboard state
+- [x] Add focused artifact/schema verification tests
 
 ### Phase 30 — Multi-portfolio overview board
 Goal: provide one top-level operational view across portfolios.
@@ -188,4 +188,5 @@ Goal: provide one top-level operational view across portfolios.
 ### Current focus
 - Expanded follow-on roadmap is now active beyond Phase 27.
 - Phase 28 command-center dashboard is closed with explicit health, blockers, pending-actions, material-events, and recommended-next-step surfaces.
-- Next up: Phase 29 structured UI summary artifacts.
+- Phase 29 structured UI summary artifacts is now closed with per-portfolio summaries plus repo-level portfolio-index and pending-actions JSON artifacts.
+- Next up: Phase 30 multi-portfolio overview board.

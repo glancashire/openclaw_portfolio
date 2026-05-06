@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-06T15:42:11.889Z",
+  "itemCount": 8,
+  "items": [
+    {
+      "portfolio": "acceptance-closure",
+      "kind": "blocker",
+      "severity": "high",
+      "status": "blocked",
+      "summary": "Holdings and pricing are still simulated.",
+      "blocking": true,
+      "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+      "source": "safety_controls"
+    },
+    {
+      "portfolio": "acceptance-closure",
+      "kind": "blocker",
+      "severity": "high",
+      "status": "blocked",
+      "summary": "Missing concrete risk limit: Max cash drag after full deployment.",
+      "blocking": true,
+      "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+      "source": "safety_controls"
+    },
+    {
+      "portfolio": "acceptance-closure",
+      "kind": "blocker",
+      "severity": "high",
+      "status": "blocked",
+      "summary": "Missing concrete risk limit: Max single ETF allocation.",
+      "blocking": true,
+      "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+      "source": "safety_controls"
+    },
+    {
+      "portfolio": "acceptance-closure",
+      "kind": "blocker",
+      "severity": "high",
+      "status": "blocked",
+      "summary": "Missing concrete risk limit: Max single issuer allocation.",
+      "blocking": true,
+      "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+      "source": "safety_controls"
+    },
+    {
+      "portfolio": "acceptance-closure",
+      "kind": "blocker",
+      "severity": "high",
+      "status": "blocked",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked.",
+      "blocking": true,
+      "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+      "source": "safety_controls"
+    },
+    {
+      "portfolio": "acceptance-closure",
+      "kind": "broker",
+      "severity": "high",
+      "status": "degraded",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "blocking": true,
+      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "source": "broker_readiness"
+    },
+    {
+      "portfolio": "etf",
+      "kind": "broker",
+      "severity": "high",
+      "status": "degraded",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "blocking": true,
+      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "source": "broker_readiness"
+    },
+    {
+      "portfolio": "etf",
+      "kind": "approval",
+      "severity": "medium",
+      "status": "pending_user_approval",
+      "summary": "7 proposed trade row(s) still need user approval.",
+      "blocking": false,
+      "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",
+      "source": "trade_lifecycle"
+    }
+  ]
+}

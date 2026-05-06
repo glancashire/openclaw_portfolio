@@ -48,17 +48,17 @@ Goal: turn the portfolio dashboard into a clearer operator command center.
 ### Phase 29 — Structured UI summary artifacts
 Goal: generate machine-readable artifacts that can power a future UI or compact digests.
 
-- [ ] Generate `portfolio/<name>/summary.json`
-- [ ] Generate `runtime/overview/portfolio-index.json`
-- [ ] Generate `runtime/overview/pending-actions.json`
-- [ ] Define stable schemas for these artifacts
-- [ ] Ensure artifacts stay aligned with Markdown/dashboard state
-- [ ] Add focused artifact/schema verification tests
+- [x] Generate `portfolio/<name>/summary.json`
+- [x] Generate `runtime/overview/portfolio-index.json`
+- [x] Generate `runtime/overview/pending-actions.json`
+- [x] Define stable schemas for these artifacts
+- [x] Ensure artifacts stay aligned with Markdown/dashboard state
+- [x] Add focused artifact/schema verification tests
 
 ### Phase 30 — Multi-portfolio overview board
 Goal: provide one top-level operational overview across portfolios.
 
-- [ ] Build portfolio index aggregation across all portfolio folders
+- [~] Build portfolio index aggregation across all portfolio folders
 - [ ] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
 - [ ] Add a recommended-action summary across portfolios
 - [ ] Generate Markdown and/or HTML multi-portfolio overview output

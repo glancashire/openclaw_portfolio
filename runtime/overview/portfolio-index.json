@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-06T15:42:11.889Z",
+  "portfolioCount": 2,
+  "totalValueChf": 5000,
+  "portfolios": [
+    {
+      "portfolio": "acceptance-closure",
+      "status": "warning",
+      "strategyStatus": "blocked",
+      "totalValueChf": 0,
+      "cashChf": 0,
+      "investedChf": 0,
+      "lastSyncAt": "YYYY-MM-DD HH:mm:ss",
+      "latestSnapshotDate": "YYYY-MM-DD",
+      "pendingApprovals": 0,
+      "blockers": 5,
+      "pendingActions": 6,
+      "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
+      "driftStatuses": [
+        {
+          "assetClass": "Global equities",
+          "status": "out_of_bounds",
+          "driftPct": -50
+        },
+        {
+          "assetClass": "Swiss equities",
+          "status": "out_of_bounds",
+          "driftPct": -20
+        },
+        {
+          "assetClass": "Bonds / cash-like",
+          "status": "out_of_bounds",
+          "driftPct": -30
+        }
+      ],
+      "brokerHealth": "degraded",
+      "executionPosture": "degraded_dry_run_only",
+      "deliveryPosture": "ready",
+      "dataFreshness": "current"
+    },
+    {
+      "portfolio": "etf",
+      "status": "warning",
+      "strategyStatus": "blocked",
+      "totalValueChf": 5000,
+      "cashChf": 5000,
+      "investedChf": 0,
+      "lastSyncAt": "2026-05-02 10:20:02",
+      "latestSnapshotDate": "2026-05-06",
+      "pendingApprovals": 7,
+      "blockers": 0,
+      "pendingActions": 2,
+      "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "driftStatuses": [
+        {
+          "assetClass": "Global equities",
+          "status": "out_of_bounds",
+          "driftPct": -60
+        },
+        {
+          "assetClass": "Swiss equities",
+          "status": "out_of_bounds",
+          "driftPct": -20
+        },
+        {
+          "assetClass": "Bonds / cash-like",
+          "status": "out_of_bounds",
+          "driftPct": -20
+        }
+      ],
+      "brokerHealth": "degraded",
+      "executionPosture": "degraded_dry_run_only",
+      "deliveryPosture": "ready",
+      "dataFreshness": "current"
+    }
+  ]
+}
