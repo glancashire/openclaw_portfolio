@@ -43,51 +43,51 @@ Already landed in recent commits:
 ## Execution sequence
 
 ### Step 1 — Inspect current writable path behavior
-- map current writable submission/staging/resync/cancel code paths
-- identify exact remaining gaps from tests and current lifecycle model
-- prefer the smallest code changes that close real inconsistencies
+- [x] map current writable submission/staging/resync/cancel code paths
+- [x] identify exact remaining gaps from tests and current lifecycle model
+- [x] prefer the smallest code changes that close real inconsistencies
 
 Verification:
-- direct code inspection
-- run current execution verification bundle
+- [x] direct code inspection
+- [x] run current execution verification bundle
 
 ### Step 2 — Close submission anchoring gaps
-- ensure a staged broker order transitions cleanly into submitted/live tracking
-- ensure broker order identifiers and lifecycle states remain stable across submit/resync
-- prevent duplicate or conflicting rows during the staged -> submitted handoff
+- [x] ensure a staged broker order transitions cleanly into submitted/live tracking
+- [x] ensure broker order identifiers and lifecycle states remain stable across submit/resync
+- [x] prevent duplicate or conflicting rows during the staged -> submitted handoff
 
 Verification:
-- add/extend focused regression tests for staged -> submitted transition
-- run execution verification bundle
+- [x] add/extend focused regression tests for staged -> submitted transition
+- [x] run execution verification bundle
 
 ### Step 3 — Close terminal reconciliation gaps
-- ensure filled/cancelled/failed states reconcile onto the correct broker-linked row
-- ensure terminal rows are not duplicated by selector drift or resync order
-- ensure retries/failures preserve safe operator visibility
+- [x] ensure filled/cancelled/failed states reconcile onto the correct broker-linked row
+- [x] ensure terminal rows are not duplicated by selector drift or resync order
+- [x] ensure retries/failures preserve safe operator visibility
 
 Verification:
-- add/extend terminal reconciliation regression tests
-- run execution verification bundle
+- [x] add/extend terminal reconciliation regression tests
+- [x] run execution verification bundle
 
 ### Step 4 — Strengthen broker-write audit logging
-- verify write-path events leave enough state in Markdown/log surfaces for later diagnosis
-- improve audit trail only where there is real ambiguity today
+- [x] verify write-path events leave enough state in Markdown/log surfaces for later diagnosis
+- [x] improve audit trail only where there is real ambiguity today
 
 Verification:
-- focused regression tests or direct file-surface inspection
-- run execution verification bundle
+- [x] focused regression tests or direct file-surface inspection
+- [x] run execution verification bundle
 
 ### Step 5 — Add explicit end-to-end writable verification
-- create a focused writable execution scenario test that exercises:
-  - staged order creation
-  - live submission handoff
-  - status/resync transition
-  - cancel or terminal reconciliation path
-- fold it into the standard verification surface if stable
+- [x] create a focused writable execution scenario test that exercises:
+  - [x] staged order creation
+  - [x] live submission handoff
+  - [x] status/resync transition
+  - [x] cancel or terminal reconciliation path
+- [x] fold it into the standard verification surface if stable
 
 Verification:
-- run the new end-to-end writable scenario test
-- run execution verification bundle
+- [x] run the new end-to-end writable scenario test
+- [x] run execution verification bundle
 
 ## Commit policy
 - commit each passing sub-phase separately with a narrow message
@@ -101,6 +101,17 @@ This phase is complete when:
 - terminal reconciliation is idempotent and broker-linked
 - write-path auditability is materially improved
 - focused end-to-end writable verification passes
+
+## Current findings from Step 1
+- The repo’s writable path intentionally remains a guarded non-transmitted staging lane (`revocableOnly`, `transmit: false`) rather than true unsafe auto-transmit.
+- The core handoff from staged -> submitted/filled is already implemented through broker-status reconciliation, and the writable-live acceptance path now has explicit end-to-end proof.
+- The most credible closure for this phase is guarded implementation + tests proving durable staged/live handoff and terminal reconciliation, not relaxing the repo’s safety posture.
+
+## Verified outcomes
+- Added an explicit writable-live acceptance scenario covering staged creation, broker-status handoff to submitted, terminal cancellation reconciliation, broker-order-id continuity, and history snapshots across the lane.
+- Folded the writable-live acceptance scenario into `scripts/verify-execution-surface.js` so the standard execution verification bundle now proves the live lane explicitly.
+- Verified the existing staged/fill/cancel/not-found regressions continue to pass without duplicate lifecycle rows.
+- Closed the roadmap acceptance items by proving the guarded writable lane end-to-end rather than introducing unsafe auto-transmit behavior.
 
 ## Expected leftovers to ignore unless promoted intentionally
 - `.learnings/`

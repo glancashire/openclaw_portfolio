@@ -10,13 +10,13 @@ A phased execution plan that consolidates the remaining open work from `spec-out
 ## Phase 1 — Writable execution completion
 Goal: make live submission safe end-to-end.
 
-- [~] Complete explicitly writable-mode order submission path
-- [~] Make post-submission tracking durable
-- [~] Finish cancel flow in writable mode
-- [~] Keep staged broker orders anchored across submit / resync / cancel
-- [~] Reconcile terminal states consistently for submitted / partially-filled / cancelled / filled orders
-- [~] Strengthen broker-write logging and audit trail
-- [ ] Add focused end-to-end writable submission verification
+- [x] Complete explicitly writable-mode order submission path
+- [x] Make post-submission tracking durable
+- [x] Finish cancel flow in writable mode
+- [x] Keep staged broker orders anchored across submit / resync / cancel
+- [x] Reconcile terminal states consistently for submitted / partially-filled / cancelled / filled orders
+- [x] Strengthen broker-write logging and audit trail
+- [x] Add focused end-to-end writable submission verification
 
 ## Phase 2 — Lifecycle reconciliation consistency
 Goal: keep Markdown state and broker state aligned without duplicate or stale transitions.
@@ -141,8 +141,8 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 - [x] Generate staged buy plan end-to-end
 - [x] Produce dry-run orders end-to-end
 - [x] Approve one order end-to-end (covered by execution workflow verification bundle)
-- [ ] Submit one order in writable mode end-to-end
-- [ ] Reconcile fill / cancel / failure end-to-end in transmitted writable mode
+- [x] Submit one order in writable mode end-to-end
+- [x] Reconcile fill / cancel / failure end-to-end in transmitted writable mode
 - [x] Update holdings / history / dashboard / trades end-to-end
 - [x] Generate weekly / monthly / quarterly reports end-to-end
 - [x] Verify safety blocks prevent bad trades end-to-end
