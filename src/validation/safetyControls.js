@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+const { recordRuntimeEvent } = require('../observability/runtimeEvents');
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
@@ -64,6 +66,16 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
   const portfolioText = read(portfolioPath);
   const holdingsText = read(holdingsPath);
   const blockers = [];
+  const diagnostics = {
+    portfolio: path.basename(path.dirname(portfolioPath)) || 'default',
+    executionMode: extractExecutionMode(portfolioText),
+    riskLimits: {},
+    holdingsHealth: {
+      simulatedPricing: includesSimulatedPricing(holdingsText),
+      stalePricing: includesStalePricing(holdingsText),
+      maxObservedWeightPct: findMaxObservedWeightPct(holdingsText),
+    },
+  };
 
   if (hasOpenQuestions(portfolioText)) {
     blockers.push({ severity: 'error', message: 'Portfolio still has open questions; trade execution must remain blocked.' });
@@ -84,6 +96,7 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
   }
   for (const label of ['Max single ETF allocation', 'Max single issuer allocation', 'Max cash drag after full deployment']) {
     const value = extractRiskLimit(portfolioText, label);
+    diagnostics.riskLimits[label] = value;
     if (!value || value.includes('<')) {
       blockers.push({ severity: 'error', message: `Missing concrete risk limit: ${label}.` });
     }
@@ -95,7 +108,31 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
     blockers.push({ severity: 'error', message: `Current holdings exceed max single ETF allocation (${observedMaxWeight}% > ${maxSingleEtf}%).` });
   }
 
-  return blockers;
+  const result = {
+    blockers,
+    diagnostics: {
+      ...diagnostics,
+      holdingsHealth: {
+        ...diagnostics.holdingsHealth,
+        maxSingleEtfLimitPct: maxSingleEtf,
+      },
+    },
+  };
+
+  if (blockers.length) {
+    recordRuntimeEvent({
+      level: blockers.some((item) => item.severity === 'error') ? 'warn' : 'info',
+      category: 'risk',
+      action: 'safety_controls_blocked',
+      portfolio: diagnostics.portfolio,
+      mode: diagnostics.executionMode || 'unknown',
+      status: blockers.some((item) => item.severity === 'error') ? 'blocked' : 'warning',
+      summary: blockers.map((item) => item.message).join(' | '),
+      details: result.diagnostics,
+    });
+  }
+
+  return result;
 }
 
 module.exports = { evaluateSafetyControls, hasOpenQuestions, includesSimulatedPricing, includesStalePricing, findMaxObservedWeightPct };

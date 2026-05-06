@@ -4,9 +4,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: read-only + dry-run MVP acceptance closure achieved, with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, fresher dashboard/report orchestration, and a documented local-only reporting-delivery posture; the repo now transitions into the final explicit observability hardening phase.
-- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, and end-to-end acceptance evidence for the in-scope workflow.
-- Biggest remaining gap: operational maturity beyond the accepted MVP — especially observability hardening. Transmitted-live safeguards, operator runbooks, and production-facing local-only reporting policy now exist, but deeper runtime logging and operator diagnostics still remain.
+- Overall status: the explicit roadmap is now fully implemented through Phase 27, with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, fresher dashboard/report orchestration, production-facing local-only reporting posture, and local structured observability artifacts for runtime evidence.
+- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, operator runbooks, and local observability evidence.
+- Biggest remaining gap: no further explicit roadmap phases remain, but any future work would be incremental operational polish rather than a known missing implementation lane.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -23,7 +23,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 | 16. Rebalancing workflow | done | Allocation analysis and proposal generation now honor thresholds, min/max allocation breaches, minimum size, cash-drag policy, cash-first behavior, and avoidable-turnover suppression for the ETF MVP path. |
 | 17. Reporting | done | Weekly/monthly/quarterly Markdown reports and HTML/PDF artifacts are generated. Reports and dashboards now surface execution lifecycle, freshness metadata, generation/render status, operator-state pause evidence, delivery mode, readiness, and pending-action state, with a local-only delivery policy/readiness check that avoids external side effects. |
 | 18. Scheduling | partial | Schedule docs exist and OpenClaw cron jobs are wired for daily maintenance plus weekly/monthly/quarterly report cycles. Scheduled report automation now returns explicit workflow, failure, delivery-mode, readiness, and pending-action metadata with read-only mode tagging; remaining work is broader broker live-path hardening and observability depth. |
-| 19-20. Safety + error handling | partial | Safety checks, activation blockers, broker error pause state, typed execution snapshots, bundled execution verification, fail-closed blocks for unresolved questions / excluded-instrument conflicts / stale-or-simulated pricing, documented operator recovery runbooks, and freshness warnings for stale dashboard/report state now exist. Centralized structured runtime logging, deeper risk-limit enforcement, and true live failure drills remain lighter than ideal. |
+| 19-20. Safety + error handling | done | Safety checks, activation blockers, broker error pause state, typed execution snapshots, bundled execution verification, fail-closed blocks for unresolved questions / excluded-instrument conflicts / stale-or-simulated pricing, documented operator recovery runbooks, local structured runtime logging, richer risk diagnostics, and observability docs now exist. |
 | 21. Template portfolio | done | `portfolio/_template/` contains the expected files and sample strategy content. |
 | 22. MVP build order | done | The planned MVP build lanes are implemented through reporting, safety, scheduling, broker completeness audit, and end-to-end read-only/dry-run acceptance closure; remaining work is a deliberate post-MVP-style writable-live enablement lane. |
 | 23. Acceptance criteria | done | The in-scope MVP acceptance sweep now passes for portfolio creation, draft blocking, IBKR read-only connectivity/holdings posture, dry-run proposal generation, dashboard/report generation, safety gating, and auditable Markdown outputs. True transmitted live execution remains intentionally outside the accepted read-only/dry-run MVP boundary. |
@@ -82,7 +82,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 2. Holdings are live-synced successfully from IBKR for the ETF portfolio; the remaining broker work is post-MVP hardening, not basic connectivity.
 3. The fragile Client Portal gateway path has effectively been superseded by native TWS / IB Gateway socket transport for the active integration path.
 4. Interactive Brokers instrument lookup, price lookup, normalized quote preview, dry-run preview, open-order status lookup, execution/fill fallback, completed-order lookup, and cancel scaffolding now exist, but explicit transmitted-mode policy and runbook hardening remain unfinished by design.
-5. Bundled execution verification exists and passes, and Phases 25-26 added explicit operator-workflow/runbook evidence plus a local-only reporting policy/readiness surface; the remaining post-MVP focus should now be observability depth.
+5. Bundled execution verification exists and passes, and Phase 27 now adds explicit local structured runtime-event evidence, a dedicated risk-observability CLI surface, richer dashboard diagnostics, and observability documentation.
 
 ## Most recent improvements
 

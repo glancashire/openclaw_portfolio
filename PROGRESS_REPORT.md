@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The main reason the MVP is **not yet fully implemented** is that the broker execution surface is still intentionally incomplete in true writable mode. The system is now much more complete in dry-run/read-only/reconciliation behavior, and the operator incident/runbook layer is stronger, but it still does not provide a fully enabled, operator-validated, durable live submit path.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. With Phase 27 complete, the explicit follow-on roadmap is now also closed. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
 
 ## Validation snapshot
 

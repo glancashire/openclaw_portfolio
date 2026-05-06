@@ -39,11 +39,11 @@ Goal: make scheduled outputs more production-ready for real operator use.
 ## Phase 27 — Risk, logging, and observability hardening
 Goal: improve trust in real operations through stronger runtime evidence, risk-limit visibility, and failure diagnosis.
 
-- [ ] Centralize structured runtime logging guidance/artifacts
-- [ ] Strengthen deeper risk-limit enforcement visibility and operator-facing diagnostics
-- [ ] Add targeted failure-drill coverage for live-path edge cases that can be safely simulated
-- [ ] Improve observability docs around broker degradation, stale data, and blocked trading states
-- [ ] Update verification bundles and status docs to reflect the stronger observability posture
+- [x] Centralize structured runtime logging guidance/artifacts
+- [x] Strengthen deeper risk-limit enforcement visibility and operator-facing diagnostics
+- [x] Add targeted failure-drill coverage for live-path edge cases that can be safely simulated
+- [x] Improve observability docs around broker degradation, stale data, and blocked trading states
+- [x] Update verification bundles and status docs to reflect the stronger observability posture
 
 ## Suggested execution order
 1. Phase 24 — Transmitted live execution hardening

@@ -10,6 +10,7 @@ const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-brokers/holdingsSync');
 const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows } = require('./tradeState');
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
+const { recordRuntimeEvent } = require('../observability/runtimeEvents');
 
 function parsePortfolioStatus(text) {
   return captureLine(text, 'Status');
@@ -95,7 +96,7 @@ function buildPolicyContext({ portfolioPath, holdingsPath }) {
     requireSalesApproval: parseBooleanLine(portfolioText, 'Require user approval for sales'),
     approvedInstruments: readApprovedInstruments(portfolioPath),
     excludedInstruments: readExcludedInstruments(portfolioPath),
-    safetyBlockers: evaluateSafetyControls({ portfolioPath, holdingsPath }),
+    safetyEvaluation: evaluateSafetyControls({ portfolioPath, holdingsPath }),
     holdingsHealth: parseHoldingsHealth(holdingsText),
   };
 }
@@ -111,6 +112,7 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
   const transmittedIntent = order?.transmit === true || transmitted === true;
 
   const blockers = [];
+  const safetyBlockers = context.safetyEvaluation?.blockers || [];
   if (!instrument) blockers.push('Requested instrument is not in Approved Instruments.');
   if (context.portfolioStatus !== 'active') blockers.push(`Portfolio status is ${context.portfolioStatus || 'unknown'}, not active.`);
   if (live && context.executionMode === 'propose_only') blockers.push('Execution mode is propose_only; live execution is not allowed.');
@@ -142,9 +144,9 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
   if (transmittedIntent && order?.userApproved !== true) blockers.push('Transmitted live execution requires explicit user approval flag.');
   if (transmittedIntent && order?.transmittedLiveAck !== 'I UNDERSTAND THIS WILL TRANSMIT A LIVE ORDER') blockers.push('Transmitted live execution requires the exact transmittedLiveAck confirmation string.');
   if (live && errorState.stopAutomation) blockers.push(`Broker automation is paused after ${errorState.consecutive} consecutive broker errors.`);
-  for (const blocker of context.safetyBlockers) blockers.push(blocker.message);
+  for (const blocker of safetyBlockers) blockers.push(blocker.message);
 
-  return {
+  const result = {
     ok: blockers.length === 0,
     live,
     transmitted: transmittedIntent,
@@ -157,8 +159,34 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
       accountReference: context.accountReference,
       holdingsHealth: context.holdingsHealth,
       errorState,
+      safetyDiagnostics: context.safetyEvaluation?.diagnostics || null,
     },
   };
+
+  if (!result.ok) {
+    recordRuntimeEvent({
+      level: 'warn',
+      category: 'execution_policy',
+      action: transmittedIntent ? 'transmitted_live_blocked' : live ? 'live_execution_blocked' : 'draft_execution_blocked',
+      portfolio: portfolioName,
+      mode: context.executionMode || 'unknown',
+      status: 'blocked',
+      summary: blockers.join(' | '),
+      details: {
+        live,
+        transmitted: transmittedIntent,
+        requestedAction: normalizedAction,
+        symbol: order?.symbol || null,
+        conid: order?.conid || order?.ibkrConid || null,
+        readiness,
+        holdingsHealth: context.holdingsHealth,
+        errorState,
+        safetyDiagnostics: context.safetyEvaluation?.diagnostics || null,
+      },
+    });
+  }
+
+  return result;
 }
 
 function toTradeProposalRow(order, policy, brokerResult) {
@@ -441,8 +469,23 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
   const blockers = [];
   if (context.portfolioStatus !== 'active') blockers.push(`Portfolio status is ${context.portfolioStatus || 'unknown'}, not active.`);
   if (!readiness.authenticated) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
-  for (const blocker of context.safetyBlockers) blockers.push(blocker.message);
+  for (const blocker of (context.safetyEvaluation?.blockers || [])) blockers.push(blocker.message);
   if (blockers.length > 0) {
+    recordRuntimeEvent({
+      level: 'warn',
+      category: 'execution_policy',
+      action: 'cancel_blocked',
+      portfolio: portfolioName,
+      mode: context.executionMode || 'unknown',
+      status: 'blocked',
+      summary: blockers.join(' | '),
+      details: {
+        orderId,
+        readiness,
+        holdingsHealth: context.holdingsHealth,
+        safetyDiagnostics: context.safetyEvaluation?.diagnostics || null,
+      },
+    });
     return {
       ok: false,
       reason: 'policy_blocked',
@@ -458,6 +501,7 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
           executionMode: context.executionMode,
           accountReference: context.accountReference,
           holdingsHealth: context.holdingsHealth,
+          safetyDiagnostics: context.safetyEvaluation?.diagnostics || null,
         },
       },
     };

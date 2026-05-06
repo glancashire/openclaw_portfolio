@@ -5,7 +5,7 @@ These runbooks cover the normal operator actions and the most common incident pa
 ## Scope and assumptions
 - The repo is still safety-first and fail-closed.
 - `dry-run`, non-transmitted `stage`, and `transmit-live` are distinct lanes.
-- Operator actions are expected to leave evidence in `trades.md`, `history.md`, `dashboard.md`, reports, and `runtime/execution-state.json`.
+- Operator actions are expected to leave evidence in `trades.md`, `history.md`, `dashboard.md`, reports, `runtime/execution-state.json`, and `runtime/events/runtime-events.jsonl`.
 - The examples below use `portfolio/etf`.
 
 ## Quick state model
@@ -230,6 +230,13 @@ Response:
 After any meaningful operator action, check:
 - `trades.md` row state and reason text
 - `history.md` latest snapshot note
-- `dashboard.md` execution lifecycle and warnings
+- `dashboard.md` execution lifecycle, observability summary, and risk diagnostics
 - latest report freshness/generation state if reporting is involved
 - `runtime/execution-state.json` if a broker failure occurred
+- `runtime/events/runtime-events.jsonl` or `node scripts/show-runtime-events.js --portfolio etf` for structured blocker/degradation evidence
+
+## 11) Observability quick reference
+- Runtime event log: `runtime/events/runtime-events.jsonl`
+- Combined risk/observability check: `node scripts/check-risk-observability.js portfolio/etf`
+- Recent structured event view: `node scripts/show-runtime-events.js --portfolio etf`
+- Deeper guide: `docs/observability.md`

@@ -158,4 +158,5 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 - Phase 24 transmitted-live hardening is now closed with explicit opt-in `transmit-live` safeguards, a dedicated readiness check, and focused regression coverage.
 - Phase 25 operator incident/runbook maturity is now closed with a dedicated operator runbook, operator incident summary CLI, broker-error pause regression coverage, and richer dashboard/report operator-state surfacing.
 - Phase 26 production reporting/delivery polish is now closed with a local-only delivery policy, a dedicated report-delivery readiness CLI, richer delivery/pending-action metadata in dashboard/report/report-cycle outputs, and focused regression coverage.
-- The next highest-value lane is observability hardening.
+- Phase 27 observability hardening is now closed with local structured runtime JSONL events, richer risk diagnostics in CLI/dashboard surfaces, a dedicated risk-observability check, and focused regression coverage.
+- There are no remaining explicit roadmap phases after Phase 27 in the current post-MVP roadmap.

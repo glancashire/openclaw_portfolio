@@ -8,6 +8,8 @@ const { getInteractiveBrokersReadiness } = require('../brokers/interactive-broke
 const { brokerErrorStatus } = require('../execution/runtimeState');
 const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { fileFreshnessSummary } = require('./freshness');
+const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
+const { evaluateSafetyControls } = require('../validation/safetyControls');
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -164,7 +166,19 @@ function formatExecutionLifecycle(summary = {}) {
   ].join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null }) {
+function formatObservabilityStatus(observability = {}) {
+  const normalized = observability || {};
+  const recent = normalized.recentSummary || {};
+  return [
+    `- Runtime event file present: ${normalized.eventsPathPresent ? 'yes' : 'no'}`,
+    `- Recent runtime events scanned: ${recent.total || 0}`,
+    `- Recent blocked trade events: ${recent.blockedTrades || 0}`,
+    `- Recent degraded broker events: ${recent.degradedBrokerEvents || 0}`,
+    `- Recent stale-data events: ${recent.staleDataEvents || 0}`,
+  ].join('\n');
+}
+
+function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -186,6 +200,8 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) warnings.push('- There are in-flight broker order states; avoid overlapping execution plans until reconciliation is current.');
   if (freshness?.stale) warnings.push(`- Dashboard freshness warning: source state changed after the dashboard was last written (${freshness.newestSourcePath || 'unknown source'}).`);
   if (latestSnapshot?.notes) warnings.push(`- Latest history note: ${latestSnapshot.notes}`);
+  if ((observability?.recentSummary?.blockedTrades || 0) > 0) warnings.push(`- Observability shows ${observability.recentSummary.blockedTrades} recent blocked execution-policy event(s).`);
+  if (safetyDiagnostics?.holdingsHealth?.stalePricing) warnings.push('- Safety diagnostics currently mark holdings pricing as stale.');
   const actions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
   const deliveryLines = [
     `- Delivery mode: ${deliveryStatus?.deliveryMode || 'unknown'}`,
@@ -198,7 +214,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     ? (deliveryStatus.pendingActions || []).map((item, index) => `${index + 1}. ${item}`).join('\n')
     : '1. None.';
 
-  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Delivery Status\n${deliveryLines}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
+  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Delivery Status\n${deliveryLines}\n\n## Observability Status\n${formatObservabilityStatus(observability)}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Risk Diagnostics\n- Execution mode: ${safetyDiagnostics?.executionMode || 'unknown'}\n- Max single ETF limit %: ${safetyDiagnostics?.holdingsHealth?.maxSingleEtfLimitPct ?? 'unknown'}\n- Max observed holding weight %: ${safetyDiagnostics?.holdingsHealth?.maxObservedWeightPct ?? 'unknown'}\n- Simulated pricing detected: ${safetyDiagnostics?.holdingsHealth?.simulatedPricing ? 'yes' : 'no'}\n- Stale pricing detected: ${safetyDiagnostics?.holdingsHealth?.stalePricing ? 'yes' : 'no'}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
 async function regenerateDashboard(portfolioDir) {
@@ -215,6 +231,12 @@ async function regenerateDashboard(portfolioDir) {
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const sourcePaths = [portfolioPath, holdingsPath, tradesPath, historyPath];
   const currentBrokerErrorState = brokerErrorStatus(portfolioName);
+  const safetyEvaluation = evaluateSafetyControls({ portfolioPath, holdingsPath });
+  const recentEvents = readRuntimeEvents({ portfolio: portfolioName, limit: 100 });
+  const observability = {
+    eventsPathPresent: recentEvents.length > 0,
+    recentSummary: summarizeRuntimeEvents(recentEvents),
+  };
   let freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   let deliveryStatus = reportDeliveryStatus({ portfolioDir });
   let dashboard = generateDashboard({
@@ -231,6 +253,8 @@ async function regenerateDashboard(portfolioDir) {
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
+    observability,
+    safetyDiagnostics: safetyEvaluation.diagnostics,
   });
   fs.writeFileSync(dashboardPath, dashboard);
   freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
@@ -249,6 +273,8 @@ async function regenerateDashboard(portfolioDir) {
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
+    observability,
+    safetyDiagnostics: safetyEvaluation.diagnostics,
   });
   fs.writeFileSync(dashboardPath, dashboard);
   return dashboardPath;

@@ -27,3 +27,34 @@ exec denied: allowlist miss
 - Related Files: /home/ubuntu/.openclaw/workspace/.learnings/ERRORS.md
 
 ---
+
+## [ERR-20260506-002] dashboard-observability-null-arg
+
+**Logged**: 2026-05-06T13:39:00Z
+**Priority**: medium
+**Status**: pending
+**Area**: tests
+
+### Summary
+New dashboard observability helper assumed `observability` was always non-null and broke an existing dashboard summary regression test.
+
+### Error
+```
+TypeError: Cannot read properties of null (reading 'recentSummary')
+    at formatObservabilityStatus (.../src/reporting/dashboardGenerator.js:170:32)
+```
+
+### Context
+- Command attempted: `npm run verify:execution`
+- Failing test: `scripts/test-dashboard-execution-summary.js`
+- Cause: helper used `observability.recentSummary` while some direct `generateDashboard()` callers pass `null`
+
+### Suggested Fix
+- Keep new report/dashboard observability sections null-safe.
+- Preserve backward compatibility for direct test/helper callers that omit new optional inputs.
+
+### Metadata
+- Reproducible: yes
+- Related Files: /home/ubuntu/.openclaw/workspace/src/reporting/dashboardGenerator.js
+
+---
