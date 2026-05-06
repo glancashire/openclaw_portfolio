@@ -71,11 +71,11 @@ Goal: improve proposal quality and reduce avoidable churn.
 
 - [x] Enforce absolute drift thresholds
 - [x] Enforce relative drift thresholds
-- [ ] Enforce min/max allocation breach handling
-- [~] Enforce cash-drag checks
+- [x] Enforce min/max allocation breach handling
+- [x] Enforce cash-drag checks
 - [x] Prefer new cash before selling
 - [x] Suppress tiny trades below minimum trade size
-- [ ] Avoid excessive turnover
+- [x] Avoid excessive turnover
 - [x] Include explicit rationale for each rebalance proposal
 
 ## Phase 7 — ETF suggestion workflow

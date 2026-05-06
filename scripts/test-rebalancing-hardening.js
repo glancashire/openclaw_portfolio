@@ -35,15 +35,16 @@ function main() {
 
   fs.writeFileSync(portfolioPath, makePortfolio({ threshold: 'absolute drift > 25 percentage points or relative drift > 80%' }));
   const belowThreshold = proposeTrades({ portfolioPath, holdingsPath });
-  assert(belowThreshold.proposals.length === 0, 'Expected no proposal when drift stays within threshold');
-  assert(belowThreshold.notes.some((note) => /within the configured rebalance threshold/i.test(note)), 'Expected threshold note');
+  assert(belowThreshold.proposals.length === 1, 'Expected min/max breach proposal even when threshold is not hit');
+  assert(belowThreshold.proposals[0].forcedByBounds === true, 'Expected min/max breach to be flagged explicitly');
+  assert(belowThreshold.notes.some((note) => /outside configured min\/max allocation bounds/i.test(note)), 'Expected min/max bounds note');
 
   fs.writeFileSync(portfolioPath, makePortfolio({ minimumTradeSize: 1200 }));
   const belowMinimum = proposeTrades({ portfolioPath, holdingsPath });
   assert(belowMinimum.proposals.length === 1, 'Expected proposal to remain visible when below minimum');
   assert(belowMinimum.proposals[0].blocked === true, 'Expected below-minimum proposal to be blocked');
   assert(/Below minimum trade size of CHF 1200/i.test(belowMinimum.proposals[0].blockedReason), 'Expected explicit blocked reason');
-  assert(belowMinimum.notes.some((note) => /below the configured minimum trade size/i.test(note)), 'Expected minimum-size note');
+  assert(belowMinimum.notes.some((note) => /remain blocked by policy checks/i.test(note)), 'Expected policy-block note');
 
   console.log(JSON.stringify({
     ok: true,
