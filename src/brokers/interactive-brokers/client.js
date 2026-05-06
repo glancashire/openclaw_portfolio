@@ -256,7 +256,7 @@ class InteractiveBrokersClient {
     }
   }
 
-  async placeOrder(order, { dryRun = true, revocableOnly = true } = {}) {
+  async placeOrder(order, { dryRun = true, revocableOnly = true, transmitLive = false } = {}) {
     if (dryRun !== true) this.assertWritable('live order placement');
     const quoteResult = await this.getOrderQuote(order);
     if (dryRun === true) {
@@ -306,6 +306,16 @@ class InteractiveBrokersClient {
         order,
       });
     }
+    if (transmitLive && order?.transmit !== true) {
+      return blockedBrokerOperation({
+        operation: 'place_order',
+        reason: 'policy_blocked',
+        message: 'Transmitted live submission requires order.transmit=true explicit intent.',
+        mode: activeMode(this),
+        portfolio: this.options.portfolio,
+        order,
+      });
+    }
     if (!this.skill || typeof this.skill.placeOrder !== 'function') {
       return blockedBrokerOperation({
         operation: 'place_order',
@@ -329,25 +339,31 @@ class InteractiveBrokersClient {
       });
     }
     try {
-      const placed = await this.skill.placeOrder(order, { transmit: false });
+      const placed = await this.skill.placeOrder(order, { transmit: transmitLive === true });
+      const normalizedOrder = normaliseOrder(placed.trade || {});
+      const transmitted = transmitLive === true;
       return {
         ok: true,
         dryRun: false,
-        submitted: false,
-        mode: 'staged_not_transmitted',
-        order: normaliseOrder(placed.trade || {}),
+        submitted: transmitted,
+        mode: transmitted ? 'transmitted_live' : 'staged_not_transmitted',
+        order: { ...normalizedOrder, transmit: transmitted ? true : false },
         brokerErrors: placed.errors || [],
         quote: quoteResult.quote || null,
-        message: 'Interactive Brokers non-transmitted order scaffold created; order was not transmitted.',
+        message: transmitted
+          ? 'Interactive Brokers transmitted live order submitted to broker.'
+          : 'Interactive Brokers non-transmitted order scaffold created; order was not transmitted.',
         log: logBrokerEvent({
           broker: 'interactive-brokers',
           operation: 'place_order',
-          status: 'staged_not_transmitted',
+          status: transmitted ? 'transmitted_live' : 'staged_not_transmitted',
           summary: {
             symbol: order?.symbol || null,
             action,
             quantity: Number(order?.quantity || 0),
             orderType,
+            transmit: transmitted,
+            transmittedLiveAck: transmitted ? 'present' : 'not_required',
           },
           portfolio: this.options.portfolio,
         }),

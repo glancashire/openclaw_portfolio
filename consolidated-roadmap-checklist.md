@@ -155,5 +155,5 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 
 ## Current focus
 - Acceptance closure is complete for the in-scope read-only + dry-run MVP.
-- The next roadmap now shifts from MVP completion to post-MVP operational hardening.
-- The highest-value remaining lane is explicit opt-in transmitted live execution safeguards plus operator/observability polish.
+- Phase 24 transmitted-live hardening is now closed with explicit opt-in `transmit-live` safeguards, a dedicated readiness check, and focused regression coverage.
+- The next highest-value lanes are operator incident/runbook maturity plus production reporting and observability polish.

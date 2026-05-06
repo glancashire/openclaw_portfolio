@@ -100,7 +100,7 @@ function buildPolicyContext({ portfolioPath, holdingsPath }) {
   };
 }
 
-async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requireApproval = true }) {
+async function evaluateExecutionPolicy({ portfolioDir, order, live = false, transmitted = false, requireApproval = true }) {
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const context = buildPolicyContext({ portfolioPath, holdingsPath });
@@ -108,11 +108,13 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
   const readiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const instrument = approvedInstrumentForOrder(order, context.approvedInstruments);
   const errorState = brokerErrorStatus(portfolioName);
+  const transmittedIntent = order?.transmit === true || transmitted === true;
 
   const blockers = [];
   if (!instrument) blockers.push('Requested instrument is not in Approved Instruments.');
   if (context.portfolioStatus !== 'active') blockers.push(`Portfolio status is ${context.portfolioStatus || 'unknown'}, not active.`);
   if (live && context.executionMode === 'propose_only') blockers.push('Execution mode is propose_only; live execution is not allowed.');
+  if (transmittedIntent && context.executionMode !== 'transmitted_live') blockers.push(`Execution mode is ${context.executionMode || 'unknown'}, not transmitted_live.`);
   if (live && requireApproval && context.executionMode === 'require_confirmation' && order?.userApproved !== true) {
     blockers.push('Live execution requires explicit user approval flag.');
   }
@@ -136,12 +138,16 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, requ
   if (live && !readiness.authenticated) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
   if (live && readiness.configured === false) blockers.push('Broker configuration is incomplete for live execution.');
   if (live && context.accountReference && /^(<.*>|unknown)$/i.test(String(context.accountReference).trim())) blockers.push('Broker account reference is unresolved for live execution.');
+  if (transmittedIntent && !live) blockers.push('Transmitted live execution requires dryRun=false.');
+  if (transmittedIntent && order?.userApproved !== true) blockers.push('Transmitted live execution requires explicit user approval flag.');
+  if (transmittedIntent && order?.transmittedLiveAck !== 'I UNDERSTAND THIS WILL TRANSMIT A LIVE ORDER') blockers.push('Transmitted live execution requires the exact transmittedLiveAck confirmation string.');
   if (live && errorState.stopAutomation) blockers.push(`Broker automation is paused after ${errorState.consecutive} consecutive broker errors.`);
   for (const blocker of context.safetyBlockers) blockers.push(blocker.message);
 
   return {
     ok: blockers.length === 0,
     live,
+    transmitted: transmittedIntent,
     instrument,
     blockers,
     readiness,
@@ -161,13 +167,14 @@ function toTradeProposalRow(order, policy, brokerResult) {
   const estimatedValue = brokerResult?.quote?.estimatedValue || (Number(order.quantity || 0) * Number(referencePrice || 0));
   const action = normalizeAction(order.action) === 'SELL' ? 'sell' : normalizeAction(order.action) === 'HOLD' ? 'hold' : 'buy';
   const brokerOrderId = brokerResult?.order?.orderId != null ? String(brokerResult.order.orderId) : '';
+  const transmittedLive = brokerResult?.dryRun === false && brokerResult?.order?.transmit !== false;
   const approval = brokerResult?.dryRun === false
-    ? (brokerResult?.order?.transmit === false ? 'staged_not_transmitted' : 'submitted_to_broker')
+    ? (transmittedLive ? 'submitted_to_broker' : 'staged_not_transmitted')
     : 'pending_user_approval';
   return {
     action,
     status: brokerResult?.dryRun === false
-      ? (brokerResult?.order?.transmit === false ? 'staged' : 'submitted')
+      ? (transmittedLive ? 'submitted' : 'staged')
       : 'planned',
     instrument: instrument?.tickerOrIsin || order.symbol || order.identifier,
     instrumentName: instrument?.name || order.symbol || 'Unknown instrument',
@@ -186,10 +193,14 @@ function toTradeProposalRow(order, policy, brokerResult) {
     approval,
     brokerOrderId,
     rationale: brokerResult?.dryRun === false
-      ? 'Portfolio-approved staged broker order prepared but not transmitted.'
+      ? (transmittedLive
+          ? 'Portfolio-approved transmitted live broker order submitted.'
+          : 'Portfolio-approved staged broker order prepared but not transmitted.')
       : 'Portfolio-approved dry-run broker order preview generated.',
     riskNote: brokerResult?.dryRun === false
-      ? 'Non-transmitted broker staging only; requires explicit follow-up before any live transmission.'
+      ? (transmittedLive
+          ? 'Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.'
+          : 'Non-transmitted broker staging only; requires explicit follow-up before any live transmission.')
       : 'Dry-run only; no broker write attempted.',
   };
 }
@@ -218,8 +229,8 @@ function hasConflictingOpenTrade(tradesPath, order) {
   return false;
 }
 
-async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocableOnly = true }) {
-  const policy = await evaluateExecutionPolicy({ portfolioDir, order, live: !dryRun, requireApproval: true });
+async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocableOnly = true, transmitLive = false }) {
+  const policy = await evaluateExecutionPolicy({ portfolioDir, order, live: !dryRun, transmitted: transmitLive, requireApproval: true });
   if (!policy.ok) {
     return {
       ok: false,
@@ -240,7 +251,7 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
   }
 
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
-  const brokerResult = await client.placeOrder(order, { dryRun, revocableOnly });
+  const brokerResult = await client.placeOrder(order, { dryRun, revocableOnly, transmitLive });
   if (!brokerResult.ok) {
     const errorState = recordBrokerError({
       portfolio: path.basename(portfolioDir),
@@ -266,7 +277,7 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
     historyPath,
     holdingsPath,
     dryRun ? 'end_of_day' : 'execution_staged',
-    dryRun ? 'Dry-run broker order preview generated.' : 'Non-transmitted broker order staged.'
+    dryRun ? 'Dry-run broker order preview generated.' : transmitLive ? 'Transmitted live broker order submitted.' : 'Non-transmitted broker order staged.'
   );
   const dashboardPath = await regenerateDashboard(portfolioDir);
 

@@ -21,6 +21,7 @@
     "ibkr:search": "node scripts/search-interactive-brokers-instruments.js",
     "ibkr:price": "node scripts/fetch-interactive-brokers-price.js",
     "ibkr:readiness": "node scripts/check-interactive-brokers-readiness.js",
+    "ibkr:transmitted-readiness": "node scripts/check-transmitted-live-readiness.js portfolio/etf '{\"symbol\":\"EMUAA\",\"conid\":\"243939970\",\"action\":\"BUY\",\"orderType\":\"LMT\",\"limitPrice\":38.5,\"quantity\":1,\"currency\":\"EUR\",\"exchange\":\"SMART\",\"secType\":\"STK\",\"userApproved\":true,\"transmit\":true,\"transmittedLiveAck\":\"I UNDERSTAND THIS WILL TRANSMIT A LIVE ORDER\"}'",
     "ibkr:test-native": "node scripts/test-interactive-brokers-native-client.js",
     "ibkr:resolve-conids": "node scripts/resolve-interactive-brokers-conids.js portfolio/etf/portfolio.md",
     "propose:instrument-trades:live": "node scripts/propose-instrument-trades-live-priced.js portfolio/etf/portfolio.md portfolio/etf/holdings.md",

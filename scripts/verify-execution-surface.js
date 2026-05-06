@@ -30,6 +30,8 @@ const checks = [
   'test-writable-live-lane-acceptance.js',
   'test-operator-action-audit-trail.js',
   'test-history-material-events.js',
+  'test-transmitted-live-gating.js',
+  'test-transmitted-live-submission-surface.js',
 ];
 
 function run(script) {

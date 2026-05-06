@@ -79,8 +79,8 @@ function evaluateSafetyControls({ portfolioPath, holdingsPath }) {
     blockers.push({ severity: 'error', message: 'Holdings pricing is stale.' });
   }
   const executionMode = extractExecutionMode(portfolioText);
-  if (executionMode && executionMode !== 'require_confirmation' && executionMode !== 'propose_only') {
-    blockers.push({ severity: 'warning', message: `Execution mode is ${executionMode}; MVP should stay confirmation-gated until broker validation is complete.` });
+  if (executionMode && !['require_confirmation', 'propose_only', 'transmitted_live'].includes(executionMode)) {
+    blockers.push({ severity: 'warning', message: `Execution mode is ${executionMode}; operator review should confirm this mode is intentional and supported.` });
   }
   for (const label of ['Max single ETF allocation', 'Max single issuer allocation', 'Max cash drag after full deployment']) {
     const value = extractRiskLimit(portfolioText, label);

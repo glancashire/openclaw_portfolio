@@ -10,13 +10,13 @@ This roadmap starts after the accepted read-only + dry-run MVP closure. It defin
 ## Phase 24 — Transmitted live execution hardening
 Goal: introduce an explicitly opt-in transmitted live-order path with fail-closed safety boundaries, operator confirmation checkpoints, and auditable broker-write behavior.
 
-- [ ] Define the transmitted-live scope and activation prerequisites in docs/config
-- [ ] Add explicit mode boundaries between staged writable flow and transmitted live flow
-- [ ] Require stronger readiness checks before transmitted submission
-- [ ] Harden broker-write audit logging for transmitted actions
-- [ ] Add explicit operator-facing warnings/notes for transmitted mode
-- [ ] Add focused regression tests for transmitted-mode gating
-- [ ] Add a verification command or bundle entry covering transmitted-mode safeguards
+- [x] Define the transmitted-live scope and activation prerequisites in docs/config
+- [x] Add explicit mode boundaries between staged writable flow and transmitted live flow
+- [x] Require stronger readiness checks before transmitted submission
+- [x] Harden broker-write audit logging for transmitted actions
+- [x] Add explicit operator-facing warnings/notes for transmitted mode
+- [x] Add focused regression tests for transmitted-mode gating
+- [x] Add a verification command or bundle entry covering transmitted-mode safeguards
 
 ## Phase 25 — Operator runbooks and incident handling
 Goal: make the system operable during degraded broker conditions, stale state, and execution incidents without relying on tribal knowledge.
