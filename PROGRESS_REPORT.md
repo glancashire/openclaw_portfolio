@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The original MVP acceptance scope was already closed in read-only + dry-run terms. With Phase 27 complete, the explicit follow-on roadmap is now also closed. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now underway, and Phase 28 has been completed to turn the per-portfolio dashboard into a more operator-centric command-center surface. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
 
 ## Validation snapshot
 
@@ -96,6 +96,7 @@ Legend:
 - trade-log writing exists
 - trade approval/status/cancel reconciliation exists
 - dashboard regeneration exists
+- command-center dashboard sections now surface health snapshot, blockers, pending actions, recent material events, and one recommended next step
 - history snapshot writing exists with typed execution states
 - weekly/monthly/quarterly report generation exists
 - local-only report delivery readiness inspection exists
@@ -171,10 +172,10 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-After the writable execution lifecycle is complete, the next most valuable follow-up would be:
-- polishing the manual approval workflow for ETF shortlist adoption and trade approval
-- improving structured logging/alerts for scheduled operation
-- tightening report/dashboard presentation for execution operations
+After the command-center dashboard uplift, the next most valuable follow-up is:
+- generate structured UI-ready summary artifacts (`summary.json`, `portfolio-index.json`, `pending-actions.json`)
+- build a multi-portfolio overview board on top of those artifacts
+- then unify approvals and pending actions into one explicit queue surface
 
 ## Known environment caveat
 

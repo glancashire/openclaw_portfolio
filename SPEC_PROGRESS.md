@@ -4,9 +4,9 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: the explicit roadmap is now fully implemented through Phase 27, with portfolio-aware execution safety, typed execution history, bundled execution verification, durable lifecycle reconciliation, fail-closed pre-trade blocking, fresher dashboard/report orchestration, production-facing local-only reporting posture, and local structured observability artifacts for runtime evidence.
-- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, operator runbooks, and local observability evidence.
-- Biggest remaining gap: no further explicit roadmap phases remain, but any future work would be incremental operational polish rather than a known missing implementation lane.
+- Overall status: the original roadmap is implemented through Phase 27 and the expanded follow-on roadmap has now started with Phase 28, adding a more operator-centric command-center dashboard on top of the existing execution/reporting/safety foundation.
+- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, operator runbooks, local observability evidence, and a materially clearer per-portfolio operator dashboard.
+- Biggest remaining gap: the next usability layers are still open after Phase 28 — structured UI summary artifacts, multi-portfolio overview surfaces, a unified pending-actions queue, decision-oriented reporting polish, and guided onboarding/workflow uplift.
 - Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
 
 ## Progress by specification area
@@ -111,3 +111,4 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - Closed the final acceptance sweep for the read-only + dry-run MVP and removed the remaining non-browser proposal-path regression caused by eager browser-session imports.
 - Defined the post-MVP roadmap covering transmitted live execution hardening, operator runbooks, production reporting/delivery polish, and risk/logging/observability hardening.
 - Added a local-only report delivery policy, a report-delivery readiness CLI, richer delivery/pending-action metadata in dashboard/report/report-cycle outputs, and focused verification for that production reporting posture.
+- Completed Phase 28 command-center dashboard uplift with explicit health snapshot, portfolio value snapshot, blocker and pending-action surfacing, material-event timeline, report/delivery posture section, and one recommended-next-step summary.

@@ -153,10 +153,39 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 3. Phase 26 — Production reporting and delivery polish
 4. Phase 27 — Risk, logging, and observability hardening
 
-## Current focus
-- Acceptance closure is complete for the in-scope read-only + dry-run MVP.
-- Phase 24 transmitted-live hardening is now closed with explicit opt-in `transmit-live` safeguards, a dedicated readiness check, and focused regression coverage.
-- Phase 25 operator incident/runbook maturity is now closed with a dedicated operator runbook, operator incident summary CLI, broker-error pause regression coverage, and richer dashboard/report operator-state surfacing.
-- Phase 26 production reporting/delivery polish is now closed with a local-only delivery policy, a dedicated report-delivery readiness CLI, richer delivery/pending-action metadata in dashboard/report/report-cycle outputs, and focused regression coverage.
-- Phase 27 observability hardening is now closed with local structured runtime JSONL events, richer risk diagnostics in CLI/dashboard surfaces, a dedicated risk-observability check, and focused regression coverage.
-- There are no remaining explicit roadmap phases after Phase 27 in the current post-MVP roadmap.
+## Expanded roadmap follow-on phases
+
+### Phase 28 — Portfolio command-center dashboard
+Goal: turn the per-portfolio dashboard into a clearer operator command center.
+
+- [x] Add explicit health snapshot section
+- [x] Add broker health, execution posture, and delivery posture summary
+- [x] Add clearer pending approvals / active blockers sections
+- [x] Add recent material events timeline summary
+- [x] Add one explicit recommended next step section
+- [x] Improve severity/status labels for skimmability
+- [x] Add focused dashboard UX verification tests
+
+### Phase 29 — Structured UI summary artifacts
+Goal: generate machine-readable artifacts for future UI and compact digest surfaces.
+
+- [ ] Generate `portfolio/<name>/summary.json`
+- [ ] Generate `runtime/overview/portfolio-index.json`
+- [ ] Generate `runtime/overview/pending-actions.json`
+- [ ] Define stable schemas for these artifacts
+- [ ] Ensure artifacts stay aligned with Markdown/dashboard state
+- [ ] Add focused artifact/schema verification tests
+
+### Phase 30 — Multi-portfolio overview board
+Goal: provide one top-level operational view across portfolios.
+
+- [ ] Build portfolio index aggregation across all portfolio folders
+- [ ] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
+- [ ] Add a recommended-action summary across portfolios
+- [ ] Generate Markdown and/or HTML multi-portfolio overview output
+- [ ] Add tests for aggregation and missing-data edge cases
+
+### Current focus
+- Expanded follow-on roadmap is now active beyond Phase 27.
+- Phase 28 command-center dashboard is closed with explicit health, blockers, pending-actions, material-events, and recommended-next-step surfaces.
+- Next up: Phase 29 structured UI summary artifacts.

@@ -1,0 +1,89 @@
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const { generateDashboard, buildPendingOperatorActions, buildMaterialEvents, bestNextStep } = require('../src/reporting/dashboardGenerator');
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function main() {
+  const pending = buildPendingOperatorActions({
+    deliveryStatus: { pendingActions: ['Delivery readiness needs review.'] },
+    brokerReadiness: { fallbackRequired: true, message: 'IBKR unavailable' },
+    brokerErrorState: { stopAutomation: false },
+    lifecycleSummary: { approved: 2, submitted: 1, partiallyFilled: 0 },
+    safetyDiagnostics: { holdingsHealth: { stalePricing: true } },
+    recommended: ['Review proposals now.'],
+  });
+  assert(pending.length >= 4, 'Expected rich pending action queue');
+
+  const events = buildMaterialEvents([
+    { timestamp: '2026-05-06T13:49:27.490Z', action: 'draft_execution_blocked', level: 'warn', status: 'blocked', summary: 'Requested instrument is not approved.' },
+    { timestamp: '2026-05-06T13:50:23.490Z', action: 'live_execution_blocked', level: 'warn', status: 'blocked', summary: 'Live execution blocked.' },
+  ]);
+  assert(events[0].nextStep.includes('Resolve'), 'Expected blocked event next step');
+
+  const recommendation = bestNextStep({
+    pendingActions: pending,
+    blockers: [],
+    recommendedActionsList: ['Fallback recommendation'],
+    brokerReadiness: { fallbackRequired: true },
+    lifecycleSummary: { approved: 2 },
+  });
+  assert(recommendation === pending[0], 'Expected pending queue to drive best next step');
+
+  const dashboard = generateDashboard({
+    portfolioName: 'demo',
+    holdingsText: `## Last Sync\n- Date/time: 2026-05-03 10:00:00\n- Total value CHF: 5000\n- Cash CHF: 5000\n- Invested value CHF: 0`,
+    allocations: [
+      { assetClass: 'Global equities', current: 0, target: 60, drift: -60, status: 'out_of_bounds' },
+    ],
+    approvedInstruments: [
+      { tickerOrIsin: 'AAA', name: 'ETF A', target: 60 },
+    ],
+    existingTrades: [
+      { date: '2026-05-03 10:03:00', action: 'buy', instrument: 'ETF D', estimatedChf: '1600', status: 'failed' },
+    ],
+    latestProposals: [
+      { tickerOrIsin: 'AAA', status: 'proposed', action: 'buy', estimatedChf: '1000', reason: 'Deploy cash; target drift correction', approval: 'pending_user_approval' },
+    ],
+    executionPlan: { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } },
+    latestSnapshot: { date: '2026-05-03', dailyChange: '0', dailyChangePct: '0', notes: 'demo snapshot' },
+    brokerReadiness: { fallbackRequired: true, message: 'gateway unavailable' },
+    lifecycleSummary: { proposed: 1, approved: 1, rejected: 0, staged: 0, submitted: 1, partiallyFilled: 0, filled: 0, cancelled: 0, failed: 1, planned: 0, withBrokerOrderId: 1 },
+    freshness: { stale: false, dashboardExists: true, newestSourcePath: 'holdings.md' },
+    brokerErrorState: { stopAutomation: false, consecutive: 0 },
+    deliveryStatus: { ready: false, latestHistoryDate: '2026-05-03', deliveryMode: 'local_only', failureAlertMode: 'local_operator_review', pendingActions: ['Delivery readiness needs review.'] },
+    observability: { eventsPathPresent: true, recentSummary: { total: 2, blockedTrades: 2, degradedBrokerEvents: 1, staleDataEvents: 0 } },
+    safetyDiagnostics: { blockers: [{ severity: 'error', message: 'Portfolio still has open questions; trade execution must remain blocked.' }], diagnostics: { holdingsHealth: { stalePricing: false } } },
+    recentEvents: [
+      { timestamp: '2026-05-06T13:49:27.490Z', action: 'draft_execution_blocked', level: 'warn', status: 'blocked', summary: 'Requested instrument is not approved.' },
+    ],
+  });
+
+  const requiredSections = [
+    '## Health Snapshot',
+    '## Portfolio Value Snapshot',
+    '## Allocation Health',
+    '## Instrument Actions Queue',
+    '## Safety / Risk Diagnostics',
+    '## Pending Operator Actions',
+    '## Recent Material Events',
+    '## Report / Delivery Status',
+    '## Recommended Next Step',
+  ];
+
+  for (const section of requiredSections) {
+    assert(dashboard.includes(section), `Expected section ${section}`);
+  }
+
+  assert(/Portfolio status: warning/i.test(dashboard), 'Expected health label');
+  assert(/Broker health: gateway unavailable/i.test(dashboard), 'Expected broker health line');
+  assert(/Resolve the active blocker:/i.test(dashboard), 'Expected blocker-driven recommendation');
+  assert(/draft_execution_blocked/i.test(dashboard), 'Expected recent material event row');
+
+  console.log(JSON.stringify({ ok: true }, null, 2));
+}
+
+main();

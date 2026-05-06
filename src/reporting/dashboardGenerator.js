@@ -37,16 +37,29 @@ function countHoldingRows(text) {
   return count;
 }
 
-function strategyStatus(allocations, brokerReadiness) {
-  if (brokerReadiness?.fallbackRequired) return 'blocked';
+function strategyStatus(allocations, brokerReadiness, blockers = []) {
+  if (blockers.length > 0 || brokerReadiness?.fallbackRequired) return 'blocked';
   if (allocations.some((row) => row.status === 'out_of_bounds')) return 'rebalance_needed';
   if (allocations.some((row) => row.status === 'drifted')) return 'minor_drift';
   return 'on_track';
 }
 
+function healthLabel({ brokerReadiness, brokerErrorState, freshness, blockers = [], lifecycleSummary = {}, pendingActions = [] }) {
+  if (brokerErrorState?.stopAutomation) return 'blocked';
+  if (blockers.length > 0) return 'warning';
+  if (brokerReadiness?.fallbackRequired) return 'warning';
+  if (freshness?.stale) return 'warning';
+  if ((lifecycleSummary?.failed || 0) > 0) return 'warning';
+  if (pendingActions.length > 0) return 'attention_needed';
+  return 'healthy';
+}
+
 function formatAllocationRows(rows) {
-  if (!rows.length) return '| <asset class> | 0 | 0 | 0 | blocked |';
-  return rows.map((row) => `| ${row.assetClass} | ${row.current} | ${row.target} | ${row.drift} | ${row.status} |`).join('\n');
+  if (!rows.length) return '| <asset class> | 0 | 0 | 0 | blocked | no | review missing allocation data |';
+  return rows.map((row) => {
+    const actionNeeded = row.status === 'out_of_bounds' ? 'yes' : row.status === 'drifted' ? 'watch' : 'no';
+    return `| ${row.assetClass} | ${row.current} | ${row.target} | ${row.drift} | ${row.status} | ${actionNeeded} | ${row.status === 'out_of_bounds' ? 'outside min/max band' : row.status === 'drifted' ? 'drift threshold breached' : 'within tolerance'} |`;
+  }).join('\n');
 }
 
 function proposalSummary(latestProposals = [], totalValue = 0) {
@@ -71,8 +84,16 @@ function proposalSummary(latestProposals = [], totalValue = 0) {
   };
 }
 
-function formatInstrumentOverviewRows(approvedInstruments = [], latestProposals = [], totalValue = 0) {
-  if (!approvedInstruments.length) return '| <ticker> | <name> | 0 | 0 | 0 | 0 | blocked |';
+function queueSeverityFromStatus(status = '') {
+  const normalized = String(status || '').trim().toLowerCase();
+  if (['failed', 'rejected', 'cancelled'].includes(normalized)) return 'warning';
+  if (['submitted', 'partially_filled', 'staged', 'approved'].includes(normalized)) return 'attention';
+  if (['proposed', 'planned'].includes(normalized)) return 'review';
+  return 'info';
+}
+
+function formatInstrumentActionRows(approvedInstruments = [], latestProposals = [], totalValue = 0) {
+  if (!approvedInstruments.length) return '| <ticker> | 0 | 0 | review missing approvals | missing approved-instrument list | review portfolio setup |';
 
   const latestRowsByInstrument = new Map();
   for (const proposal of latestProposals) {
@@ -84,23 +105,10 @@ function formatInstrumentOverviewRows(approvedInstruments = [], latestProposals 
     const plannedValue = Number(proposal?.estimatedChf || 0);
     const plannedPct = totalValue > 0 ? Number(((plannedValue / totalValue) * 100).toFixed(2)) : 0;
     const target = Number(instrument.target || 0);
-    const drift = Number((plannedPct - target).toFixed(2));
-    const quantityText = proposal?.quantity ? ` (${proposal.quantity} @ ${proposal.limitPrice})` : '';
-    const sourceText = proposal?.priceSource ? ` via ${proposal.priceSource}` : '';
-    const status = String(proposal?.status || '').trim().toLowerCase();
-    const statusPrefix = status === 'approved'
-      ? 'approved'
-      : status === 'staged' || status === 'submitted' || status === 'partially_filled' || status === 'filled'
-        ? 'in_flight'
-        : status === 'proposed'
-          ? 'proposal'
-          : status === 'planned'
-            ? 'planned'
-            : 'watch';
-    const action = proposal
-      ? `${statusPrefix}: ${proposal.action} ${plannedValue} CHF${quantityText}${sourceText}`
-      : 'watch';
-    return `| ${instrument.tickerOrIsin} | ${instrument.name} | ${plannedValue} | ${plannedPct} | ${target} | ${drift} | ${action} |`;
+    const reason = proposal?.reason ? String(proposal.reason).split(';')[0].trim() : 'No active proposal';
+    const approvalNeeded = proposal ? (proposal.approval || 'review') : 'watch';
+    const suggestedAction = proposal ? `${proposal.status}: ${proposal.action}` : 'watch';
+    return `| ${instrument.tickerOrIsin} | ${plannedPct} | ${target} | ${suggestedAction} | ${reason} | ${approvalNeeded} |`;
   }).join('\n');
 }
 
@@ -143,6 +151,66 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
   ];
 }
 
+function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, safetyDiagnostics = null, recommended = [] }) {
+  const actions = [];
+  for (const item of deliveryStatus?.pendingActions || []) {
+    actions.push(item);
+  }
+  if (brokerReadiness?.fallbackRequired) {
+    actions.push(`Broker connectivity recovery: ${brokerReadiness.message}`);
+  }
+  if (brokerErrorState?.stopAutomation) {
+    actions.push(`Broker automation paused after ${brokerErrorState.consecutive} consecutive errors; investigate before resuming.`);
+  }
+  if ((lifecycleSummary?.approved || 0) > 0) {
+    actions.push(`There are ${lifecycleSummary.approved} approved trade row(s) ready for staging/review.`);
+  }
+  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) {
+    actions.push('Reconcile in-flight broker orders before creating overlapping plans.');
+  }
+  if (safetyDiagnostics?.holdingsHealth?.stalePricing) {
+    actions.push('Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.');
+  }
+  if (!actions.length && recommended[0]) actions.push(recommended[0]);
+  return Array.from(new Set(actions));
+}
+
+function buildMaterialEvents(events = []) {
+  if (!events.length) {
+    return [{
+      time: 'n/a',
+      eventType: 'none',
+      severity: 'info',
+      summary: 'No recent runtime events recorded.',
+      nextStep: 'Continue normal monitoring.',
+    }];
+  }
+
+  return events.slice(-5).reverse().map((event) => ({
+    time: String(event.timestamp || 'n/a').replace('T', ' ').replace('Z', ' UTC'),
+    eventType: event.action || event.category || 'event',
+    severity: event.level || 'info',
+    summary: event.summary || 'Observed runtime event.',
+    nextStep: String(event.status || '').toLowerCase().includes('blocked')
+      ? 'Resolve the blocking condition before proceeding.'
+      : String(event.level || '').toLowerCase() === 'warn'
+        ? 'Review details and confirm no operator action is required.'
+        : 'No immediate action required.',
+  }));
+}
+
+function formatMaterialEventRows(events = []) {
+  return events.map((event) => `| ${event.time} | ${event.eventType} | ${event.severity} | ${event.summary} | ${event.nextStep} |`).join('\n');
+}
+
+function bestNextStep({ pendingActions = [], blockers = [], recommendedActionsList = [], brokerReadiness = null, lifecycleSummary = null }) {
+  if (blockers.length > 0) return `Resolve the active blocker: ${blockers[0].message || blockers[0]}`;
+  if (pendingActions.length > 0) return pendingActions[0];
+  if ((lifecycleSummary?.approved || 0) > 0) return 'Review and stage approved trades once broker readiness is healthy.';
+  if (brokerReadiness?.fallbackRequired) return 'Restore Interactive Brokers readiness, then refresh broker-backed proposals.';
+  return recommendedActionsList[0] || 'Continue normal monitoring and refresh the portfolio workflow after the next material state change.';
+}
+
 function formatExecutionPlan(plan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }) {
   if (!plan.rows.length) return '- No draft execution plan yet.';
   const lines = plan.rows.map((row) => `- ${row.tickerOrIsin}: target ${row.targetPct}% | intended CHF ${row.intendedChf} | executable CHF ${row.executableChf} | gap CHF ${row.executionGapChf}`);
@@ -178,7 +246,12 @@ function formatObservabilityStatus(observability = {}) {
   ].join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null }) {
+function formatBlockerLines(blockers = []) {
+  if (!blockers.length) return '- none';
+  return blockers.map((item) => `- ${item.severity || 'info'}: ${item.message || item}`).join('\n');
+}
+
+function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [] }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -186,6 +259,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     ? existingTrades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.estimatedChf || t.amount} | ${t.status} |`).join('\n')
     : '| YYYY-MM-DD | <action> | <instrument> | 0 | none |';
 
+  const blockers = safetyDiagnostics?.blockers || [];
   const warnings = [
     '- Dashboard regeneration currently computes allocation drift at the asset-class level only.',
   ];
@@ -201,20 +275,49 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   if (freshness?.stale) warnings.push(`- Dashboard freshness warning: source state changed after the dashboard was last written (${freshness.newestSourcePath || 'unknown source'}).`);
   if (latestSnapshot?.notes) warnings.push(`- Latest history note: ${latestSnapshot.notes}`);
   if ((observability?.recentSummary?.blockedTrades || 0) > 0) warnings.push(`- Observability shows ${observability.recentSummary.blockedTrades} recent blocked execution-policy event(s).`);
-  if (safetyDiagnostics?.holdingsHealth?.stalePricing) warnings.push('- Safety diagnostics currently mark holdings pricing as stale.');
-  const actions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
+  if (safetyDiagnostics?.diagnostics?.holdingsHealth?.stalePricing || safetyDiagnostics?.holdingsHealth?.stalePricing) warnings.push('- Safety diagnostics currently mark holdings pricing as stale.');
+
+  const strategy = strategyStatus(allocations, brokerReadiness, blockers);
+  const recommended = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
+  const pendingActions = buildPendingOperatorActions({
+    deliveryStatus,
+    brokerReadiness,
+    brokerErrorState,
+    lifecycleSummary,
+    safetyDiagnostics: safetyDiagnostics?.diagnostics || safetyDiagnostics,
+    recommended,
+  });
+  const materialEvents = buildMaterialEvents(recentEvents);
+  const portfolioHealth = healthLabel({
+    brokerReadiness,
+    brokerErrorState,
+    freshness,
+    blockers,
+    lifecycleSummary,
+    pendingActions,
+  });
+  const recommendation = bestNextStep({
+    pendingActions,
+    blockers,
+    recommendedActionsList: recommended,
+    brokerReadiness,
+    lifecycleSummary,
+  });
+  const pendingApprovalCount = (lifecycleSummary?.proposed || 0) + (lifecycleSummary?.approved || 0);
+  const inFlightCount = (lifecycleSummary?.staged || 0) + (lifecycleSummary?.submitted || 0) + (lifecycleSummary?.partiallyFilled || 0);
+  const latestDate = latestSnapshot?.date || summary.syncTime || 'unknown';
   const deliveryLines = [
-    `- Delivery mode: ${deliveryStatus?.deliveryMode || 'unknown'}`,
-    `- Intended channels: ${(deliveryStatus?.intendedChannels || []).join(', ') || 'unknown'}`,
-    `- External delivery enabled: ${deliveryStatus?.externalDeliveryEnabled ? 'yes' : 'no'}`,
-    `- Failure alert mode: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
-    `- Pending actions: ${(deliveryStatus?.pendingActions || []).length}`,
+    `- Weekly report: ${deliveryStatus?.latestHistoryDate ? `latest history ${deliveryStatus.latestHistoryDate}` : 'unknown'}`,
+    `- Monthly report: ${deliveryStatus?.deliveryMode || 'unknown'}`,
+    `- Quarterly report: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
+    `- Delivery readiness: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}`,
+    `- Failure alert readiness: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
   ].join('\n');
-  const pendingActionRows = (deliveryStatus?.pendingActions || []).length
-    ? (deliveryStatus.pendingActions || []).map((item, index) => `${index + 1}. ${item}`).join('\n')
+  const pendingActionRows = pendingActions.length
+    ? pendingActions.map((item, index) => `${index + 1}. ${item}`).join('\n')
     : '1. None.';
 
-  return `# Dashboard: ${portfolioName}\n\n## Summary\n- Total value: CHF ${summary.totalValue}\n- Cash: CHF ${summary.cash}\n- Invested: CHF ${summary.invested}\n- Number of holdings: ${holdingCount}\n- Strategy status: ${strategyStatus(allocations, brokerReadiness)}\n- Last sync: ${summary.syncTime}\n- Last rebalance check: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Broker readiness: ${brokerReadiness?.message || 'unknown'}\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Delivery Status\n${deliveryLines}\n\n## Observability Status\n${formatObservabilityStatus(observability)}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Risk Diagnostics\n- Execution mode: ${safetyDiagnostics?.executionMode || 'unknown'}\n- Max single ETF limit %: ${safetyDiagnostics?.holdingsHealth?.maxSingleEtfLimitPct ?? 'unknown'}\n- Max observed holding weight %: ${safetyDiagnostics?.holdingsHealth?.maxObservedWeightPct ?? 'unknown'}\n- Simulated pricing detected: ${safetyDiagnostics?.holdingsHealth?.simulatedPricing ? 'yes' : 'no'}\n- Stale pricing detected: ${safetyDiagnostics?.holdingsHealth?.stalePricing ? 'yes' : 'no'}\n\n## Allocation vs Target\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Overview\n| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |\n|---|---|---:|---:|---:|---:|---|\n${formatInstrumentOverviewRows(approvedInstruments, latestProposals, totalValue)}\n\n## Recommended Actions\n1. ${actions[0]}\n2. ${actions[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
+  return `# Dashboard: ${portfolioName}\n\n## Health Snapshot\n- Portfolio status: ${portfolioHealth}\n- Strategy status: ${strategy}\n- Broker health: ${brokerReadiness?.message || 'unknown'}\n- Last successful sync: ${summary.syncTime}\n- Data freshness: ${freshness?.stale ? 'stale' : 'current'}\n- Execution posture: ${brokerErrorState?.stopAutomation ? 'paused' : (brokerReadiness?.fallbackRequired ? 'degraded_dry_run_only' : 'ready_for_review')}\n- Delivery posture: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}\n- Pending approvals: ${pendingApprovalCount}\n- Active blockers: ${blockers.length}\n\n## Portfolio Value Snapshot\n- Total value CHF: ${summary.totalValue}\n- Cash CHF: ${summary.cash}\n- Invested CHF: ${summary.invested}\n- Daily move CHF: ${latestSnapshot?.dailyChange || '0'}\n- Daily move %: ${latestSnapshot?.dailyChangePct || '0'}\n- Since last report CHF: ${latestSnapshot?.dailyChange || '0'}\n- Since last report %: ${latestSnapshot?.dailyChangePct || '0'}\n- Number of holdings: ${holdingCount}\n- Latest snapshot date: ${latestDate}\n\n## Allocation Health\n| Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |\n|---|---:|---:|---:|---|---|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Actions Queue\n| Instrument | Current % | Target % | Suggested action | Reason | Approval needed |\n|---|---:|---:|---|---|---|\n${formatInstrumentActionRows(approvedInstruments, latestProposals, totalValue)}\n\n## Safety / Risk Diagnostics\n- Safety status: ${blockers.length ? 'blocked_or_warning' : 'clear'}\n- Risk-limit warnings: ${blockers.filter((item) => item.severity === 'warning').length}\n- Broker/API warnings: ${brokerReadiness?.fallbackRequired ? 1 : 0}\n- Stale data warnings: ${(freshness?.stale || (safetyDiagnostics?.diagnostics?.holdingsHealth?.stalePricing || safetyDiagnostics?.holdingsHealth?.stalePricing)) ? 1 : 0}\n- Execution pause state: ${brokerErrorState?.stopAutomation ? 'paused' : 'active'}\n- Active blocker detail:\n${formatBlockerLines(blockers)}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Recent Material Events\n| Time | Event type | Severity | Summary | Next step |\n|---|---|---|---|---|\n${formatMaterialEventRows(materialEvents)}\n\n## Report / Delivery Status\n${deliveryLines}\n\n## Recommended Next Step\n${recommendation}\n\n## Status Labels\n- Pending approvals queue count: ${pendingApprovalCount}\n- In-flight execution rows: ${inFlightCount}\n- Latest action recommendations:\n  - ${recommended[0]}\n  - ${recommended[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Observability Status\n${formatObservabilityStatus(observability)}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
 async function regenerateDashboard(portfolioDir) {
@@ -254,7 +357,8 @@ async function regenerateDashboard(portfolioDir) {
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
     observability,
-    safetyDiagnostics: safetyEvaluation.diagnostics,
+    safetyDiagnostics: safetyEvaluation,
+    recentEvents,
   });
   fs.writeFileSync(dashboardPath, dashboard);
   freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
@@ -274,10 +378,11 @@ async function regenerateDashboard(portfolioDir) {
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
     observability,
-    safetyDiagnostics: safetyEvaluation.diagnostics,
+    safetyDiagnostics: safetyEvaluation,
+    recentEvents,
   });
   fs.writeFileSync(dashboardPath, dashboard);
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep };
