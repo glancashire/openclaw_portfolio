@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
-const { buildApprovalsQueue, buildDailySummary, buildReportHistory, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+const { buildApprovalsQueue, buildDailySummary, buildReportHistory, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -138,6 +138,18 @@ async function main() {
   const reportHistoryHtml = fs.readFileSync(generated.reportHistoryHtmlPath, 'utf8');
   assert(reportHistoryHtml.includes('Report History'), 'Expected report history html title');
   assert(reportHistoryHtml.includes('<table>'), 'Expected html table in report history');
+
+  // Phase 41: operator cockpit landing page
+  assert(fs.existsSync(generated.cockpitHtmlPath), 'Expected cockpit index.html artifact');
+  const cockpitHtml = fs.readFileSync(generated.cockpitHtmlPath, 'utf8');
+  assert(cockpitHtml.includes('Operator Cockpit'), 'Expected cockpit title');
+  assert(cockpitHtml.includes('status-grid'), 'Expected status grid in cockpit');
+  assert(cockpitHtml.includes('daily-summary.html'), 'Expected daily summary nav link');
+  assert(cockpitHtml.includes('approvals-queue.html'), 'Expected approvals queue nav link');
+  assert(cockpitHtml.includes('report-history.html'), 'Expected report history nav link');
+  assert(cockpitHtml.includes('portfolio-overview.html'), 'Expected overview nav link');
+  assert(cockpitHtml.includes('summary.html'), 'Expected portfolio summary link');
+  assert(cockpitHtml.includes('badge-'), 'Expected health badge in cockpit');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
