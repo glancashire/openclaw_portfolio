@@ -10,9 +10,11 @@ const { execSync } = require('child_process');
 const path = require('path');
 const { validateTradeList } = require('../lib/etfQualityFilter');
 const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
+const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const DRY_RUN = process.argv.includes('--dry-run');
+const FORCE = process.argv.includes('--force');
 
 // Trades to execute (approved by operator)
 const TRADES = [
@@ -71,6 +73,18 @@ async function main() {
   console.log(`=== Smart Market-Open Execution ${DRY_RUN ? '(DRY RUN)' : '(LIVE)'} ===`);
   console.log(`Time: ${new Date().toISOString()}`);
   console.log('');
+
+  // Guard: market hours
+  if (!DRY_RUN && !FORCE) {
+    const market = isMarketOpen('EBS');
+    if (!market.open) {
+      console.error(`\n✗ Market is closed: ${market.reason}`);
+      console.error(`  Next open: ${nextOpenTime('EBS')}`);
+      console.error(`  Schedule this script to run at market open, or use --force to override.`);
+      process.exit(1);
+    }
+    console.log('✓ Market is open');
+  }
 
   // Step 1: Validate ETF quality
   const validation = validateTradeList(TRADES);

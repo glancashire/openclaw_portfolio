@@ -8,9 +8,12 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
+const { validateTradeList } = require('../lib/etfQualityFilter');
+const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const DRY_RUN = process.argv.includes('--dry-run');
+const FORCE = process.argv.includes('--force');
 
 // Approved trades from the proposal
 const TRADES = [
@@ -115,6 +118,29 @@ async function buildPortfolioState(account) {
 
 async function main() {
   console.log(`=== Trade Execution ${DRY_RUN ? '(DRY RUN)' : '(LIVE)'} ===`);
+
+  // Guard: market hours
+  if (!DRY_RUN && !FORCE) {
+    const market = isMarketOpen('EBS');
+    if (!market.open) {
+      console.error(`\n✗ Market is closed: ${market.reason}`);
+      console.error(`  Next open: ${nextOpenTime('EBS')}`);
+      console.error(`  Use --force to override, or use scripts/submit-orders-at-open.js for smart execution.`);
+      process.exit(1);
+    }
+  }
+
+  // Guard: ETF quality filter
+  const validation = validateTradeList(TRADES);
+  if (!validation.allPass) {
+    console.error('\n✗ ETF quality check FAILED:');
+    for (const r of validation.results) {
+      if (!r.pass) console.error(`  ${r.symbol}: ${r.reasons.join(', ')}`);
+    }
+    process.exit(1);
+  }
+  console.log('✓ ETF quality filter passed');
+
   console.log(`Trades to execute: ${TRADES.length}`);
   console.log('');
 
