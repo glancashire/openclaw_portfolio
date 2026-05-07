@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { collectPortfolioSummary, buildPortfolioIndex, buildPendingActionsOverview, generatePortfolioSummaryArtifacts, renderPortfolioSummaryMarkdown } = require('../src/reporting/summaryArtifacts');
+const { collectPortfolioSummary, buildPortfolioIndex, buildPendingActionsOverview, generatePortfolioSummaryArtifacts, renderPortfolioSummaryMarkdown, buildRecoveryChecklist, renderRecoveryChecklistMarkdown } = require('../src/reporting/summaryArtifacts');
 const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
 
 function assert(condition, message) {
@@ -20,7 +20,12 @@ async function main() {
   const summary = await collectPortfolioSummary({ portfolioDir });
   const generated = await generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles: true });
   const renderedMarkdown = renderPortfolioSummaryMarkdown(summary);
+  const checklist = buildRecoveryChecklist(summary);
+  const recoveryMarkdown = renderRecoveryChecklistMarkdown(checklist);
   const html = fs.readFileSync(path.join(portfolioDir, 'summary.html'), 'utf8');
+  const recoveryHtml = fs.readFileSync(path.join(portfolioDir, 'recovery-checklist.html'), 'utf8');
+  const recoveryJson = JSON.parse(fs.readFileSync(path.join(portfolioDir, 'recovery-checklist.json'), 'utf8'));
+  const recoveryMd = fs.readFileSync(path.join(portfolioDir, 'recovery-checklist.md'), 'utf8');
   const index = buildPortfolioIndex([summary]);
   const pending = buildPendingActionsOverview([summary]);
 
@@ -36,12 +41,21 @@ async function main() {
   assert(Array.isArray(summary.recentMaterialEvents), 'Expected material events array');
   assert(typeof summary.recommendedNextStep === 'string' && summary.recommendedNextStep.length > 0, 'Expected recommended next step');
   assert(typeof renderedMarkdown === 'string' && renderedMarkdown.includes('# Portfolio Summary Page: etf'), 'Expected rendered portfolio summary markdown');
+  assert(typeof recoveryMarkdown === 'string' && recoveryMarkdown.includes('# Recovery Checklist: etf'), 'Expected rendered recovery checklist markdown');
   assert(generated.htmlPath.endsWith('summary.html'), 'Expected generated per-portfolio html path');
+  assert(generated.recoveryHtmlPath.endsWith('recovery-checklist.html'), 'Expected recovery checklist html path');
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
   assert(html.includes('<table>'), 'Expected html table rendering for summary page');
   assert(html.includes('<ol>') || html.includes('<ul>'), 'Expected list rendering in summary html');
+  assert(checklist.summary.queueItemCount === summary.operatorQueue.items.length, 'Expected recovery checklist queue count to align');
+  assert(recoveryJson.portfolio === 'etf', 'Expected recovery checklist json portfolio');
+  assert(recoveryJson.summary.recommendedNextStep === summary.recommendedNextStep, 'Expected recovery checklist recommendation alignment');
+  assert(recoveryMd.includes('## Action Checklist'), 'Expected action checklist markdown section');
+  assert(recoveryHtml.includes('Recovery Checklist: etf'), 'Expected recovery checklist html title content');
+  assert(recoveryHtml.includes('Action Checklist'), 'Expected action checklist section in html');
+  assert(recoveryHtml.includes('<ol>') || recoveryHtml.includes('<ul>'), 'Expected list rendering in recovery checklist html');
 
   assert(dashboard.includes(`Portfolio status: ${summary.status.health}`), 'Dashboard health should align with summary');
   assert(dashboard.includes(`Pending approvals: ${summary.approvals.pendingApprovalCount}`), 'Dashboard pending approvals should align');

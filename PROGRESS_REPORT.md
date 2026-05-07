@@ -178,8 +178,8 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-The tracked post-MVP usability follow-on phases are now complete through the currently named Phase 34 control-UI portfolio summary page uplift.
-Further work should be re-entered as a freshly defined roadmap phase list rather than guessed from old notes.
+The tracked post-MVP usability follow-on phases are complete through Phase 34, and Phase 35 recovery / incident checklist view is now the active implementation focus.
+Further work after that should be re-entered as a freshly defined roadmap phase list rather than guessed from old notes.
 
 ## Known environment caveat
 

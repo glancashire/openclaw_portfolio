@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Portfolio Report</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 32px; color: #111; }
+h1, h2, h3 { margin-top: 24px; }
+p, li { line-height: 1.4; }
+pre { white-space: pre-wrap; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 12px; }
+code { font-family: monospace; }
+</style>
+</head>
+<body>
+<h1>Recovery Checklist: acceptance-closure</h1>
+<h2>Incident Status</h2>
+<ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: ready</li><li>Data freshness: current</li><li>Pending approvals: 0</li><li>Recommended next step: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.</li></ul>
+<h2>Incident Drivers</h2>
+<ul><li>Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.</li><li>5 explicit blocker(s) are preventing a healthy operating posture.</li></ul>
+<h2>Active Blockers</h2>
+<ol><li>[error] Portfolio still has open questions; trade execution must remain blocked.</li><li>[error] Holdings and pricing are still simulated.</li><li>[error] Missing concrete risk limit: Max single ETF allocation.</li><li>[error] Missing concrete risk limit: Max single issuer allocation.</li><li>[error] Missing concrete risk limit: Max cash drag after full deployment.</li></ol>
+<h2>Action Checklist</h2>
+<ol><li>[high] Holdings and pricing are still simulated.</li><li>[high] Missing concrete risk limit: Max cash drag after full deployment.</li><li>[high] Missing concrete risk limit: Max single ETF allocation.</li><li>[high] Missing concrete risk limit: Max single issuer allocation.</li><li>[high] Portfolio still has open questions; trade execution must remain blocked.</li><li>[high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.</li></ol>
+<h2>Verification Checks</h2>
+<ul><li>Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.</li><li>Freshness posture remains current.</li><li>No approval backlog remains.</li><li>Active blockers are cleared or explicitly documented as accepted constraints.</li></ul>
+<h2>Completion Criteria</h2>
+<ul><li>Blocking recovery items no longer appear in the operator queue.</li><li>Portfolio health no longer depends on unresolved blocker conditions.</li><li>The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.</li></ul>
+<h2>Recent Signals</h2>
+<ol><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li></ol>
+</body>
+</html>

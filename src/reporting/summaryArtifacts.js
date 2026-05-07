@@ -452,6 +452,131 @@ async function collectPortfolioSummary({ portfolioDir }) {
   });
 }
 
+function buildRecoveryChecklist(summary = {}) {
+  const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
+  const blockers = Array.isArray(summary.blockers?.items) ? summary.blockers.items : [];
+  const events = Array.isArray(summary.recentMaterialEvents) ? summary.recentMaterialEvents : [];
+  const incidentDrivers = [];
+
+  if (summary.status?.brokerHealth === 'degraded') {
+    incidentDrivers.push('Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.');
+  }
+  if (summary.status?.dataFreshness === 'stale') {
+    incidentDrivers.push('Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.');
+  }
+  if (summary.runtimeState?.brokerAutomationPaused) {
+    incidentDrivers.push('Broker automation is paused after repeated errors and needs explicit operator recovery.');
+  }
+  if ((summary.approvals?.pendingApprovalCount || 0) > 0) {
+    incidentDrivers.push(`${summary.approvals.pendingApprovalCount} approval-gated trade rows are still waiting for operator review.`);
+  }
+  if (blockers.length > 0) {
+    incidentDrivers.push(`${blockers.length} explicit blocker(s) are preventing a healthy operating posture.`);
+  }
+  if (!incidentDrivers.length) {
+    incidentDrivers.push('No active incident drivers were detected; this checklist is a verification pass confirming healthy posture.');
+  }
+
+  const derivedActions = queueItems.length
+    ? queueItems.map((item, index) => ({
+        step: index + 1,
+        priority: item.severity || 'low',
+        title: item.summary,
+        action: item.recommendedOperatorAction || 'Review and resolve as appropriate.',
+        verification: item.blocking
+          ? 'Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.'
+          : 'Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.',
+        source: item.source || item.kind || 'operator_queue',
+      }))
+    : [{
+        step: 1,
+        priority: 'low',
+        title: 'No active recovery actions detected.',
+        action: 'Perform a quick verification pass across broker health, freshness, approvals, and recent events.',
+        verification: 'Confirm the portfolio remains healthy and no new incident signals have appeared.',
+        source: 'operator_queue',
+      }];
+
+  const verificationChecks = [
+    summary.status?.brokerHealth === 'degraded'
+      ? 'Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.'
+      : 'Broker health remains healthy or intentionally degraded with operator awareness.',
+    summary.status?.dataFreshness === 'stale'
+      ? 'Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.'
+      : 'Freshness posture remains current.',
+    (summary.approvals?.pendingApprovalCount || 0) > 0
+      ? 'All approval-gated rows are explicitly approved, rejected, or intentionally left pending.'
+      : 'No approval backlog remains.',
+    blockers.length > 0
+      ? 'Active blockers are cleared or explicitly documented as accepted constraints.'
+      : 'No active blockers remain.',
+  ];
+
+  const completionCriteria = blockers.length || queueItems.some((item) => item.blocking)
+    ? [
+        'Blocking recovery items no longer appear in the operator queue.',
+        'Portfolio health no longer depends on unresolved blocker conditions.',
+        'The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.',
+      ]
+    : [
+        'Portfolio remains in a healthy or intentionally monitored posture.',
+        'No blocker-class recovery work is outstanding.',
+        'The next operating step is clear from the summary surface.',
+      ];
+
+  return {
+    schemaVersion: '1.0',
+    generatedAt: summary.generatedAt || new Date().toISOString(),
+    portfolio: summary.portfolio || 'unknown',
+    incidentStatus: blockers.length || queueItems.some((item) => item.blocking) ? 'action_required' : 'monitor_only',
+    summary: {
+      health: summary.status?.health || 'unknown',
+      brokerHealth: summary.status?.brokerHealth || 'unknown',
+      executionPosture: summary.status?.executionPosture || 'unknown',
+      deliveryPosture: summary.status?.deliveryPosture || 'unknown',
+      dataFreshness: summary.status?.dataFreshness || 'unknown',
+      blockerCount: blockers.length,
+      queueItemCount: queueItems.length,
+      pendingApprovals: summary.approvals?.pendingApprovalCount || 0,
+      recommendedNextStep: summary.recommendedNextStep || 'No recommendation available.',
+    },
+    incidentDrivers,
+    activeBlockers: blockers.map((item, index) => ({ rank: index + 1, severity: item.severity || 'info', message: item.message || String(item) })),
+    actionChecklist: derivedActions,
+    verificationChecks,
+    completionCriteria,
+    recentSignals: events.slice(0, 5).map((item, index) => ({
+      rank: index + 1,
+      severity: item.severity || 'info',
+      summary: item.summary || item.message || 'event',
+      timestamp: item.timestamp || null,
+    })),
+  };
+}
+
+function renderRecoveryChecklistMarkdown(checklist = {}) {
+  const drivers = Array.isArray(checklist.incidentDrivers) && checklist.incidentDrivers.length
+    ? checklist.incidentDrivers.map((item) => `- ${item}`).join('\n')
+    : '- No active incident drivers.';
+  const blockers = Array.isArray(checklist.activeBlockers) && checklist.activeBlockers.length
+    ? checklist.activeBlockers.map((item, index) => `${index + 1}. [${item.severity}] ${item.message}`).join('\n')
+    : '1. No active blockers.';
+  const actions = Array.isArray(checklist.actionChecklist) && checklist.actionChecklist.length
+    ? checklist.actionChecklist.map((item) => `${item.step}. [${item.priority}] ${item.title}\n   - Action: ${item.action}\n   - Verify: ${item.verification}\n   - Source: ${item.source}`).join('\n')
+    : '1. [low] No recovery actions required.\n   - Action: Monitor the portfolio normally.\n   - Verify: Confirm healthy posture.\n   - Source: operator_queue';
+  const verification = Array.isArray(checklist.verificationChecks) && checklist.verificationChecks.length
+    ? checklist.verificationChecks.map((item) => `- ${item}`).join('\n')
+    : '- No verification checks defined.';
+  const completion = Array.isArray(checklist.completionCriteria) && checklist.completionCriteria.length
+    ? checklist.completionCriteria.map((item) => `- ${item}`).join('\n')
+    : '- No completion criteria defined.';
+  const recentSignals = Array.isArray(checklist.recentSignals) && checklist.recentSignals.length
+    ? checklist.recentSignals.map((item, index) => `${index + 1}. [${item.severity}] ${item.summary}${item.timestamp ? ` (${item.timestamp})` : ''}`).join('\n')
+    : '1. No recent signals captured.';
+
+  return `# Recovery Checklist: ${checklist.portfolio || 'unknown'}\n\n## Incident Status\n- Status: ${checklist.incidentStatus || 'unknown'}\n- Health: ${checklist.summary?.health || 'unknown'}\n- Broker health: ${checklist.summary?.brokerHealth || 'unknown'}\n- Execution posture: ${checklist.summary?.executionPosture || 'unknown'}\n- Delivery posture: ${checklist.summary?.deliveryPosture || 'unknown'}\n- Data freshness: ${checklist.summary?.dataFreshness || 'unknown'}\n- Pending approvals: ${checklist.summary?.pendingApprovals || 0}\n- Recommended next step: ${checklist.summary?.recommendedNextStep || 'No recommendation available.'}\n\n## Incident Drivers\n${drivers}\n\n## Active Blockers\n${blockers}\n\n## Action Checklist\n${actions}\n\n## Verification Checks\n${verification}\n\n## Completion Criteria\n${completion}\n\n## Recent Signals\n${recentSignals}\n`;
+}
+
 function renderPortfolioSummaryMarkdown(summary = {}) {
   const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
   const blockers = Array.isArray(summary.blockers?.items) ? summary.blockers.items : [];
@@ -488,14 +613,22 @@ function renderPortfolioSummaryMarkdown(summary = {}) {
 
 async function generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles = true }) {
   const summary = await collectPortfolioSummary({ portfolioDir });
+  const checklist = buildRecoveryChecklist(summary);
   const outPath = path.join(portfolioDir, 'summary.json');
   const htmlPath = path.join(portfolioDir, 'summary.html');
   const markdown = renderPortfolioSummaryMarkdown(summary);
+  const recoveryPath = path.join(portfolioDir, 'recovery-checklist.json');
+  const recoveryMarkdownPath = path.join(portfolioDir, 'recovery-checklist.md');
+  const recoveryHtmlPath = path.join(portfolioDir, 'recovery-checklist.html');
+  const recoveryMarkdown = renderRecoveryChecklistMarkdown(checklist);
   if (writeFiles) {
     fs.writeFileSync(outPath, JSON.stringify(summary, null, 2) + '\n');
     fs.writeFileSync(htmlPath, markdownToBasicHtml(markdown));
+    fs.writeFileSync(recoveryPath, JSON.stringify(checklist, null, 2) + '\n');
+    fs.writeFileSync(recoveryMarkdownPath, recoveryMarkdown);
+    fs.writeFileSync(recoveryHtmlPath, markdownToBasicHtml(recoveryMarkdown));
   }
-  return { summary, outPath, htmlPath, markdown };
+  return { summary, checklist, outPath, htmlPath, markdown, recoveryPath, recoveryMarkdownPath, recoveryHtmlPath, recoveryMarkdown };
 }
 
 function listPortfolioDirectories(repoRoot = process.cwd()) {
@@ -599,6 +732,8 @@ module.exports = {
   queueTypeForItem,
   summarizeOperatorQueue,
   collectPortfolioSummary,
+  buildRecoveryChecklist,
+  renderRecoveryChecklistMarkdown,
   renderPortfolioSummaryMarkdown,
   generatePortfolioSummaryArtifacts,
   listPortfolioDirectories,

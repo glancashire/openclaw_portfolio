@@ -9,7 +9,7 @@ async function main() {
 
   const result = await generatePortfolioSummaryArtifacts({ portfolioDir: target, writeFiles: true });
   const overview = await generateOverviewArtifacts({ writeFiles: true });
-  console.log(JSON.stringify({ summary: result.outPath, portfolioIndex: overview.portfolioIndexPath, pendingActions: overview.pendingActionsPath }, null, 2));
+  console.log(JSON.stringify({ summary: result.outPath, summaryHtml: result.htmlPath, recoveryChecklist: result.recoveryPath, recoveryChecklistHtml: result.recoveryHtmlPath, portfolioIndex: overview.portfolioIndexPath, pendingActions: overview.pendingActionsPath }, null, 2));
 }
 
 main().catch((error) => {
