@@ -1,0 +1,7 @@
+{
+  "replicationMethod": "physical",
+  "maxTerPct": 0.25,
+  "preferLowestTer": true,
+  "allowExplicitOverride": true,
+  "notes": "Only physical (full or sampled) replication ETFs. Reject synthetic/swap-based. Prefer lowest TER within each asset class. User can override per-instrument with explicit approval."
+}
