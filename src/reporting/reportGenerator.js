@@ -124,6 +124,101 @@ function formatOperatorQueueSummary(summary = {}) {
   ].join('\n');
 }
 
+function urgencyLabel(level = 'medium') {
+  return level === 'critical' ? 'CRITICAL' : level === 'high' ? 'HIGH' : level === 'low' ? 'LOW' : 'MEDIUM';
+}
+
+function deriveRecommendationUrgency({ brokerReadiness, lifecycleSummary, queueSummary, executionPlan, freshness, deliveryStatus }) {
+  if ((queueSummary?.blocking || 0) > 0 || brokerReadiness?.fallbackRequired || (lifecycleSummary?.failed || 0) > 0) return 'critical';
+  if ((lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) return 'high';
+  if (freshness?.stale || deliveryStatus?.ready === false || Number(executionPlan?.totals?.executionGapChf || 0) > 0 || (queueSummary?.approvals || 0) > 0) return 'medium';
+  return 'low';
+}
+
+function formatUrgentAction(label, text, level) {
+  return `- [${urgencyLabel(level)}] ${label}: ${text}`;
+}
+
+function buildIncidentSummary({ brokerReadiness, lifecycleSummary, freshness, brokerErrorState, queueSummary }) {
+  const incidents = [];
+  if ((queueSummary?.blocking || 0) > 0) incidents.push(`Blocking queue items: ${queueSummary.blocking}`);
+  if (brokerReadiness?.fallbackRequired) incidents.push(`Broker readiness degraded: ${brokerReadiness.message}`);
+  if (brokerErrorState?.stopAutomation) incidents.push(`Broker automation paused after ${brokerErrorState.consecutive || 0} consecutive errors`);
+  if ((lifecycleSummary?.failed || 0) > 0) incidents.push(`Failed execution rows: ${lifecycleSummary.failed}`);
+  if ((lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) incidents.push(`In-flight execution rows: ${Number(lifecycleSummary?.staged || 0) + Number(lifecycleSummary?.submitted || 0) + Number(lifecycleSummary?.partiallyFilled || 0)}`);
+  if (freshness?.stale) incidents.push('Dashboard/report freshness is stale relative to source state');
+  return incidents.length ? incidents.map((item) => `- ${item}`).join('\n') : '- No active incidents or blockers are currently surfaced.';
+}
+
+function buildChangeSummary({ latestSnapshot, previousSnapshot = null, lifecycleSummary, previousLifecycleSummary = null, queueSummary, previousQueueSummary = null }) {
+  if (!previousSnapshot && !previousLifecycleSummary && !previousQueueSummary) {
+    return '- No prior report comparison available yet.';
+  }
+
+  const lines = [];
+  if (latestSnapshot && previousSnapshot) {
+    const valueDelta = Number(latestSnapshot.totalValue || 0) - Number(previousSnapshot.totalValue || 0);
+    const cashDelta = Number(latestSnapshot.cash || 0) - Number(previousSnapshot.cash || 0);
+    lines.push(`- Portfolio value change since previous report: CHF ${valueDelta.toFixed(2)}`);
+    lines.push(`- Cash change since previous report: CHF ${cashDelta.toFixed(2)}`);
+  }
+  if (lifecycleSummary && previousLifecycleSummary) {
+    const proposedDelta = Number(lifecycleSummary.proposed || 0) - Number(previousLifecycleSummary.proposed || 0);
+    const approvedDelta = Number(lifecycleSummary.approved || 0) - Number(previousLifecycleSummary.approved || 0);
+    const inflightNow = Number(lifecycleSummary.staged || 0) + Number(lifecycleSummary.submitted || 0) + Number(lifecycleSummary.partiallyFilled || 0);
+    const inflightPrev = Number(previousLifecycleSummary.staged || 0) + Number(previousLifecycleSummary.submitted || 0) + Number(previousLifecycleSummary.partiallyFilled || 0);
+    lines.push(`- Proposed trade delta: ${proposedDelta >= 0 ? '+' : ''}${proposedDelta}`);
+    lines.push(`- Approved trade delta: ${approvedDelta >= 0 ? '+' : ''}${approvedDelta}`);
+    lines.push(`- In-flight execution delta: ${inflightNow - inflightPrev >= 0 ? '+' : ''}${inflightNow - inflightPrev}`);
+  }
+  if (queueSummary && previousQueueSummary) {
+    const pendingDelta = Number(queueSummary.total || 0) - Number(previousQueueSummary.total || 0);
+    const blockingDelta = Number(queueSummary.blocking || 0) - Number(previousQueueSummary.blocking || 0);
+    lines.push(`- Queue item delta: ${pendingDelta >= 0 ? '+' : ''}${pendingDelta}`);
+    lines.push(`- Blocking item delta: ${blockingDelta >= 0 ? '+' : ''}${blockingDelta}`);
+  }
+
+  return lines.length ? lines.join('\n') : '- No material changes since the previous report snapshot.';
+}
+
+function loadPreviousReportContext({ portfolioDir, period, currentDateStamp }) {
+  const reportsDir = path.join(portfolioDir, 'reports', period);
+  if (!fs.existsSync(reportsDir)) return null;
+  const candidates = fs.readdirSync(reportsDir)
+    .filter((name) => name.endsWith('.md'))
+    .filter((name) => !currentDateStamp || !name.includes(`_${currentDateStamp}.md`))
+    .sort();
+  const latest = candidates[candidates.length - 1];
+  if (!latest) return null;
+  const text = fs.readFileSync(path.join(reportsDir, latest), 'utf8');
+  const escapedLabel = (label) => String(label).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const numberFor = (label) => {
+    const match = text.match(new RegExp(`- ${escapedLabel(label)}: ([^\\n]+)`));
+    if (!match) return null;
+    const numeric = Number(String(match[1]).replace(/[^0-9.+-]/g, ''));
+    return Number.isFinite(numeric) ? numeric : null;
+  };
+  const cashMatch = text.match(/Latest snapshot: CHF\s+([0-9.+-]+)\s+total and CHF\s+([0-9.+-]+)\s+cash\./i);
+  return {
+    file: latest,
+    snapshot: {
+      totalValue: numberFor('End value CHF'),
+      cash: cashMatch ? Number(cashMatch[2]) : null,
+    },
+    lifecycleSummary: {
+      proposed: numberFor('Proposed') || 0,
+      approved: numberFor('Approved') || 0,
+      staged: numberFor('Staged') || 0,
+      submitted: numberFor('Submitted') || 0,
+      partiallyFilled: numberFor('Partially filled') || 0,
+    },
+    queueSummary: {
+      total: numberFor('Total queue items') || 0,
+      blocking: numberFor('Blocking items') || 0,
+    },
+  };
+}
+
 function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta, deliveryStatus }) {
   const parts = [];
   if (latestSnapshot) parts.push(`Latest snapshot: CHF ${latestSnapshot.totalValue} total and CHF ${latestSnapshot.cash} cash.`);
@@ -139,13 +234,16 @@ function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, f
   return parts.join(' ');
 }
 
-function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null, freshness = null, generationMeta = null, brokerErrorState = null, deliveryStatus = null, pendingActions = [] }) {
+function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null, freshness = null, generationMeta = null, brokerErrorState = null, deliveryStatus = null, pendingActions = [], previousReportContext = null }) {
   const normalizedQueueItems = pendingActions.map((item) => typeof item === 'string' ? { queueType: 'workflow', severity: 'low', status: 'pending', summary: item } : item);
   const queueSummary = summarizeOperatorQueue(normalizedQueueItems);
   const tradeRows = trades.length
     ? trades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.reason} |`).join('\n')
     : '| YYYY-MM-DD | <action> | <instrument> | 0 | No trades recorded |';
   const compliance = formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness, lifecycleSummary });
+  const recommendationUrgency = deriveRecommendationUrgency({ brokerReadiness, lifecycleSummary, queueSummary, executionPlan, freshness, deliveryStatus });
+  const incidentSummary = buildIncidentSummary({ brokerReadiness, lifecycleSummary, freshness, brokerErrorState, queueSummary });
+  const changeSummary = buildChangeSummary({ latestSnapshot, previousSnapshot: previousReportContext?.snapshot || null, lifecycleSummary, previousLifecycleSummary: previousReportContext?.lifecycleSummary || null, queueSummary, previousQueueSummary: previousReportContext?.queueSummary || null });
   const whatWorked = latestSnapshot
     ? '- The dry-run portfolio state, trade log, dashboard, and execution lifecycle summary are consistent enough to review as one workflow.'
     : '- Initial reporting scaffold is in place.';
@@ -160,27 +258,117 @@ function formatReport({ portfolioName, period, start = '', end = '', generated =
           : deliveryStatus?.ready === false
             ? `- Reporting delivery posture still has ${(pendingActions || []).length} operator-facing pending action(s).`
             : '- Live broker pricing and order quoting are not connected yet.';
-  const recommendedChanges = brokerReadiness?.fallbackRequired
-    ? '- Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.'
+  const recommendedChangesText = brokerReadiness?.fallbackRequired
+    ? 'Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.'
     : (lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0
-      ? '- Reconcile in-flight orders before approving overlapping new plans or revising allocations.'
+      ? 'Reconcile in-flight orders before approving overlapping new plans or revising allocations.'
       : executionPlan.totals.executionGapChf > 0
-        ? '- Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.'
+        ? 'Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.'
         : deliveryStatus?.ready === false
-          ? '- Clear the reporting pending-action list or explicitly accept the degraded local-only posture before wider operational use.'
-          : '- Connect live broker pricing to replace draft assumptions before enabling execution.';
-  const nextActions = brokerReadiness?.fallbackRequired
-    ? '- Validate Interactive Brokers gateway/session reachability before treating any proposal as broker-backed.'
+          ? 'Clear the reporting pending-action list or explicitly accept the degraded local-only posture before wider operational use.'
+          : 'Connect live broker pricing to replace draft assumptions before enabling execution.';
+  const nextActionsText = brokerReadiness?.fallbackRequired
+    ? 'Validate Interactive Brokers gateway/session reachability before treating any proposal as broker-backed.'
     : (lifecycleSummary?.approved || 0) > 0
-      ? '- Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.'
+      ? 'Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.'
       : executionPlan.rows.length
-        ? '- Approve or revise the current dry-run order set, then validate live read-only broker connectivity.'
+        ? 'Approve or revise the current dry-run order set, then validate live read-only broker connectivity.'
         : deliveryStatus?.ready === false
-          ? '- Run the local report-delivery readiness check and resolve the surfaced operator actions.'
-          : '- Generate the next dry-run proposal set after holdings or strategy changes.';
+          ? 'Run the local report-delivery readiness check and resolve the surfaced operator actions.'
+          : 'Generate the next dry-run proposal set after holdings or strategy changes.';
   const executiveSummary = narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta, deliveryStatus });
+  const recommendedChanges = formatUrgentAction('Recommendation', recommendedChangesText, recommendationUrgency);
+  const nextActions = formatUrgentAction('Next action', nextActionsText, recommendationUrgency);
 
-  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${executiveSummary}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n- In-flight orders: ${compliance.inflightOrders}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Delivery Status\n${formatDeliveryStatus(deliveryStatus)}\n\n## Operator Queue Summary\n${formatOperatorQueueSummary(queueSummary)}\n\n## Pending Operator Actions\n${formatPendingActions(normalizedQueueItems)}\n\n## Operator State\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n- Consecutive broker errors: ${brokerErrorState?.consecutive || 0}\n- Last broker error reason: ${brokerErrorState?.lastReason || 'none'}\n\n## Generation Status\n${formatGenerationStatus(generationMeta)}\n\n## Execution Lifecycle\n${formatExecutionLifecycleSection(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
+  return `# Portfolio Report: ${portfolioName}
+
+## Period
+- Report type: ${period}
+- Period start: ${start}
+- Period end: ${end}
+- Generated: ${generated}
+
+## Decision View
+
+### Executive Summary
+${executiveSummary}
+
+### Incident / Blocker Summary
+${incidentSummary}
+
+### What Changed Since Last Report
+${changeSummary}
+
+### Recommendation Urgency
+- Current urgency: ${urgencyLabel(recommendationUrgency)}
+
+### Recommended Changes
+${recommendedChanges}
+
+### Next Actions
+${nextActions}
+
+## Audit Detail
+
+### Performance
+| Metric | Value |
+|---|---:|
+| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |
+| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |
+| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |
+| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |
+
+### Allocation Review
+| Asset class | Start % | End % | Target % | Drift % |
+|---|---:|---:|---:|---:|
+${formatAllocationReview(executionPlan)}
+
+### Trades During Period
+| Date | Action | Instrument | Amount CHF | Reason |
+|---|---|---|---:|---|
+${tradeRows}
+
+### Strategy Compliance
+- On strategy: ${compliance.onStrategy}
+- Rebalance needed: ${compliance.rebalanceNeeded}
+- Risk limits breached: ${compliance.riskLimitsBreached}
+- Broker readiness: ${compliance.brokerReadiness}
+- In-flight orders: ${compliance.inflightOrders}
+
+### Freshness
+- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}
+- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}
+- Newest source file: ${freshness?.newestSourcePath || 'unknown'}
+
+### Delivery Status
+${formatDeliveryStatus(deliveryStatus)}
+
+### Operator Queue Summary
+${formatOperatorQueueSummary(queueSummary)}
+
+### Pending Operator Actions
+${formatPendingActions(normalizedQueueItems)}
+
+### Operator State
+- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}
+- Consecutive broker errors: ${brokerErrorState?.consecutive || 0}
+- Last broker error reason: ${brokerErrorState?.lastReason || 'none'}
+
+### Generation Status
+${formatGenerationStatus(generationMeta)}
+
+### Execution Lifecycle
+${formatExecutionLifecycleSection(lifecycleSummary)}
+
+### Execution Plan
+${formatExecutionPlanSection(executionPlan)}
+
+### What Worked
+${whatWorked}
+
+### What Did Not Work
+${whatDidNotWork}
+`;
 }
 
 function writeReport({ portfolioDir, period, dateStamp, content }) {
@@ -210,6 +398,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   const initialGenerationMeta = { markdownWritten: true, pdfMode: 'pending', pdfPath: null, htmlPath: null, renderWarning: null };
   const initialDeliveryStatus = reportDeliveryStatus({ portfolioDir, generationMeta: initialGenerationMeta, workflow });
   const initialPendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta: initialGenerationMeta, workflow, policy: initialDeliveryStatus });
+  const previousReportContext = loadPreviousReportContext({ portfolioDir, period, currentDateStamp: dateStamp });
   const markdownPath = writeReport({
     portfolioDir,
     period,
@@ -230,6 +419,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
       brokerErrorState,
       deliveryStatus: initialDeliveryStatus,
       pendingActions: initialPendingActions,
+      previousReportContext,
     }),
   });
   const pdf = renderPdf(markdownPath);
@@ -258,6 +448,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
     brokerErrorState,
     deliveryStatus,
     pendingActions,
+    previousReportContext,
   });
   fs.writeFileSync(markdownPath, finalContent);
   return {
@@ -271,4 +462,4 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   };
 }
 
-module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary };
+module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary, loadPreviousReportContext };

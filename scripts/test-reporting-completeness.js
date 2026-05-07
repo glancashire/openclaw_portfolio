@@ -1,4 +1,4 @@
-const { formatReport, narrativeSummary, formatGenerationStatus, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary } = require('../src/reporting/reportGenerator');
+const { formatReport, narrativeSummary, formatGenerationStatus, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary } = require('../src/reporting/reportGenerator');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -44,9 +44,14 @@ function main() {
     generationMeta,
     deliveryStatus,
     pendingActions: deliveryStatus.pendingActions,
+    previousReportContext: {
+      snapshot: { totalValue: 4800, cash: 3900 },
+      lifecycleSummary: { proposed: 0, approved: 0, staged: 0, submitted: 0, partiallyFilled: 0 },
+      queueSummary: { total: 0, blocking: 0 },
+    },
   });
 
-  for (const section of ['## Executive Summary', '## Performance', '## Allocation Review', '## Trades During Period', '## Strategy Compliance', '## Freshness', '## Delivery Status', '## Operator Queue Summary', '## Pending Operator Actions', '## Generation Status', '## Execution Lifecycle', '## Execution Plan', '## What Worked', '## What Did Not Work', '## Recommended Changes', '## Next Actions']) {
+  for (const section of ['## Decision View', '### Executive Summary', '### Incident / Blocker Summary', '### What Changed Since Last Report', '### Recommendation Urgency', '### Recommended Changes', '### Next Actions', '## Audit Detail', '### Performance', '### Allocation Review', '### Trades During Period', '### Strategy Compliance', '### Freshness', '### Delivery Status', '### Operator Queue Summary', '### Pending Operator Actions', '### Generation Status', '### Execution Lifecycle', '### Execution Plan', '### What Worked', '### What Did Not Work']) {
     assert(report.includes(section), `Expected section ${section}`);
   }
 
@@ -57,6 +62,9 @@ function main() {
   assert(report.includes('1. [workflow/pending/low] Dashboard/report freshness is stale relative to source state.'), 'Expected pending actions section');
   assert(report.includes('- Total queue items: 1'), 'Expected queue summary section');
   assert(report.includes('Report rendering required fallback handling: render mode stub'), 'Expected fallback warning in What Did Not Work');
+  assert(report.includes('- Current urgency: HIGH') || report.includes('- Current urgency: CRITICAL') || report.includes('- Current urgency: MEDIUM'), 'Expected urgency section');
+  assert(report.includes('Portfolio value change since previous report'), 'Expected change summary section');
+  assert(report.includes('Incident / Blocker Summary'), 'Expected incident summary section');
 
   const summary = narrativeSummary({
     latestSnapshot: { totalValue: '5000', cash: '4000' },
