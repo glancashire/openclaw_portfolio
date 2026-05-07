@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-07T10:54:27.024Z",
+  "totalReports": 11,
+  "portfolioCount": 2,
+  "portfolios": [
+    {
+      "portfolio": "acceptance-closure",
+      "reportCount": 0,
+      "reports": []
+    },
+    {
+      "portfolio": "etf",
+      "reportCount": 11,
+      "reports": [
+        {
+          "basename": "portfolio_report_etf_weekly_20260507",
+          "period": "weekly",
+          "date": "20260507",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260507.html",
+            "weekly/portfolio_report_etf_weekly_20260507.md",
+            "weekly/portfolio_report_etf_weekly_20260507.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_weekly_20260506",
+          "period": "weekly",
+          "date": "20260506",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260506.html",
+            "weekly/portfolio_report_etf_weekly_20260506.md",
+            "weekly/portfolio_report_etf_weekly_20260506.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_weekly_20260503",
+          "period": "weekly",
+          "date": "20260503",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260503.html",
+            "weekly/portfolio_report_etf_weekly_20260503.md",
+            "weekly/portfolio_report_etf_weekly_20260503.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_monthly_20260502",
+          "period": "monthly",
+          "date": "20260502",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "monthly/portfolio_report_etf_monthly_20260502.html",
+            "monthly/portfolio_report_etf_monthly_20260502.md",
+            "monthly/portfolio_report_etf_monthly_20260502.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_quarterly_20260502",
+          "period": "quarterly",
+          "date": "20260502",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "quarterly/portfolio_report_etf_quarterly_20260502.html",
+            "quarterly/portfolio_report_etf_quarterly_20260502.md",
+            "quarterly/portfolio_report_etf_quarterly_20260502.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_weekly_20260502",
+          "period": "weekly",
+          "date": "20260502",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260502.html",
+            "weekly/portfolio_report_etf_weekly_20260502.md",
+            "weekly/portfolio_report_etf_weekly_20260502.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_weekly_20260429",
+          "period": "weekly",
+          "date": "20260429",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260429.html",
+            "weekly/portfolio_report_etf_weekly_20260429.md",
+            "weekly/portfolio_report_etf_weekly_20260429.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_monthly_20260428",
+          "period": "monthly",
+          "date": "20260428",
+          "formats": [
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "monthly/portfolio_report_etf_monthly_20260428.md",
+            "monthly/portfolio_report_etf_monthly_20260428.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_quarterly_20260428",
+          "period": "quarterly",
+          "date": "20260428",
+          "formats": [
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "quarterly/portfolio_report_etf_quarterly_20260428.md",
+            "quarterly/portfolio_report_etf_quarterly_20260428.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_weekly_20260428",
+          "period": "weekly",
+          "date": "20260428",
+          "formats": [
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260428.md",
+            "weekly/portfolio_report_etf_weekly_20260428.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_weekly_20260427",
+          "period": "weekly",
+          "date": "20260427",
+          "formats": [
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260427.md",
+            "weekly/portfolio_report_etf_weekly_20260427.pdf"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
-const { buildApprovalsQueue, buildDailySummary, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+const { buildApprovalsQueue, buildDailySummary, buildReportHistory, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -117,6 +117,27 @@ async function main() {
   assert(dailyHtml.includes('Daily Summary Page'), 'Expected daily summary html artifact');
   assert(dailyHtml.includes('Cash waiting to deploy CHF'), 'Expected daily summary cash rendering');
   assert(dailyHtml.includes('Why it matters'), 'Expected daily summary explanation rendering');
+
+  // Phase 39: report history
+  const reportHistory = buildReportHistory(path.resolve(__dirname, '..'), []);
+  assert(reportHistory.schemaVersion === '1.0', 'Expected report history schema version');
+  assert(typeof reportHistory.totalReports === 'number' && reportHistory.totalReports > 0, 'Expected at least one report in history');
+  assert(reportHistory.portfolios.some((p) => p.portfolio === 'etf'), 'Expected etf in report history');
+  const etfHistory = reportHistory.portfolios.find((p) => p.portfolio === 'etf');
+  assert(etfHistory.reports.length > 0, 'Expected etf reports in history');
+  assert(etfHistory.reports[0].formats.length > 0, 'Expected report formats');
+  assert(etfHistory.reports[0].date.length === 8, 'Expected 8-char date on report entry');
+  const historyMarkdown = renderReportHistoryMarkdown(reportHistory);
+  assert(historyMarkdown.includes('# Report History'), 'Expected report history title');
+  assert(historyMarkdown.includes('| Date | Period | Formats | Report |'), 'Expected report history table header');
+  assert(historyMarkdown.includes('etf'), 'Expected etf in report history markdown');
+
+  assert(fs.existsSync(generated.reportHistoryPath), 'Expected report history json artifact');
+  assert(fs.existsSync(generated.reportHistoryMarkdownPath), 'Expected report history markdown artifact');
+  assert(fs.existsSync(generated.reportHistoryHtmlPath), 'Expected report history html artifact');
+  const reportHistoryHtml = fs.readFileSync(generated.reportHistoryHtmlPath, 'utf8');
+  assert(reportHistoryHtml.includes('Report History'), 'Expected report history html title');
+  assert(reportHistoryHtml.includes('<table>'), 'Expected html table in report history');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }

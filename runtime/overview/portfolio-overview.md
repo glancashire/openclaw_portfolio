@@ -1,7 +1,7 @@
 # Multi-Portfolio Overview
 
 ## Summary
-- Generated at: 2026-05-07T10:48:04.314Z
+- Generated at: 2026-05-07T10:54:27.021Z
 - Portfolios discovered: 2
 - Active portfolios: 1
 - Demo-like portfolios: 1

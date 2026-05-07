@@ -2,7 +2,7 @@ const { generateOverviewBoard } = require('../src/reporting/overviewBoard');
 
 async function main() {
   const result = await generateOverviewBoard({ writeFiles: true });
-  console.log(JSON.stringify({ markdown: result.markdownPath, html: result.htmlPath, approvalsQueue: result.approvalsQueuePath, approvalsQueueHtml: result.approvalsQueueHtmlPath, dailySummary: result.dailySummaryPath, dailySummaryHtml: result.dailySummaryHtmlPath }, null, 2));
+  console.log(JSON.stringify({ markdown: result.markdownPath, html: result.htmlPath, approvalsQueue: result.approvalsQueuePath, approvalsQueueHtml: result.approvalsQueueHtmlPath, dailySummary: result.dailySummaryPath, dailySummaryHtml: result.dailySummaryHtmlPath, reportHistory: result.reportHistoryPath, reportHistoryHtml: result.reportHistoryHtmlPath }, null, 2));
 }
 
 main().catch((error) => {

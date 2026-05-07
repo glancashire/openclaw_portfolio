@@ -864,6 +864,65 @@ function renderApprovalsQueueMarkdown(queue = {}) {
   return `# Approvals Queue\n\n## Summary\n- Generated at: ${queue.generatedAt || 'unknown'}\n- Approval items: ${queue.itemCount || 0}\n\n## Approval Review Queue\n\n${rows}\n`;
 }
 
+function collectReportFiles(reportsDir) {
+  const entries = [];
+  if (!fs.existsSync(reportsDir)) return entries;
+  const periods = fs.readdirSync(reportsDir).filter((name) => {
+    const full = path.join(reportsDir, name);
+    return fs.statSync(full).isDirectory() && !name.startsWith('.');
+  });
+  for (const period of periods) {
+    const periodDir = path.join(reportsDir, period);
+    const files = fs.readdirSync(periodDir).filter((f) => /\.(md|html|pdf)$/i.test(f));
+    const groups = new Map();
+    for (const file of files) {
+      const dateMatch = file.match(/(\d{8})/);
+      const date = dateMatch ? dateMatch[1] : 'unknown';
+      const ext = path.extname(file).replace('.', '');
+      const key = file.replace(/\.(md|html|pdf)$/i, '');
+      if (!groups.has(key)) groups.set(key, { basename: key, period, date, formats: [], paths: [] });
+      const group = groups.get(key);
+      group.formats.push(ext);
+      group.paths.push(path.join(period, file));
+    }
+    for (const group of groups.values()) {
+      group.formats.sort();
+      group.paths.sort();
+      entries.push(group);
+    }
+  }
+  entries.sort((a, b) => b.date.localeCompare(a.date) || a.period.localeCompare(b.period));
+  return entries;
+}
+
+function buildReportHistory(repoRoot, summaries = []) {
+  const portfolios = [];
+  const portfolioDirs = listPortfolioDirectories(repoRoot);
+  for (const portfolioDir of portfolioDirs) {
+    const portfolioName = path.basename(portfolioDir);
+    const reportsDir = path.join(portfolioDir, 'reports');
+    const reports = collectReportFiles(reportsDir);
+    portfolios.push({ portfolio: portfolioName, reportCount: reports.length, reports });
+  }
+  const totalReports = portfolios.reduce((sum, p) => sum + p.reportCount, 0);
+  return {
+    schemaVersion: '1.0',
+    generatedAt: new Date().toISOString(),
+    totalReports,
+    portfolioCount: portfolios.length,
+    portfolios,
+  };
+}
+
+function renderReportHistoryMarkdown(history = {}) {
+  const portfolioSections = (history.portfolios || []).map((p) => {
+    if (!p.reports.length) return `### ${p.portfolio}\n\nNo reports generated yet.`;
+    const rows = p.reports.map((r) => `| ${r.date} | ${r.period} | ${r.formats.join(', ')} | ${r.basename} |`).join('\n');
+    return `### ${p.portfolio}\n\n| Date | Period | Formats | Report |\n|---|---|---|---|\n${rows}`;
+  }).join('\n\n');
+  return `# Report History\n\n- Generated at: ${history.generatedAt || 'unknown'}\n- Total reports: ${history.totalReports || 0}\n- Portfolios: ${history.portfolioCount || 0}\n\n## Report Index\n\n${portfolioSections}\n`;
+}
+
 async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles = true } = {}) {
   const portfolioDirs = listPortfolioDirectories(repoRoot);
   const summaries = [];
@@ -897,6 +956,16 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     fs.writeFileSync(dailySummaryMarkdownPath, dailySummaryMarkdown);
     fs.writeFileSync(dailySummaryHtmlPath, markdownToBasicHtml(dailySummaryMarkdown));
   }
+  const reportHistory = buildReportHistory(repoRoot, summaries);
+  const reportHistoryMarkdown = renderReportHistoryMarkdown(reportHistory);
+  const reportHistoryPath = path.join(overviewDir, 'report-history.json');
+  const reportHistoryMarkdownPath = path.join(overviewDir, 'report-history.md');
+  const reportHistoryHtmlPath = path.join(overviewDir, 'report-history.html');
+  if (writeFiles) {
+    fs.writeFileSync(reportHistoryPath, JSON.stringify(reportHistory, null, 2) + '\n');
+    fs.writeFileSync(reportHistoryMarkdownPath, reportHistoryMarkdown);
+    fs.writeFileSync(reportHistoryHtmlPath, markdownToBasicHtml(reportHistoryMarkdown));
+  }
   return {
     summaries,
     portfolioIndex,
@@ -905,6 +974,8 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     approvalsQueueMarkdown,
     dailySummary,
     dailySummaryMarkdown,
+    reportHistory,
+    reportHistoryMarkdown,
     portfolioIndexPath,
     pendingActionsPath,
     approvalsQueuePath,
@@ -913,6 +984,9 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     dailySummaryPath,
     dailySummaryMarkdownPath,
     dailySummaryHtmlPath,
+    reportHistoryPath,
+    reportHistoryMarkdownPath,
+    reportHistoryHtmlPath,
   };
 }
 
@@ -939,5 +1013,7 @@ module.exports = {
   buildDailySummary,
   renderApprovalsQueueMarkdown,
   renderDailySummaryMarkdown,
+  buildReportHistory,
+  renderReportHistoryMarkdown,
   generateOverviewArtifacts,
 };
