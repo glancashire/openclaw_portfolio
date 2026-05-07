@@ -151,6 +151,61 @@ function guidedQuestions(filePath) {
   }));
 }
 
+function sectionLabel(section) {
+  return String(section || 'general')
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function onboardingWorkflow(targetPath) {
+  const portfolioPath = path.basename(path.resolve(targetPath)) === 'portfolio.md'
+    ? path.resolve(targetPath)
+    : path.join(path.resolve(targetPath), 'portfolio.md');
+  const state = collectDraftState(portfolioPath);
+  const questions = guidedQuestions(portfolioPath);
+  const answeredCount = QUESTION_FIELDS.length - questions.length;
+  const completionPct = QUESTION_FIELDS.length ? Math.round((answeredCount / QUESTION_FIELDS.length) * 100) : 100;
+
+  const groupedMap = questions.reduce((acc, question) => {
+    const key = question.section || 'general';
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(question);
+    return acc;
+  }, {});
+
+  const sections = Object.entries(groupedMap).map(([key, items]) => ({
+    key,
+    label: sectionLabel(key),
+    pendingCount: items.length,
+    prompts: items.map((item) => ({
+      key: item.key,
+      prompt: item.prompt,
+      guidance: item.guidance,
+      answerFormat: item.answerFormat,
+      blocker: item.blocker,
+    })),
+  }));
+
+  const nextSection = sections[0] || null;
+  const nextStep = nextSection
+    ? `Resolve ${nextSection.pendingCount} onboarding item(s) in ${nextSection.label} next.`
+    : 'Onboarding draft questions are complete; portfolio is ready for activation checks.';
+
+  return {
+    portfolioPath,
+    portfolioName: state.portfolioName || null,
+    totalQuestions: QUESTION_FIELDS.length,
+    answeredCount,
+    pendingCount: questions.length,
+    completionPct,
+    readyForActivationQuestions: questions.length === 0,
+    nextStep,
+    sections,
+    questions,
+  };
+}
+
 function suggestedAnswerFormat(key) {
   if (['investmentHorizon', 'initialCapital'].includes(key)) return 'short numeric value';
   if (['maximumAcceptableDrawdown'].includes(key)) return 'percentage';
@@ -190,7 +245,8 @@ function activationReadiness(targetPath) {
   const portfolioPath = path.basename(path.resolve(targetPath)) === 'portfolio.md'
     ? path.resolve(targetPath)
     : path.join(path.resolve(targetPath), 'portfolio.md');
-  const questions = guidedQuestions(portfolioPath);
+  const workflow = onboardingWorkflow(portfolioPath);
+  const questions = workflow.questions;
   const fileStatus = requiredFileStatus(portfolioPath);
   const missingFiles = fileStatus.filter((item) => !item.exists).map((item) => item.name);
   const placeholders = unresolvedPlaceholderLines(portfolioPath);
@@ -207,6 +263,7 @@ function activationReadiness(targetPath) {
     unresolvedPlaceholders: placeholders,
     pendingQuestionKeys: questions.map((q) => q.key),
     guidedQuestions: questions,
+    onboardingWorkflow: workflow,
     requiredFiles: fileStatus,
   };
 }
@@ -216,6 +273,7 @@ module.exports = {
   collectDraftState,
   nextQuestions,
   guidedQuestions,
+  onboardingWorkflow,
   requiredFileStatus,
   unresolvedPlaceholderLines,
   activationReadiness,
