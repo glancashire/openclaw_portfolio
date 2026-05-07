@@ -1,10 +1,13 @@
+const fs = require('fs');
+const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
+const { buildApprovalsQueue, renderApprovalsQueueMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function main() {
+async function main() {
   assert(classifyPortfolioKind({ portfolio: 'etf' }) === 'active', 'Expected active portfolio classification');
   assert(classifyPortfolioKind({ portfolio: 'acceptance-closure' }) === 'demo_like', 'Expected demo-like classification');
   assert(formatDriftSummary([{ status: 'out_of_bounds' }, { status: 'on_track' }]) === '1 out_of_bounds', 'Expected severe drift summary');
@@ -61,7 +64,33 @@ function main() {
   assert(markdown.includes('- Recovery items: 1'), 'Expected recovery count in queue summary');
   assert(markdown.includes('1. [recovery/high/degraded] etf: Broker degraded. — Fix broker.'), 'Expected recommended action row');
 
+  const approvalsQueue = buildApprovalsQueue([
+    {
+      portfolio: 'etf',
+      operatorQueue: {
+        items: [
+          { queueType: 'approval', kind: 'approval', severity: 'medium', status: 'pending_user_approval', summary: '7 proposed trade row(s) still need user approval.', recommendedOperatorAction: 'Review the proposed trades and approve or reject them explicitly.' },
+        ],
+      },
+    },
+  ]);
+  const approvalsMarkdown = renderApprovalsQueueMarkdown(approvalsQueue);
+  assert(approvalsQueue.itemCount === 1, 'Expected one approval queue item');
+  assert(approvalsQueue.items[0].urgency === 'medium', 'Expected medium urgency approval item');
+  assert(approvalsMarkdown.includes('# Approvals Queue'), 'Expected approvals queue title');
+  assert(approvalsMarkdown.includes('Effect if approved'), 'Expected approval consequence text');
+
+  const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
+  const approvalsHtml = fs.readFileSync(generated.approvalsQueueHtmlPath, 'utf8');
+  assert(fs.existsSync(generated.approvalsQueuePath), 'Expected approvals queue json artifact');
+  assert(fs.existsSync(generated.approvalsQueueMarkdownPath), 'Expected approvals queue markdown artifact');
+  assert(approvalsHtml.includes('Approvals Queue'), 'Expected approvals queue html artifact');
+  assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
+
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
 
-main();
+main().catch((error) => {
+  console.error(error?.stack || error?.message || String(error));
+  process.exit(1);
+});

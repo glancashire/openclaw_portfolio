@@ -696,6 +696,56 @@ function buildPendingActionsOverview(summaries = []) {
   };
 }
 
+function approvalUrgencyForItem(item = {}) {
+  if (item.severity === 'high' || item.blocking) return 'high';
+  if (item.status === 'pending_user_approval' || item.status === 'ready_for_review') return 'medium';
+  return 'low';
+}
+
+function buildApprovalsQueue(summaries = []) {
+  const items = summaries.flatMap((summary) => {
+    const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
+    return queueItems
+      .filter((item) => ['approval'].includes(item.queueType || queueTypeForItem(item)) || item.kind === 'approval')
+      .map((item) => ({
+        portfolio: summary.portfolio,
+        urgency: approvalUrgencyForItem(item),
+        status: item.status,
+        summary: item.summary,
+        explanation: item.summary,
+        effectIfApproved: item.status === 'pending_user_approval'
+          ? 'The operator can move this proposal from review into the next staging / execution decision step.'
+          : 'The operator can advance the reviewed item into the next workflow step with fewer manual joins.',
+        effectIfIgnored: 'The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.',
+        recommendedOperatorAction: item.recommendedOperatorAction || 'Review and resolve the approval item explicitly.',
+        queueType: item.queueType || queueTypeForItem(item),
+        severity: item.severity,
+      }));
+  });
+
+  items.sort((a, b) => {
+    const urgencyRank = { high: 0, medium: 1, low: 2 };
+    return (urgencyRank[a.urgency] ?? 99) - (urgencyRank[b.urgency] ?? 99)
+      || String(a.portfolio).localeCompare(String(b.portfolio))
+      || String(a.summary).localeCompare(String(b.summary));
+  });
+
+  const enrichedItems = items.map((item, index) => ({ rank: index + 1, ...item }));
+  return {
+    schemaVersion: '1.0',
+    generatedAt: new Date().toISOString(),
+    itemCount: enrichedItems.length,
+    items: enrichedItems,
+  };
+}
+
+function renderApprovalsQueueMarkdown(queue = {}) {
+  const rows = Array.isArray(queue.items) && queue.items.length
+    ? queue.items.map((item) => `### Approval ${item.rank}: ${item.portfolio}\n- Urgency: ${item.urgency}\n- Summary: ${item.summary}\n- Explanation: ${item.explanation}\n- Effect if approved: ${item.effectIfApproved}\n- Effect if ignored: ${item.effectIfIgnored}\n- Recommended action: ${item.recommendedOperatorAction}`).join('\n\n')
+    : '### Approval 1: none\n- Urgency: low\n- Summary: No pending approval items.\n- Explanation: No approval-gated actions are currently waiting.\n- Effect if approved: No action required.\n- Effect if ignored: No approval backlog remains.\n- Recommended action: Continue normal monitoring.';
+  return `# Approvals Queue\n\n## Summary\n- Generated at: ${queue.generatedAt || 'unknown'}\n- Approval items: ${queue.itemCount || 0}\n\n## Approval Review Queue\n\n${rows}\n`;
+}
+
 async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles = true } = {}) {
   const portfolioDirs = listPortfolioDirectories(repoRoot);
   const summaries = [];
@@ -705,20 +755,33 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
   }
   const portfolioIndex = buildPortfolioIndex(summaries);
   const pendingActions = buildPendingActionsOverview(summaries);
+  const approvalsQueue = buildApprovalsQueue(summaries);
+  const approvalsQueueMarkdown = renderApprovalsQueueMarkdown(approvalsQueue);
   const overviewDir = path.join(repoRoot, 'runtime', 'overview');
   const portfolioIndexPath = path.join(overviewDir, 'portfolio-index.json');
   const pendingActionsPath = path.join(overviewDir, 'pending-actions.json');
+  const approvalsQueuePath = path.join(overviewDir, 'approvals-queue.json');
+  const approvalsQueueMarkdownPath = path.join(overviewDir, 'approvals-queue.md');
+  const approvalsQueueHtmlPath = path.join(overviewDir, 'approvals-queue.html');
   if (writeFiles) {
     fs.mkdirSync(overviewDir, { recursive: true });
     fs.writeFileSync(portfolioIndexPath, JSON.stringify(portfolioIndex, null, 2) + '\n');
     fs.writeFileSync(pendingActionsPath, JSON.stringify(pendingActions, null, 2) + '\n');
+    fs.writeFileSync(approvalsQueuePath, JSON.stringify(approvalsQueue, null, 2) + '\n');
+    fs.writeFileSync(approvalsQueueMarkdownPath, approvalsQueueMarkdown);
+    fs.writeFileSync(approvalsQueueHtmlPath, markdownToBasicHtml(approvalsQueueMarkdown));
   }
   return {
     summaries,
     portfolioIndex,
     pendingActions,
+    approvalsQueue,
+    approvalsQueueMarkdown,
     portfolioIndexPath,
     pendingActionsPath,
+    approvalsQueuePath,
+    approvalsQueueMarkdownPath,
+    approvalsQueueHtmlPath,
   };
 }
 
@@ -739,5 +802,8 @@ module.exports = {
   listPortfolioDirectories,
   buildPortfolioIndex,
   buildPendingActionsOverview,
+  approvalUrgencyForItem,
+  buildApprovalsQueue,
+  renderApprovalsQueueMarkdown,
   generateOverviewArtifacts,
 };
