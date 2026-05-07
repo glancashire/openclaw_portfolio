@@ -739,6 +739,80 @@ function buildApprovalsQueue(summaries = []) {
   };
 }
 
+function biggestDrift(summary = {}) {
+  const rows = Array.isArray(summary.allocation) ? summary.allocation : [];
+  if (!rows.length) return null;
+  return rows
+    .map((row) => ({ ...row, absDrift: Math.abs(Number(row.driftPct || 0)) }))
+    .sort((a, b) => b.absDrift - a.absDrift)[0] || null;
+}
+
+function buildDailySummary(summaries = [], approvalsQueue = null) {
+  const items = Array.isArray(summaries) ? summaries : [];
+  const totalCash = Number(items.reduce((sum, summary) => sum + Number(summary.holdings?.cashChf || 0), 0).toFixed(2));
+  const healthCounts = {
+    healthy: items.filter((summary) => summary.status?.health === 'healthy').length,
+    warning: items.filter((summary) => ['warning', 'attention_needed'].includes(summary.status?.health)).length,
+    blocked: items.filter((summary) => summary.status?.health === 'blocked').length,
+  };
+  const drifts = items
+    .map((summary) => {
+      const drift = biggestDrift(summary);
+      return drift ? {
+        portfolio: summary.portfolio,
+        assetClass: drift.assetClass,
+        driftPct: Number(drift.driftPct || 0),
+        status: drift.status,
+        absDrift: Math.abs(Number(drift.driftPct || 0)),
+      } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.absDrift - a.absDrift);
+  const topDrift = drifts[0] || null;
+  const approvalCount = approvalsQueue?.itemCount || 0;
+  const highlightedPortfolio = items
+    .slice()
+    .sort((a, b) => {
+      const healthRank = { blocked: 0, warning: 1, attention_needed: 1, healthy: 2 };
+      return (healthRank[a.status?.health] ?? 99) - (healthRank[b.status?.health] ?? 99)
+        || Number(b.approvals?.pendingApprovalCount || 0) - Number(a.approvals?.pendingApprovalCount || 0)
+        || String(a.portfolio).localeCompare(String(b.portfolio));
+    })[0] || null;
+
+  return {
+    schemaVersion: '1.0',
+    generatedAt: new Date().toISOString(),
+    totals: {
+      portfolioCount: items.length,
+      totalCashChf: totalCash,
+      approvalCount,
+      ...healthCounts,
+    },
+    healthHeadline: healthCounts.blocked > 0 ? 'blocked' : (healthCounts.warning > 0 ? 'warning' : 'healthy'),
+    cashWaitingToDeployChf: totalCash,
+    biggestDrift: topDrift,
+    brokerHealth: items.some((summary) => summary.status?.brokerHealth === 'degraded') ? 'degraded' : 'healthy',
+    reportingHealth: items.some((summary) => summary.status?.dataFreshness === 'stale' || summary.status?.deliveryPosture !== 'ready') ? 'attention_needed' : 'ready',
+    pendingApprovals: approvalCount,
+    recommendedNextStep: highlightedPortfolio?.recommendedNextStep || 'No recommendation available.',
+    highlightedPortfolio: highlightedPortfolio ? {
+      portfolio: highlightedPortfolio.portfolio,
+      health: highlightedPortfolio.status?.health,
+      cashChf: highlightedPortfolio.holdings?.cashChf || 0,
+      brokerHealth: highlightedPortfolio.status?.brokerHealth,
+      deliveryPosture: highlightedPortfolio.status?.deliveryPosture,
+      pendingApprovals: highlightedPortfolio.approvals?.pendingApprovalCount || 0,
+      recommendedNextStep: highlightedPortfolio.recommendedNextStep,
+    } : null,
+  };
+}
+
+function renderDailySummaryMarkdown(daily = {}) {
+  const drift = daily.biggestDrift;
+  const highlight = daily.highlightedPortfolio;
+  return `# Daily Summary Page\n\n## Headline\n- Overall health: ${daily.healthHeadline || 'unknown'}\n- Portfolios tracked: ${daily.totals?.portfolioCount || 0}\n- Cash waiting to deploy CHF: ${daily.cashWaitingToDeployChf || 0}\n- Pending approvals: ${daily.pendingApprovals || 0}\n- Broker health: ${daily.brokerHealth || 'unknown'}\n- Reporting health: ${daily.reportingHealth || 'unknown'}\n- Recommended next step: ${daily.recommendedNextStep || 'No recommendation available.'}\n\n## Biggest Drift Today\n- ${drift ? `${drift.portfolio}: ${drift.assetClass} drift ${drift.driftPct}% (${drift.status})` : 'No drift data available.'}\n\n## Highlighted Portfolio\n- Portfolio: ${highlight?.portfolio || 'none'}\n- Health: ${highlight?.health || 'unknown'}\n- Cash CHF: ${highlight?.cashChf || 0}\n- Broker health: ${highlight?.brokerHealth || 'unknown'}\n- Delivery posture: ${highlight?.deliveryPosture || 'unknown'}\n- Pending approvals: ${highlight?.pendingApprovals || 0}\n- Recommended next step: ${highlight?.recommendedNextStep || 'No recommendation available.'}\n`;
+}
+
 function renderApprovalsQueueMarkdown(queue = {}) {
   const rows = Array.isArray(queue.items) && queue.items.length
     ? queue.items.map((item) => `### Approval ${item.rank}: ${item.portfolio}\n- Urgency: ${item.urgency}\n- Summary: ${item.summary}\n- Explanation: ${item.explanation}\n- Effect if approved: ${item.effectIfApproved}\n- Effect if ignored: ${item.effectIfIgnored}\n- Recommended action: ${item.recommendedOperatorAction}`).join('\n\n')
@@ -757,12 +831,17 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
   const pendingActions = buildPendingActionsOverview(summaries);
   const approvalsQueue = buildApprovalsQueue(summaries);
   const approvalsQueueMarkdown = renderApprovalsQueueMarkdown(approvalsQueue);
+  const dailySummary = buildDailySummary(summaries, approvalsQueue);
+  const dailySummaryMarkdown = renderDailySummaryMarkdown(dailySummary);
   const overviewDir = path.join(repoRoot, 'runtime', 'overview');
   const portfolioIndexPath = path.join(overviewDir, 'portfolio-index.json');
   const pendingActionsPath = path.join(overviewDir, 'pending-actions.json');
   const approvalsQueuePath = path.join(overviewDir, 'approvals-queue.json');
   const approvalsQueueMarkdownPath = path.join(overviewDir, 'approvals-queue.md');
   const approvalsQueueHtmlPath = path.join(overviewDir, 'approvals-queue.html');
+  const dailySummaryPath = path.join(overviewDir, 'daily-summary.json');
+  const dailySummaryMarkdownPath = path.join(overviewDir, 'daily-summary.md');
+  const dailySummaryHtmlPath = path.join(overviewDir, 'daily-summary.html');
   if (writeFiles) {
     fs.mkdirSync(overviewDir, { recursive: true });
     fs.writeFileSync(portfolioIndexPath, JSON.stringify(portfolioIndex, null, 2) + '\n');
@@ -770,6 +849,9 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     fs.writeFileSync(approvalsQueuePath, JSON.stringify(approvalsQueue, null, 2) + '\n');
     fs.writeFileSync(approvalsQueueMarkdownPath, approvalsQueueMarkdown);
     fs.writeFileSync(approvalsQueueHtmlPath, markdownToBasicHtml(approvalsQueueMarkdown));
+    fs.writeFileSync(dailySummaryPath, JSON.stringify(dailySummary, null, 2) + '\n');
+    fs.writeFileSync(dailySummaryMarkdownPath, dailySummaryMarkdown);
+    fs.writeFileSync(dailySummaryHtmlPath, markdownToBasicHtml(dailySummaryMarkdown));
   }
   return {
     summaries,
@@ -777,11 +859,16 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     pendingActions,
     approvalsQueue,
     approvalsQueueMarkdown,
+    dailySummary,
+    dailySummaryMarkdown,
     portfolioIndexPath,
     pendingActionsPath,
     approvalsQueuePath,
     approvalsQueueMarkdownPath,
     approvalsQueueHtmlPath,
+    dailySummaryPath,
+    dailySummaryMarkdownPath,
+    dailySummaryHtmlPath,
   };
 }
 
@@ -803,7 +890,10 @@ module.exports = {
   buildPortfolioIndex,
   buildPendingActionsOverview,
   approvalUrgencyForItem,
+  biggestDrift,
   buildApprovalsQueue,
+  buildDailySummary,
   renderApprovalsQueueMarkdown,
+  renderDailySummaryMarkdown,
   generateOverviewArtifacts,
 };

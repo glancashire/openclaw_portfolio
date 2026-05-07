@@ -178,7 +178,7 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-The tracked post-MVP usability follow-on phases are complete through Phase 35, and Phase 36 clean approvals queue is now the active implementation focus.
+The tracked post-MVP usability follow-on phases are complete through Phase 36, and Phase 37 one daily summary page is now the active implementation focus.
 Further work after that should be re-entered as a freshly defined roadmap phase list rather than guessed from old notes.
 
 ## Known environment caveat

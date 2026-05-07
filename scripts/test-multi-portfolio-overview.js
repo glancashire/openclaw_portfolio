@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
-const { buildApprovalsQueue, renderApprovalsQueueMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+const { buildApprovalsQueue, buildDailySummary, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -80,12 +80,35 @@ async function main() {
   assert(approvalsMarkdown.includes('# Approvals Queue'), 'Expected approvals queue title');
   assert(approvalsMarkdown.includes('Effect if approved'), 'Expected approval consequence text');
 
+  const dailySummary = buildDailySummary([
+    {
+      portfolio: 'etf',
+      status: { health: 'warning', brokerHealth: 'degraded', dataFreshness: 'current', deliveryPosture: 'ready' },
+      holdings: { cashChf: 5000 },
+      allocation: [{ assetClass: 'Global equities', driftPct: -60, status: 'out_of_bounds' }],
+      approvals: { pendingApprovalCount: 7 },
+      recommendedNextStep: 'Restore broker connectivity.',
+    },
+  ], approvalsQueue);
+  const dailyMarkdown = renderDailySummaryMarkdown(dailySummary);
+  assert(dailySummary.healthHeadline === 'warning', 'Expected warning daily headline');
+  assert(dailySummary.cashWaitingToDeployChf === 5000, 'Expected daily cash total');
+  assert(dailySummary.pendingApprovals === 1, 'Expected approval queue alignment in daily summary');
+  assert(dailyMarkdown.includes('# Daily Summary Page'), 'Expected daily summary title');
+  assert(dailyMarkdown.includes('Cash waiting to deploy CHF: 5000'), 'Expected daily cash line');
+  assert(dailyMarkdown.includes('Biggest Drift Today'), 'Expected biggest drift section');
+
   const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
   const approvalsHtml = fs.readFileSync(generated.approvalsQueueHtmlPath, 'utf8');
+  const dailyHtml = fs.readFileSync(generated.dailySummaryHtmlPath, 'utf8');
   assert(fs.existsSync(generated.approvalsQueuePath), 'Expected approvals queue json artifact');
   assert(fs.existsSync(generated.approvalsQueueMarkdownPath), 'Expected approvals queue markdown artifact');
   assert(approvalsHtml.includes('Approvals Queue'), 'Expected approvals queue html artifact');
   assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
+  assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
+  assert(fs.existsSync(generated.dailySummaryMarkdownPath), 'Expected daily summary markdown artifact');
+  assert(dailyHtml.includes('Daily Summary Page'), 'Expected daily summary html artifact');
+  assert(dailyHtml.includes('Cash waiting to deploy CHF'), 'Expected daily summary cash rendering');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }

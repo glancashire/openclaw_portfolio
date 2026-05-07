@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-07T10:36:08.013Z",
+  "totals": {
+    "portfolioCount": 2,
+    "totalCashChf": 5000,
+    "approvalCount": 1,
+    "healthy": 0,
+    "warning": 2,
+    "blocked": 0
+  },
+  "healthHeadline": "warning",
+  "cashWaitingToDeployChf": 5000,
+  "biggestDrift": {
+    "portfolio": "etf",
+    "assetClass": "Global equities",
+    "driftPct": -60,
+    "status": "out_of_bounds",
+    "absDrift": 60
+  },
+  "brokerHealth": "degraded",
+  "reportingHealth": "ready",
+  "pendingApprovals": 1,
+  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+  "highlightedPortfolio": {
+    "portfolio": "etf",
+    "health": "warning",
+    "cashChf": 5000,
+    "brokerHealth": "degraded",
+    "deliveryPosture": "ready",
+    "pendingApprovals": 7,
+    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+  }
+}
