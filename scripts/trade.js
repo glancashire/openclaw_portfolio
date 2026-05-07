@@ -82,7 +82,21 @@ function cmdValidate() {
 }
 
 function cmdStatus() {
-  const openOrders = JSON.parse(ibkr('open-orders --json'));
+  let openOrders = [];
+  try {
+    openOrders = JSON.parse(ibkr('open-orders --json'));
+  } catch (e) {
+    if (JSON_OUT) { printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [] }); return; }
+    console.log('Open Orders\n');
+    console.log('  ⚠️ IB Gateway not connected. Cannot fetch open orders.');
+    console.log(`  Error: ${e.message.split('\n')[0]}`);
+    // Still show fill state
+    const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
+    let state = { notifiedFills: [] };
+    try { state = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
+    console.log(`\nNotified fills: ${state.notifiedFills.length}`);
+    return;
+  }
   const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
   let state = { notifiedFills: [] };
   try { state = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
@@ -192,10 +206,62 @@ function cmdHistory() {
 }
 
 function cmdPropose() {
-  console.log('Trade proposal generation based on portfolio drift.');
-  console.log('See: runtime/trade-proposal-2026-05-08.md for the current proposal.');
-  console.log('\nTo generate a new proposal, analyze portfolio drift against targets');
-  console.log('and create a new trade-proposal file in runtime/.');
+  const { analyzeDrift } = require('../lib/portfolioDrift');
+  const { generateProposal } = require('../lib/tradeProposalGenerator');
+  const { formatProposalMarkdown } = require('../lib/tradeProposalFormatter');
+
+  let totalValue, cashChf, positions;
+
+  if (DRY_RUN) {
+    // Use mock data for dry-run
+    totalValue = 5000;
+    cashChf = 5000;
+    positions = [];
+  } else {
+    // Fetch live data from IB
+    try {
+      const accountRaw = ibkr('account-summary');
+      const nlMatch = accountRaw.match(/tag=NetLiquidation\s+value=([\d.]+)/);
+      const cashMatch = accountRaw.match(/tag=TotalCashValue\s+value=([\d.]+)/);
+      totalValue = nlMatch ? parseFloat(nlMatch[1]) : 5000;
+      cashChf = cashMatch ? parseFloat(cashMatch[1]) : 5000;
+
+      const posRaw = JSON.parse(ibkr('positions --json'));
+      positions = posRaw.map(p => ({
+        symbol: p.contract?.symbol || p.symbol,
+        marketValue: p.marketValue || (p.avgCost * p.position),
+      }));
+    } catch (e) {
+      console.error('Failed to fetch account data:', e.message);
+      console.error('Use --dry-run for mock data.');
+      process.exit(1);
+    }
+  }
+
+  const drift = analyzeDrift({ totalValue, cashChf, positions });
+
+  // Use last known prices or defaults
+  const prices = {
+    VUSA: { price: 109.50, currency: 'CHF', exchange: 'EBS' },
+    SLICHA: { price: 222.00, currency: 'CHF', exchange: 'EBS' },
+    EMUAA: { price: 40.00, currency: 'EUR', exchange: 'EBS' },
+  };
+
+  const proposal = generateProposal({ drift, prices });
+
+  if (JSON_OUT) {
+    printJson({ drift, proposal });
+    return;
+  }
+
+  // Write markdown proposal
+  const date = new Date().toISOString().slice(0, 10);
+  const md = formatProposalMarkdown({ trades: proposal.trades, summary: proposal.summary, drift, date });
+  const outPath = path.join(ROOT, 'runtime', `trade-proposal-${date}.md`);
+  fs.writeFileSync(outPath, md);
+
+  console.log(md);
+  console.log(`\nProposal written to: ${outPath}`);
 }
 
 // --- Dispatch ---

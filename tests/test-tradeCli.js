@@ -47,7 +47,7 @@ assert(parsed.allPass === true, 'validate --json allPass is true');
 // Status
 console.log('\n-- status --');
 const status = run('node scripts/trade.js status');
-assert(status.code === 0, 'status exits 0');
+assert(status.code === 0, 'status exits 0 (graceful degradation when IB offline)');
 assert(status.out.includes('Open Orders') || status.out.includes('open'), 'status shows orders section');
 
 // Submit (market closed)

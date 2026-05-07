@@ -13,6 +13,7 @@ const TESTS = [
   'tests/test-tradeNotificationEmail.js',
   'tests/test-tradeExecutionNotifier.js',
   'tests/test-monitorFills.js',
+  'tests/test-tradeProposal.js',
   'tests/test-tradeCli.js',
   'scripts/test-trading-guards.js',
 ];
