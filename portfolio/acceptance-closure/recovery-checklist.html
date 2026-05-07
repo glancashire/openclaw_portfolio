@@ -4,19 +4,48 @@
 <meta charset="utf-8" />
 <title>Portfolio Report</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 32px; color: #111; }
-h1, h2, h3 { margin-top: 24px; }
-p, li { line-height: 1.4; }
-pre { white-space: pre-wrap; }
-table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 12px; }
-code { font-family: monospace; }
+:root {
+  --color-healthy: #16a34a;
+  --color-warning: #d97706;
+  --color-blocked: #dc2626;
+  --color-info: #2563eb;
+  --color-muted: #6b7280;
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text: #1f2937;
+  --color-text-secondary: #4b5563;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 32px 40px; color: var(--color-text); background: var(--color-bg); line-height: 1.6; }
+.report-container { max-width: 900px; margin: 0 auto; background: var(--color-surface); border-radius: 8px; padding: 32px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 8px 0; padding-bottom: 12px; border-bottom: 2px solid var(--color-border); }
+h2 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 12px 0; color: var(--color-text); }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px 0; color: var(--color-text-secondary); }
+p { margin: 8px 0; color: var(--color-text-secondary); }
+ul, ol { margin: 8px 0; padding-left: 24px; }
+li { margin: 4px 0; line-height: 1.5; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.85rem; }
+th { background: #f3f4f6; font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--color-border); }
+td { padding: 8px 12px; border-bottom: 1px solid var(--color-border); }
+tbody tr:nth-child(even) { background: #f9fafb; }
+tbody tr:hover { background: #f0f4ff; }
+code { font-family: 'SF Mono', Monaco, monospace; font-size: 0.85em; background: #f3f4f6; padding: 2px 5px; border-radius: 3px; }
+pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 6px; font-size: 0.85rem; }
+.badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+.badge-healthy { background: #dcfce7; color: var(--color-healthy); }
+.badge-warning { background: #fef3c7; color: var(--color-warning); }
+.badge-blocked { background: #fee2e2; color: var(--color-blocked); }
+.badge-info { background: #dbeafe; color: var(--color-info); }
+.meta-bar { font-size: 0.8rem; color: var(--color-muted); margin-bottom: 16px; }
 </style>
 </head>
 <body>
+<div class="report-container">
 <h1>Recovery Checklist: acceptance-closure</h1>
 <h2>Incident Status</h2>
 <ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: ready</li><li>Data freshness: current</li><li>Pending approvals: 0</li><li>Recommended next step: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.</li></ul>
+<h2>Why This Incident Exists</h2>
+<ul><li>Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.</li><li>There is no active approval backlog.</li></ul>
 <h2>Incident Drivers</h2>
 <ul><li>Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.</li><li>5 explicit blocker(s) are preventing a healthy operating posture.</li></ul>
 <h2>Active Blockers</h2>
@@ -29,5 +58,6 @@ code { font-family: monospace; }
 <ul><li>Blocking recovery items no longer appear in the operator queue.</li><li>Portfolio health no longer depends on unresolved blocker conditions.</li><li>The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.</li></ul>
 <h2>Recent Signals</h2>
 <ol><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li><li>[warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.</li></ol>
+</div>
 </body>
 </html>

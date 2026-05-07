@@ -54,6 +54,9 @@ async function main() {
   assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');
   assert(html.includes('outside the allowed band') || html.includes('broker readiness is degraded') || html.includes('approval-gated trade row'), 'Expected explanation text in summary html');
   assert(html.includes('<table>'), 'Expected html table rendering for summary page');
+  assert(html.includes('report-container'), 'Expected improved report container class');
+  assert(html.includes('--color-healthy'), 'Expected CSS custom properties for status colors');
+  assert(html.includes('nth-child(even)'), 'Expected alternating row styling');
   assert(html.includes('<ol>') || html.includes('<ul>'), 'Expected list rendering in summary html');
   assert(checklist.summary.queueItemCount === summary.operatorQueue.items.length, 'Expected recovery checklist queue count to align');
   assert(recoveryJson.portfolio === 'etf', 'Expected recovery checklist json portfolio');

@@ -4,21 +4,49 @@
 <meta charset="utf-8" />
 <title>Portfolio Report</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 32px; color: #111; }
-h1, h2, h3 { margin-top: 24px; }
-p, li { line-height: 1.4; }
-pre { white-space: pre-wrap; }
-table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; font-size: 12px; }
-code { font-family: monospace; }
+:root {
+  --color-healthy: #16a34a;
+  --color-warning: #d97706;
+  --color-blocked: #dc2626;
+  --color-info: #2563eb;
+  --color-muted: #6b7280;
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text: #1f2937;
+  --color-text-secondary: #4b5563;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 32px 40px; color: var(--color-text); background: var(--color-bg); line-height: 1.6; }
+.report-container { max-width: 900px; margin: 0 auto; background: var(--color-surface); border-radius: 8px; padding: 32px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 8px 0; padding-bottom: 12px; border-bottom: 2px solid var(--color-border); }
+h2 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 12px 0; color: var(--color-text); }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px 0; color: var(--color-text-secondary); }
+p { margin: 8px 0; color: var(--color-text-secondary); }
+ul, ol { margin: 8px 0; padding-left: 24px; }
+li { margin: 4px 0; line-height: 1.5; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.85rem; }
+th { background: #f3f4f6; font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--color-border); }
+td { padding: 8px 12px; border-bottom: 1px solid var(--color-border); }
+tbody tr:nth-child(even) { background: #f9fafb; }
+tbody tr:hover { background: #f0f4ff; }
+code { font-family: 'SF Mono', Monaco, monospace; font-size: 0.85em; background: #f3f4f6; padding: 2px 5px; border-radius: 3px; }
+pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 6px; font-size: 0.85rem; }
+.badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+.badge-healthy { background: #dcfce7; color: var(--color-healthy); }
+.badge-warning { background: #fef3c7; color: var(--color-warning); }
+.badge-blocked { background: #fee2e2; color: var(--color-blocked); }
+.badge-info { background: #dbeafe; color: var(--color-info); }
+.meta-bar { font-size: 0.8rem; color: var(--color-muted); margin-bottom: 16px; }
 </style>
 </head>
 <body>
+<div class="report-container">
 <h1>Approvals Queue</h1>
 <h2>Summary</h2>
-<ul><li>Generated at: 2026-05-07T10:54:27.021Z</li><li>Approval items: 1</li></ul>
+<ul><li>Generated at: 2026-05-07T10:56:26.010Z</li><li>Approval items: 1</li></ul>
 <h2>Approval Review Queue</h2>
 <h3>Approval 1: etf</h3>
 <ul><li>Urgency: medium</li><li>Summary: 7 proposed trade row(s) still need user approval.</li><li>Explanation: 7 proposed trade row(s) still need user approval.</li><li>Effect if approved: The operator can move this proposal from review into the next staging / execution decision step.</li><li>Effect if ignored: The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.</li><li>Recommended action: Review the proposed trades and approve or reject them explicitly.</li></ul>
+</div>
 </body>
 </html>
