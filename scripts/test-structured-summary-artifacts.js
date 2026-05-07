@@ -39,6 +39,10 @@ async function main() {
   assert(summary.operatorQueue && Array.isArray(summary.operatorQueue.items), 'Expected operator queue items');
   assert(summary.operatorQueue.summary && typeof summary.operatorQueue.summary.total === 'number', 'Expected operator queue summary');
   assert(Array.isArray(summary.recentMaterialEvents), 'Expected material events array');
+  assert(summary.explanations && typeof summary.explanations.biggestDrift === 'string', 'Expected drift explanation');
+  assert(typeof summary.explanations.executionBlock === 'string' && summary.explanations.executionBlock.length > 0, 'Expected execution explanation');
+  assert(typeof summary.explanations.approvalBacklog === 'string' && summary.explanations.approvalBacklog.length > 0, 'Expected approval explanation');
+  assert(typeof summary.explanations.noTradePosture === 'string' && summary.explanations.noTradePosture.length > 0, 'Expected trade posture explanation');
   assert(typeof summary.recommendedNextStep === 'string' && summary.recommendedNextStep.length > 0, 'Expected recommended next step');
   assert(typeof renderedMarkdown === 'string' && renderedMarkdown.includes('# Portfolio Summary Page: etf'), 'Expected rendered portfolio summary markdown');
   assert(typeof recoveryMarkdown === 'string' && recoveryMarkdown.includes('# Recovery Checklist: etf'), 'Expected rendered recovery checklist markdown');
@@ -47,6 +51,8 @@ async function main() {
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
+  assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');
+  assert(html.includes('outside the allowed band') || html.includes('broker readiness is degraded') || html.includes('approval-gated trade row'), 'Expected explanation text in summary html');
   assert(html.includes('<table>'), 'Expected html table rendering for summary page');
   assert(html.includes('<ol>') || html.includes('<ul>'), 'Expected list rendering in summary html');
   assert(checklist.summary.queueItemCount === summary.operatorQueue.items.length, 'Expected recovery checklist queue count to align');
@@ -54,6 +60,7 @@ async function main() {
   assert(recoveryJson.summary.recommendedNextStep === summary.recommendedNextStep, 'Expected recovery checklist recommendation alignment');
   assert(recoveryMd.includes('## Action Checklist'), 'Expected action checklist markdown section');
   assert(recoveryHtml.includes('Recovery Checklist: etf'), 'Expected recovery checklist html title content');
+  assert(recoveryHtml.includes('Why This Incident Exists'), 'Expected explanation section in recovery html');
   assert(recoveryHtml.includes('Action Checklist'), 'Expected action checklist section in html');
   assert(recoveryHtml.includes('<ol>') || recoveryHtml.includes('<ul>'), 'Expected list rendering in recovery checklist html');
 

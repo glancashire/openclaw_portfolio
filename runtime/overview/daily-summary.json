@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-07T10:36:08.013Z",
+  "generatedAt": "2026-05-07T10:48:04.315Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 5000,
@@ -22,6 +22,7 @@
   "reportingHealth": "ready",
   "pendingApprovals": 1,
   "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+  "biggestDriftWhy": "Global equities is 60% under target and outside the allowed band around the 60% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",
@@ -29,6 +30,7 @@
     "brokerHealth": "degraded",
     "deliveryPosture": "ready",
     "pendingApprovals": 7,
-    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "whyNow": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
   }
 }

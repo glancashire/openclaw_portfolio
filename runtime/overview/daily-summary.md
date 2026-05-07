@@ -11,6 +11,7 @@
 
 ## Biggest Drift Today
 - etf: Global equities drift -60% (out_of_bounds)
+- Why it matters: Global equities is 60% under target and outside the allowed band around the 60% target.
 
 ## Highlighted Portfolio
 - Portfolio: etf
@@ -20,3 +21,4 @@
 - Delivery posture: ready
 - Pending approvals: 7
 - Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Why now: Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.

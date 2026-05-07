@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-07T10:36:08.011Z",
+  "generatedAt": "2026-05-07T10:48:04.312Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
@@ -276,6 +276,12 @@
     "7 proposed trade row(s) still need user approval."
   ],
   "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+  "explanations": {
+    "biggestDrift": "Global equities is 60% under target and outside the allowed band around the 60% target.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalBacklog": "7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly."
+  },
   "recentMaterialEvents": [
     {
       "time": "2026-05-06 13:50:22.805 UTC",

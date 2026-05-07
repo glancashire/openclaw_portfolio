@@ -17,6 +17,8 @@ code { font-family: monospace; }
 <h1>Recovery Checklist: etf</h1>
 <h2>Incident Status</h2>
 <ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: ready</li><li>Data freshness: current</li><li>Pending approvals: 7</li><li>Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.</li></ul>
+<h2>Why This Incident Exists</h2>
+<ul><li>Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.</li><li>7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly.</li></ul>
 <h2>Incident Drivers</h2>
 <ul><li>Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.</li><li>7 approval-gated trade rows are still waiting for operator review.</li></ul>
 <h2>Active Blockers</h2>

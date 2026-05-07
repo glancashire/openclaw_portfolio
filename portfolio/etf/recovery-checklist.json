@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-07T10:36:08.011Z",
+  "generatedAt": "2026-05-07T10:48:04.312Z",
   "portfolio": "etf",
   "incidentStatus": "action_required",
   "summary": {
@@ -12,7 +12,9 @@
     "blockerCount": 0,
     "queueItemCount": 2,
     "pendingApprovals": 7,
-    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalWhy": "7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
     "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",

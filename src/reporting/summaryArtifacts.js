@@ -14,6 +14,37 @@ const { markdownToBasicHtml } = require('./pdfExport');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep } = require('./dashboardGenerator');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 
+function explainAllocationRow(row = {}) {
+  const assetClass = row.assetClass || 'This sleeve';
+  const driftPct = Number(row.driftPct ?? row.drift ?? 0);
+  const targetPct = Number(row.targetPct ?? row.target ?? 0);
+  const direction = driftPct < 0 ? 'under target' : driftPct > 0 ? 'over target' : 'on target';
+  if (row.status === 'out_of_bounds') return `${assetClass} is ${Math.abs(driftPct)}% ${direction} and outside the allowed band around the ${targetPct}% target.`;
+  if (row.status === 'drifted') return `${assetClass} is ${Math.abs(driftPct)}% ${direction}, but still within a softer drift posture that should be monitored.`;
+  return `${assetClass} is currently aligned closely enough with the ${targetPct}% target.`;
+}
+
+function explainNoTradePosture({ latestProposals = [], brokerReadiness = null, lifecycleSummary = null, freshness = null }) {
+  if (brokerReadiness?.fallbackRequired) return `No live-ready trade path is available because broker readiness is degraded: ${brokerReadiness.message}`;
+  if (freshness?.stale) return 'Execution should stay blocked because the supporting dashboard/holdings inputs are stale.';
+  if ((lifecycleSummary?.proposed || 0) === 0 && (latestProposals || []).length === 0) return 'No trade was proposed because there is currently no executable proposal set to review.';
+  return 'Trade posture is driven by the current proposal and approval state.';
+}
+
+function explainExecutionBlock({ brokerReadiness = null, freshness = null, blockers = [], lifecycleSummary = null }) {
+  if (blockers.length > 0) return `Execution is blocked because ${blockers[0].message}`;
+  if (freshness?.stale) return 'Execution is blocked because the underlying portfolio state is stale and should be refreshed first.';
+  if (brokerReadiness?.fallbackRequired) return `Execution is blocked because broker readiness is degraded: ${brokerReadiness.message}`;
+  if ((lifecycleSummary?.proposed || 0) > 0) return 'Execution is waiting on explicit operator approval of proposed trade rows.';
+  return 'No explicit execution block is currently surfaced.';
+}
+
+function explainApprovalBacklog(lifecycleSummary = {}) {
+  const pending = Number(lifecycleSummary?.proposed || 0) + Number(lifecycleSummary?.approved || 0);
+  if (pending > 0) return `${pending} approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly.`;
+  return 'There is no active approval backlog.';
+}
+
 function parseHoldingsSummary(text) {
   const get = (label) => {
     const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
@@ -306,6 +337,14 @@ function buildPortfolioSummaryModel({ portfolioName, holdingsText, allocations =
     lifecycleSummary,
   });
   const materialEvents = buildMaterialEvents(recentEvents);
+  const explanationSummary = {
+    biggestDrift: allocations.length
+      ? explainAllocationRow(allocations.slice().sort((a, b) => Math.abs(Number(b.drift || 0)) - Math.abs(Number(a.drift || 0)))[0])
+      : 'No allocation drift explanation is available.',
+    noTradePosture: explainNoTradePosture({ latestProposals, brokerReadiness, lifecycleSummary, freshness }),
+    executionBlock: explainExecutionBlock({ brokerReadiness, freshness, blockers, lifecycleSummary }),
+    approvalBacklog: explainApprovalBacklog(lifecycleSummary),
+  };
 
   const operatorQueueSummary = summarizeOperatorQueue(pendingActions);
 
@@ -389,6 +428,7 @@ function buildPortfolioSummaryModel({ portfolioName, holdingsText, allocations =
     }),
     pendingActions: pendingActions.map((item) => item.summary),
     recommendedNextStep,
+    explanations: explanationSummary,
     recentMaterialEvents: materialEvents,
     observability: {
       eventsPresent: observability?.eventsPathPresent || false,
@@ -539,6 +579,8 @@ function buildRecoveryChecklist(summary = {}) {
       queueItemCount: queueItems.length,
       pendingApprovals: summary.approvals?.pendingApprovalCount || 0,
       recommendedNextStep: summary.recommendedNextStep || 'No recommendation available.',
+      executionWhy: summary.explanations?.executionBlock || 'No execution explanation available.',
+      approvalWhy: summary.explanations?.approvalBacklog || 'No approval explanation available.',
     },
     incidentDrivers,
     activeBlockers: blockers.map((item, index) => ({ rank: index + 1, severity: item.severity || 'info', message: item.message || String(item) })),
@@ -574,7 +616,7 @@ function renderRecoveryChecklistMarkdown(checklist = {}) {
     ? checklist.recentSignals.map((item, index) => `${index + 1}. [${item.severity}] ${item.summary}${item.timestamp ? ` (${item.timestamp})` : ''}`).join('\n')
     : '1. No recent signals captured.';
 
-  return `# Recovery Checklist: ${checklist.portfolio || 'unknown'}\n\n## Incident Status\n- Status: ${checklist.incidentStatus || 'unknown'}\n- Health: ${checklist.summary?.health || 'unknown'}\n- Broker health: ${checklist.summary?.brokerHealth || 'unknown'}\n- Execution posture: ${checklist.summary?.executionPosture || 'unknown'}\n- Delivery posture: ${checklist.summary?.deliveryPosture || 'unknown'}\n- Data freshness: ${checklist.summary?.dataFreshness || 'unknown'}\n- Pending approvals: ${checklist.summary?.pendingApprovals || 0}\n- Recommended next step: ${checklist.summary?.recommendedNextStep || 'No recommendation available.'}\n\n## Incident Drivers\n${drivers}\n\n## Active Blockers\n${blockers}\n\n## Action Checklist\n${actions}\n\n## Verification Checks\n${verification}\n\n## Completion Criteria\n${completion}\n\n## Recent Signals\n${recentSignals}\n`;
+  return `# Recovery Checklist: ${checklist.portfolio || 'unknown'}\n\n## Incident Status\n- Status: ${checklist.incidentStatus || 'unknown'}\n- Health: ${checklist.summary?.health || 'unknown'}\n- Broker health: ${checklist.summary?.brokerHealth || 'unknown'}\n- Execution posture: ${checklist.summary?.executionPosture || 'unknown'}\n- Delivery posture: ${checklist.summary?.deliveryPosture || 'unknown'}\n- Data freshness: ${checklist.summary?.dataFreshness || 'unknown'}\n- Pending approvals: ${checklist.summary?.pendingApprovals || 0}\n- Recommended next step: ${checklist.summary?.recommendedNextStep || 'No recommendation available.'}\n\n## Why This Incident Exists\n- ${checklist.summary?.executionWhy || 'No execution explanation available.'}\n- ${checklist.summary?.approvalWhy || 'No approval explanation available.'}\n\n## Incident Drivers\n${drivers}\n\n## Active Blockers\n${blockers}\n\n## Action Checklist\n${actions}\n\n## Verification Checks\n${verification}\n\n## Completion Criteria\n${completion}\n\n## Recent Signals\n${recentSignals}\n`;
 }
 
 function renderPortfolioSummaryMarkdown(summary = {}) {
@@ -608,7 +650,7 @@ function renderPortfolioSummaryMarkdown(summary = {}) {
   const onboardingSection = onboarding
     ? `## Onboarding Workflow\n- Completion: ${onboarding.completionPct}%\n- Answered questions: ${onboarding.answeredCount}/${onboarding.totalQuestions}\n- Pending questions: ${onboarding.pendingCount}\n- Ready for activation-question gate: ${onboarding.readyForActivationQuestions ? 'yes' : 'no'}\n- Next step: ${onboarding.nextStep}\n\n### Onboarding Sections\n${(onboarding.sections || []).length ? onboarding.sections.map((section) => `- ${section.label}: ${section.pendingCount} pending`).join('\n') : '- No pending onboarding sections.'}\n\n` : '';
 
-  return `# Portfolio Summary Page: ${summary.portfolio || 'unknown'}\n\n## Status Snapshot\n- Generated at: ${summary.generatedAt || 'unknown'}\n- Health: ${summary.status?.health || 'unknown'}\n- Strategy status: ${summary.status?.strategy || 'unknown'}\n- Broker health: ${summary.status?.brokerHealth || 'unknown'}\n- Execution posture: ${summary.status?.executionPosture || 'unknown'}\n- Delivery posture: ${summary.status?.deliveryPosture || 'unknown'}\n- Data freshness: ${summary.status?.dataFreshness || 'unknown'}\n\n## Holdings Snapshot\n- Total value CHF: ${summary.holdings?.totalValueChf || 0}\n- Cash CHF: ${summary.holdings?.cashChf || 0}\n- Invested CHF: ${summary.holdings?.investedChf || 0}\n- Holding count: ${summary.holdings?.holdingCount || 0}\n- Last sync: ${summary.holdings?.lastSyncAt || 'unknown'}\n- Latest snapshot date: ${summary.holdings?.latestSnapshotDate || 'unknown'}\n\n## Recommended Next Step\n- ${summary.recommendedNextStep || 'No recommendation available.'}\n\n## Operator Queue Summary\n- Total queue items: ${summary.operatorQueue?.summary?.total || 0}\n- Blocking items: ${summary.operatorQueue?.summary?.blocking || 0}\n- Approval items: ${summary.operatorQueue?.summary?.approvals || 0}\n- Recovery items: ${summary.operatorQueue?.summary?.recovery || 0}\n- Warning items: ${summary.operatorQueue?.summary?.warnings || 0}\n\n## Operator Queue Items\n${queueLines}\n\n## Blockers\n${blockerLines}\n\n## Execution Posture\n- Proposed trades: ${summary.approvals?.proposedCount || 0}\n- Approved trades: ${summary.approvals?.approvedCount || 0}\n- Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}\n- In-flight rows: ${summary.execution?.inFlightCount || 0}\n- Failed rows: ${summary.execution?.failedCount || 0}\n\n## Allocation\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${allocationTable}\n\n## Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Latest proposal status | Approval |\n|---|---|---|---:|---|---|\n${instrumentTable}\n\n${onboardingSection}## Recent Material Events\n${eventLines}\n`;
+  return `# Portfolio Summary Page: ${summary.portfolio || 'unknown'}\n\n## Status Snapshot\n- Generated at: ${summary.generatedAt || 'unknown'}\n- Health: ${summary.status?.health || 'unknown'}\n- Strategy status: ${summary.status?.strategy || 'unknown'}\n- Broker health: ${summary.status?.brokerHealth || 'unknown'}\n- Execution posture: ${summary.status?.executionPosture || 'unknown'}\n- Delivery posture: ${summary.status?.deliveryPosture || 'unknown'}\n- Data freshness: ${summary.status?.dataFreshness || 'unknown'}\n\n## Why This Portfolio Looks This Way\n- Drift: ${summary.explanations?.biggestDrift || 'No drift explanation available.'}\n- Execution: ${summary.explanations?.executionBlock || 'No execution explanation available.'}\n- Approvals: ${summary.explanations?.approvalBacklog || 'No approval explanation available.'}\n- Trade posture: ${summary.explanations?.noTradePosture || 'No trade-posture explanation available.'}\n\n## Holdings Snapshot\n- Total value CHF: ${summary.holdings?.totalValueChf || 0}\n- Cash CHF: ${summary.holdings?.cashChf || 0}\n- Invested CHF: ${summary.holdings?.investedChf || 0}\n- Holding count: ${summary.holdings?.holdingCount || 0}\n- Last sync: ${summary.holdings?.lastSyncAt || 'unknown'}\n- Latest snapshot date: ${summary.holdings?.latestSnapshotDate || 'unknown'}\n\n## Recommended Next Step\n- ${summary.recommendedNextStep || 'No recommendation available.'}\n\n## Operator Queue Summary\n- Total queue items: ${summary.operatorQueue?.summary?.total || 0}\n- Blocking items: ${summary.operatorQueue?.summary?.blocking || 0}\n- Approval items: ${summary.operatorQueue?.summary?.approvals || 0}\n- Recovery items: ${summary.operatorQueue?.summary?.recovery || 0}\n- Warning items: ${summary.operatorQueue?.summary?.warnings || 0}\n\n## Operator Queue Items\n${queueLines}\n\n## Blockers\n${blockerLines}\n\n## Execution Posture\n- Proposed trades: ${summary.approvals?.proposedCount || 0}\n- Approved trades: ${summary.approvals?.approvedCount || 0}\n- Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}\n- In-flight rows: ${summary.execution?.inFlightCount || 0}\n- Failed rows: ${summary.execution?.failedCount || 0}\n\n## Allocation\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${allocationTable}\n\n## Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Latest proposal status | Approval |\n|---|---|---|---:|---|---|\n${instrumentTable}\n\n${onboardingSection}## Recent Material Events\n${eventLines}\n`;
 }
 
 async function generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles = true }) {
@@ -795,6 +837,7 @@ function buildDailySummary(summaries = [], approvalsQueue = null) {
     reportingHealth: items.some((summary) => summary.status?.dataFreshness === 'stale' || summary.status?.deliveryPosture !== 'ready') ? 'attention_needed' : 'ready',
     pendingApprovals: approvalCount,
     recommendedNextStep: highlightedPortfolio?.recommendedNextStep || 'No recommendation available.',
+    biggestDriftWhy: highlightedPortfolio?.explanations?.biggestDrift || (topDrift ? `${topDrift.assetClass} is the largest current drift signal in the portfolio set.` : 'No drift explanation available.'),
     highlightedPortfolio: highlightedPortfolio ? {
       portfolio: highlightedPortfolio.portfolio,
       health: highlightedPortfolio.status?.health,
@@ -803,6 +846,7 @@ function buildDailySummary(summaries = [], approvalsQueue = null) {
       deliveryPosture: highlightedPortfolio.status?.deliveryPosture,
       pendingApprovals: highlightedPortfolio.approvals?.pendingApprovalCount || 0,
       recommendedNextStep: highlightedPortfolio.recommendedNextStep,
+      whyNow: highlightedPortfolio.explanations?.executionBlock || highlightedPortfolio.explanations?.approvalBacklog || 'No highlighted explanation available.',
     } : null,
   };
 }
@@ -810,7 +854,7 @@ function buildDailySummary(summaries = [], approvalsQueue = null) {
 function renderDailySummaryMarkdown(daily = {}) {
   const drift = daily.biggestDrift;
   const highlight = daily.highlightedPortfolio;
-  return `# Daily Summary Page\n\n## Headline\n- Overall health: ${daily.healthHeadline || 'unknown'}\n- Portfolios tracked: ${daily.totals?.portfolioCount || 0}\n- Cash waiting to deploy CHF: ${daily.cashWaitingToDeployChf || 0}\n- Pending approvals: ${daily.pendingApprovals || 0}\n- Broker health: ${daily.brokerHealth || 'unknown'}\n- Reporting health: ${daily.reportingHealth || 'unknown'}\n- Recommended next step: ${daily.recommendedNextStep || 'No recommendation available.'}\n\n## Biggest Drift Today\n- ${drift ? `${drift.portfolio}: ${drift.assetClass} drift ${drift.driftPct}% (${drift.status})` : 'No drift data available.'}\n\n## Highlighted Portfolio\n- Portfolio: ${highlight?.portfolio || 'none'}\n- Health: ${highlight?.health || 'unknown'}\n- Cash CHF: ${highlight?.cashChf || 0}\n- Broker health: ${highlight?.brokerHealth || 'unknown'}\n- Delivery posture: ${highlight?.deliveryPosture || 'unknown'}\n- Pending approvals: ${highlight?.pendingApprovals || 0}\n- Recommended next step: ${highlight?.recommendedNextStep || 'No recommendation available.'}\n`;
+  return `# Daily Summary Page\n\n## Headline\n- Overall health: ${daily.healthHeadline || 'unknown'}\n- Portfolios tracked: ${daily.totals?.portfolioCount || 0}\n- Cash waiting to deploy CHF: ${daily.cashWaitingToDeployChf || 0}\n- Pending approvals: ${daily.pendingApprovals || 0}\n- Broker health: ${daily.brokerHealth || 'unknown'}\n- Reporting health: ${daily.reportingHealth || 'unknown'}\n- Recommended next step: ${daily.recommendedNextStep || 'No recommendation available.'}\n\n## Biggest Drift Today\n- ${drift ? `${drift.portfolio}: ${drift.assetClass} drift ${drift.driftPct}% (${drift.status})` : 'No drift data available.'}\n- Why it matters: ${daily.biggestDriftWhy || 'No drift explanation available.'}\n\n## Highlighted Portfolio\n- Portfolio: ${highlight?.portfolio || 'none'}\n- Health: ${highlight?.health || 'unknown'}\n- Cash CHF: ${highlight?.cashChf || 0}\n- Broker health: ${highlight?.brokerHealth || 'unknown'}\n- Delivery posture: ${highlight?.deliveryPosture || 'unknown'}\n- Pending approvals: ${highlight?.pendingApprovals || 0}\n- Recommended next step: ${highlight?.recommendedNextStep || 'No recommendation available.'}\n- Why now: ${highlight?.whyNow || 'No highlighted explanation available.'}\n`;
 }
 
 function renderApprovalsQueueMarkdown(queue = {}) {

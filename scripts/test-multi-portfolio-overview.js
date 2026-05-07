@@ -88,6 +88,11 @@ async function main() {
       allocation: [{ assetClass: 'Global equities', driftPct: -60, status: 'out_of_bounds' }],
       approvals: { pendingApprovalCount: 7 },
       recommendedNextStep: 'Restore broker connectivity.',
+      explanations: {
+        biggestDrift: 'Global equities are 60% under target and outside the allowed band around the 100% target.',
+        executionBlock: 'Execution is blocked because broker readiness is degraded: broker offline.',
+        approvalBacklog: '7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly.',
+      },
     },
   ], approvalsQueue);
   const dailyMarkdown = renderDailySummaryMarkdown(dailySummary);
@@ -97,6 +102,8 @@ async function main() {
   assert(dailyMarkdown.includes('# Daily Summary Page'), 'Expected daily summary title');
   assert(dailyMarkdown.includes('Cash waiting to deploy CHF: 5000'), 'Expected daily cash line');
   assert(dailyMarkdown.includes('Biggest Drift Today'), 'Expected biggest drift section');
+  assert(dailyMarkdown.includes('Why it matters'), 'Expected drift explanation line');
+  assert(dailyMarkdown.includes('Why now'), 'Expected highlighted portfolio explanation line');
 
   const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
   const approvalsHtml = fs.readFileSync(generated.approvalsQueueHtmlPath, 'utf8');
@@ -109,6 +116,7 @@ async function main() {
   assert(fs.existsSync(generated.dailySummaryMarkdownPath), 'Expected daily summary markdown artifact');
   assert(dailyHtml.includes('Daily Summary Page'), 'Expected daily summary html artifact');
   assert(dailyHtml.includes('Cash waiting to deploy CHF'), 'Expected daily summary cash rendering');
+  assert(dailyHtml.includes('Why it matters'), 'Expected daily summary explanation rendering');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }

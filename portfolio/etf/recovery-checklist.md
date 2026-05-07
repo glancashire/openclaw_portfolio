@@ -10,6 +10,10 @@
 - Pending approvals: 7
 - Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 
+## Why This Incident Exists
+- Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- 7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly.
+
 ## Incident Drivers
 - Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
 - 7 approval-gated trade rows are still waiting for operator review.
