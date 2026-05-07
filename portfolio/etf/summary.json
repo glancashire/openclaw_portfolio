@@ -1,6 +1,6 @@
 {
-  "schemaVersion": "1.0",
-  "generatedAt": "2026-05-06T15:42:11.888Z",
+  "schemaVersion": "1.1",
+  "generatedAt": "2026-05-07T08:10:10.675Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
@@ -27,6 +27,50 @@
     "proposedCount": 7,
     "approvedCount": 0,
     "pendingApprovalCount": 7
+  },
+  "operatorQueue": {
+    "summary": {
+      "total": 2,
+      "blocking": 1,
+      "approvals": 1,
+      "execution": 0,
+      "recovery": 1,
+      "delivery": 0,
+      "data": 0,
+      "warnings": 0,
+      "workflow": 0,
+      "bySeverity": {
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      }
+    },
+    "items": [
+      {
+        "rank": 1,
+        "queueType": "recovery",
+        "portfolio": "etf",
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
+      },
+      {
+        "rank": 2,
+        "queueType": "approval",
+        "portfolio": "etf",
+        "kind": "approval",
+        "severity": "medium",
+        "status": "pending_user_approval",
+        "summary": "7 proposed trade row(s) still need user approval.",
+        "blocking": false,
+        "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",
+        "source": "trade_lifecycle"
+      }
+    ]
   },
   "blockers": {
     "count": 0,
@@ -228,26 +272,8 @@
     }
   ],
   "pendingActions": [
-    {
-      "portfolio": "etf",
-      "kind": "broker",
-      "severity": "high",
-      "status": "degraded",
-      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-      "blocking": true,
-      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "source": "broker_readiness"
-    },
-    {
-      "portfolio": "etf",
-      "kind": "approval",
-      "severity": "medium",
-      "status": "pending_user_approval",
-      "summary": "7 proposed trade row(s) still need user approval.",
-      "blocking": false,
-      "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",
-      "source": "trade_lifecycle"
-    }
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "7 proposed trade row(s) still need user approval."
   ],
   "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
   "recentMaterialEvents": [

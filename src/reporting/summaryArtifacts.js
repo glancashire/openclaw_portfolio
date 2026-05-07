@@ -11,6 +11,7 @@ const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep } = require('./dashboardGenerator');
+const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -83,11 +84,6 @@ function proposalSummary(latestProposals = [], totalValue = 0) {
   };
 }
 
-function classifyActionSeverity(item) {
-  if (item.blocking) return 'high';
-  if (item.kind === 'approval' || item.kind === 'execution') return 'medium';
-  return 'low';
-}
 
 function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0, brokerReadiness = null, lifecycleSummary = null) {
   if (brokerReadiness?.fallbackRequired) {
@@ -310,8 +306,10 @@ function buildPortfolioSummaryModel({ portfolioName, holdingsText, allocations =
   });
   const materialEvents = buildMaterialEvents(recentEvents);
 
+  const operatorQueueSummary = summarizeOperatorQueue(pendingActions);
+
   return {
-    schemaVersion: '1.0',
+    schemaVersion: '1.1',
     generatedAt: new Date().toISOString(),
     portfolio: portfolioName,
     status: {
@@ -339,6 +337,14 @@ function buildPortfolioSummaryModel({ portfolioName, holdingsText, allocations =
       proposedCount: Number(lifecycleSummary?.proposed || 0),
       approvedCount: Number(lifecycleSummary?.approved || 0),
       pendingApprovalCount: Number(lifecycleSummary?.proposed || 0) + Number(lifecycleSummary?.approved || 0),
+    },
+    operatorQueue: {
+      summary: operatorQueueSummary,
+      items: pendingActions.map((item, index) => ({
+        rank: index + 1,
+        queueType: queueTypeForItem(item),
+        ...item,
+      })),
     },
     blockers: {
       count: blockers.length,
@@ -380,7 +386,7 @@ function buildPortfolioSummaryModel({ portfolioName, holdingsText, allocations =
         } : null,
       };
     }),
-    pendingActions,
+    pendingActions: pendingActions.map((item) => item.summary),
     recommendedNextStep,
     recentMaterialEvents: materialEvents,
     observability: {
@@ -486,16 +492,17 @@ function buildPortfolioIndex(summaries = []) {
   }));
 
   return {
-    schemaVersion: '1.0',
+    schemaVersion: '1.1',
     generatedAt: new Date().toISOString(),
     portfolioCount: portfolios.length,
     totalValueChf: Number(portfolios.reduce((sum, item) => sum + Number(item.totalValueChf || 0), 0).toFixed(2)),
     portfolios,
+    queueSummary: summarizeOperatorQueue(summaries.flatMap((summary) => summary.operatorQueue?.items || [])),
   };
 }
 
 function buildPendingActionsOverview(summaries = []) {
-  const items = summaries.flatMap((summary) => summary.pendingActions.map((item) => ({ ...item })));
+  const items = summaries.flatMap((summary) => (summary.operatorQueue?.items || []).map((item) => ({ ...item })));
   items.sort((a, b) => {
     const severityRank = { high: 0, medium: 1, low: 2 };
     const statusRank = { blocked: 0, degraded: 1, paused: 2, failed: 3, pending_user_approval: 4, ready_for_review: 5, in_flight: 6, pending: 7, stale: 8, warning: 9, recommended: 10 };
@@ -504,11 +511,17 @@ function buildPendingActionsOverview(summaries = []) {
       || String(a.portfolio).localeCompare(String(b.portfolio))
       || String(a.summary).localeCompare(String(b.summary));
   });
+  const enrichedItems = items.map((item, index) => ({
+    ...item,
+    rank: index + 1,
+    queueType: item.queueType || queueTypeForItem(item),
+  }));
   return {
-    schemaVersion: '1.0',
+    schemaVersion: '1.1',
     generatedAt: new Date().toISOString(),
-    itemCount: items.length,
-    items,
+    itemCount: enrichedItems.length,
+    queueSummary: summarizeOperatorQueue(enrichedItems),
+    items: enrichedItems,
   };
 }
 
@@ -545,6 +558,8 @@ module.exports = {
   healthLabel,
   buildPendingActionItems,
   buildPortfolioSummaryModel,
+  queueTypeForItem,
+  summarizeOperatorQueue,
   collectPortfolioSummary,
   generatePortfolioSummaryArtifacts,
   listPortfolioDirectories,

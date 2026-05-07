@@ -7,6 +7,7 @@ const { getInteractiveBrokersReadiness } = require('../brokers/interactive-broke
 const { fileFreshnessSummary } = require('./freshness');
 const { brokerErrorStatus } = require('../execution/runtimeState');
 const { reportDeliveryStatus, reportPendingActions } = require('./deliveryPolicy');
+const { summarizeOperatorQueue } = require('./operatorQueue');
 
 function defaultPeriodBounds(period, latestSnapshot) {
   const end = latestSnapshot?.date || new Date().toISOString().slice(0, 10);
@@ -103,7 +104,24 @@ function formatDeliveryStatus(deliveryStatus = {}) {
 
 function formatPendingActions(pendingActions = []) {
   if (!pendingActions.length) return '1. None.';
-  return pendingActions.map((item, index) => `${index + 1}. ${item}`).join('\n');
+  return pendingActions.map((item, index) => {
+    if (typeof item === 'string') return `${index + 1}. ${item}`;
+    return `${index + 1}. [${item.queueType || 'workflow'}/${item.status || 'pending'}/${item.severity || 'low'}] ${item.summary}`;
+  }).join('\n');
+}
+
+function formatOperatorQueueSummary(summary = {}) {
+  return [
+    `- Total queue items: ${summary.total || 0}`,
+    `- Blocking items: ${summary.blocking || 0}`,
+    `- Approval items: ${summary.approvals || 0}`,
+    `- Execution items: ${summary.execution || 0}`,
+    `- Recovery items: ${summary.recovery || 0}`,
+    `- Delivery items: ${summary.delivery || 0}`,
+    `- Data items: ${summary.data || 0}`,
+    `- Warning items: ${summary.warnings || 0}`,
+    `- Workflow items: ${summary.workflow || 0}`,
+  ].join('\n');
 }
 
 function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta, deliveryStatus }) {
@@ -122,6 +140,8 @@ function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, f
 }
 
 function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null, freshness = null, generationMeta = null, brokerErrorState = null, deliveryStatus = null, pendingActions = [] }) {
+  const normalizedQueueItems = pendingActions.map((item) => typeof item === 'string' ? { queueType: 'workflow', severity: 'low', status: 'pending', summary: item } : item);
+  const queueSummary = summarizeOperatorQueue(normalizedQueueItems);
   const tradeRows = trades.length
     ? trades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.reason} |`).join('\n')
     : '| YYYY-MM-DD | <action> | <instrument> | 0 | No trades recorded |';
@@ -160,7 +180,7 @@ function formatReport({ portfolioName, period, start = '', end = '', generated =
           : '- Generate the next dry-run proposal set after holdings or strategy changes.';
   const executiveSummary = narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta, deliveryStatus });
 
-  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${executiveSummary}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n- In-flight orders: ${compliance.inflightOrders}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Delivery Status\n${formatDeliveryStatus(deliveryStatus)}\n\n## Pending Operator Actions\n${formatPendingActions(pendingActions)}\n\n## Operator State\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n- Consecutive broker errors: ${brokerErrorState?.consecutive || 0}\n- Last broker error reason: ${brokerErrorState?.lastReason || 'none'}\n\n## Generation Status\n${formatGenerationStatus(generationMeta)}\n\n## Execution Lifecycle\n${formatExecutionLifecycleSection(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
+  return `# Portfolio Report: ${portfolioName}\n\n## Period\n- Report type: ${period}\n- Period start: ${start}\n- Period end: ${end}\n- Generated: ${generated}\n\n## Executive Summary\n${executiveSummary}\n\n## Performance\n| Metric | Value |\n|---|---:|\n| Start value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |\n| Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |\n| Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |\n\n## Allocation Review\n| Asset class | Start % | End % | Target % | Drift % |\n|---|---:|---:|---:|---:|\n${formatAllocationReview(executionPlan)}\n\n## Trades During Period\n| Date | Action | Instrument | Amount CHF | Reason |\n|---|---|---|---:|---|\n${tradeRows}\n\n## Strategy Compliance\n- On strategy: ${compliance.onStrategy}\n- Rebalance needed: ${compliance.rebalanceNeeded}\n- Risk limits breached: ${compliance.riskLimitsBreached}\n- Broker readiness: ${compliance.brokerReadiness}\n- In-flight orders: ${compliance.inflightOrders}\n\n## Freshness\n- Dashboard stale: ${freshness?.stale ? 'yes' : 'no'}\n- Dashboard file present: ${freshness?.dashboardExists === false ? 'no' : 'yes'}\n- Newest source file: ${freshness?.newestSourcePath || 'unknown'}\n\n## Delivery Status\n${formatDeliveryStatus(deliveryStatus)}\n\n## Operator Queue Summary\n${formatOperatorQueueSummary(queueSummary)}\n\n## Pending Operator Actions\n${formatPendingActions(normalizedQueueItems)}\n\n## Operator State\n- Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}\n- Consecutive broker errors: ${brokerErrorState?.consecutive || 0}\n- Last broker error reason: ${brokerErrorState?.lastReason || 'none'}\n\n## Generation Status\n${formatGenerationStatus(generationMeta)}\n\n## Execution Lifecycle\n${formatExecutionLifecycleSection(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlanSection(executionPlan)}\n\n## What Worked\n${whatWorked}\n\n## What Did Not Work\n${whatDidNotWork}\n\n## Recommended Changes\n${recommendedChanges}\n\n## Next Actions\n${nextActions}\n`;
 }
 
 function writeReport({ portfolioDir, period, dateStamp, content }) {
@@ -251,4 +271,4 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   };
 }
 
-module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions };
+module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary };

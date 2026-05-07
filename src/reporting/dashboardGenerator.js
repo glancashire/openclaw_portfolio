@@ -10,6 +10,7 @@ const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
+const { summarizeOperatorQueue } = require('./operatorQueue');
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -154,25 +155,60 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
 function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, safetyDiagnostics = null, recommended = [] }) {
   const actions = [];
   for (const item of deliveryStatus?.pendingActions || []) {
-    actions.push(item);
+    actions.push({ queueType: 'delivery', severity: 'medium', status: 'pending', summary: item });
   }
   if (brokerReadiness?.fallbackRequired) {
-    actions.push(`Broker connectivity recovery: ${brokerReadiness.message}`);
+    actions.push({ queueType: 'recovery', severity: 'high', status: 'degraded', summary: `Broker connectivity recovery: ${brokerReadiness.message}` });
   }
   if (brokerErrorState?.stopAutomation) {
-    actions.push(`Broker automation paused after ${brokerErrorState.consecutive} consecutive errors; investigate before resuming.`);
+    actions.push({ queueType: 'recovery', severity: 'high', status: 'paused', summary: `Broker automation paused after ${brokerErrorState.consecutive} consecutive errors; investigate before resuming.` });
   }
   if ((lifecycleSummary?.approved || 0) > 0) {
-    actions.push(`There are ${lifecycleSummary.approved} approved trade row(s) ready for staging/review.`);
+    actions.push({ queueType: 'approval', severity: 'medium', status: 'ready_for_review', summary: `There are ${lifecycleSummary.approved} approved trade row(s) ready for staging/review.` });
   }
-  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) {
-    actions.push('Reconcile in-flight broker orders before creating overlapping plans.');
+  if ((lifecycleSummary?.proposed || 0) > 0) {
+    actions.push({ queueType: 'approval', severity: 'medium', status: 'pending_user_approval', summary: `There are ${lifecycleSummary.proposed} proposed trade row(s) awaiting approval.` });
+  }
+  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0 || (lifecycleSummary?.staged || 0) > 0) {
+    const inflight = (lifecycleSummary?.submitted || 0) + (lifecycleSummary?.partiallyFilled || 0) + (lifecycleSummary?.staged || 0);
+    actions.push({ queueType: 'execution', severity: 'medium', status: 'in_flight', summary: `Reconcile ${inflight} in-flight broker order(s) before creating overlapping plans.` });
   }
   if (safetyDiagnostics?.holdingsHealth?.stalePricing) {
-    actions.push('Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.');
+    actions.push({ queueType: 'data', severity: 'high', status: 'stale', summary: 'Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.' });
   }
-  if (!actions.length && recommended[0]) actions.push(recommended[0]);
-  return Array.from(new Set(actions));
+  if (!actions.length && recommended[0]) actions.push({ queueType: 'workflow', severity: 'low', status: 'recommended', summary: recommended[0] });
+
+  const deduped = [];
+  const seen = new Set();
+  for (const action of actions) {
+    const key = `${action.queueType}::${action.status}::${action.summary}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(action);
+  }
+
+  const severityRank = { high: 0, medium: 1, low: 2 };
+  const statusRank = { blocked: 0, degraded: 1, paused: 2, failed: 3, pending_user_approval: 4, ready_for_review: 5, in_flight: 6, pending: 7, stale: 8, warning: 9, recommended: 10 };
+  return deduped.sort((a, b) => (severityRank[a.severity] ?? 99) - (severityRank[b.severity] ?? 99) || (statusRank[a.status] ?? 99) - (statusRank[b.status] ?? 99) || a.summary.localeCompare(b.summary));
+}
+
+function formatPendingQueueRows(items = []) {
+  if (!items.length) return '1. [workflow/recommended] No pending operator actions.';
+  return items.map((item, index) => `${index + 1}. [${item.queueType}/${item.status}/${item.severity}] ${item.summary}`).join('\n');
+}
+
+function formatQueueSummary(summary = {}) {
+  return [
+    `- Total queue items: ${summary.total || 0}`,
+    `- Blocking items: ${summary.blocking || 0}`,
+    `- Approval items: ${summary.approvals || 0}`,
+    `- Execution items: ${summary.execution || 0}`,
+    `- Recovery items: ${summary.recovery || 0}`,
+    `- Delivery items: ${summary.delivery || 0}`,
+    `- Data items: ${summary.data || 0}`,
+    `- Warning items: ${summary.warnings || 0}`,
+    `- Workflow items: ${summary.workflow || 0}`,
+  ].join('\n');
 }
 
 function buildMaterialEvents(events = []) {
@@ -288,16 +324,17 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     recommended,
   });
   const materialEvents = buildMaterialEvents(recentEvents);
+  const operatorQueueSummary = summarizeOperatorQueue(pendingActions.map((item) => ({ ...item, kind: item.queueType === 'recovery' ? 'broker' : item.queueType })));
   const portfolioHealth = healthLabel({
     brokerReadiness,
     brokerErrorState,
     freshness,
     blockers,
     lifecycleSummary,
-    pendingActions,
+    pendingActions: pendingActions.map((item) => item.summary),
   });
   const recommendation = bestNextStep({
-    pendingActions,
+    pendingActions: pendingActions.map((item) => item.summary),
     blockers,
     recommendedActionsList: recommended,
     brokerReadiness,
@@ -313,9 +350,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     `- Delivery readiness: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}`,
     `- Failure alert readiness: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
   ].join('\n');
-  const pendingActionRows = pendingActions.length
-    ? pendingActions.map((item, index) => `${index + 1}. ${item}`).join('\n')
-    : '1. None.';
+  const pendingActionRows = formatPendingQueueRows(pendingActions);
 
   return `# Dashboard: ${portfolioName}\n\n## Health Snapshot\n- Portfolio status: ${portfolioHealth}\n- Strategy status: ${strategy}\n- Broker health: ${brokerReadiness?.message || 'unknown'}\n- Last successful sync: ${summary.syncTime}\n- Data freshness: ${freshness?.stale ? 'stale' : 'current'}\n- Execution posture: ${brokerErrorState?.stopAutomation ? 'paused' : (brokerReadiness?.fallbackRequired ? 'degraded_dry_run_only' : 'ready_for_review')}\n- Delivery posture: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}\n- Pending approvals: ${pendingApprovalCount}\n- Active blockers: ${blockers.length}\n\n## Portfolio Value Snapshot\n- Total value CHF: ${summary.totalValue}\n- Cash CHF: ${summary.cash}\n- Invested CHF: ${summary.invested}\n- Daily move CHF: ${latestSnapshot?.dailyChange || '0'}\n- Daily move %: ${latestSnapshot?.dailyChangePct || '0'}\n- Since last report CHF: ${latestSnapshot?.dailyChange || '0'}\n- Since last report %: ${latestSnapshot?.dailyChangePct || '0'}\n- Number of holdings: ${holdingCount}\n- Latest snapshot date: ${latestDate}\n\n## Allocation Health\n| Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |\n|---|---:|---:|---:|---|---|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Actions Queue\n| Instrument | Current % | Target % | Suggested action | Reason | Approval needed |\n|---|---:|---:|---|---|---|\n${formatInstrumentActionRows(approvedInstruments, latestProposals, totalValue)}\n\n## Safety / Risk Diagnostics\n- Safety status: ${blockers.length ? 'blocked_or_warning' : 'clear'}\n- Risk-limit warnings: ${blockers.filter((item) => item.severity === 'warning').length}\n- Broker/API warnings: ${brokerReadiness?.fallbackRequired ? 1 : 0}\n- Stale data warnings: ${(freshness?.stale || (safetyDiagnostics?.diagnostics?.holdingsHealth?.stalePricing || safetyDiagnostics?.holdingsHealth?.stalePricing)) ? 1 : 0}\n- Execution pause state: ${brokerErrorState?.stopAutomation ? 'paused' : 'active'}\n- Active blocker detail:\n${formatBlockerLines(blockers)}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Recent Material Events\n| Time | Event type | Severity | Summary | Next step |\n|---|---|---|---|---|\n${formatMaterialEventRows(materialEvents)}\n\n## Report / Delivery Status\n${deliveryLines}\n\n## Recommended Next Step\n${recommendation}\n\n## Status Labels\n- Pending approvals queue count: ${pendingApprovalCount}\n- In-flight execution rows: ${inFlightCount}\n- Latest action recommendations:\n  - ${recommended[0]}\n  - ${recommended[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Observability Status\n${formatObservabilityStatus(observability)}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
@@ -385,4 +420,4 @@ async function regenerateDashboard(portfolioDir) {
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatPendingQueueRows, formatQueueSummary };

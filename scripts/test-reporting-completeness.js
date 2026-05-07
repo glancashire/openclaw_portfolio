@@ -1,4 +1,4 @@
-const { formatReport, narrativeSummary, formatGenerationStatus, formatDeliveryStatus, formatPendingActions } = require('../src/reporting/reportGenerator');
+const { formatReport, narrativeSummary, formatGenerationStatus, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary } = require('../src/reporting/reportGenerator');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -46,7 +46,7 @@ function main() {
     pendingActions: deliveryStatus.pendingActions,
   });
 
-  for (const section of ['## Executive Summary', '## Performance', '## Allocation Review', '## Trades During Period', '## Strategy Compliance', '## Freshness', '## Delivery Status', '## Pending Operator Actions', '## Generation Status', '## Execution Lifecycle', '## Execution Plan', '## What Worked', '## What Did Not Work', '## Recommended Changes', '## Next Actions']) {
+  for (const section of ['## Executive Summary', '## Performance', '## Allocation Review', '## Trades During Period', '## Strategy Compliance', '## Freshness', '## Delivery Status', '## Operator Queue Summary', '## Pending Operator Actions', '## Generation Status', '## Execution Lifecycle', '## Execution Plan', '## What Worked', '## What Did Not Work', '## Recommended Changes', '## Next Actions']) {
     assert(report.includes(section), `Expected section ${section}`);
   }
 
@@ -54,7 +54,8 @@ function main() {
   assert(report.includes('Reporting delivery posture needs operator attention'), 'Expected delivery readiness narrative');
   assert(report.includes('- PDF mode: stub'), 'Expected generation status section');
   assert(report.includes('- Delivery mode: local_only'), 'Expected delivery status section');
-  assert(report.includes('1. Dashboard/report freshness is stale relative to source state.'), 'Expected pending actions section');
+  assert(report.includes('1. [workflow/pending/low] Dashboard/report freshness is stale relative to source state.'), 'Expected pending actions section');
+  assert(report.includes('- Total queue items: 1'), 'Expected queue summary section');
   assert(report.includes('Report rendering required fallback handling: render mode stub'), 'Expected fallback warning in What Did Not Work');
 
   const summary = narrativeSummary({

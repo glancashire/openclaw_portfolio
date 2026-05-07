@@ -47,7 +47,8 @@
 - none
 
 ## Pending Operator Actions
-1. Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+1. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+2. [approval/pending_user_approval/medium] There are 7 proposed trade row(s) awaiting approval.
 
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |

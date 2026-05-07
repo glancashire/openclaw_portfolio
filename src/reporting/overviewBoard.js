@@ -39,7 +39,21 @@ function summarizeOverview(index = {}, pending = {}) {
 function buildRecommendedActionRows(pending = {}) {
   const items = Array.isArray(pending.items) ? pending.items : [];
   if (!items.length) return '1. No pending cross-portfolio actions.';
-  return items.slice(0, 10).map((item, index) => `${index + 1}. [${item.severity}/${item.status}] ${item.portfolio}: ${item.summary} — ${item.recommendedOperatorAction}`).join('\n');
+  return items.slice(0, 10).map((item, index) => `${index + 1}. [${item.queueType || 'workflow'}/${item.severity}/${item.status}] ${item.portfolio}: ${item.summary} — ${item.recommendedOperatorAction}`).join('\n');
+}
+
+function formatQueueSummary(summary = {}) {
+  return [
+    `- Total queue items: ${summary.total || 0}`,
+    `- Blocking items: ${summary.blocking || 0}`,
+    `- Approval items: ${summary.approvals || 0}`,
+    `- Execution items: ${summary.execution || 0}`,
+    `- Recovery items: ${summary.recovery || 0}`,
+    `- Delivery items: ${summary.delivery || 0}`,
+    `- Data items: ${summary.data || 0}`,
+    `- Warning items: ${summary.warnings || 0}`,
+    `- Workflow items: ${summary.workflow || 0}`,
+  ].join('\n');
 }
 
 function buildPortfolioTable(index = {}) {
@@ -52,7 +66,7 @@ function buildPortfolioTable(index = {}) {
 
 function formatOverviewMarkdown({ index, pending }) {
   const totals = summarizeOverview(index, pending);
-  return `# Multi-Portfolio Overview\n\n## Summary\n- Generated at: ${index.generatedAt || new Date().toISOString()}\n- Portfolios discovered: ${totals.portfolioCount}\n- Active portfolios: ${totals.activeCount}\n- Demo-like portfolios: ${totals.demoLikeCount}\n- Total value CHF: ${totals.totalValueChf}\n- Healthy portfolios: ${totals.healthyCount}\n- Warning / attention portfolios: ${totals.warningCount}\n- Blocked portfolios: ${totals.blockedCount}\n- Pending approvals: ${totals.pendingApprovals}\n- Pending actions: ${totals.pendingActions}\n\n## Portfolio Board\n| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | Recommended next step |\n|---|---|---:|---|---|---:|---:|---:|---|\n${buildPortfolioTable(index)}\n\n## Cross-Portfolio Recommended Actions\n${buildRecommendedActionRows(pending)}\n\n## Notes\n- This board is generated from Phase 29 structured summary artifacts rather than by re-deriving state directly from Markdown.\n- Demo-like portfolios are surfaced explicitly so they do not silently disappear from operator review.\n`;
+  return `# Multi-Portfolio Overview\n\n## Summary\n- Generated at: ${index.generatedAt || new Date().toISOString()}\n- Portfolios discovered: ${totals.portfolioCount}\n- Active portfolios: ${totals.activeCount}\n- Demo-like portfolios: ${totals.demoLikeCount}\n- Total value CHF: ${totals.totalValueChf}\n- Healthy portfolios: ${totals.healthyCount}\n- Warning / attention portfolios: ${totals.warningCount}\n- Blocked portfolios: ${totals.blockedCount}\n- Pending approvals: ${totals.pendingApprovals}\n- Pending actions: ${totals.pendingActions}\n\n## Portfolio Board\n| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | Recommended next step |\n|---|---|---:|---|---|---:|---:|---:|---|\n${buildPortfolioTable(index)}\n\n## Operator Queue Summary\n${formatQueueSummary(pending.queueSummary || {})}\n\n## Cross-Portfolio Recommended Actions\n${buildRecommendedActionRows(pending)}\n\n## Notes\n- This board is generated from Phase 29 structured summary artifacts rather than by re-deriving state directly from Markdown.\n- Demo-like portfolios are surfaced explicitly so they do not silently disappear from operator review.\n`;
 }
 
 async function generateOverviewBoard({ repoRoot = process.cwd(), writeFiles = true } = {}) {
@@ -82,5 +96,6 @@ module.exports = {
   buildRecommendedActionRows,
   buildPortfolioTable,
   formatOverviewMarkdown,
+  formatQueueSummary,
   generateOverviewBoard,
 };

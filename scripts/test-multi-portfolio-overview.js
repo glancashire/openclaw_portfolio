@@ -38,9 +38,10 @@ function main() {
     ],
   };
   const pending = {
+    queueSummary: { total: 2, blocking: 1, approvals: 0, execution: 0, recovery: 1, delivery: 0, data: 0, warnings: 0, workflow: 1 },
     items: [
-      { portfolio: 'etf', severity: 'high', status: 'degraded', summary: 'Broker degraded.', recommendedOperatorAction: 'Fix broker.' },
-      { portfolio: 'acceptance-closure', severity: 'medium', status: 'pending', summary: 'Demo needs cleanup.', recommendedOperatorAction: 'Review demo.' },
+      { portfolio: 'etf', queueType: 'recovery', severity: 'high', status: 'degraded', summary: 'Broker degraded.', recommendedOperatorAction: 'Fix broker.' },
+      { portfolio: 'acceptance-closure', queueType: 'workflow', severity: 'medium', status: 'pending', summary: 'Demo needs cleanup.', recommendedOperatorAction: 'Review demo.' },
     ],
   };
 
@@ -56,7 +57,9 @@ function main() {
   assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
   assert(markdown.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | Restore broker connectivity. |'), 'Expected ETF board row');
   assert(markdown.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | Resolve blockers. |'), 'Expected acceptance board row');
-  assert(markdown.includes('1. [high/degraded] etf: Broker degraded. — Fix broker.'), 'Expected recommended action row');
+  assert(markdown.includes('## Operator Queue Summary'), 'Expected operator queue summary section');
+  assert(markdown.includes('- Recovery items: 1'), 'Expected recovery count in queue summary');
+  assert(markdown.includes('1. [recovery/high/degraded] etf: Broker degraded. — Fix broker.'), 'Expected recommended action row');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }

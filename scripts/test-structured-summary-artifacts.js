@@ -21,13 +21,15 @@ async function main() {
   const index = buildPortfolioIndex([summary]);
   const pending = buildPendingActionsOverview([summary]);
 
-  assert(summary.schemaVersion === '1.0', 'Expected summary schema version');
+  assert(summary.schemaVersion === '1.1', 'Expected summary schema version');
   assert(summary.portfolio === 'etf', 'Expected ETF portfolio summary');
   assert(summary.status.health, 'Expected summary health status');
   assert(summary.status.executionPosture, 'Expected execution posture');
   assert(Array.isArray(summary.allocation) && summary.allocation.length >= 3, 'Expected allocation rows');
   assert(Array.isArray(summary.instruments) && summary.instruments.length >= 4, 'Expected approved instruments in summary');
   assert(Array.isArray(summary.pendingActions), 'Expected pending actions array');
+  assert(summary.operatorQueue && Array.isArray(summary.operatorQueue.items), 'Expected operator queue items');
+  assert(summary.operatorQueue.summary && typeof summary.operatorQueue.summary.total === 'number', 'Expected operator queue summary');
   assert(Array.isArray(summary.recentMaterialEvents), 'Expected material events array');
   assert(typeof summary.recommendedNextStep === 'string' && summary.recommendedNextStep.length > 0, 'Expected recommended next step');
 
@@ -36,13 +38,14 @@ async function main() {
   assert(dashboard.includes(summary.recommendedNextStep), 'Dashboard recommendation should align with summary');
   assert(dashboard.includes(`Broker health: ${summary.status.brokerMessage}`), 'Dashboard broker message should align with summary');
 
-  assert(index.schemaVersion === '1.0', 'Expected index schema version');
+  assert(index.schemaVersion === '1.1', 'Expected index schema version');
   assert(index.portfolioCount === 1, 'Expected one portfolio in index');
   assert(index.portfolios[0].portfolio === 'etf', 'Expected ETF in index');
   assert(index.portfolios[0].pendingApprovals === summary.approvals.pendingApprovalCount, 'Expected pending approval count in index');
   assert(index.portfolios[0].recommendedNextStep === summary.recommendedNextStep, 'Expected recommendation in index');
 
-  assert(pending.schemaVersion === '1.0', 'Expected pending-actions schema version');
+  assert(pending.schemaVersion === '1.1', 'Expected pending-actions schema version');
+  assert(pending.queueSummary && typeof pending.queueSummary.total === 'number', 'Expected queue summary on pending-actions overview');
   assert(Array.isArray(pending.items), 'Expected pending actions list');
   assert(pending.itemCount === pending.items.length, 'Expected pending item count to match');
   if (pending.items.length > 1) {
@@ -51,6 +54,7 @@ async function main() {
       const prev = severityRank[pending.items[i - 1].severity] ?? 99;
       const cur = severityRank[pending.items[i].severity] ?? 99;
       assert(prev <= cur, 'Expected pending actions sorted by severity');
+      assert(typeof pending.items[i].queueType === 'string' && pending.items[i].queueType.length > 0, 'Expected queue type on pending items');
     }
   }
 
