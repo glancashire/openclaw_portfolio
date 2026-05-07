@@ -923,7 +923,45 @@ function renderReportHistoryMarkdown(history = {}) {
   return `# Report History\n\n- Generated at: ${history.generatedAt || 'unknown'}\n- Total reports: ${history.totalReports || 0}\n- Portfolios: ${history.portfolioCount || 0}\n\n## Report Index\n\n${portfolioSections}\n`;
 }
 
-function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHistory = {}, summaries = [] }) {
+function buildDeliveryOverview(repoRoot) {
+  const { reportDeliveryStatus } = require('./deliveryPolicy');
+  const portfolioDirs = listPortfolioDirectories(repoRoot);
+  const portfolios = [];
+  for (const portfolioDir of portfolioDirs) {
+    const status = reportDeliveryStatus({ portfolioDir });
+    portfolios.push({
+      portfolio: status.portfolio,
+      deliveryMode: status.deliveryMode,
+      intendedChannels: status.intendedChannels,
+      externalDeliveryEnabled: status.externalDeliveryEnabled,
+      failureAlertMode: status.failureAlertMode,
+      failureAlertTargets: status.failureAlertTargets,
+      overrideLoaded: status.overrideLoaded,
+      ready: status.ready,
+      pendingActions: status.pendingActions,
+    });
+  }
+  const allReady = portfolios.every((p) => p.ready);
+  return {
+    schemaVersion: '1.0',
+    generatedAt: new Date().toISOString(),
+    portfolioCount: portfolios.length,
+    allReady,
+    portfolios,
+  };
+}
+
+function renderDeliveryStatusMarkdown(overview = {}) {
+  const portfolioSections = (overview.portfolios || []).map((p) => {
+    const actions = p.pendingActions.length
+      ? p.pendingActions.map((a) => `  - ${a}`).join('\n')
+      : '  - None';
+    return `### ${p.portfolio}\n- Delivery mode: ${p.deliveryMode}\n- Channels: ${(p.intendedChannels || []).join(', ')}\n- External delivery: ${p.externalDeliveryEnabled ? 'enabled' : 'disabled'}\n- Failure alert mode: ${p.failureAlertMode}\n- Alert targets: ${(p.failureAlertTargets || []).join(', ')}\n- Policy override loaded: ${p.overrideLoaded ? 'yes' : 'no'}\n- Ready: ${p.ready ? 'yes' : 'no'}\n- Pending actions:\n${actions}`;
+  }).join('\n\n');
+  return `# Delivery & Alerting Status\n\n- Generated at: ${overview.generatedAt || 'unknown'}\n- Portfolios: ${overview.portfolioCount || 0}\n- All ready: ${overview.allReady ? 'yes' : 'no'}\n\n## Per-Portfolio Delivery Posture\n\n${portfolioSections}\n`;
+}
+
+function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHistory = {}, summaries = [], deliveryOverview = {} }) {
   const health = dailySummary.healthHeadline || 'unknown';
   const badgeClass = health === 'healthy' ? 'badge-healthy' : health === 'blocked' ? 'badge-blocked' : 'badge-warning';
   const drift = dailySummary.biggestDrift;
@@ -989,6 +1027,7 @@ nav a:hover { background: #dbeafe; }
   <a href="daily-summary.html">Daily Summary</a>
   <a href="approvals-queue.html">Approvals Queue</a>
   <a href="report-history.html">Report History</a>
+  <a href="delivery-status.html">Delivery &amp; Alerting</a>
   <a href="portfolio-overview.html">Multi-Portfolio Overview</a>
 </nav>
 
@@ -1041,14 +1080,22 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
   const reportHistoryPath = path.join(overviewDir, 'report-history.json');
   const reportHistoryMarkdownPath = path.join(overviewDir, 'report-history.md');
   const reportHistoryHtmlPath = path.join(overviewDir, 'report-history.html');
+  const deliveryOverview = buildDeliveryOverview(repoRoot);
+  const deliveryStatusMarkdown = renderDeliveryStatusMarkdown(deliveryOverview);
+  const deliveryStatusPath = path.join(overviewDir, 'delivery-status.json');
+  const deliveryStatusMarkdownPath = path.join(overviewDir, 'delivery-status.md');
+  const deliveryStatusHtmlPath = path.join(overviewDir, 'delivery-status.html');
   if (writeFiles) {
     fs.writeFileSync(reportHistoryPath, JSON.stringify(reportHistory, null, 2) + '\n');
     fs.writeFileSync(reportHistoryMarkdownPath, reportHistoryMarkdown);
     fs.writeFileSync(reportHistoryHtmlPath, markdownToBasicHtml(reportHistoryMarkdown));
+    fs.writeFileSync(deliveryStatusPath, JSON.stringify(deliveryOverview, null, 2) + '\n');
+    fs.writeFileSync(deliveryStatusMarkdownPath, deliveryStatusMarkdown);
+    fs.writeFileSync(deliveryStatusHtmlPath, markdownToBasicHtml(deliveryStatusMarkdown));
   }
   const cockpitHtmlPath = path.join(overviewDir, 'index.html');
   if (writeFiles) {
-    const cockpitHtml = renderCockpitPage({ dailySummary, approvalsQueue, reportHistory, summaries });
+    const cockpitHtml = renderCockpitPage({ dailySummary, approvalsQueue, reportHistory, summaries, deliveryOverview });
     fs.writeFileSync(cockpitHtmlPath, cockpitHtml);
   }
   return {
@@ -1061,6 +1108,8 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     dailySummaryMarkdown,
     reportHistory,
     reportHistoryMarkdown,
+    deliveryOverview,
+    deliveryStatusMarkdown,
     portfolioIndexPath,
     pendingActionsPath,
     approvalsQueuePath,
@@ -1072,6 +1121,9 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     reportHistoryPath,
     reportHistoryMarkdownPath,
     reportHistoryHtmlPath,
+    deliveryStatusPath,
+    deliveryStatusMarkdownPath,
+    deliveryStatusHtmlPath,
     cockpitHtmlPath,
   };
 }
@@ -1101,6 +1153,8 @@ module.exports = {
   renderDailySummaryMarkdown,
   buildReportHistory,
   renderReportHistoryMarkdown,
+  buildDeliveryOverview,
+  renderDeliveryStatusMarkdown,
   renderCockpitPage,
   generateOverviewArtifacts,
 };

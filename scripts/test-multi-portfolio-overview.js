@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
-const { buildApprovalsQueue, buildDailySummary, buildReportHistory, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -150,6 +150,28 @@ async function main() {
   assert(cockpitHtml.includes('portfolio-overview.html'), 'Expected overview nav link');
   assert(cockpitHtml.includes('summary.html'), 'Expected portfolio summary link');
   assert(cockpitHtml.includes('badge-'), 'Expected health badge in cockpit');
+  assert(cockpitHtml.includes('delivery-status.html'), 'Expected delivery status nav link in cockpit');
+
+  // Phase 42: delivery & alerting status
+  const deliveryOverview = buildDeliveryOverview(path.resolve(__dirname, '..'));
+  assert(deliveryOverview.schemaVersion === '1.0', 'Expected delivery overview schema version');
+  assert(typeof deliveryOverview.portfolioCount === 'number' && deliveryOverview.portfolioCount > 0, 'Expected at least one portfolio in delivery overview');
+  assert(deliveryOverview.portfolios.some((p) => p.portfolio === 'etf'), 'Expected etf in delivery overview');
+  const etfDelivery = deliveryOverview.portfolios.find((p) => p.portfolio === 'etf');
+  assert(typeof etfDelivery.deliveryMode === 'string', 'Expected delivery mode');
+  assert(Array.isArray(etfDelivery.intendedChannels), 'Expected intended channels array');
+  assert(typeof etfDelivery.ready === 'boolean', 'Expected ready boolean');
+  const deliveryMd = renderDeliveryStatusMarkdown(deliveryOverview);
+  assert(deliveryMd.includes('# Delivery & Alerting Status'), 'Expected delivery status title');
+  assert(deliveryMd.includes('etf'), 'Expected etf in delivery markdown');
+  assert(deliveryMd.includes('Delivery mode:'), 'Expected delivery mode line');
+
+  assert(fs.existsSync(generated.deliveryStatusPath), 'Expected delivery status json artifact');
+  assert(fs.existsSync(generated.deliveryStatusMarkdownPath), 'Expected delivery status markdown artifact');
+  assert(fs.existsSync(generated.deliveryStatusHtmlPath), 'Expected delivery status html artifact');
+  const deliveryHtml = fs.readFileSync(generated.deliveryStatusHtmlPath, 'utf8');
+  assert(deliveryHtml.includes('Delivery'), 'Expected delivery html title');
+  assert(deliveryHtml.includes('local_only') || deliveryHtml.includes('Delivery mode'), 'Expected delivery mode in html');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
