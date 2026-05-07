@@ -15,22 +15,22 @@ function assert(cond, msg) {
 console.log('=== Market Hours Guard ===');
 
 // Simulate a Wednesday at 10:00 CET
-const wedMorning = new Date('2026-05-06T10:00:00');
+const wedMorning = new Date('2026-05-06T08:00:00Z'); // 10:00 CET
 const result1 = isMarketOpen('EBS', wedMorning);
 assert(result1.open === true, 'Wednesday 10:00 CET → market open');
 
 // Simulate a Wednesday at 18:00 CET (after close)
-const wedEvening = new Date('2026-05-06T18:00:00');
+const wedEvening = new Date('2026-05-06T16:00:00Z'); // 18:00 CET
 const result2 = isMarketOpen('EBS', wedEvening);
 assert(result2.open === false, 'Wednesday 18:00 CET → market closed');
 
 // Simulate a Saturday
-const saturday = new Date('2026-05-09T12:00:00');
+const saturday = new Date('2026-05-09T10:00:00Z'); // Saturday
 const result3 = isMarketOpen('EBS', saturday);
 assert(result3.open === false, 'Saturday 12:00 → market closed (weekend)');
 
 // Simulate before open
-const earlyMorning = new Date('2026-05-06T07:30:00');
+const earlyMorning = new Date('2026-05-06T05:30:00Z'); // 07:30 CET = 05:30 UTC
 const result4 = isMarketOpen('EBS', earlyMorning);
 assert(result4.open === false, 'Wednesday 07:30 CET → before open');
 
