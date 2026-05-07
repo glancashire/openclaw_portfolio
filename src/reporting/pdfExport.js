@@ -18,25 +18,53 @@ function markdownReportToPdfStub(markdownPath) {
   return { pdfPath, mode: 'stub' };
 }
 
-function markdownToBasicHtml(markdown) {
-  const escaped = markdown
+function escapeHtml(text) {
+  return String(text)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
 
-  const html = escaped
-    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
-    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
-    .replace(/^- (.*)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`)
-    .replace(/\|(.+)\|/g, (line) => line)
-    .split(/\n\n+/)
-    .map((block) => {
-      if (/^<h[1-3]>/.test(block) || /^<ul>/.test(block) || /^\|/.test(block)) return block;
-      return `<p>${block.replace(/\n/g, '<br/>')}</p>`;
-    })
-    .join('\n');
+function renderMarkdownTable(block) {
+  const lines = block.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return `<p>${lines.map(escapeHtml).join('<br/>')}</p>`;
+  const rows = lines
+    .filter((line) => /^\|.*\|$/.test(line.trim()))
+    .map((line) => line.split('|').slice(1, -1).map((cell) => escapeHtml(cell.trim())));
+  if (rows.length < 2) return `<p>${lines.map(escapeHtml).join('<br/>')}</p>`;
+  const header = rows[0];
+  const bodyRows = rows.slice(2);
+  const thead = `<thead><tr>${header.map((cell) => `<th>${cell}</th>`).join('')}</tr></thead>`;
+  const tbody = bodyRows.length
+    ? `<tbody>${bodyRows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`
+    : '';
+  return `<table>${thead}${tbody}</table>`;
+}
+
+function markdownToBasicHtml(markdown) {
+  const normalized = String(markdown)
+    .replace(/^###\s+(.*)$/gm, '### $1\n\n')
+    .replace(/^##\s+(.*)$/gm, '## $1\n\n')
+    .replace(/^#\s+(.*)$/gm, '# $1\n\n')
+    .replace(/\n{3,}/g, '\n\n');
+  const blocks = normalized.split(/\n\n+/);
+  const html = blocks.map((block) => {
+    const trimmed = block.trim();
+    if (!trimmed) return '';
+    if (/^###\s+[^\n]+$/.test(trimmed)) return `<h3>${escapeHtml(trimmed.replace(/^###\s+/, ''))}</h3>`;
+    if (/^##\s+[^\n]+$/.test(trimmed)) return `<h2>${escapeHtml(trimmed.replace(/^##\s+/, ''))}</h2>`;
+    if (/^#\s+[^\n]+$/.test(trimmed)) return `<h1>${escapeHtml(trimmed.replace(/^#\s+/, ''))}</h1>`;
+    if (/^(?:- .*(?:\n|$))+/.test(trimmed)) {
+      const items = trimmed.split(/\r?\n/).filter((line) => line.startsWith('- '));
+      return `<ul>${items.map((line) => `<li>${escapeHtml(line.slice(2))}</li>`).join('')}</ul>`;
+    }
+    if (/^\|.*\|(?:\n\|.*\|)+$/m.test(trimmed)) return renderMarkdownTable(trimmed);
+    if (/^(?:\d+\. .*(?:\n|$))+/.test(trimmed)) {
+      const items = trimmed.split(/\r?\n/).filter((line) => /^\d+\. /.test(line));
+      return `<ol>${items.map((line) => `<li>${escapeHtml(line.replace(/^\d+\.\s+/, ''))}</li>`).join('')}</ol>`;
+    }
+    return `<p>${trimmed.split(/\r?\n/).map(escapeHtml).join('<br/>')}</p>`;
+  }).filter(Boolean).join('\n');
 
   return `<!doctype html>
 <html>

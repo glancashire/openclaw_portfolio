@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now underway, and Phases 28-33 have been completed to turn the per-portfolio dashboard into a more operator-centric command-center surface, generate structured UI-ready summary artifacts for portfolios/portfolio indexing/pending actions, layer a generated multi-portfolio overview board on top of those artifacts, unify approvals/pending actions into a structured operator queue across dashboard/report/summary/overview outputs, restructure reports into clearer decision-vs-audit layers, and expose grouped progress-aware onboarding workflow status for draft portfolios. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now underway, and Phases 28-34 have been completed to turn the per-portfolio dashboard into a more operator-centric command-center surface, generate structured UI-ready summary artifacts for portfolios/portfolio indexing/pending actions, layer a generated multi-portfolio overview board on top of those artifacts, unify approvals/pending actions into a structured operator queue across dashboard/report/summary/overview outputs, restructure reports into clearer decision-vs-audit layers, expose grouped progress-aware onboarding workflow status for draft portfolios, and generate static per-portfolio HTML summary pages for future control-UI/operator consumption. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
 
 ## Validation snapshot
 
@@ -102,6 +102,7 @@ Legend:
 - dashboard/report/summary/overview outputs now share a structured operator queue model with queue type, severity, status, rank, and queue-summary rollups
 - reports now expose a clearer decision layer with blocker summary, change summary, and urgency-labeled recommendations
 - onboarding workflow helpers now expose grouped sections, progress metrics, and explicit next-step guidance for draft portfolios
+- per-portfolio structured summaries now also render a static `summary.html` page for operator/control-UI consumption
 - history snapshot writing exists with typed execution states
 - weekly/monthly/quarterly report generation exists
 - local-only report delivery readiness inspection exists
@@ -177,7 +178,7 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-The tracked post-MVP usability follow-on phases are now complete through the currently named Phase 33 onboarding workflow uplift.
+The tracked post-MVP usability follow-on phases are now complete through the currently named Phase 34 control-UI portfolio summary page uplift.
 Further work should be re-entered as a freshly defined roadmap phase list rather than guessed from old notes.
 
 ## Known environment caveat

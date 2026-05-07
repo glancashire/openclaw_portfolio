@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { collectPortfolioSummary, buildPortfolioIndex, buildPendingActionsOverview } = require('../src/reporting/summaryArtifacts');
+const { collectPortfolioSummary, buildPortfolioIndex, buildPendingActionsOverview, generatePortfolioSummaryArtifacts, renderPortfolioSummaryMarkdown } = require('../src/reporting/summaryArtifacts');
 const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
 
 function assert(condition, message) {
@@ -18,6 +18,9 @@ async function main() {
   const dashboardPath = await regenerateDashboard(portfolioDir);
   const dashboard = fs.readFileSync(dashboardPath, 'utf8');
   const summary = await collectPortfolioSummary({ portfolioDir });
+  const generated = await generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles: true });
+  const renderedMarkdown = renderPortfolioSummaryMarkdown(summary);
+  const html = fs.readFileSync(path.join(portfolioDir, 'summary.html'), 'utf8');
   const index = buildPortfolioIndex([summary]);
   const pending = buildPendingActionsOverview([summary]);
 
@@ -32,6 +35,13 @@ async function main() {
   assert(summary.operatorQueue.summary && typeof summary.operatorQueue.summary.total === 'number', 'Expected operator queue summary');
   assert(Array.isArray(summary.recentMaterialEvents), 'Expected material events array');
   assert(typeof summary.recommendedNextStep === 'string' && summary.recommendedNextStep.length > 0, 'Expected recommended next step');
+  assert(typeof renderedMarkdown === 'string' && renderedMarkdown.includes('# Portfolio Summary Page: etf'), 'Expected rendered portfolio summary markdown');
+  assert(generated.htmlPath.endsWith('summary.html'), 'Expected generated per-portfolio html path');
+  assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
+  assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
+  assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
+  assert(html.includes('<table>'), 'Expected html table rendering for summary page');
+  assert(html.includes('<ol>') || html.includes('<ul>'), 'Expected list rendering in summary html');
 
   assert(dashboard.includes(`Portfolio status: ${summary.status.health}`), 'Dashboard health should align with summary');
   assert(dashboard.includes(`Pending approvals: ${summary.approvals.pendingApprovalCount}`), 'Dashboard pending approvals should align');

@@ -10,6 +10,7 @@ const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
+const { markdownToBasicHtml } = require('./pdfExport');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep } = require('./dashboardGenerator');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 
@@ -451,13 +452,50 @@ async function collectPortfolioSummary({ portfolioDir }) {
   });
 }
 
+function renderPortfolioSummaryMarkdown(summary = {}) {
+  const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
+  const blockers = Array.isArray(summary.blockers?.items) ? summary.blockers.items : [];
+  const allocationRows = Array.isArray(summary.allocation) ? summary.allocation : [];
+  const instrumentRows = Array.isArray(summary.instruments) ? summary.instruments : [];
+  const eventRows = Array.isArray(summary.recentMaterialEvents) ? summary.recentMaterialEvents : [];
+  const onboarding = summary.onboardingWorkflow || null;
+
+  const queueLines = queueItems.length
+    ? queueItems.map((item, index) => `${index + 1}. [${item.queueType || item.kind || 'workflow'}/${item.status}/${item.severity}] ${item.summary} — ${item.recommendedOperatorAction || 'Review and resolve as appropriate.'}`).join('\n')
+    : '1. No pending operator queue items.';
+
+  const blockerLines = blockers.length
+    ? blockers.map((item, index) => `${index + 1}. [${item.severity || 'info'}] ${item.message}`).join('\n')
+    : '1. No active blockers.';
+
+  const allocationTable = allocationRows.length
+    ? allocationRows.map((row) => `| ${row.assetClass} | ${row.currentPct} | ${row.targetPct} | ${row.driftPct} | ${row.status} |`).join('\n')
+    : '| none | 0 | 0 | 0 | n/a |';
+
+  const instrumentTable = instrumentRows.length
+    ? instrumentRows.map((row) => `| ${row.tickerOrIsin} | ${row.name} | ${row.assetClass} | ${row.targetPct} | ${row.latestProposal?.status || 'none'} | ${row.latestProposal?.approval || 'n/a'} |`).join('\n')
+    : '| none | none | none | 0 | none | n/a |';
+
+  const eventLines = eventRows.length
+    ? eventRows.map((item, index) => `${index + 1}. [${item.severity || 'info'}] ${item.summary || item.message || 'event'}${item.timestamp ? ` (${item.timestamp})` : ''}`).join('\n')
+    : '1. No recent material events.';
+
+  const onboardingSection = onboarding
+    ? `## Onboarding Workflow\n- Completion: ${onboarding.completionPct}%\n- Answered questions: ${onboarding.answeredCount}/${onboarding.totalQuestions}\n- Pending questions: ${onboarding.pendingCount}\n- Ready for activation-question gate: ${onboarding.readyForActivationQuestions ? 'yes' : 'no'}\n- Next step: ${onboarding.nextStep}\n\n### Onboarding Sections\n${(onboarding.sections || []).length ? onboarding.sections.map((section) => `- ${section.label}: ${section.pendingCount} pending`).join('\n') : '- No pending onboarding sections.'}\n\n` : '';
+
+  return `# Portfolio Summary Page: ${summary.portfolio || 'unknown'}\n\n## Status Snapshot\n- Generated at: ${summary.generatedAt || 'unknown'}\n- Health: ${summary.status?.health || 'unknown'}\n- Strategy status: ${summary.status?.strategy || 'unknown'}\n- Broker health: ${summary.status?.brokerHealth || 'unknown'}\n- Execution posture: ${summary.status?.executionPosture || 'unknown'}\n- Delivery posture: ${summary.status?.deliveryPosture || 'unknown'}\n- Data freshness: ${summary.status?.dataFreshness || 'unknown'}\n\n## Holdings Snapshot\n- Total value CHF: ${summary.holdings?.totalValueChf || 0}\n- Cash CHF: ${summary.holdings?.cashChf || 0}\n- Invested CHF: ${summary.holdings?.investedChf || 0}\n- Holding count: ${summary.holdings?.holdingCount || 0}\n- Last sync: ${summary.holdings?.lastSyncAt || 'unknown'}\n- Latest snapshot date: ${summary.holdings?.latestSnapshotDate || 'unknown'}\n\n## Recommended Next Step\n- ${summary.recommendedNextStep || 'No recommendation available.'}\n\n## Operator Queue Summary\n- Total queue items: ${summary.operatorQueue?.summary?.total || 0}\n- Blocking items: ${summary.operatorQueue?.summary?.blocking || 0}\n- Approval items: ${summary.operatorQueue?.summary?.approvals || 0}\n- Recovery items: ${summary.operatorQueue?.summary?.recovery || 0}\n- Warning items: ${summary.operatorQueue?.summary?.warnings || 0}\n\n## Operator Queue Items\n${queueLines}\n\n## Blockers\n${blockerLines}\n\n## Execution Posture\n- Proposed trades: ${summary.approvals?.proposedCount || 0}\n- Approved trades: ${summary.approvals?.approvedCount || 0}\n- Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}\n- In-flight rows: ${summary.execution?.inFlightCount || 0}\n- Failed rows: ${summary.execution?.failedCount || 0}\n\n## Allocation\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${allocationTable}\n\n## Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Latest proposal status | Approval |\n|---|---|---|---:|---|---|\n${instrumentTable}\n\n${onboardingSection}## Recent Material Events\n${eventLines}\n`;
+}
+
 async function generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles = true }) {
   const summary = await collectPortfolioSummary({ portfolioDir });
   const outPath = path.join(portfolioDir, 'summary.json');
+  const htmlPath = path.join(portfolioDir, 'summary.html');
+  const markdown = renderPortfolioSummaryMarkdown(summary);
   if (writeFiles) {
     fs.writeFileSync(outPath, JSON.stringify(summary, null, 2) + '\n');
+    fs.writeFileSync(htmlPath, markdownToBasicHtml(markdown));
   }
-  return { summary, outPath };
+  return { summary, outPath, htmlPath, markdown };
 }
 
 function listPortfolioDirectories(repoRoot = process.cwd()) {
@@ -561,6 +599,7 @@ module.exports = {
   queueTypeForItem,
   summarizeOperatorQueue,
   collectPortfolioSummary,
+  renderPortfolioSummaryMarkdown,
   generatePortfolioSummaryArtifacts,
   listPortfolioDirectories,
   buildPortfolioIndex,
