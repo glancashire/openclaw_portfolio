@@ -290,6 +290,27 @@ function listOpenBrokerOrderRows(tradesPath) {
   }));
 }
 
+function requeueBlockedTradeRow(tradesPath, selector, options = {}) {
+  const approval = options.approval || 'queued_for_open_runner';
+  const reasonNote = options.reasonNote || 'Row requeued for market-open runner after operator review.';
+  return updateTradeRows(tradesPath, selector, (row) => {
+    const orderId = String(row['Broker order id'] || '').trim();
+    if (orderId) return null;
+    const blockCode = String(row['Block code'] || '').trim();
+    if (!blockCode) return null;
+    return {
+      ...row,
+      Status: ['proposed', 'planned', 'approved'].includes(String(row.Status || '').trim().toLowerCase()) ? row.Status : 'approved',
+      Approval: approval,
+      'Block code': '',
+      'Block reason': '',
+      'Blocked at': '',
+      'Next action': '',
+      Reason: appendReasonNote(row.Reason, reasonNote),
+    };
+  });
+}
+
 function listExecutableTradeRows(tradesPath) {
   const table = readTradesTable(tradesPath);
   return table.rows.filter((row) => {
@@ -331,4 +352,5 @@ module.exports = {
   reconcileOrderStatus,
   mapBrokerOrderStatus,
   appendReasonNote,
+  requeueBlockedTradeRow,
 };
