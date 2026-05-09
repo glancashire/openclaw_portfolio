@@ -14,6 +14,7 @@ This is the active incident and operator reference.
 - `node scripts/reject-portfolio-trade.js portfolio/etf '<json>'`
 - `node scripts/trade.js queue-open --ticker <tickerOrIsin> --action <buy|sell>`
 - `node scripts/trade.js requeue-open --ticker <tickerOrIsin> --action <buy|sell>`
+- `node scripts/trade.js status portfolio/etf`
 - `node scripts/stage-portfolio-order.js portfolio/etf '<json>' stage`
 - `node scripts/check-transmitted-live-readiness.js portfolio/etf '<json>'`
 - `node scripts/resync-portfolio-orders.js portfolio/etf`
@@ -38,6 +39,7 @@ This is the active incident and operator reference.
 - `Open-runner retries` should only reflect rows that were blocked, reviewed, and intentionally requeued.
 - Use `queue-open` for the first handoff of an eligible row.
 - Use `requeue-open` only after a row was blocked and explicitly reviewed for retry.
+- Use `trade.js status` when you want a quick CLI check of first-handoff vs retry counts without opening `dashboard.md` or `summary.md`.
 - Confirm command evidence in `runtime/events/runtime-events.jsonl`: successful first handoffs now emit `queue_open_runner` with `retry: false`, while retries emit `queue_open_runner` with `retry: true`.
 - If `Blocked rows` is non-zero, inspect blocker fields in `trades.md` and use the recovery/requeue workflow before retrying.
 - If broker readiness is degraded, treat pricing as review-only unless readiness returns to live-safe posture.

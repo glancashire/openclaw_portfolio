@@ -7,6 +7,7 @@ Use these entry points:
 - `node scripts/trade.js propose`
 - `node scripts/trade.js validate`
 - `node scripts/trade.js submit`
+- `node scripts/trade.js status portfolio/etf`
 - `node scripts/submit-orders-at-open.js`
 - `node scripts/resync-portfolio-orders.js portfolio/etf`
 
@@ -26,6 +27,7 @@ Use these entry points:
 - delayed-only broker pricing may support fallback pricing/reporting, but must not be treated as live-ready submission state
 - runtime evidence belongs in `runtime/events/runtime-events.jsonl` and portfolio artifacts
 - successful `queue-open` and `requeue-open` actions should leave matching `queue_open_runner` runtime-event evidence
+- `trade.js status` should reflect the same first-handoff vs retry split that dashboards and summaries show
 
 ## Primary docs
 - `docs/operator-runbooks.md`

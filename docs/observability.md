@@ -6,6 +6,7 @@
 - portfolio dashboards and history files for operator-facing state
 
 ## Typical checks
+- `node scripts/trade.js status portfolio/etf`
 - `node scripts/show-runtime-events.js --portfolio etf`
 - `node scripts/check-risk-observability.js portfolio/etf`
 - `node scripts/check-safety-controls.js portfolio/etf`
@@ -22,6 +23,7 @@
 - `Open-runner retries` means previously blocked rows were explicitly recovered and requeued via `requeue-open`.
 - `Blocked rows` means market-open execution skipped rows and wrote explicit blocker metadata (`Block code`, `Block reason`, `Blocked at`, `Next action`) into `trades.md`.
 - Summary artifacts now surface queued and blocked counts alongside approval and broker-readiness posture.
+- `trade.js status` should agree with dashboard/summary surfaces on the split between `Open-runner first handoffs` and `Open-runner retries`.
 
 ## Rule
 Keep runtime evidence local, structured, and short. Use Markdown for the operator view, JSONL for detail.
