@@ -73,10 +73,14 @@ async function main() {
   assert(recommendedActionText.includes('2. [open_runner/retry] acceptance-closure: Blocked row was requeued for the next intended market-open run. — Verify blocker recovery before the retry window opens.'), 'Expected helper retry recommended action text');
 
   const totals = summarizeOverview(index, pending);
+  assert(Object.keys(totals).sort().join(',') === ['activeCount','blockedCount','demoLikeCount','healthyCount','pendingActions','pendingApprovals','portfolioCount','totalValueChf','warningCount'].sort().join(','), 'Expected stable overview totals keys');
   assert(totals.portfolioCount === 2, 'Expected portfolio count');
   assert(totals.totalValueChf === 5000, 'Expected total value');
   assert(totals.activeCount === 1, 'Expected one active portfolio');
   assert(totals.demoLikeCount === 1, 'Expected one demo-like portfolio');
+  assert(totals.healthyCount === 0, 'Expected zero healthy portfolios');
+  assert(totals.warningCount === 2, 'Expected two warning portfolios');
+  assert(totals.blockedCount === 0, 'Expected zero blocked portfolios');
   assert(totals.pendingApprovals === 7, 'Expected pending approvals total');
   assert(totals.pendingActions === 2, 'Expected pending action total');
 
