@@ -1,6 +1,6 @@
 # Phase 98 Actionable Checklist
 
-- [ ] Inspect overview markdown identity assertions
-- [ ] Add overview markdown identity checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect overview markdown identity assertions
+- [x] Add overview markdown identity checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

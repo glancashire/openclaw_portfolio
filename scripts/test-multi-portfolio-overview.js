@@ -169,6 +169,10 @@ async function main() {
   assert(approvalsHtml.includes('Approvals Queue'), 'Expected approvals queue html artifact');
   assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
   assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
+  assert(overviewMarkdown.includes('# Multi-Portfolio Overview'), 'Expected overview markdown title');
+  assert(overviewMarkdown.includes('## Portfolio Board'), 'Expected overview markdown portfolio board section');
+  assert(overviewMarkdown.includes('## Operator Queue Summary'), 'Expected overview markdown queue summary section');
+  assert(overviewMarkdown.includes('## Cross-Portfolio Recommended Actions'), 'Expected overview markdown recommended actions section');
   assert(overviewMarkdown.includes('First handoffs'), 'Expected first-handoff column in generated overview markdown');
   assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
   assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
