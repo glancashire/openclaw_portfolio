@@ -14,6 +14,7 @@ async function fetchLatestPrice({ conid, portfolio = 'etf', appCode = null, pref
     const bid = parseNumeric(readField(first, '84'));
     const ask = parseNumeric(readField(first, '86'));
     const last = parseNumeric(readField(first, '31'));
+    const close = parseNumeric(readField(first, '7295')) || parseNumeric(first?.close);
     const currency = readField(first, '85') || first?.currency || null;
     return {
       ok: true,
@@ -22,6 +23,7 @@ async function fetchLatestPrice({ conid, portfolio = 'etf', appCode = null, pref
       bid,
       ask,
       last,
+      close,
       currency,
       raw: first,
       log: logBrokerEvent({

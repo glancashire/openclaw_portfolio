@@ -5,16 +5,15 @@
  * Reads executable trade rows from portfolio/<name>/trades.md instead of a hard-coded list.
  */
 
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { validateTradeList } = require('../lib/etfQualityFilter');
 const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
 const { listExecutableTradeRows, updateTradeRows } = require('../src/execution/tradeState');
 const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
+const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing');
 const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
 
-const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const cliArgs = process.argv.slice(2);
 const DRY_RUN = cliArgs.includes('--dry-run');
 const FORCE = cliArgs.includes('--force');
@@ -24,31 +23,14 @@ const portfolioDir = path.resolve(positionalArgs[0] || path.join(__dirname, '..'
 const tradesPath = path.join(portfolioDir, 'trades.md');
 const portfolioPath = path.join(portfolioDir, 'portfolio.md');
 
-function ibkr(args) {
-  return execSync(`python3 ${IBKR_CLI} ${args}`, { encoding: 'utf8', timeout: 30000 }).trim();
-}
-
-function getLiveQuote(symbol, exchange, currency, primaryExchange) {
-  const script = `
-from ib_insync import *
-ib = IB()
-ib.connect('127.0.0.1', 4001, clientId=110, timeout=10)
-ib.reqMarketDataType(1)
-contract = Stock('${symbol}', '${exchange}', '${currency}'${primaryExchange ? `, primaryExchange='${primaryExchange}'` : ''})
-ib.qualifyContracts(contract)
-ticker = ib.reqMktData(contract)
-ib.sleep(8)
-import json
-print(json.dumps({"bid": ticker.bid if ticker.bid == ticker.bid else None, "ask": ticker.ask if ticker.ask == ticker.ask else None, "last": ticker.last if ticker.last == ticker.last else None, "close": ticker.close if ticker.close == ticker.close else None}))
-ib.disconnect()
-`;
-  try {
-    const out = execSync(`python3 -c '${script.replace(/'/g, "'\\''")}'`, { encoding: 'utf8', timeout: 20000 });
-    return JSON.parse(out.trim());
-  } catch (e) {
-    console.error(`[smart-exec] Quote failed for ${symbol}: ${e.message}`);
+async function getLiveQuote(trade) {
+  if (!trade?.conid) return null;
+  const quote = await fetchLatestPrice({ conid: trade.conid, portfolio: path.basename(portfolioDir) });
+  if (!quote?.ok) {
+    console.error(`[smart-exec] Quote failed for ${trade.symbol}: ${quote?.error || quote?.reason || 'unknown error'}`);
     return null;
   }
+  return quote;
 }
 
 function calculateSmartLimit(quote, action) {
@@ -218,7 +200,7 @@ async function main() {
   const orders = [];
   for (const trade of executable) {
     console.log(`Fetching live quote for ${trade.symbol}...`);
-    const quote = getLiveQuote(trade.symbol, trade.exchange, trade.currency, trade.primaryExchange);
+    const quote = await getLiveQuote(trade);
     if (!quote) {
       const reason = 'No broker quote was available during market-open execution.';
       console.error(`  ✗ No quote available for ${trade.symbol} — skipping`);
@@ -287,9 +269,21 @@ async function main() {
 
     console.log(`Placing: ${order.action} ${order.qty} ${order.symbol} @ ${order.limit} ${order.currency}`);
     try {
-      const raw = ibkr(args.join(' '));
-      const result = JSON.parse(raw);
-      const orderId = result.trade?.orderId ? String(result.trade.orderId) : '';
+      const { InteractiveBrokersClient } = require('../src/brokers/interactive-brokers/client');
+      const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
+      const result = await client.placeOrder({
+        symbol: order.symbol,
+        conid: order.conid,
+        action: order.action,
+        quantity: order.qty,
+        orderType: 'LMT',
+        limitPrice: order.limit,
+        currency: order.currency,
+        exchange: order.exchange,
+        secType: 'STK',
+      }, { dryRun: false, revocableOnly: true, transmitLive: false });
+      if (!result.ok) throw new Error(result.error || result.message || result.reason || 'Broker placeOrder failed');
+      const orderId = result.order?.orderId ? String(result.order.orderId) : '';
       updateTradeRows(tradesPath, { dateTime: order.row.dateTime, tickerOrIsin: order.row.tickerOrIsin, action: order.row.action }, (row) => ({
         ...row,
         Status: 'submitted',
@@ -298,8 +292,8 @@ async function main() {
         'Limit price': String(order.limit),
         Reason: `${row.Reason}; Market-open live submission attempted.`,
       }));
-      console.log(`  → orderId=${result.trade?.orderId} status=${result.trade?.status}`);
-      results.push({ ...order, orderId: result.trade?.orderId, status: result.trade?.status, errors: result.errors });
+      console.log(`  → orderId=${result.order?.orderId} status=${result.order?.status}`);
+      results.push({ ...order, orderId: result.order?.orderId, status: result.order?.status, errors: result.brokerErrors });
     } catch (e) {
       console.error(`  ✗ Order failed: ${e.message}`);
       results.push({ ...order, orderId: null, status: 'error', error: e.message });
