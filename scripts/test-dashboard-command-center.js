@@ -13,6 +13,7 @@ function main() {
     brokerReadiness: { fallbackRequired: true, message: 'IBKR unavailable' },
     brokerErrorState: { stopAutomation: false },
     lifecycleSummary: { approved: 2, submitted: 1, partiallyFilled: 0 },
+    openRunnerRetryState: { queuedInitial: 1, queuedRetry: 1 },
     safetyDiagnostics: { holdingsHealth: { stalePricing: true } },
     recommended: ['Review proposals now.'],
   });
@@ -52,6 +53,7 @@ function main() {
     latestSnapshot: { date: '2026-05-03', dailyChange: '0', dailyChangePct: '0', notes: 'demo snapshot' },
     brokerReadiness: { fallbackRequired: true, message: 'gateway unavailable' },
     lifecycleSummary: { proposed: 1, approved: 1, rejected: 0, staged: 0, submitted: 1, partiallyFilled: 0, filled: 0, cancelled: 0, failed: 1, planned: 0, withBrokerOrderId: 1 },
+    openRunnerRetryState: { queuedInitial: 1, queuedRetry: 1 },
     freshness: { stale: false, dashboardExists: true, newestSourcePath: 'holdings.md' },
     brokerErrorState: { stopAutomation: false, consecutive: 0 },
     deliveryStatus: { ready: false, latestHistoryDate: '2026-05-03', deliveryMode: 'local_only', failureAlertMode: 'local_operator_review', pendingActions: ['Delivery readiness needs review.'] },
@@ -82,6 +84,10 @@ function main() {
   assert(/Broker health: gateway unavailable/i.test(dashboard), 'Expected broker health line');
   assert(/Resolve the active blocker:/i.test(dashboard), 'Expected blocker-driven recommendation');
   assert(/draft_execution_blocked/i.test(dashboard), 'Expected recent material event row');
+  assert(/Open-runner first handoffs: 1/i.test(dashboard), 'Expected first-handoff queue summary in dashboard');
+  assert(/Open-runner retries: 1/i.test(dashboard), 'Expected retry queue summary in dashboard');
+  assert(/\[open_runner_queue\/ready_for_review\/medium\]/i.test(dashboard), 'Expected first-handoff pending action row');
+  assert(/\[open_runner_retry\/ready_for_review\/medium\]/i.test(dashboard), 'Expected retry pending action row');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
