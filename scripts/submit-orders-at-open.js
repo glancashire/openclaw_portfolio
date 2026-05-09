@@ -6,12 +6,13 @@
  */
 
 const { execSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 const { validateTradeList } = require('../lib/etfQualityFilter');
 const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
 const { listExecutableTradeRows, updateTradeRows } = require('../src/execution/tradeState');
 const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
-const { evaluateExecutionPolicy } = require('../src/execution/portfolioExecution');
+const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const cliArgs = process.argv.slice(2);
@@ -61,6 +62,90 @@ function calculateSmartLimit(quote, action) {
   return Math.round(ref * buffer * 10000) / 10000;
 }
 
+function parseBooleanLine(text, label) {
+  const match = text.match(new RegExp(`- ${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:\\s*(.+)`));
+  if (!match) return null;
+  const value = String(match[1] || '').trim();
+  if (/^(true|yes)$/i.test(value)) return true;
+  if (/^(false|no)$/i.test(value)) return false;
+  return null;
+}
+
+function loadMarketEntryPolicy() {
+  const text = fs.readFileSync(portfolioPath, 'utf8');
+  return {
+    avoidBuyingAfterExtremeDailyMoves: parseBooleanLine(text, 'Avoid buying after extreme daily price moves') !== false,
+  };
+}
+
+function analyzeQuoteTrend(quote) {
+  const close = Number(quote?.close);
+  const last = Number(quote?.last);
+  const bid = Number(quote?.bid);
+  const ask = Number(quote?.ask);
+  const reference = Number.isFinite(last) && last > 0
+    ? last
+    : Number.isFinite(ask) && ask > 0
+      ? ask
+      : Number.isFinite(bid) && bid > 0
+        ? bid
+        : null;
+  if (!Number.isFinite(close) || close <= 0 || !Number.isFinite(reference) || reference <= 0) {
+    return { ok: false, trend: 'unknown', movePct: null, referencePrice: reference, closePrice: Number.isFinite(close) ? close : null };
+  }
+  const movePct = Number((((reference - close) / close) * 100).toFixed(2));
+  return {
+    ok: true,
+    trend: movePct >= 1 ? 'up' : movePct <= -1 ? 'down' : 'flat',
+    movePct,
+    referencePrice: reference,
+    closePrice: close,
+  };
+}
+
+function shouldBlockForTrend({ action, trendInfo, marketEntryPolicy, extremeMovePct = 3 }) {
+  if (String(action || '').toUpperCase() !== 'BUY') return { block: false, reason: null };
+  if (!marketEntryPolicy?.avoidBuyingAfterExtremeDailyMoves) return { block: false, reason: null };
+  if (!trendInfo?.ok) return { block: false, reason: null };
+  if (Number(trendInfo.movePct) >= extremeMovePct) {
+    return {
+      block: true,
+      reason: `Buy skipped because price is up ${trendInfo.movePct}% versus prior close, breaching the extreme daily move guard (${extremeMovePct}%).`,
+    };
+  }
+  return { block: false, reason: null };
+}
+
+function markTradeBlocked(trade, { blockCode, blockReason, nextAction, status = 'approved' }) {
+  const blockedAt = new Date().toISOString().replace('T', ' ').slice(0, 19);
+  updateTradeRows(tradesPath, { dateTime: trade.row.dateTime, tickerOrIsin: trade.row.tickerOrIsin, action: trade.row.action }, (row) => ({
+    ...row,
+    Status: status,
+    'Block code': blockCode,
+    'Block reason': blockReason,
+    'Blocked at': blockedAt,
+    'Next action': nextAction,
+    Reason: `${row.Reason}; ${blockReason}`,
+  }));
+  recordRuntimeEvent({
+    level: 'warn',
+    category: 'market_open_execution',
+    action: 'submission_blocked',
+    portfolio: path.basename(portfolioDir),
+    mode: DRY_RUN ? 'dry_run' : 'live',
+    status: 'blocked',
+    summary: `${trade.symbol} blocked before submission: ${blockReason}`,
+    details: {
+      symbol: trade.symbol,
+      tickerOrIsin: trade.row.tickerOrIsin,
+      action: trade.action,
+      quantity: trade.qty,
+      blockCode,
+      nextAction,
+    },
+  });
+}
+
 function buildExecutableOrders() {
   const rows = listExecutableTradeRows(tradesPath);
   const instruments = readApprovedInstruments(portfolioPath);
@@ -107,6 +192,7 @@ async function main() {
     console.log('✓ Market is open');
   }
 
+  const marketEntryPolicy = loadMarketEntryPolicy();
   const executable = buildExecutableOrders();
   if (executable.length === 0) {
     const message = 'No approved executable trade rows found for market-open submission.';
@@ -134,16 +220,44 @@ async function main() {
     console.log(`Fetching live quote for ${trade.symbol}...`);
     const quote = getLiveQuote(trade.symbol, trade.exchange, trade.currency, trade.primaryExchange);
     if (!quote) {
+      const reason = 'No broker quote was available during market-open execution.';
       console.error(`  ✗ No quote available for ${trade.symbol} — skipping`);
+      markTradeBlocked(trade, {
+        blockCode: 'quote_unavailable',
+        blockReason: reason,
+        nextAction: 'Restore broker pricing and rerun the market-open submission path.',
+      });
+      continue;
+    }
+    const trendInfo = analyzeQuoteTrend(quote);
+    if (trendInfo.ok) {
+      console.log(`  → Trend check: ${trendInfo.trend} (${trendInfo.movePct}% vs prior close ${trendInfo.closePrice})`);
+    } else {
+      console.log('  → Trend check: unavailable (missing usable close/reference price)');
+    }
+    const trendDecision = shouldBlockForTrend({ action: trade.action, trendInfo, marketEntryPolicy });
+    if (trendDecision.block) {
+      console.error(`  ✗ ${trendDecision.reason}`);
+      markTradeBlocked(trade, {
+        blockCode: 'trend_guard_blocked',
+        blockReason: trendDecision.reason,
+        nextAction: 'Review price action after the open and re-approve or reschedule if the move normalizes.',
+      });
       continue;
     }
     const limit = calculateSmartLimit(quote, trade.action);
     if (!limit) {
+      const reason = 'Could not determine a smart limit price from broker quote data.';
       console.error(`  ✗ Cannot determine limit price for ${trade.symbol} — skipping`);
+      markTradeBlocked(trade, {
+        blockCode: 'limit_price_unavailable',
+        blockReason: reason,
+        nextAction: 'Inspect broker quote fields and retry when a usable reference price is available.',
+      });
       continue;
     }
     console.log(`  → Smart limit: ${limit} ${trade.currency}`);
-    orders.push({ ...trade, limit, quote });
+    orders.push({ ...trade, limit, quote, trendInfo });
   }
 
   console.log('');
@@ -202,7 +316,17 @@ async function main() {
   if (!DRY_RUN && results.every((r) => r.status === 'error')) process.exit(3);
 }
 
-main().catch(err => {
-  console.error('FATAL:', err.stack || String(err));
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    console.error('FATAL:', err.stack || String(err));
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  calculateSmartLimit,
+  analyzeQuoteTrend,
+  shouldBlockForTrend,
+  loadMarketEntryPolicy,
+  buildExecutableOrders,
+};
