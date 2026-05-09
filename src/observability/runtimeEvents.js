@@ -78,15 +78,22 @@ function summarizeRuntimeEvents(events = []) {
     blockedTrades: 0,
     degradedBrokerEvents: 0,
     staleDataEvents: 0,
+    openRunnerQueueEvents: 0,
+    openRunnerRetryEvents: 0,
   };
   for (const event of events) {
     const level = String(event.level || 'info');
     const category = String(event.category || 'general');
     summary.byLevel[level] = (summary.byLevel[level] || 0) + 1;
     summary.byCategory[category] = (summary.byCategory[category] || 0) + 1;
-    if (String(event.status || '').toLowerCase().includes('blocked')) summary.blockedTrades += 1;
-    if (String(event.action || '').toLowerCase().includes('broker') && String(event.level || '') === 'warn') summary.degradedBrokerEvents += 1;
-    if (String(event.summary || '').toLowerCase().includes('stale')) summary.staleDataEvents += 1;
+    const status = String(event.status || '').toLowerCase();
+    const action = String(event.action || '').toLowerCase();
+    const summaryText = String(event.summary || '').toLowerCase();
+    if (status.includes('blocked')) summary.blockedTrades += 1;
+    if (action.includes('broker') && String(event.level || '') === 'warn') summary.degradedBrokerEvents += 1;
+    if (summaryText.includes('stale')) summary.staleDataEvents += 1;
+    if (action.includes('queue') && summaryText.includes('market-open') && summaryText.includes('retry')) summary.openRunnerRetryEvents += 1;
+    else if (action.includes('queue') && summaryText.includes('market-open')) summary.openRunnerQueueEvents += 1;
   }
   return summary;
 }

@@ -24,5 +24,7 @@ assert(latest.category === 'risk', 'expected risk event');
 assert(latest.status === 'blocked', 'expected blocked status');
 const summary = summarizeRuntimeEvents(events);
 assert(summary.blockedTrades >= 1, 'expected blocked trade summary count');
+assert(typeof summary.openRunnerQueueEvents === 'number', 'expected open-runner first-handoff event counter');
+assert(typeof summary.openRunnerRetryEvents === 'number', 'expected open-runner retry event counter');
 
 console.log(JSON.stringify({ ok: true, blockers: result.blockers.length, events: events.length }, null, 2));

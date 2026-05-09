@@ -32,6 +32,8 @@ function main() {
   console.log(`Runtime events: ${EVENTS_PATH}`);
   console.log(`Scanned: ${summary.total}`);
   console.log(`Blocked trades: ${summary.blockedTrades}`);
+  console.log(`Open-runner first handoff events: ${summary.openRunnerQueueEvents}`);
+  console.log(`Open-runner retry events: ${summary.openRunnerRetryEvents}`);
   console.log(`Degraded broker events: ${summary.degradedBrokerEvents}`);
   console.log(`Stale-data events: ${summary.staleDataEvents}`);
   console.log('---');
