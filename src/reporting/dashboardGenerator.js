@@ -288,6 +288,8 @@ function formatObservabilityStatus(observability = {}) {
     `- Runtime event file present: ${normalized.eventsPathPresent ? 'yes' : 'no'}`,
     `- Recent runtime events scanned: ${recent.total || 0}`,
     `- Recent blocked trade events: ${recent.blockedTrades || 0}`,
+    `- Open-runner first handoff events: ${recent.openRunnerQueueEvents || 0}`,
+    `- Open-runner retry events: ${recent.openRunnerRetryEvents || 0}`,
     `- Recent degraded broker events: ${recent.degradedBrokerEvents || 0}`,
     `- Recent stale-data events: ${recent.staleDataEvents || 0}`,
   ].join('\n');

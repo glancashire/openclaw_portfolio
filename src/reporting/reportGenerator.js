@@ -126,6 +126,17 @@ function formatOperatorQueueSummary(summary = {}) {
   ].join('\n');
 }
 
+function formatRuntimeEventSummary(summary = {}) {
+  return [
+    `- Runtime events scanned: ${summary.total || 0}`,
+    `- Blocked execution-policy events: ${summary.blockedTrades || 0}`,
+    `- Open-runner first handoff events: ${summary.openRunnerQueueEvents || 0}`,
+    `- Open-runner retry events: ${summary.openRunnerRetryEvents || 0}`,
+    `- Degraded broker events: ${summary.degradedBrokerEvents || 0}`,
+    `- Stale-data events: ${summary.staleDataEvents || 0}`,
+  ].join('\n');
+}
+
 function urgencyLabel(level = 'medium') {
   return level === 'critical' ? 'CRITICAL' : level === 'high' ? 'HIGH' : level === 'low' ? 'LOW' : 'MEDIUM';
 }
@@ -464,4 +475,4 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   };
 }
 
-module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary, loadPreviousReportContext };
+module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, formatRuntimeEventSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary, loadPreviousReportContext };

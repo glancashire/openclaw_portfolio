@@ -61,6 +61,8 @@ async function main() {
   assert(html.includes('Queued for open runner'), 'Expected queued-for-open-runner execution posture in html');
   assert(html.includes('Queued retries'), 'Expected queued-retry execution posture in html');
   assert(html.includes('Blocked rows'), 'Expected blocked-row execution posture in html');
+  assert(html.includes('Open-runner first handoff events'), 'Expected first-handoff runtime-event count in html');
+  assert(html.includes('Open-runner retry events'), 'Expected retry runtime-event count in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
   assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');
   assert(html.includes('outside the allowed band') || html.includes('broker readiness is degraded') || html.includes('approval-gated trade row'), 'Expected explanation text in summary html');
@@ -82,6 +84,8 @@ async function main() {
   assert(dashboard.includes(`Pending approvals: ${summary.approvals.pendingApprovalCount}`), 'Dashboard pending approvals should align');
   assert(dashboard.includes(summary.recommendedNextStep), 'Dashboard recommendation should align with summary');
   assert(dashboard.includes(`Broker health: ${summary.status.brokerMessage}`), 'Dashboard broker message should align with summary');
+  assert(dashboard.includes('Open-runner first handoff events'), 'Dashboard should show first-handoff runtime-event count');
+  assert(dashboard.includes('Open-runner retry events'), 'Dashboard should show retry runtime-event count');
 
   assert(index.schemaVersion === '1.1', 'Expected index schema version');
   assert(index.portfolioCount === 1, 'Expected one portfolio in index');

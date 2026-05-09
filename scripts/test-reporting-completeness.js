@@ -1,4 +1,4 @@
-const { formatReport, narrativeSummary, formatGenerationStatus, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary } = require('../src/reporting/reportGenerator');
+const { formatReport, narrativeSummary, formatGenerationStatus, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, formatRuntimeEventSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary } = require('../src/reporting/reportGenerator');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -87,6 +87,17 @@ function main() {
 
   const pendingActions = formatPendingActions(['Action one', 'Action two']);
   assert(/1\. Action one/i.test(pendingActions) && /2\. Action two/i.test(pendingActions), 'Expected numbered pending actions');
+
+  const runtimeSummary = formatRuntimeEventSummary({
+    total: 3,
+    blockedTrades: 1,
+    openRunnerQueueEvents: 1,
+    openRunnerRetryEvents: 1,
+    degradedBrokerEvents: 0,
+    staleDataEvents: 1,
+  });
+  assert(/Open-runner first handoff events: 1/i.test(runtimeSummary), 'Expected first-handoff runtime-event summary line');
+  assert(/Open-runner retry events: 1/i.test(runtimeSummary), 'Expected retry runtime-event summary line');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
