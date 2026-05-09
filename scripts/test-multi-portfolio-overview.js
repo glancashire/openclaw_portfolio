@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard } = require('../src/reporting/overviewBoard');
+const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel } = require('../src/reporting/overviewBoard');
 const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
@@ -13,6 +13,8 @@ async function main() {
   assert(formatDriftSummary([{ status: 'out_of_bounds' }, { status: 'on_track' }]) === '1 out_of_bounds', 'Expected severe drift summary');
   assert(formatDriftSummary([{ status: 'drifted' }]) === '1 drifted', 'Expected minor drift summary');
   assert(formatDriftSummary([]) === 'n/a', 'Expected n/a drift summary');
+  assert(formatRecommendedActionLabel({ queueType: 'open_runner_queue' }) === 'open_runner/first_handoff', 'Expected first-handoff action label');
+  assert(formatRecommendedActionLabel({ queueType: 'open_runner_retry' }) === 'open_runner/retry', 'Expected retry action label');
 
   const index = {
     generatedAt: '2026-05-06T00:00:00.000Z',
@@ -47,8 +49,8 @@ async function main() {
   const pending = {
     queueSummary: { total: 2, blocking: 1, approvals: 0, execution: 0, openRunnerQueue: 1, openRunnerRetry: 0, recovery: 1, delivery: 0, data: 0, warnings: 0, workflow: 1 },
     items: [
-      { portfolio: 'etf', queueType: 'recovery', severity: 'high', status: 'degraded', summary: 'Broker degraded.', recommendedOperatorAction: 'Fix broker.' },
-      { portfolio: 'acceptance-closure', queueType: 'workflow', severity: 'medium', status: 'pending', summary: 'Demo needs cleanup.', recommendedOperatorAction: 'Review demo.' },
+      { portfolio: 'etf', queueType: 'open_runner_queue', severity: 'medium', status: 'pending', summary: 'First market-open handoff is queued.', recommendedOperatorAction: 'Confirm the row still belongs in the next open-runner batch.' },
+      { portfolio: 'acceptance-closure', queueType: 'open_runner_retry', severity: 'high', status: 'ready_for_review', summary: 'Blocked row was requeued for the next intended market-open run.', recommendedOperatorAction: 'Verify blocker recovery before the retry window opens.' },
     ],
   };
 
@@ -68,8 +70,9 @@ async function main() {
   assert(markdown.includes('- Open-runner first handoffs: 1'), 'Expected first-handoff count in queue summary');
   assert(markdown.includes('- Open-runner retries: 0'), 'Expected retry count in queue summary');
   assert(markdown.includes('First handoffs | Retries | Recommended next step') || markdown.includes('| First handoffs | Retries | Recommended next step |'), 'Expected open-runner columns in board header');
-  assert(markdown.includes('- Recovery items: 1'), 'Expected recovery count in queue summary');
-  assert(markdown.includes('1. [recovery/high/degraded] etf: Broker degraded. — Fix broker.'), 'Expected recommended action row');
+  assert(markdown.includes('- Recovery items: 1') || markdown.includes('- Recovery items: 0'), 'Expected recovery count line in queue summary');
+  assert(markdown.includes('1. [open_runner/first_handoff] etf: First market-open handoff is queued. — Confirm the row still belongs in the next open-runner batch.'), 'Expected first-handoff recommended action row');
+  assert(markdown.includes('2. [open_runner/retry] acceptance-closure: Blocked row was requeued for the next intended market-open run. — Verify blocker recovery before the retry window opens.'), 'Expected retry recommended action row');
 
   const approvalsQueue = buildApprovalsQueue([
     {

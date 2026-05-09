@@ -36,10 +36,17 @@ function summarizeOverview(index = {}, pending = {}) {
   return totals;
 }
 
+function formatRecommendedActionLabel(item = {}) {
+  const queueType = item.queueType || 'workflow';
+  if (queueType === 'open_runner_queue') return 'open_runner/first_handoff';
+  if (queueType === 'open_runner_retry') return 'open_runner/retry';
+  return `${queueType}/${item.severity}/${item.status}`;
+}
+
 function buildRecommendedActionRows(pending = {}) {
   const items = Array.isArray(pending.items) ? pending.items : [];
   if (!items.length) return '1. No pending cross-portfolio actions.';
-  return items.slice(0, 10).map((item, index) => `${index + 1}. [${item.queueType || 'workflow'}/${item.severity}/${item.status}] ${item.portfolio}: ${item.summary} — ${item.recommendedOperatorAction}`).join('\n');
+  return items.slice(0, 10).map((item, index) => `${index + 1}. [${formatRecommendedActionLabel(item)}] ${item.portfolio}: ${item.summary} — ${item.recommendedOperatorAction}`).join('\n');
 }
 
 function formatQueueSummary(summary = {}) {
@@ -95,6 +102,7 @@ module.exports = {
   classifyPortfolioKind,
   formatDriftSummary,
   summarizeOverview,
+  formatRecommendedActionLabel,
   buildRecommendedActionRows,
   buildPortfolioTable,
   formatOverviewMarkdown,
