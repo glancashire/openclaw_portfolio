@@ -201,6 +201,10 @@ async function main() {
   assert(overviewMarkdown.includes('Retries'), 'Expected retry column in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner retries'), 'Expected retry queue summary in generated overview markdown');
+  assert(overviewHtml.includes('Multi-Portfolio Overview'), 'Expected overview html title');
+  assert(overviewHtml.includes('Portfolio Board'), 'Expected overview html portfolio board section');
+  assert(overviewHtml.includes('Operator Queue Summary'), 'Expected overview html queue summary section');
+  assert(overviewHtml.includes('Cross-Portfolio Recommended Actions'), 'Expected overview html recommended actions section');
   assert(overviewHtml.includes('First handoffs'), 'Expected first-handoff column in generated overview html');
   assert(overviewHtml.includes('Retries'), 'Expected retry column in generated overview html');
   assert(overviewHtml.includes('acceptance-closure'), 'Expected populated acceptance row content in generated overview html');

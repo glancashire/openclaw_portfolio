@@ -1,6 +1,6 @@
 # Phase 97 Actionable Checklist
 
-- [ ] Inspect overview HTML identity assertions
-- [ ] Add overview HTML identity checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect overview HTML identity assertions
+- [x] Add overview HTML identity checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push
