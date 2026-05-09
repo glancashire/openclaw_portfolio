@@ -12,6 +12,7 @@ const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
 const { listExecutableTradeRows, updateTradeRows } = require('../src/execution/tradeState');
 const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
 const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing');
+const { calculateSmartLimit, analyzeQuoteTrend, shouldBlockForTrend, evaluateMarketOpenBlock } = require('../src/execution/marketOpenPolicy');
 const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
 
 const cliArgs = process.argv.slice(2);
@@ -33,16 +34,6 @@ async function getLiveQuote(trade) {
   return quote;
 }
 
-function calculateSmartLimit(quote, action) {
-  if (quote.bid && quote.ask && quote.bid > 0 && quote.ask > 0) {
-    if (action === 'BUY') return Math.round(quote.ask * 10000) / 10000;
-    return Math.round(quote.bid * 10000) / 10000;
-  }
-  const ref = quote.last || quote.close;
-  if (!ref) return null;
-  const buffer = action === 'BUY' ? 1.003 : 0.997;
-  return Math.round(ref * buffer * 10000) / 10000;
-}
 
 function parseBooleanLine(text, label) {
   const match = text.match(new RegExp(`- ${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:\\s*(.+)`));
@@ -60,43 +51,7 @@ function loadMarketEntryPolicy() {
   };
 }
 
-function analyzeQuoteTrend(quote) {
-  const close = Number(quote?.close);
-  const last = Number(quote?.last);
-  const bid = Number(quote?.bid);
-  const ask = Number(quote?.ask);
-  const reference = Number.isFinite(last) && last > 0
-    ? last
-    : Number.isFinite(ask) && ask > 0
-      ? ask
-      : Number.isFinite(bid) && bid > 0
-        ? bid
-        : null;
-  if (!Number.isFinite(close) || close <= 0 || !Number.isFinite(reference) || reference <= 0) {
-    return { ok: false, trend: 'unknown', movePct: null, referencePrice: reference, closePrice: Number.isFinite(close) ? close : null };
-  }
-  const movePct = Number((((reference - close) / close) * 100).toFixed(2));
-  return {
-    ok: true,
-    trend: movePct >= 1 ? 'up' : movePct <= -1 ? 'down' : 'flat',
-    movePct,
-    referencePrice: reference,
-    closePrice: close,
-  };
-}
 
-function shouldBlockForTrend({ action, trendInfo, marketEntryPolicy, extremeMovePct = 3 }) {
-  if (String(action || '').toUpperCase() !== 'BUY') return { block: false, reason: null };
-  if (!marketEntryPolicy?.avoidBuyingAfterExtremeDailyMoves) return { block: false, reason: null };
-  if (!trendInfo?.ok) return { block: false, reason: null };
-  if (Number(trendInfo.movePct) >= extremeMovePct) {
-    return {
-      block: true,
-      reason: `Buy skipped because price is up ${trendInfo.movePct}% versus prior close, breaching the extreme daily move guard (${extremeMovePct}%).`,
-    };
-  }
-  return { block: false, reason: null };
-}
 
 function markTradeBlocked(trade, { blockCode, blockReason, nextAction, status = 'approved' }) {
   const blockedAt = new Date().toISOString().replace('T', ' ').slice(0, 19);
@@ -211,35 +166,24 @@ async function main() {
       });
       continue;
     }
-    const trendInfo = analyzeQuoteTrend(quote);
+    const policy = evaluateMarketOpenBlock({ trade, quote, marketEntryPolicy });
+    const trendInfo = policy.trendInfo;
     if (trendInfo.ok) {
       console.log(`  → Trend check: ${trendInfo.trend} (${trendInfo.movePct}% vs prior close ${trendInfo.closePrice})`);
     } else {
       console.log('  → Trend check: unavailable (missing usable close/reference price)');
     }
-    const trendDecision = shouldBlockForTrend({ action: trade.action, trendInfo, marketEntryPolicy });
-    if (trendDecision.block) {
-      console.error(`  ✗ ${trendDecision.reason}`);
+    if (policy.blocked) {
+      console.error(`  ✗ ${policy.blockReason}`);
       markTradeBlocked(trade, {
-        blockCode: 'trend_guard_blocked',
-        blockReason: trendDecision.reason,
-        nextAction: 'Review price action after the open and re-approve or reschedule if the move normalizes.',
+        blockCode: policy.blockCode,
+        blockReason: policy.blockReason,
+        nextAction: policy.nextAction,
       });
       continue;
     }
-    const limit = calculateSmartLimit(quote, trade.action);
-    if (!limit) {
-      const reason = 'Could not determine a smart limit price from broker quote data.';
-      console.error(`  ✗ Cannot determine limit price for ${trade.symbol} — skipping`);
-      markTradeBlocked(trade, {
-        blockCode: 'limit_price_unavailable',
-        blockReason: reason,
-        nextAction: 'Inspect broker quote fields and retry when a usable reference price is available.',
-      });
-      continue;
-    }
-    console.log(`  → Smart limit: ${limit} ${trade.currency}`);
-    orders.push({ ...trade, limit, quote, trendInfo });
+    console.log(`  → Smart limit: ${policy.limitPrice} ${trade.currency}`);
+    orders.push({ ...trade, limit: policy.limitPrice, quote, trendInfo });
   }
 
   console.log('');

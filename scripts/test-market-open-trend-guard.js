@@ -4,7 +4,7 @@ const {
   analyzeQuoteTrend,
   shouldBlockForTrend,
   calculateSmartLimit,
-} = require('./submit-orders-at-open');
+} = require('../src/execution/marketOpenPolicy');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

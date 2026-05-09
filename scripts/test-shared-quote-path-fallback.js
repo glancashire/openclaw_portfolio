@@ -1,6 +1,6 @@
 'use strict';
 
-const { calculateSmartLimit, analyzeQuoteTrend } = require('./submit-orders-at-open');
+const { calculateSmartLimit, analyzeQuoteTrend } = require('../src/execution/marketOpenPolicy');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
