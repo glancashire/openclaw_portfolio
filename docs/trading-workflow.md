@@ -25,6 +25,7 @@ Use these entry points:
 - blocked or already-submitted rows must not be re-submitted
 - delayed-only broker pricing may support fallback pricing/reporting, but must not be treated as live-ready submission state
 - runtime evidence belongs in `runtime/events/runtime-events.jsonl` and portfolio artifacts
+- successful `queue-open` and `requeue-open` actions should leave matching `queue_open_runner` runtime-event evidence
 
 ## Primary docs
 - `docs/operator-runbooks.md`

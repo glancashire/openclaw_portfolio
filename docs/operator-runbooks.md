@@ -25,6 +25,7 @@ This is the active incident and operator reference.
 - `runtime/execution-state.json`
 - `runtime/events/runtime-events.jsonl`
 - portfolio `summary.md` / `summary.html` execution posture section for queued, retry, and blocked counts
+- runtime-event evidence for `queue_open_runner` summaries confirming first handoff vs retry intent
 
 ## Broker readiness note
 - Treat `reason: delayed_data_only` as a degraded-but-connected state.
@@ -37,6 +38,7 @@ This is the active incident and operator reference.
 - `Open-runner retries` should only reflect rows that were blocked, reviewed, and intentionally requeued.
 - Use `queue-open` for the first handoff of an eligible row.
 - Use `requeue-open` only after a row was blocked and explicitly reviewed for retry.
+- Confirm command evidence in `runtime/events/runtime-events.jsonl`: successful first handoffs now emit `queue_open_runner` with `retry: false`, while retries emit `queue_open_runner` with `retry: true`.
 - If `Blocked rows` is non-zero, inspect blocker fields in `trades.md` and use the recovery/requeue workflow before retrying.
 - If broker readiness is degraded, treat pricing as review-only unless readiness returns to live-safe posture.
 
