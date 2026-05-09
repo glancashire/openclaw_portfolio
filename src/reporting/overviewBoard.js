@@ -68,7 +68,7 @@ function formatQueueSummary(summary = {}) {
 function buildPortfolioTable(index = {}) {
   const portfolios = Array.isArray(index.portfolios) ? index.portfolios : [];
   if (!portfolios.length) {
-    return '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | no portfolios discovered |\n';
+    return '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |\n';
   }
   return portfolios.map((item) => `| ${item.portfolio} | ${classifyPortfolioKind(item)} | ${item.totalValueChf} | ${item.status} | ${formatDriftSummary(item.driftStatuses)} | ${item.blockers} | ${item.pendingApprovals} | ${item.pendingActions} | ${item.openRunnerQueue || 0} | ${item.openRunnerRetry || 0} | ${item.recommendedNextStep} |`).join('\n');
 }

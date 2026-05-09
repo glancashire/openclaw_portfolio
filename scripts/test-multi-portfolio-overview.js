@@ -62,6 +62,10 @@ async function main() {
   assert(totals.pendingApprovals === 7, 'Expected pending approvals total');
   assert(totals.pendingActions === 2, 'Expected pending action total');
 
+  const emptyMarkdown = formatOverviewMarkdown({ index: { generatedAt: '2026-05-06T00:00:00.000Z', totalValueChf: 0, portfolios: [] }, pending: { queueSummary: {}, items: [] } });
+  assert(emptyMarkdown.includes('| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |'), 'Expected empty-state board header');
+  assert(emptyMarkdown.includes('| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |'), 'Expected empty-state board row');
+
   const markdown = formatOverviewMarkdown({ index, pending });
   assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
   assert(markdown.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | Restore broker connectivity. |'), 'Expected ETF board row');
