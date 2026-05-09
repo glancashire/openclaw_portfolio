@@ -77,10 +77,16 @@ async function main() {
   assert(totals.pendingActions === 2, 'Expected pending action total');
 
   assert(buildRecommendedActionRows({ items: [] }) === '1. No pending cross-portfolio actions.', 'Expected empty recommended-actions helper text');
+  const emptyQueueSummaryText = formatQueueSummary({});
+  assert(emptyQueueSummaryText.includes('- Open-runner first handoffs: 0'), 'Expected empty helper first-handoff summary line');
+  assert(emptyQueueSummaryText.includes('- Open-runner retries: 0'), 'Expected empty helper retry summary line');
 
   const emptyMarkdown = formatOverviewMarkdown({ index: { generatedAt: '2026-05-06T00:00:00.000Z', totalValueChf: 0, portfolios: [] }, pending: { queueSummary: {}, items: [] } });
   assert(emptyMarkdown.includes('| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |'), 'Expected empty-state board header');
   assert(emptyMarkdown.includes('| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |'), 'Expected empty-state board row');
+  assert(emptyMarkdown.includes('## Operator Queue Summary\n- Total queue items: 0'), 'Expected empty-state queue summary section');
+  assert(emptyMarkdown.includes('- Open-runner first handoffs: 0'), 'Expected empty-state first-handoff queue summary line');
+  assert(emptyMarkdown.includes('- Open-runner retries: 0'), 'Expected empty-state retry queue summary line');
   assert(emptyMarkdown.includes('## Cross-Portfolio Recommended Actions\n1. No pending cross-portfolio actions.'), 'Expected empty-state recommended actions section');
 
   const markdown = formatOverviewMarkdown({ index, pending });

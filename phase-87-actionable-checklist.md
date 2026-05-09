@@ -1,6 +1,6 @@
 # Phase 87 Actionable Checklist
 
-- [ ] Inspect empty-state queue-summary path
-- [ ] Add empty-state queue-summary checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect empty-state queue-summary path
+- [x] Add empty-state queue-summary checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push
