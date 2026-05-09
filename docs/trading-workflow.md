@@ -13,9 +13,10 @@ Use these entry points:
 ## Current lifecycle
 1. proposal is generated
 2. operator approves or rejects trade rows in `trades.md`
-3. market-open submission loads executable approved rows from portfolio trade state
-4. broker status is reconciled back into portfolio state
-5. fills/cancels/failures refresh dashboard and history
+3. operator uses `queue-open` for a first market-open handoff, or `requeue-open` after blocked-row recovery
+4. market-open submission loads executable approved rows from portfolio trade state
+5. broker status is reconciled back into portfolio state
+6. fills/cancels/failures refresh dashboard and history
 
 ## Safety rules
 - ETF quality filter must pass
@@ -34,3 +35,4 @@ Use these entry points:
 ## Notes
 - `scripts/execute-trades.js` is obsolete and intentionally no longer the active path.
 - Prefer portfolio-backed trade execution over any static trade list.
+- `Queued for open runner` is the total handoff pool; reporting now breaks that out into `Open-runner first handoffs` and `Open-runner retries` where space allows.

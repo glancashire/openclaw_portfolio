@@ -18,6 +18,8 @@
 
 ## Trade-state interpretation
 - `Queued for open runner` means rows were intentionally handed off and are waiting for the market-open submission path.
+- `Open-runner first handoffs` means rows queued via the initial `queue-open` path.
+- `Open-runner retries` means previously blocked rows were explicitly recovered and requeued via `requeue-open`.
 - `Blocked rows` means market-open execution skipped rows and wrote explicit blocker metadata (`Block code`, `Block reason`, `Blocked at`, `Next action`) into `trades.md`.
 - Summary artifacts now surface queued and blocked counts alongside approval and broker-readiness posture.
 
