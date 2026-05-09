@@ -180,12 +180,17 @@ function cmdRequeueOpen() {
 }
 
 function cmdStatus() {
+  const { summarizeOpenRunnerRetryState } = require('../src/execution/tradeState');
+  const portfolioArg = flags.find((flag) => !flag.startsWith('-'));
+  const portfolioDir = portfolioArg ? path.resolve(portfolioArg) : path.join(ROOT, 'portfolio', 'etf');
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   let openOrders = [];
   try {
     openOrders = JSON.parse(ibkr('open-orders --json'));
   } catch (error) {
     if (JSON_OUT) {
-      printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [] });
+      printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [], openRunnerRetryState });
       return;
     }
     console.log('Open Orders\n');
@@ -194,6 +199,7 @@ function cmdStatus() {
     const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
     let state = { notifiedFills: [] };
     try { state = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
+    console.log(`\nOpen-runner queue: ${openRunnerRetryState.queuedInitial} first handoff, ${openRunnerRetryState.queuedRetry} retry`);
     console.log(`\nNotified fills: ${state.notifiedFills.length}`);
     return;
   }
@@ -203,7 +209,7 @@ function cmdStatus() {
   try { state = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
 
   if (JSON_OUT) {
-    printJson({ openOrders, notifiedFills: state.notifiedFills });
+    printJson({ openOrders, notifiedFills: state.notifiedFills, openRunnerRetryState });
     return;
   }
 
@@ -215,6 +221,7 @@ function cmdStatus() {
       console.log(`  ${order.action} ${order.quantity} ${order.symbol} @ ${order.orderType} ${order.status} (id: ${order.orderId})`);
     }
   }
+  console.log(`\nOpen-runner queue: ${openRunnerRetryState.queuedInitial} first handoff, ${openRunnerRetryState.queuedRetry} retry`);
   console.log(`\nNotified fills: ${state.notifiedFills.length}`);
   if (state.notifiedFills.length > 0) {
     console.log(`  Order IDs: ${state.notifiedFills.join(', ')}`);
