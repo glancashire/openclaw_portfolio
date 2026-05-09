@@ -116,6 +116,8 @@ function formatOperatorQueueSummary(summary = {}) {
     `- Blocking items: ${summary.blocking || 0}`,
     `- Approval items: ${summary.approvals || 0}`,
     `- Execution items: ${summary.execution || 0}`,
+    `- Open-runner first handoffs: ${summary.openRunnerQueue || 0}`,
+    `- Open-runner retries: ${summary.openRunnerRetry || 0}`,
     `- Recovery items: ${summary.recovery || 0}`,
     `- Delivery items: ${summary.delivery || 0}`,
     `- Data items: ${summary.data || 0}`,

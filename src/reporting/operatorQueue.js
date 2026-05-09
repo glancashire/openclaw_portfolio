@@ -5,6 +5,8 @@ function classifyActionSeverity(item) {
 }
 
 function queueTypeForItem(item = {}) {
+  if (item.queueType === 'open_runner_retry') return 'open_runner_retry';
+  if (item.queueType === 'open_runner_queue') return 'open_runner_queue';
   if (item.kind === 'approval') return 'approval';
   if (item.kind === 'execution') return 'execution';
   if (item.kind === 'broker') return 'recovery';
@@ -20,6 +22,8 @@ function summarizeOperatorQueue(items = []) {
     blocking: 0,
     approvals: 0,
     execution: 0,
+    openRunnerQueue: 0,
+    openRunnerRetry: 0,
     recovery: 0,
     delivery: 0,
     data: 0,
@@ -34,6 +38,8 @@ function summarizeOperatorQueue(items = []) {
     const type = item.queueType || queueTypeForItem(item);
     if (type === 'approval') summary.approvals += 1;
     else if (type === 'execution') summary.execution += 1;
+    else if (type === 'open_runner_queue') summary.openRunnerQueue += 1;
+    else if (type === 'open_runner_retry') summary.openRunnerRetry += 1;
     else if (type === 'recovery') summary.recovery += 1;
     else if (type === 'delivery') summary.delivery += 1;
     else if (type === 'data') summary.data += 1;

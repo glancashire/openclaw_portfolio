@@ -61,6 +61,8 @@ function main() {
   assert(report.includes('- Delivery mode: local_only'), 'Expected delivery status section');
   assert(report.includes('1. [workflow/pending/low] Dashboard/report freshness is stale relative to source state.'), 'Expected pending actions section');
   assert(report.includes('- Total queue items: 1'), 'Expected queue summary section');
+  assert(report.includes('- Open-runner first handoffs: 0'), 'Expected first-handoff queue summary section');
+  assert(report.includes('- Open-runner retries: 0'), 'Expected retry queue summary section');
   assert(report.includes('Report rendering required fallback handling: render mode stub'), 'Expected fallback warning in What Did Not Work');
   assert(report.includes('- Current urgency: HIGH') || report.includes('- Current urgency: CRITICAL') || report.includes('- Current urgency: MEDIUM'), 'Expected urgency section');
   assert(report.includes('Portfolio value change since previous report'), 'Expected change summary section');

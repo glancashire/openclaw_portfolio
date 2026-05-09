@@ -38,6 +38,8 @@ async function main() {
   assert(Array.isArray(summary.pendingActions), 'Expected pending actions array');
   assert(summary.operatorQueue && Array.isArray(summary.operatorQueue.items), 'Expected operator queue items');
   assert(summary.operatorQueue.summary && typeof summary.operatorQueue.summary.total === 'number', 'Expected operator queue summary');
+  assert(typeof summary.operatorQueue.summary.openRunnerQueue === 'number', 'Expected open-runner first-handoff queue summary');
+  assert(typeof summary.operatorQueue.summary.openRunnerRetry === 'number', 'Expected open-runner retry queue summary');
   assert(Array.isArray(summary.recentMaterialEvents), 'Expected material events array');
   assert(summary.explanations && typeof summary.explanations.biggestDrift === 'string', 'Expected drift explanation');
   assert(typeof summary.explanations.executionBlock === 'string' && summary.explanations.executionBlock.length > 0, 'Expected execution explanation');
@@ -54,6 +56,8 @@ async function main() {
   assert(generated.recoveryHtmlPath.endsWith('recovery-checklist.html'), 'Expected recovery checklist html path');
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
+  assert(html.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in html');
+  assert(html.includes('Open-runner retries'), 'Expected retry queue summary in html');
   assert(html.includes('Queued for open runner'), 'Expected queued-for-open-runner execution posture in html');
   assert(html.includes('Queued retries'), 'Expected queued-retry execution posture in html');
   assert(html.includes('Blocked rows'), 'Expected blocked-row execution posture in html');
