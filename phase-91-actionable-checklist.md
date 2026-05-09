@@ -1,6 +1,6 @@
 # Phase 91 Actionable Checklist
 
-- [ ] Inspect generated overview-board assertions
-- [ ] Add generated overview-board row checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect generated overview-board assertions
+- [x] Add generated overview-board row checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

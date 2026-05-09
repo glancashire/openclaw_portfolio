@@ -170,6 +170,9 @@ async function main() {
   assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
   assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
   assert(overviewMarkdown.includes('First handoffs'), 'Expected first-handoff column in generated overview markdown');
+  assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
+  assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
+  assert(overviewMarkdown.includes('| etf | active | 5000 | warning |') && overviewMarkdown.includes('| 0 | 0 | Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. |'), 'Expected generated ETF row to retain queue columns and recommendation');
   assert(Array.isArray(portfolioIndexJson.portfolios), 'Expected portfolio index portfolios array');
   assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerQueue')), 'Expected openRunnerQueue in portfolio index rows');
   assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerRetry')), 'Expected openRunnerRetry in portfolio index rows');
