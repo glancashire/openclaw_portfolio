@@ -1,6 +1,6 @@
 # Phase 95 Actionable Checklist
 
-- [ ] Inspect queueSummary.bySeverity coverage
-- [ ] Add severity-counter contract checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect queueSummary.bySeverity coverage
+- [x] Add severity-counter contract checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

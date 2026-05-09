@@ -189,6 +189,12 @@ async function main() {
     assert(typeof portfolioIndexJson.queueSummary[key] === 'number', `Expected numeric ${key} in queue summary`);
     assert(portfolioIndexJson.queueSummary[key] >= 0, `Expected non-negative ${key} in queue summary`);
   }
+  assert(portfolioIndexJson.queueSummary && typeof portfolioIndexJson.queueSummary.bySeverity === 'object', 'Expected bySeverity in queue summary');
+  for (const key of ['high', 'medium', 'low']) {
+    assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary.bySeverity || {}, key), `Expected ${key} in queue summary bySeverity`);
+    assert(typeof portfolioIndexJson.queueSummary.bySeverity[key] === 'number', `Expected numeric ${key} in queue summary bySeverity`);
+    assert(portfolioIndexJson.queueSummary.bySeverity[key] >= 0, `Expected non-negative ${key} in queue summary bySeverity`);
+  }
   assert(overviewMarkdown.includes('Retries'), 'Expected retry column in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner retries'), 'Expected retry queue summary in generated overview markdown');
