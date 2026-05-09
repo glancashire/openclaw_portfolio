@@ -16,5 +16,10 @@
 - `reason: delayed_data_only` means connectivity is up but pricing is delayed-only and execution posture remains degraded/dry-run only.
 - `fallbackRequired: true` means operator-facing dashboards and runbooks should treat the broker path as degraded, even if pricing fallback is usable.
 
+## Trade-state interpretation
+- `Queued for open runner` means rows were intentionally handed off and are waiting for the market-open submission path.
+- `Blocked rows` means market-open execution skipped rows and wrote explicit blocker metadata (`Block code`, `Block reason`, `Blocked at`, `Next action`) into `trades.md`.
+- Summary artifacts now surface queued and blocked counts alongside approval and broker-readiness posture.
+
 ## Rule
 Keep runtime evidence local, structured, and short. Use Markdown for the operator view, JSONL for detail.

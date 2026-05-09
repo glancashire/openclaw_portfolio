@@ -42,6 +42,8 @@ async function main() {
   assert(summary.explanations && typeof summary.explanations.biggestDrift === 'string', 'Expected drift explanation');
   assert(typeof summary.explanations.executionBlock === 'string' && summary.explanations.executionBlock.length > 0, 'Expected execution explanation');
   assert(typeof summary.explanations.approvalBacklog === 'string' && summary.explanations.approvalBacklog.length > 0, 'Expected approval explanation');
+  assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.queuedForOpenRunner === 'number', 'Expected queued-for-open-runner trade-state count');
+  assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.blocked === 'number', 'Expected blocked trade-state count');
   assert(typeof summary.explanations.noTradePosture === 'string' && summary.explanations.noTradePosture.length > 0, 'Expected trade posture explanation');
   assert(typeof summary.recommendedNextStep === 'string' && summary.recommendedNextStep.length > 0, 'Expected recommended next step');
   assert(typeof renderedMarkdown === 'string' && renderedMarkdown.includes('# Portfolio Summary Page: etf'), 'Expected rendered portfolio summary markdown');
@@ -50,6 +52,8 @@ async function main() {
   assert(generated.recoveryHtmlPath.endsWith('recovery-checklist.html'), 'Expected recovery checklist html path');
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
+  assert(html.includes('Queued for open runner'), 'Expected queued-for-open-runner execution posture in html');
+  assert(html.includes('Blocked rows'), 'Expected blocked-row execution posture in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
   assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');
   assert(html.includes('outside the allowed band') || html.includes('broker readiness is degraded') || html.includes('approval-gated trade row'), 'Expected explanation text in summary html');

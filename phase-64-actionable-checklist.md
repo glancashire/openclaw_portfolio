@@ -1,8 +1,8 @@
 # Phase 64 Actionable Checklist
 
-- [ ] Inspect current operator/reporting insertion points
-- [ ] Surface delayed-only, queued, and blocked states
-- [ ] Update operator docs/runbooks
-- [ ] Add/update focused reporting checks
-- [ ] Re-run targeted smoke checks
+- [x] Inspect current operator/reporting insertion points
+- [x] Surface delayed-only, queued, and blocked states
+- [x] Update operator docs/runbooks
+- [x] Add/update focused reporting checks
+- [x] Re-run targeted smoke checks
 - [ ] Commit and push

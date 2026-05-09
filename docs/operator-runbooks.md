@@ -23,11 +23,17 @@ This is the active incident and operator reference.
 - `dashboard.md`
 - `runtime/execution-state.json`
 - `runtime/events/runtime-events.jsonl`
+- portfolio `summary.md` / `summary.html` execution posture section for queued and blocked counts
 
 ## Broker readiness note
 - Treat `reason: delayed_data_only` as a degraded-but-connected state.
 - In that state, broker-backed pricing may use delayed fallback values for analysis/dry-runs.
 - Do not treat delayed-only pricing as permission for live submission.
+
+## Operator reading guide
+- If `Queued for open runner` is non-zero, confirm those rows are still intended before the market-open run.
+- If `Blocked rows` is non-zero, inspect blocker fields in `trades.md` and use the recovery/requeue workflow before retrying.
+- If broker readiness is degraded, treat pricing as review-only unless readiness returns to live-safe posture.
 
 ## Obsolete material
 Old duplicate operator notes were folded into this file. If a runbook is no longer used, remove it instead of keeping multiple versions.
