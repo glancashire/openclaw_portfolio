@@ -12,6 +12,7 @@ This is the active incident and operator reference.
 ## Key commands
 - `node scripts/approve-portfolio-trade.js portfolio/etf '<json>'`
 - `node scripts/reject-portfolio-trade.js portfolio/etf '<json>'`
+- `node scripts/trade.js queue-open --ticker <tickerOrIsin> --action <buy|sell>`
 - `node scripts/stage-portfolio-order.js portfolio/etf '<json>' stage`
 - `node scripts/check-transmitted-live-readiness.js portfolio/etf '<json>'`
 - `node scripts/resync-portfolio-orders.js portfolio/etf`
