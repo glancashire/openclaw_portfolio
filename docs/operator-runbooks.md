@@ -13,6 +13,7 @@ This is the active incident and operator reference.
 - `node scripts/approve-portfolio-trade.js portfolio/etf '<json>'`
 - `node scripts/reject-portfolio-trade.js portfolio/etf '<json>'`
 - `node scripts/trade.js queue-open --ticker <tickerOrIsin> --action <buy|sell>`
+- `node scripts/trade.js requeue-open --ticker <tickerOrIsin> --action <buy|sell>`
 - `node scripts/stage-portfolio-order.js portfolio/etf '<json>' stage`
 - `node scripts/check-transmitted-live-readiness.js portfolio/etf '<json>'`
 - `node scripts/resync-portfolio-orders.js portfolio/etf`
@@ -32,6 +33,8 @@ This is the active incident and operator reference.
 
 ## Operator reading guide
 - If `Queued for open runner` is non-zero, confirm those rows are still intended before the market-open run.
+- Use `queue-open` for the first handoff of an eligible row.
+- Use `requeue-open` only after a row was blocked and explicitly reviewed for retry.
 - If `Blocked rows` is non-zero, inspect blocker fields in `trades.md` and use the recovery/requeue workflow before retrying.
 - If broker readiness is degraded, treat pricing as review-only unless readiness returns to live-safe posture.
 

@@ -1,8 +1,8 @@
 # Phase 67 Actionable Checklist
 
-- [ ] Add explicit requeue-open command
-- [ ] Return distinct retry metadata
-- [ ] Add/update focused CLI recovery tests
-- [ ] Update operator docs
-- [ ] Re-run targeted command/trade-state/reporting checks
+- [x] Add explicit requeue-open command
+- [x] Return distinct retry metadata
+- [x] Add/update focused CLI recovery tests
+- [x] Update operator docs
+- [x] Re-run targeted command/trade-state/reporting checks
 - [ ] Commit and push

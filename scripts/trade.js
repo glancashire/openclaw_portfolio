@@ -36,13 +36,14 @@ Trading CLI — Unified entry point for portfolio trading operations
 Usage: node scripts/trade.js <command> [options]
 
 Commands:
-  propose     Generate trade proposal based on portfolio drift
-  validate    Run ETF quality filter on current trade instruments
-  submit      Place approved orders (respects market hours + quality filter)
-  queue-open  Queue a trade row for the market-open runner
-  status      Show open orders and fill notification state
-  cancel      Cancel open orders (--order-id <id> or --all)
-  history     Show recent trade executions
+  propose       Generate trade proposal based on portfolio drift
+  validate      Run ETF quality filter on current trade instruments
+  submit        Place approved orders (respects market hours + quality filter)
+  queue-open    Queue a trade row for the market-open runner
+  requeue-open  Requeue a blocked trade row for a retry at market open
+  status        Show open orders and fill notification state
+  cancel        Cancel open orders (--order-id <id> or --all)
+  history       Show recent trade executions
 
 Options:
   --dry-run   Simulate without placing real orders
@@ -55,6 +56,7 @@ Examples:
   node scripts/trade.js validate
   node scripts/trade.js submit --dry-run
   node scripts/trade.js queue-open --ticker AAA --action buy
+  node scripts/trade.js requeue-open --ticker AAA --action buy
   node scripts/trade.js cancel --all
   node scripts/trade.js history --json
 `);
@@ -115,6 +117,42 @@ function cmdQueueOpen() {
   };
   if (JSON_OUT) printJson(payload);
   else console.log(`✓ Queued ${ticker} ${action} for market-open runner`);
+}
+
+function cmdRequeueOpen() {
+  const tickerFlagIndex = flags.findIndex((flag) => flag === '--ticker');
+  const actionFlagIndex = flags.findIndex((flag) => flag === '--action');
+  const ticker = tickerFlagIndex >= 0 ? flags[tickerFlagIndex + 1] : null;
+  const action = actionFlagIndex >= 0 ? flags[actionFlagIndex + 1] : null;
+  const portfolioArg = flags.find((flag) => !flag.startsWith('-') && flag !== ticker && flag !== action);
+  const portfolioDir = portfolioArg ? path.resolve(portfolioArg) : path.join(ROOT, 'portfolio', 'etf');
+
+  if (!ticker || !action) {
+    console.error('Usage: trade requeue-open [portfolio-dir] --ticker <tickerOrIsin> --action <buy|sell>');
+    process.exit(1);
+  }
+
+  const { requeueBlockedTradeRow } = require('../src/execution/tradeState');
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const result = requeueBlockedTradeRow(tradesPath, { tickerOrIsin: ticker, action });
+  if (result.updated !== 1) {
+    const message = `No blocked trade row was requeued for ${ticker} ${action}.`;
+    if (JSON_OUT) printJson({ ok: false, updated: result.updated, message });
+    else console.error(`✗ ${message}`);
+    process.exit(1);
+  }
+
+  const payload = {
+    ok: true,
+    updated: result.updated,
+    ticker,
+    action,
+    approval: 'queued_for_open_runner',
+    retry: true,
+    nextAction: 'Retry at next intended market-open run after operator recovery.',
+  };
+  if (JSON_OUT) printJson(payload);
+  else console.log(`✓ Requeued ${ticker} ${action} for market-open retry`);
 }
 
 function cmdStatus() {
@@ -314,6 +352,7 @@ switch (command) {
   case 'status': cmdStatus(); break;
   case 'submit': cmdSubmit(); break;
   case 'queue-open': cmdQueueOpen(); break;
+  case 'requeue-open': cmdRequeueOpen(); break;
   case 'cancel': cmdCancel(); break;
   case 'history': cmdHistory(); break;
   case 'propose': cmdPropose(); break;
