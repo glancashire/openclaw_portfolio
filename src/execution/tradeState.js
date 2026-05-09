@@ -290,11 +290,42 @@ function listOpenBrokerOrderRows(tradesPath) {
   }));
 }
 
+function listExecutableTradeRows(tradesPath) {
+  const table = readTradesTable(tradesPath);
+  return table.rows.filter((row) => {
+    const status = String(row.Status || '').trim().toLowerCase();
+    const approval = String(row.Approval || '').trim();
+    const blockCode = String(row['Block code'] || '').trim();
+    const action = String(row.Action || '').trim().toLowerCase();
+    const orderId = String(row['Broker order id'] || '').trim();
+
+    if (action === 'hold') return false;
+    if (blockCode) return false;
+    if (orderId) return false;
+    if (!['approved', 'planned', 'proposed'].includes(status)) return false;
+    if (!['user_approved', 'submitted_to_open_runner', 'ready_for_submission'].includes(approval)) return false;
+    return true;
+  }).map((row) => ({
+    dateTime: row['Date/time'],
+    status: row.Status,
+    action: row.Action,
+    tickerOrIsin: row['Ticker / ISIN'],
+    name: row.Name,
+    quantity: Number(row.Quantity || 0),
+    limitPrice: Number(row['Limit price'] || 0),
+    estimatedChf: Number(row['Estimated CHF'] || 0),
+    approval: row.Approval,
+    brokerOrderId: row['Broker order id'],
+    reason: row.Reason,
+  }));
+}
+
 module.exports = {
   readTradesTable,
   updateTradeRows,
   appendTradeEvent,
   listOpenBrokerOrderRows,
+  listExecutableTradeRows,
   markTradeApproved,
   rejectTradeProposal,
   reconcileOrderStatus,

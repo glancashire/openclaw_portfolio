@@ -1,27 +1,24 @@
 'use strict';
 
 /**
- * Submit orders after market open with real-time pricing.
- * Fetches live bid/ask, calculates smart limit prices, places orders.
- * Designed to run at ~09:01 CET via cron.
+ * Submit approved portfolio trades after market open with live pricing.
+ * Reads executable trade rows from portfolio/<name>/trades.md instead of a hard-coded list.
  */
 
 const { execSync } = require('child_process');
 const path = require('path');
 const { validateTradeList } = require('../lib/etfQualityFilter');
-const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
 const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
+const { listExecutableTradeRows, updateTradeRows } = require('../src/execution/tradeState');
+const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
+const { evaluateExecutionPolicy } = require('../src/execution/portfolioExecution');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const DRY_RUN = process.argv.includes('--dry-run');
 const FORCE = process.argv.includes('--force');
-
-// Trades to execute (approved by operator)
-const TRADES = [
-  { symbol: 'SLICHA', exchange: 'SMART', primaryExchange: 'EBS', currency: 'CHF', action: 'BUY', qty: 4, name: 'UBS ETF SLI', targetPct: 20.0 },
-  { symbol: 'EMUAA', exchange: 'SMART', primaryExchange: 'EBS', currency: 'EUR', action: 'BUY', qty: 27, name: 'UBS MSCI EMU A Acc', targetPct: 20.0 },
-  { symbol: 'VUSA', exchange: 'SMART', primaryExchange: 'EBS', currency: 'CHF', action: 'BUY', qty: 18, name: 'Vanguard S&P 500', targetPct: 40.0 },
-];
+const portfolioDir = path.resolve(process.argv[2] || path.join(__dirname, '..', 'portfolio', 'etf'));
+const tradesPath = path.join(portfolioDir, 'trades.md');
+const portfolioPath = path.join(portfolioDir, 'portfolio.md');
 
 function ibkr(args) {
   return execSync(`python3 ${IBKR_CLI} ${args}`, { encoding: 'utf8', timeout: 30000 }).trim();
@@ -51,30 +48,46 @@ ib.disconnect()
 }
 
 function calculateSmartLimit(quote, action) {
-  // If we have bid/ask, use midpoint + small buffer for BUY
   if (quote.bid && quote.ask && quote.bid > 0 && quote.ask > 0) {
-    const mid = (quote.bid + quote.ask) / 2;
-    const spread = quote.ask - quote.bid;
-    if (action === 'BUY') {
-      // Limit at ask (willing to pay the ask for immediate fill)
-      return Math.round(quote.ask * 10000) / 10000;
-    } else {
-      return Math.round(quote.bid * 10000) / 10000;
-    }
+    if (action === 'BUY') return Math.round(quote.ask * 10000) / 10000;
+    return Math.round(quote.bid * 10000) / 10000;
   }
-  // Fallback: use last + 0.3% buffer
   const ref = quote.last || quote.close;
   if (!ref) return null;
   const buffer = action === 'BUY' ? 1.003 : 0.997;
   return Math.round(ref * buffer * 10000) / 10000;
 }
 
+function buildExecutableOrders() {
+  const rows = listExecutableTradeRows(tradesPath);
+  const instruments = readApprovedInstruments(portfolioPath);
+  return rows.map((row) => {
+    const instrument = instruments.find((item) => String(item.tickerOrIsin || '').trim() === String(row.tickerOrIsin || '').trim() || String(item.ibkrSymbol || '').trim().toUpperCase() === String(row.tickerOrIsin || '').trim().toUpperCase());
+    const symbol = instrument?.ibkrSymbol || row.tickerOrIsin;
+    const conid = instrument?.ibkrConid || null;
+    const exchange = 'SMART';
+    const primaryExchange = instrument?.exchange?.includes('EBS') ? 'EBS' : undefined;
+    const currency = instrument?.currency || 'CHF';
+    return {
+      row,
+      symbol,
+      conid,
+      exchange,
+      primaryExchange,
+      currency,
+      action: String(row.action || '').toUpperCase(),
+      qty: Number(row.quantity || 0),
+      name: row.name,
+    };
+  });
+}
+
 async function main() {
   console.log(`=== Smart Market-Open Execution ${DRY_RUN ? '(DRY RUN)' : '(LIVE)'} ===`);
   console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Portfolio: ${portfolioDir}`);
   console.log('');
 
-  // Guard: market hours
   if (!DRY_RUN && !FORCE) {
     const market = isMarketOpen('EBS');
     if (!market.open) {
@@ -86,8 +99,13 @@ async function main() {
     console.log('✓ Market is open');
   }
 
-  // Step 1: Validate ETF quality
-  const validation = validateTradeList(TRADES);
+  const executable = buildExecutableOrders();
+  if (executable.length === 0) {
+    console.error('✗ No approved executable trade rows found for market-open submission.');
+    process.exit(2);
+  }
+
+  const validation = validateTradeList(executable.map((t) => ({ symbol: t.symbol })));
   if (!validation.allPass) {
     console.error('ETF quality check FAILED:');
     for (const r of validation.results) {
@@ -95,28 +113,22 @@ async function main() {
     }
     process.exit(1);
   }
-  console.log('✓ All instruments pass ETF quality filter (physical replication, TER within limits)');
+  console.log('✓ All executable instruments pass ETF quality filter');
   console.log('');
 
-  // Step 2: Get live quotes and calculate limits
   const orders = [];
-  for (const trade of TRADES) {
+  for (const trade of executable) {
     console.log(`Fetching live quote for ${trade.symbol}...`);
     const quote = getLiveQuote(trade.symbol, trade.exchange, trade.currency, trade.primaryExchange);
-
     if (!quote) {
       console.error(`  ✗ No quote available for ${trade.symbol} — skipping`);
       continue;
     }
-
-    console.log(`  bid=${quote.bid} ask=${quote.ask} last=${quote.last} close=${quote.close}`);
     const limit = calculateSmartLimit(quote, trade.action);
-
     if (!limit) {
       console.error(`  ✗ Cannot determine limit price for ${trade.symbol} — skipping`);
       continue;
     }
-
     console.log(`  → Smart limit: ${limit} ${trade.currency}`);
     orders.push({ ...trade, limit, quote });
   }
@@ -124,22 +136,21 @@ async function main() {
   console.log('');
   console.log(`=== Placing ${orders.length} orders ===`);
 
-  // Step 3: Place orders
   const results = [];
   for (const order of orders) {
     const args = [
       'place-order',
       `--symbol ${order.symbol}`,
       `--exchange ${order.exchange}`,
-      `--primary-exchange ${order.primaryExchange}`,
+      order.primaryExchange ? `--primary-exchange ${order.primaryExchange}` : '',
       `--currency ${order.currency}`,
       `--action ${order.action}`,
       `--quantity ${order.qty}`,
-      `--order-type LMT`,
+      '--order-type LMT',
       `--limit-price ${order.limit}`,
-      `--tif DAY`,
+      '--tif DAY',
       '--json',
-    ];
+    ].filter(Boolean);
 
     if (DRY_RUN) {
       console.log(`[DRY-RUN] ${order.action} ${order.qty} ${order.symbol} @ ${order.limit} ${order.currency}`);
@@ -151,6 +162,15 @@ async function main() {
     try {
       const raw = ibkr(args.join(' '));
       const result = JSON.parse(raw);
+      const orderId = result.trade?.orderId ? String(result.trade.orderId) : '';
+      updateTradeRows(tradesPath, { dateTime: order.row.dateTime, tickerOrIsin: order.row.tickerOrIsin, action: order.row.action }, (row) => ({
+        ...row,
+        Status: 'submitted',
+        Approval: 'submitted_to_broker',
+        'Broker order id': orderId,
+        'Limit price': String(order.limit),
+        Reason: `${row.Reason}; Market-open live submission attempted.`,
+      }));
       console.log(`  → orderId=${result.trade?.orderId} status=${result.trade?.status}`);
       results.push({ ...order, orderId: result.trade?.orderId, status: result.trade?.status, errors: result.errors });
     } catch (e) {
@@ -165,6 +185,8 @@ async function main() {
     const icon = r.status === 'error' || r.status === 'Cancelled' ? '✗' : '✓';
     console.log(`  ${icon} ${r.action} ${r.qty} ${r.symbol} @ ${r.limit} ${r.currency} → ${r.status} (id: ${r.orderId})`);
   }
+
+  if (!DRY_RUN && results.every((r) => r.status === 'error')) process.exit(3);
 }
 
 main().catch(err => {
