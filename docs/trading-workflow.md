@@ -28,6 +28,7 @@ Use these entry points:
 - runtime evidence belongs in `runtime/events/runtime-events.jsonl` and portfolio artifacts
 - successful `queue-open` and `requeue-open` actions should leave matching `queue_open_runner` runtime-event evidence
 - `trade.js status` should reflect the same first-handoff vs retry split that dashboards and summaries show
+- `runtime/overview/portfolio-overview.md` should show the same split across portfolios via its `First handoffs` and `Retries` columns
 
 ## Primary docs
 - `docs/operator-runbooks.md`

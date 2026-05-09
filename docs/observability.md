@@ -7,6 +7,7 @@
 
 ## Typical checks
 - `node scripts/trade.js status portfolio/etf`
+- `runtime/overview/portfolio-overview.md`
 - `node scripts/show-runtime-events.js --portfolio etf`
 - `node scripts/check-risk-observability.js portfolio/etf`
 - `node scripts/check-safety-controls.js portfolio/etf`
@@ -24,6 +25,7 @@
 - `Blocked rows` means market-open execution skipped rows and wrote explicit blocker metadata (`Block code`, `Block reason`, `Blocked at`, `Next action`) into `trades.md`.
 - Summary artifacts now surface queued and blocked counts alongside approval and broker-readiness posture.
 - `trade.js status` should agree with dashboard/summary surfaces on the split between `Open-runner first handoffs` and `Open-runner retries`.
+- `runtime/overview/portfolio-overview.md` should surface the same posture across portfolios through its `First handoffs` and `Retries` columns.
 
 ## Rule
 Keep runtime evidence local, structured, and short. Use Markdown for the operator view, JSONL for detail.
