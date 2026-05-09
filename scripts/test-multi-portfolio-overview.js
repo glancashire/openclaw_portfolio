@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel } = require('../src/reporting/overviewBoard');
+const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel, buildRecommendedActionRows, formatQueueSummary, buildPortfolioTable } = require('../src/reporting/overviewBoard');
 const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
@@ -8,6 +8,16 @@ function assert(condition, message) {
 }
 
 async function main() {
+  assert(typeof classifyPortfolioKind === 'function', 'Expected classifyPortfolioKind export');
+  assert(typeof formatDriftSummary === 'function', 'Expected formatDriftSummary export');
+  assert(typeof summarizeOverview === 'function', 'Expected summarizeOverview export');
+  assert(typeof formatRecommendedActionLabel === 'function', 'Expected formatRecommendedActionLabel export');
+  assert(typeof buildRecommendedActionRows === 'function', 'Expected buildRecommendedActionRows export');
+  assert(typeof buildPortfolioTable === 'function', 'Expected buildPortfolioTable export');
+  assert(typeof formatQueueSummary === 'function', 'Expected formatQueueSummary export');
+  assert(typeof formatOverviewMarkdown === 'function', 'Expected formatOverviewMarkdown export');
+  assert(typeof generateOverviewBoard === 'function', 'Expected generateOverviewBoard export');
+
   assert(classifyPortfolioKind({ portfolio: 'etf' }) === 'active', 'Expected active portfolio classification');
   assert(classifyPortfolioKind({ portfolio: 'acceptance-closure' }) === 'demo_like', 'Expected demo-like classification');
   assert(formatDriftSummary([{ status: 'out_of_bounds' }, { status: 'on_track' }]) === '1 out_of_bounds', 'Expected severe drift summary');
