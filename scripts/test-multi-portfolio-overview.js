@@ -187,6 +187,9 @@ async function main() {
   assert(overviewMarkdown.includes('Open-runner retries'), 'Expected retry queue summary in generated overview markdown');
   assert(overviewHtml.includes('First handoffs'), 'Expected first-handoff column in generated overview html');
   assert(overviewHtml.includes('Retries'), 'Expected retry column in generated overview html');
+  assert(overviewHtml.includes('acceptance-closure'), 'Expected populated acceptance row content in generated overview html');
+  assert(overviewHtml.includes('etf'), 'Expected populated ETF row content in generated overview html');
+  assert(overviewHtml.includes('Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.') || overviewHtml.includes('Resolve the active blocker:'), 'Expected generated overview html recommendation content');
   assert(fs.existsSync(generated.dailySummaryMarkdownPath), 'Expected daily summary markdown artifact');
   assert(dailyHtml.includes('Daily Summary Page'), 'Expected daily summary html artifact');
   assert(dailyHtml.includes('Cash waiting to deploy CHF'), 'Expected daily summary cash rendering');

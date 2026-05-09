@@ -1,6 +1,6 @@
 # Phase 92 Actionable Checklist
 
-- [ ] Inspect generated overview HTML assertions
-- [ ] Add generated overview HTML checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect generated overview HTML assertions
+- [x] Add generated overview HTML checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push
