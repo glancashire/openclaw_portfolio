@@ -1,6 +1,6 @@
 # Phase 94 Actionable Checklist
 
-- [ ] Inspect portfolio-index queue-summary assertions
-- [ ] Add generated queue-summary contract checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect portfolio-index queue-summary assertions
+- [x] Add generated queue-summary contract checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

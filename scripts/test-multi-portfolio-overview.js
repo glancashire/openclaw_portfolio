@@ -184,10 +184,11 @@ async function main() {
   assert(typeof generatedAcceptanceIndexRow.openRunnerQueue === 'number' && typeof generatedAcceptanceIndexRow.openRunnerRetry === 'number', 'Expected acceptance open-runner counters in generated portfolio index');
   assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerQueue'), 'Expected openRunnerQueue in queue summary');
   assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerRetry'), 'Expected openRunnerRetry in queue summary');
-  assert(typeof portfolioIndexJson.queueSummary.openRunnerQueue === 'number', 'Expected numeric openRunnerQueue in queue summary');
-  assert(typeof portfolioIndexJson.queueSummary.openRunnerRetry === 'number', 'Expected numeric openRunnerRetry in queue summary');
-  assert(portfolioIndexJson.queueSummary.openRunnerQueue >= 0, 'Expected non-negative openRunnerQueue in queue summary');
-  assert(portfolioIndexJson.queueSummary.openRunnerRetry >= 0, 'Expected non-negative openRunnerRetry in queue summary');
+  for (const key of ['total', 'blocking', 'approvals', 'execution', 'openRunnerQueue', 'openRunnerRetry', 'recovery', 'delivery', 'data', 'warnings', 'workflow']) {
+    assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, key), `Expected ${key} in queue summary`);
+    assert(typeof portfolioIndexJson.queueSummary[key] === 'number', `Expected numeric ${key} in queue summary`);
+    assert(portfolioIndexJson.queueSummary[key] >= 0, `Expected non-negative ${key} in queue summary`);
+  }
   assert(overviewMarkdown.includes('Retries'), 'Expected retry column in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner retries'), 'Expected retry queue summary in generated overview markdown');
