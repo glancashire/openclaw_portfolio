@@ -272,7 +272,7 @@ function hasConflictingOpenTrade(tradesPath, order) {
     if (!line.startsWith('| ') || line.includes('|---|') || line.includes('| Date/time |')) continue;
     const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
     const status = String(cells[1] || '').toLowerCase();
-    if (!['approved', 'staged', 'submitted', 'partially_filled'].includes(status)) continue;
+    if (!['staged', 'submitted', 'partially_filled'].includes(status)) continue;
     const ticker = String(cells[3] || '').trim().toUpperCase();
     if (targetIds.has(ticker)) return true;
   }
