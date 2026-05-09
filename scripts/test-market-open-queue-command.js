@@ -4,12 +4,14 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { readRuntimeEvents, EVENTS_PATH } = require('../src/observability/runtimeEvents');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
 function main() {
+  const eventsBefore = fs.existsSync(EVENTS_PATH) ? fs.readFileSync(EVENTS_PATH, 'utf8') : null;
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'market-open-queue-command-'));
   const portfolioDir = path.join(tempDir, 'portfolio');
   fs.mkdirSync(portfolioDir, { recursive: true });
@@ -28,6 +30,10 @@ function main() {
   assert(/queued_for_open_runner/.test(updated), 'expected queued approval persisted');
   assert(/First open-runner attempt pending\./.test(updated), 'expected initial queue next-action note persisted');
 
+  const queueEvents = readRuntimeEvents({ portfolio: 'portfolio', limit: 20 }).filter((event) => event.action === 'queue_open_runner');
+  assert(queueEvents.some((event) => /first handoff/i.test(event.summary)), 'expected first-handoff runtime event');
+  assert(queueEvents.some((event) => event.details && event.details.retry === false), 'expected non-retry runtime-event details');
+
   let failed = false;
   try {
     execFileSync('node', ['scripts/trade.js', 'queue-open', portfolioDir, '--ticker', 'BBB', '--action', 'buy'], {
@@ -39,6 +45,12 @@ function main() {
     failed = true;
   }
   assert(failed, 'expected submitted row queue attempt to fail');
+
+  if (eventsBefore == null) {
+    if (fs.existsSync(EVENTS_PATH)) fs.unlinkSync(EVENTS_PATH);
+  } else {
+    fs.writeFileSync(EVENTS_PATH, eventsBefore);
+  }
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }

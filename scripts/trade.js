@@ -98,6 +98,7 @@ function cmdQueueOpen() {
   }
 
   const { queueTradeRowForOpenRunner } = require('../src/execution/tradeState');
+  const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const result = queueTradeRowForOpenRunner(tradesPath, { tickerOrIsin: ticker, action });
   if (result.updated !== 1) {
@@ -106,6 +107,17 @@ function cmdQueueOpen() {
     else console.error(`✗ ${message}`);
     process.exit(1);
   }
+
+  recordRuntimeEvent({
+    level: 'info',
+    category: 'execution',
+    action: 'queue_open_runner',
+    portfolio: path.basename(portfolioDir),
+    mode: 'operator_command',
+    status: 'queued',
+    summary: `Queued ${ticker} ${action} for market-open runner first handoff.`,
+    details: { ticker, action, approval: 'queued_for_open_runner', retry: false },
+  });
 
   const payload = {
     ok: true,
@@ -133,6 +145,7 @@ function cmdRequeueOpen() {
   }
 
   const { requeueBlockedTradeRow } = require('../src/execution/tradeState');
+  const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const result = requeueBlockedTradeRow(tradesPath, { tickerOrIsin: ticker, action });
   if (result.updated !== 1) {
@@ -141,6 +154,17 @@ function cmdRequeueOpen() {
     else console.error(`✗ ${message}`);
     process.exit(1);
   }
+
+  recordRuntimeEvent({
+    level: 'info',
+    category: 'execution',
+    action: 'queue_open_runner',
+    portfolio: path.basename(portfolioDir),
+    mode: 'operator_command',
+    status: 'queued_retry',
+    summary: `Queued ${ticker} ${action} for market-open runner retry after operator recovery.`,
+    details: { ticker, action, approval: 'queued_for_open_runner', retry: true },
+  });
 
   const payload = {
     ok: true,
