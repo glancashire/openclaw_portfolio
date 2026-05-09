@@ -89,6 +89,17 @@ async function main() {
   assert(emptyQueueSummaryText.includes('- Open-runner first handoffs: 0'), 'Expected empty helper first-handoff summary line');
   assert(emptyQueueSummaryText.includes('- Open-runner retries: 0'), 'Expected empty helper retry summary line');
 
+  const emptyTotals = summarizeOverview({ portfolios: [], totalValueChf: 0 }, { items: [] });
+  assert(emptyTotals.portfolioCount === 0, 'Expected empty summary portfolio count');
+  assert(emptyTotals.totalValueChf === 0, 'Expected empty summary total value');
+  assert(emptyTotals.activeCount === 0, 'Expected empty summary active count');
+  assert(emptyTotals.demoLikeCount === 0, 'Expected empty summary demo-like count');
+  assert(emptyTotals.healthyCount === 0, 'Expected empty summary healthy count');
+  assert(emptyTotals.warningCount === 0, 'Expected empty summary warning count');
+  assert(emptyTotals.blockedCount === 0, 'Expected empty summary blocked count');
+  assert(emptyTotals.pendingApprovals === 0, 'Expected empty summary pending approvals');
+  assert(emptyTotals.pendingActions === 0, 'Expected empty summary pending actions');
+
   const emptyBoardTable = buildPortfolioTable({ portfolios: [] });
   assert(emptyBoardTable === '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |\n', 'Expected empty board helper row');
 

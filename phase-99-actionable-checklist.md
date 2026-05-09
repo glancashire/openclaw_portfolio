@@ -1,6 +1,6 @@
 # Phase 99 Actionable Checklist
 
-- [ ] Inspect empty-state summary helper coverage
-- [ ] Add zero-state summary helper checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect empty-state summary helper coverage
+- [x] Add zero-state summary helper checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push
