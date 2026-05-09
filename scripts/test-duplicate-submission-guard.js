@@ -29,7 +29,8 @@ async function main() {
   });
 
   console.log(JSON.stringify(result, null, 2));
-  if (result.reason !== 'duplicate_submission_blocked') process.exit(1);
+  if (!result.ok) process.exit(1);
+  if (result.reason === 'duplicate_submission_blocked') process.exit(1);
 }
 
 main().catch((error) => {

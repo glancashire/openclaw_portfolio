@@ -6,6 +6,10 @@ const assert = (condition, message) => {
 };
 const { evaluateExecutionPolicy } = require('../src/execution/portfolioExecution');
 
+function blockerMessages(policy) {
+  return (policy.blockers || []).map((blocker) => typeof blocker === 'string' ? blocker : blocker.message);
+}
+
 async function main() {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'execution-policy-approval-gates-'));
   const portfolioDir = path.join(tempDir, 'demo');
@@ -36,7 +40,7 @@ async function main() {
     },
   });
 
-  assert(firstBuyBlocked.blockers.includes('Portfolio requires explicit user approval before the first live purchase.'), 'First live buy should require explicit approval when portfolio is not yet invested');
+  assert(blockerMessages(firstBuyBlocked).includes('Portfolio requires explicit user approval before the first live purchase.'), 'First live buy should require explicit approval when portfolio is not yet invested');
 
   fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), investedHoldings);
 
@@ -57,7 +61,7 @@ async function main() {
     },
   });
 
-  assert(!nonFirstBuy.blockers.includes('Portfolio requires explicit user approval before the first live purchase.'), 'Subsequent buys should not be treated as first purchases once invested capital exists');
+  assert(!blockerMessages(nonFirstBuy).includes('Portfolio requires explicit user approval before the first live purchase.'), 'Subsequent buys should not be treated as first purchases once invested capital exists');
 
   const sellBlocked = await evaluateExecutionPolicy({
     portfolioDir,
@@ -76,7 +80,7 @@ async function main() {
     },
   });
 
-  assert(sellBlocked.blockers.includes('Portfolio requires explicit user approval before live sales.'), 'Live sales should require explicit approval when portfolio policy says so');
+  assert(blockerMessages(sellBlocked).includes('Portfolio requires explicit user approval before live sales.'), 'Live sales should require explicit approval when portfolio policy says so');
 
   console.log(JSON.stringify({ ok: true, firstBuyBlocked, nonFirstBuy, sellBlocked }, null, 2));
 }

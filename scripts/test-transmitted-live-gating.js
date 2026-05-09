@@ -54,7 +54,7 @@ function loadModule(readiness) {
     requireApproval: true,
   });
   assert(result.ok === false, 'Expected transmitted mode to fail outside transmitted_live execution mode');
-  assert(result.blockers.some((entry) => /not transmitted_live/i.test(entry)), 'Expected transmitted_live mode blocker');
+  assert(result.blockers.some((entry) => /not transmitted_live/i.test(String(entry.message || entry))), 'Expected transmitted_live mode blocker');
 
   writeFixture('transmitted_live');
   mod = loadModule({ configured: true, authenticated: true, reachable: true, fallbackRequired: false, reason: 'ready', message: 'ok' });
@@ -78,7 +78,7 @@ function loadModule(readiness) {
     requireApproval: true,
   });
   assert(result.ok === false, 'Expected missing acknowledgement to block transmitted live path');
-  assert(result.blockers.some((entry) => /transmittedLiveAck/i.test(entry)), 'Expected transmittedLiveAck blocker');
+  assert(result.blockers.some((entry) => /transmittedLiveAck/i.test(String(entry.message || entry))), 'Expected transmittedLiveAck blocker');
 
   result = await mod.evaluateExecutionPolicy({
     portfolioDir,
