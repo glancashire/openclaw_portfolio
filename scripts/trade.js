@@ -105,7 +105,14 @@ function cmdQueueOpen() {
     process.exit(1);
   }
 
-  const payload = { ok: true, updated: result.updated, ticker, action, approval: 'queued_for_open_runner' };
+  const payload = {
+    ok: true,
+    updated: result.updated,
+    ticker,
+    action,
+    approval: 'queued_for_open_runner',
+    nextAction: 'First open-runner attempt pending.',
+  };
   if (JSON_OUT) printJson(payload);
   else console.log(`✓ Queued ${ticker} ${action} for market-open runner`);
 }

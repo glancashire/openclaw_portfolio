@@ -44,6 +44,8 @@ async function main() {
   assert(typeof summary.explanations.approvalBacklog === 'string' && summary.explanations.approvalBacklog.length > 0, 'Expected approval explanation');
   assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.queuedForOpenRunner === 'number', 'Expected queued-for-open-runner trade-state count');
   assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.blocked === 'number', 'Expected blocked trade-state count');
+  assert(summary.execution && summary.execution.openRunnerRetryState && typeof summary.execution.openRunnerRetryState.queuedRetry === 'number', 'Expected queued-retry count');
+  assert(typeof summary.execution.openRunnerRetryState.queuedInitial === 'number', 'Expected queued-initial count');
   assert(typeof summary.explanations.noTradePosture === 'string' && summary.explanations.noTradePosture.length > 0, 'Expected trade posture explanation');
   assert(typeof summary.recommendedNextStep === 'string' && summary.recommendedNextStep.length > 0, 'Expected recommended next step');
   assert(typeof renderedMarkdown === 'string' && renderedMarkdown.includes('# Portfolio Summary Page: etf'), 'Expected rendered portfolio summary markdown');
@@ -53,6 +55,7 @@ async function main() {
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
   assert(html.includes('Queued for open runner'), 'Expected queued-for-open-runner execution posture in html');
+  assert(html.includes('Queued retries'), 'Expected queued-retry execution posture in html');
   assert(html.includes('Blocked rows'), 'Expected blocked-row execution posture in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
   assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');

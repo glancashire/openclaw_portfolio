@@ -290,17 +290,37 @@ function listOpenBrokerOrderRows(tradesPath) {
   }));
 }
 
+function summarizeOpenRunnerRetryState(tradesPath) {
+  const table = readTradesTable(tradesPath);
+  const summary = {
+    queuedInitial: 0,
+    queuedRetry: 0,
+  };
+  table.rows.forEach((row) => {
+    const approval = String(row.Approval || '').trim();
+    const orderId = String(row['Broker order id'] || '').trim();
+    if (approval !== 'queued_for_open_runner' || orderId) return;
+    const nextAction = String(row['Next action'] || '').trim().toLowerCase();
+    if (nextAction.includes('retry')) summary.queuedRetry += 1;
+    else summary.queuedInitial += 1;
+  });
+  return summary;
+}
+
 function queueTradeRowForOpenRunner(tradesPath, selector, options = {}) {
   const approval = options.approval || 'queued_for_open_runner';
   const reasonNote = options.reasonNote || 'Row queued for market-open runner.';
+  const nextAction = options.nextAction || 'First open-runner attempt pending.';
   return updateTradeRows(tradesPath, selector, (row) => {
     const orderId = String(row['Broker order id'] || '').trim();
     if (orderId) return null;
     const status = String(row.Status || '').trim().toLowerCase();
     if (!['proposed', 'planned', 'approved'].includes(status)) return null;
+    const existingNextAction = String(row['Next action'] || '').trim();
     return {
       ...row,
       Approval: approval,
+      'Next action': existingNextAction || nextAction,
       Reason: appendReasonNote(row.Reason, reasonNote),
     };
   });
@@ -309,6 +329,7 @@ function queueTradeRowForOpenRunner(tradesPath, selector, options = {}) {
 function requeueBlockedTradeRow(tradesPath, selector, options = {}) {
   const approval = options.approval || 'queued_for_open_runner';
   const reasonNote = options.reasonNote || 'Row requeued for market-open runner after operator review.';
+  const nextAction = options.nextAction || 'Retry at next intended market-open run after operator recovery.';
   return updateTradeRows(tradesPath, selector, (row) => {
     const orderId = String(row['Broker order id'] || '').trim();
     if (orderId) return null;
@@ -321,7 +342,7 @@ function requeueBlockedTradeRow(tradesPath, selector, options = {}) {
       'Block code': '',
       'Block reason': '',
       'Blocked at': '',
-      'Next action': '',
+      'Next action': nextAction,
       Reason: appendReasonNote(row.Reason, reasonNote),
     };
   });
@@ -370,4 +391,5 @@ module.exports = {
   appendReasonNote,
   queueTradeRowForOpenRunner,
   requeueBlockedTradeRow,
+  summarizeOpenRunnerRetryState,
 };

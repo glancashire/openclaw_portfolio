@@ -29,7 +29,7 @@ function main() {
   assert(table[0]['Block code'] === '', 'expected block code cleared');
   assert(table[0]['Block reason'] === '', 'expected block reason cleared');
   assert(table[0]['Blocked at'] === '', 'expected blocked at cleared');
-  assert(table[0]['Next action'] === '', 'expected next action cleared');
+  assert(/retry/i.test(table[0]['Next action']), `expected retry next action, got ${table[0]['Next action']}`);
 
   const submittedResult = requeueBlockedTradeRow(tradesPath, { tickerOrIsin: 'BBB', action: 'buy' }, { approval: 'queued_for_open_runner' });
   assert(submittedResult.updated === 0, 'expected submitted row not to be requeued');

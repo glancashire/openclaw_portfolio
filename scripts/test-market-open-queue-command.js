@@ -26,6 +26,7 @@ function main() {
 
   const updated = fs.readFileSync(path.join(portfolioDir, 'trades.md'), 'utf8');
   assert(/queued_for_open_runner/.test(updated), 'expected queued approval persisted');
+  assert(/First open-runner attempt pending\./.test(updated), 'expected initial queue next-action note persisted');
 
   let failed = false;
   try {
