@@ -10,6 +10,10 @@
 - Pending approvals: 0
 - Recommended next step: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.
 
+## Why This Incident Exists
+- Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.
+- There is no active approval backlog.
+
 ## Incident Drivers
 - Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
 - 5 explicit blocker(s) are preventing a healthy operating posture.
@@ -61,6 +65,3 @@
 ## Recent Signals
 1. [warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.
 2. [warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.
-3. [warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.
-4. [warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.
-5. [warn] Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.

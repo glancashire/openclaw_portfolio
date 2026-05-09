@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-07T10:36:08.003Z",
+  "generatedAt": "2026-05-07T12:55:20.286Z",
   "portfolio": "acceptance-closure",
   "incidentStatus": "action_required",
   "summary": {
@@ -12,7 +12,9 @@
     "blockerCount": 5,
     "queueItemCount": 6,
     "pendingApprovals": 0,
-    "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked."
+    "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
+    "executionWhy": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
+    "approvalWhy": "There is no active approval backlog."
   },
   "incidentDrivers": [
     "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
@@ -115,24 +117,6 @@
     },
     {
       "rank": 2,
-      "severity": "warn",
-      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "timestamp": null
-    },
-    {
-      "rank": 3,
-      "severity": "warn",
-      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "timestamp": null
-    },
-    {
-      "rank": 4,
-      "severity": "warn",
-      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "timestamp": null
-    },
-    {
-      "rank": 5,
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "timestamp": null
