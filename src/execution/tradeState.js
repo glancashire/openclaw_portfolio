@@ -13,6 +13,10 @@ const TRADE_HEADERS = [
   'Reason',
   'Approval',
   'Broker order id',
+  'Block code',
+  'Block reason',
+  'Blocked at',
+  'Next action',
 ];
 
 function readTradesTable(tradesPath) {
@@ -85,6 +89,10 @@ function appendTradeEvent(tradesPath, event, timestamp = new Date().toISOString(
     'Reason': event.reason || '',
     'Approval': event.approval || '',
     'Broker order id': event.brokerOrderId || '',
+    'Block code': event.blockCode || '',
+    'Block reason': event.blockReason || '',
+    'Blocked at': event.blockedAt || '',
+    'Next action': event.nextAction || '',
   });
   fs.writeFileSync(tradesPath, `${lines}\n${row}\n`);
   return { appended: true, row };
@@ -276,6 +284,9 @@ function listOpenBrokerOrderRows(tradesPath) {
     action: row.Action,
     status: row.Status,
     brokerOrderId: row['Broker order id'],
+    blockCode: row['Block code'] || '',
+    blockReason: row['Block reason'] || '',
+    nextAction: row['Next action'] || '',
   }));
 }
 

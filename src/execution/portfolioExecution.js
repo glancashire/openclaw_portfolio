@@ -71,6 +71,24 @@ function normalizeAction(action) {
   return String(action || '').trim().toUpperCase();
 }
 
+function codeForBlocker(message) {
+  const text = String(message || '').toLowerCase();
+  if (text.includes('approved instruments') || text.includes('approved instrument') || text.includes('explicitly excluded')) return 'instrument_blocked';
+  if (text.includes('broker readiness') || text.includes('broker configuration') || text.includes('authenticated') || text.includes('reachable')) return 'broker_unready';
+  if (text.includes('open questions')) return 'open_questions';
+  if (text.includes('simulated pricing') || text.includes('stale')) return 'pricing_unready';
+  if (text.includes('explicit user approval') || text.includes('confirmation') || text.includes('approval')) return 'approval_required';
+  if (text.includes('execution mode')) return 'execution_mode_blocked';
+  if (text.includes('account reference')) return 'account_reference_unresolved';
+  if (text.includes('automation is paused')) return 'broker_automation_paused';
+  return 'policy_blocked';
+}
+
+function primaryBlocker(blockers) {
+  const first = Array.isArray(blockers) && blockers.length ? blockers[0] : null;
+  return first ? { code: codeForBlocker(first), message: first } : null;
+}
+
 function approvedInstrumentForOrder(order, approvedInstruments) {
   const identifier = String(order?.identifier || order?.conid || order?.ibkrConid || order?.symbol || '').trim();
   const symbol = String(order?.symbol || '').trim().toUpperCase();
@@ -146,12 +164,17 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
   if (live && errorState.stopAutomation) blockers.push(`Broker automation is paused after ${errorState.consecutive} consecutive broker errors.`);
   for (const blocker of safetyBlockers) blockers.push(blocker.message);
 
+  const blockerObjects = blockers.map((message) => ({ code: codeForBlocker(message), message }));
+  const primary = primaryBlocker(blockers);
   const result = {
     ok: blockers.length === 0,
+    submitReady: blockers.length === 0,
+    primaryBlocker: primary,
+    nextAction: primary ? (primary.code === 'approval_required' ? 'Approve the pending trade and retry at market open.' : primary.code === 'broker_unready' ? 'Restore IBKR readiness and rerun the pre-open check.' : primary.code === 'pricing_unready' ? 'Refresh holdings/pricing before retrying.' : primary.code === 'instrument_blocked' ? 'Remove or approve the instrument before retrying.' : 'Resolve the blocker and retry.') : 'Proceed to submission.',
     live,
     transmitted: transmittedIntent,
     instrument,
-    blockers,
+    blockers: blockerObjects,
     readiness,
     context: {
       portfolioStatus: context.portfolioStatus,

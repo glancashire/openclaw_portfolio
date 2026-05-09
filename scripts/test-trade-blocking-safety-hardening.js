@@ -53,40 +53,43 @@ async function main() {
     fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), baseHoldings());
     let result = await evaluateExecutionPolicy({ portfolioDir, order, live: true, requireApproval: true });
     assert(!result.ok, 'Expected unresolved open questions to block execution');
-    assert(result.blockers.some((entry) => /open questions/i.test(entry)), 'Expected open-question blocker message');
+    assert(result.blockers.some((entry) => /open questions/i.test(entry.message || entry)), 'Expected open-question blocker message');
+    assert(result.primaryBlocker && result.primaryBlocker.code, 'Expected primary blocker metadata');
 
     fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), basePortfolio({ excludedRows: '| AAA | test exclusion |' }));
     const overlapIssues = validateApprovedInstruments(path.join(portfolioDir, 'portfolio.md'));
     assert(overlapIssues.some((issue) => /also appears in Excluded Instruments/i.test(issue.message)), 'Expected approved/excluded overlap validation issue');
     result = await evaluateExecutionPolicy({ portfolioDir, order, live: true, requireApproval: true });
     assert(!result.ok, 'Expected excluded approved instrument overlap to block execution');
-    assert(result.blockers.some((entry) => /explicitly excluded/i.test(entry) || /also appears in Excluded Instruments/i.test(entry)), 'Expected exclusion blocker message');
+    assert(result.blockers.some((entry) => /explicitly excluded/i.test(entry.message || entry) || /also appears in Excluded Instruments/i.test(entry.message || entry)), 'Expected exclusion blocker message');
 
     fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), basePortfolio());
     fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), baseHoldings({ pricingSource: 'stale_cache', warnings: '- stale price data from prior session' }));
     result = await evaluateExecutionPolicy({ portfolioDir, order, live: true, requireApproval: true });
     assert(!result.ok, 'Expected stale pricing to block execution');
-    assert(result.blockers.some((entry) => /stale/i.test(entry)), 'Expected stale pricing blocker message');
+    assert(result.blockers.some((entry) => /stale/i.test(entry.message || entry)), 'Expected stale pricing blocker message');
 
     fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), baseHoldings({ pricingSource: 'simulated', warnings: '- Simulated pricing assumptions still active.' }));
     result = await evaluateExecutionPolicy({ portfolioDir, order, live: true, requireApproval: true });
     assert(!result.ok, 'Expected simulated pricing to block execution');
-    assert(result.blockers.some((entry) => /simulated pricing/i.test(entry)), 'Expected simulated pricing blocker message');
+    assert(result.blockers.some((entry) => /simulated pricing/i.test(entry.message || entry)), 'Expected simulated pricing blocker message');
 
     fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), baseHoldings());
     fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), basePortfolio({ accountReference: '<account_alias_or_safe_identifier>' }));
     readiness = { configured: false, authenticated: false, reachable: false, fallbackRequired: true, reason: 'missing_config', message: 'Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.' };
     result = await evaluateExecutionPolicy({ portfolioDir, order, live: true, requireApproval: true });
     assert(!result.ok, 'Expected broker uncertainty to block execution');
-    assert(result.blockers.some((entry) => /Broker readiness is not healthy/i.test(entry)), 'Expected broker readiness blocker');
-    assert(result.blockers.some((entry) => /configuration is incomplete/i.test(entry)), 'Expected broker configuration blocker');
-    assert(result.blockers.some((entry) => /account reference is unresolved/i.test(entry)), 'Expected unresolved account reference blocker');
+    assert(result.blockers.some((entry) => /Broker readiness is not healthy/i.test(entry.message || entry)), 'Expected broker readiness blocker');
+    assert(result.blockers.some((entry) => /configuration is incomplete/i.test(entry.message || entry)), 'Expected broker configuration blocker');
+    assert(result.blockers.some((entry) => /account reference is unresolved/i.test(entry.message || entry)), 'Expected unresolved account reference blocker');
+    assert(result.submitReady === false, 'Expected broker-blocked policy to mark submitReady false');
 
     readiness = { configured: true, authenticated: true, reachable: true, fallbackRequired: false, reason: 'ready', message: 'ok' };
     fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), basePortfolio());
     fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), baseHoldings());
     result = await evaluateExecutionPolicy({ portfolioDir, order, live: true, requireApproval: true });
     assert(result.ok, `Expected clean fixture to pass after hardening, got ${JSON.stringify(result)}`);
+    assert(result.submitReady === true, 'Expected clean fixture to be ready to submit');
 
     console.log(JSON.stringify({ ok: true }, null, 2));
   } finally {
