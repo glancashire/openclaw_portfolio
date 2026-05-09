@@ -89,6 +89,9 @@ async function main() {
   assert(emptyQueueSummaryText.includes('- Open-runner first handoffs: 0'), 'Expected empty helper first-handoff summary line');
   assert(emptyQueueSummaryText.includes('- Open-runner retries: 0'), 'Expected empty helper retry summary line');
 
+  const emptyBoardTable = buildPortfolioTable({ portfolios: [] });
+  assert(emptyBoardTable === '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |\n', 'Expected empty board helper row');
+
   const emptyMarkdown = formatOverviewMarkdown({ index: { generatedAt: '2026-05-06T00:00:00.000Z', totalValueChf: 0, portfolios: [] }, pending: { queueSummary: {}, items: [] } });
   assert(emptyMarkdown.includes('| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |'), 'Expected empty-state board header');
   assert(emptyMarkdown.includes('| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |'), 'Expected empty-state board row');
@@ -96,6 +99,10 @@ async function main() {
   assert(emptyMarkdown.includes('- Open-runner first handoffs: 0'), 'Expected empty-state first-handoff queue summary line');
   assert(emptyMarkdown.includes('- Open-runner retries: 0'), 'Expected empty-state retry queue summary line');
   assert(emptyMarkdown.includes('## Cross-Portfolio Recommended Actions\n1. No pending cross-portfolio actions.'), 'Expected empty-state recommended actions section');
+
+  const boardTable = buildPortfolioTable(index);
+  assert(boardTable.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | Restore broker connectivity. |'), 'Expected populated ETF board helper row');
+  assert(boardTable.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | 0 | 2 | Resolve blockers. |'), 'Expected populated acceptance board helper row');
 
   const markdown = formatOverviewMarkdown({ index, pending });
   assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
