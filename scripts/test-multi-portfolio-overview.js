@@ -173,6 +173,9 @@ async function main() {
   assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
   assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
   assert(overviewMarkdown.includes('| etf | active | 5000 | warning |') && overviewMarkdown.includes('| 0 | 0 | Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. |'), 'Expected generated ETF row to retain queue columns and recommendation');
+  assert(portfolioIndexJson.schemaVersion === '1.1', 'Expected portfolio index schema version');
+  assert(typeof portfolioIndexJson.generatedAt === 'string' && portfolioIndexJson.generatedAt.length > 0, 'Expected portfolio index generatedAt timestamp');
+  assert(typeof portfolioIndexJson.portfolioCount === 'number' && portfolioIndexJson.portfolioCount === portfolioIndexJson.portfolios.length, 'Expected portfolio index count metadata');
   assert(Array.isArray(portfolioIndexJson.portfolios), 'Expected portfolio index portfolios array');
   assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerQueue')), 'Expected openRunnerQueue in portfolio index rows');
   assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerRetry')), 'Expected openRunnerRetry in portfolio index rows');

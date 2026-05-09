@@ -1,6 +1,6 @@
 # Phase 96 Actionable Checklist
 
-- [ ] Inspect overview-index metadata assertions
-- [ ] Add top-level index metadata checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Inspect overview-index metadata assertions
+- [x] Add top-level index metadata checks
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push
