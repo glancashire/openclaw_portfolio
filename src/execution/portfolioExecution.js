@@ -155,7 +155,7 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
   if (instrument && excludedIds.has(String(instrument.tickerOrIsin || '').trim().toUpperCase())) {
     blockers.push(`Requested instrument ${instrument.tickerOrIsin} is explicitly excluded.`);
   }
-  if (live && !readiness.authenticated) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
+  if (live && (readiness.authenticated !== true || readiness.fallbackRequired === true)) blockers.push(`Broker readiness is not healthy: ${readiness.message}`);
   if (live && readiness.configured === false) blockers.push('Broker configuration is incomplete for live execution.');
   if (live && context.accountReference && /^(<.*>|unknown)$/i.test(String(context.accountReference).trim())) blockers.push('Broker account reference is unresolved for live execution.');
   if (transmittedIntent && !live) blockers.push('Transmitted live execution requires dryRun=false.');

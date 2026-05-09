@@ -22,6 +22,7 @@ Use these entry points:
 - market-hours guard applies unless explicitly forced
 - approval/staging/transmitted-live are separate lanes
 - blocked or already-submitted rows must not be re-submitted
+- delayed-only broker pricing may support fallback pricing/reporting, but must not be treated as live-ready submission state
 - runtime evidence belongs in `runtime/events/runtime-events.jsonl` and portfolio artifacts
 
 ## Primary docs

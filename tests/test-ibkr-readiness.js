@@ -1,0 +1,40 @@
+'use strict';
+
+const { summarizeReadiness } = require('../src/brokers/interactive-brokers/readiness');
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function main() {
+  let summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: true, reason: 'ready' },
+    marketData: { posture: 'live_or_realtime', detail: 'live' },
+  });
+  assert(summary.reason === 'ready', 'expected live/realtime readiness to be ready');
+  assert(summary.fallbackRequired === false, 'expected live/realtime readiness not to require fallback');
+  assert(summary.marketDataMode === 'live_or_realtime', 'expected live/realtime marketDataMode');
+
+  summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: true, reason: 'ready' },
+    marketData: { posture: 'delayed_only', detail: 'delayed only' },
+  });
+  assert(summary.reason === 'delayed_data_only', 'expected delayed-only readiness reason');
+  assert(summary.fallbackRequired === true, 'expected delayed-only readiness to require fallback');
+  assert(summary.marketDataMode === 'delayed', 'expected delayed marketDataMode');
+  assert(/delayed-only/i.test(summary.message), 'expected delayed-only readiness message');
+
+  summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: false, reason: 'native_error' },
+    marketData: null,
+  });
+  assert(summary.reason === 'native_error', 'expected auth failure reason to pass through');
+  assert(summary.fallbackRequired === true, 'expected auth failure to require fallback');
+
+  console.log(JSON.stringify({ ok: true }, null, 2));
+}
+
+main();

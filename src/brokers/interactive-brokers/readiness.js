@@ -4,22 +4,61 @@ async function getInteractiveBrokersReadiness({ portfolio = 'etf' } = {}) {
   const client = new InteractiveBrokersClient({ portfolio });
   const config = client.configurationStatus();
   const auth = await client.authenticate();
-  return summarizeReadiness({ config, auth });
+  const marketData = auth?.ok ? await detectMarketDataPosture(client).catch(() => null) : null;
+  return summarizeReadiness({ config, auth, marketData });
 }
 
-function summarizeReadiness({ config, auth }) {
+async function detectMarketDataPosture(client) {
+  try {
+    const contracts = await client.searchContracts('IEF');
+    const first = Array.isArray(contracts) ? contracts.find((row) => row?.conid) : null;
+    if (!first?.conid) return { posture: 'unknown', detail: 'No probe contract conid available.' };
+    const snapshot = await client.fetchMarketSnapshot([first.conid]);
+    const quote = Array.isArray(snapshot) ? snapshot[0] : snapshot;
+    const bid = asNumber(quote?.['84']);
+    const ask = asNumber(quote?.['86']);
+    const last = asNumber(quote?.['31']);
+    const close = asNumber(quote?.close);
+    if ([bid, ask, last].some(Number.isFinite)) {
+      return { posture: 'live_or_realtime', detail: 'Live/realtime bid/ask/last values are available.' };
+    }
+    if (Number.isFinite(close)) {
+      return { posture: 'delayed_only', detail: 'Delayed close fallback is available but live bid/ask/last are unavailable.' };
+    }
+    return { posture: 'unpriced', detail: 'Market data request succeeded but returned no usable price fields.' };
+  } catch (error) {
+    if (/Delayed market data is available/i.test(String(error?.message || ''))) {
+      return { posture: 'delayed_only', detail: 'Interactive Brokers reports delayed market data is available.' };
+    }
+    return { posture: 'unknown', detail: String(error?.message || error || 'Unknown market data posture error.') };
+  }
+}
+
+function summarizeReadiness({ config, auth, marketData }) {
+  const delayedOnly = auth?.ok && marketData?.posture === 'delayed_only';
+  const liveReady = auth?.ok && marketData?.posture === 'live_or_realtime';
   return {
     configured: Boolean(config?.ok),
     authenticated: Boolean(auth?.ok),
     reachable: auth?.reason !== 'http_error' ? Boolean(auth?.ok) : false,
-    fallbackRequired: !auth?.ok,
-    reason: auth?.ok ? 'ready' : auth?.reason || 'unknown',
-    message: auth?.ok
-      ? 'Interactive Brokers read-only connectivity is available.'
-      : auth?.reason === 'http_error'
-        ? 'Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.'
-        : 'Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.',
+    fallbackRequired: !auth?.ok || delayedOnly,
+    marketDataMode: delayedOnly ? 'delayed' : liveReady ? 'live_or_realtime' : (auth?.ok ? (marketData?.posture || 'unknown') : 'unavailable'),
+    reason: liveReady ? 'ready' : delayedOnly ? 'delayed_data_only' : (auth?.ok ? (marketData?.posture || 'ready') : auth?.reason || 'unknown'),
+    message: liveReady
+      ? 'Interactive Brokers read-only connectivity and live/realtime market data are available.'
+      : delayedOnly
+        ? 'Interactive Brokers connectivity is available, but API pricing is delayed-only; broker-backed pricing may use delayed fallback values and live submission should remain blocked.'
+        : auth?.ok
+          ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not fully ready.'
+          : auth?.reason === 'http_error'
+            ? 'Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.'
+            : 'Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.',
   };
 }
 
-module.exports = { getInteractiveBrokersReadiness, summarizeReadiness };
+function asNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+module.exports = { getInteractiveBrokersReadiness, summarizeReadiness, detectMarketDataPosture };

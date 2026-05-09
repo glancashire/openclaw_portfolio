@@ -201,10 +201,12 @@ class InteractiveBrokersClient {
       const bid = asNumber(first?.['84']);
       const ask = asNumber(first?.['86']);
       const last = asNumber(first?.['31']);
+      const close = asNumber(first?.close);
       const currency = first?.['85'] || contract.currency || 'CHF';
-      const referencePrice = preferredReferencePrice({ bid, ask, last, action: order?.action });
+      const referencePrice = preferredReferencePrice({ bid, ask, last, action: order?.action }) || close;
       const quantity = Number(order?.quantity || 0);
       const estimatedValue = Number.isFinite(referencePrice) ? Number((referencePrice * quantity).toFixed(2)) : null;
+      const delayedFallbackUsed = !Number.isFinite(preferredReferencePrice({ bid, ask, last, action: order?.action })) && Number.isFinite(close);
       const quote = normaliseOrderQuote({
         ok: true,
         identifier: contract.conid || contract.symbol,
@@ -218,8 +220,10 @@ class InteractiveBrokersClient {
         ask,
         last,
         estimatedValue,
-        priceSource: 'interactive-brokers-marketdata',
-        warning: !Number.isFinite(referencePrice) ? 'No positive quote reference price available.' : null,
+        priceSource: delayedFallbackUsed ? 'interactive-brokers-delayed-close-fallback' : 'interactive-brokers-marketdata',
+        warning: delayedFallbackUsed
+          ? 'Using delayed close fallback because live bid/ask/last were unavailable from API market data.'
+          : (!Number.isFinite(referencePrice) ? 'No positive quote reference price available.' : null),
       });
       return {
         ok: true,

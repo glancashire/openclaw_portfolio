@@ -48,6 +48,12 @@ async function main() {
     assert(result.submitReady === false, 'expected submitReady false when blocked');
     assert(/Restore IBKR readiness/i.test(result.nextAction), 'expected readiness next action');
 
+    readiness = { configured: true, authenticated: true, reachable: true, fallbackRequired: true, reason: 'delayed_data_only', marketDataMode: 'delayed', message: 'Interactive Brokers connectivity is available, but API pricing is delayed-only; broker-backed pricing may use delayed fallback values and live submission should remain blocked.' };
+    result = await evaluateExecutionPolicy({ portfolioDir, order: liveOrder, live: true, requireApproval: true });
+    assert(!result.ok, 'expected delayed-only readiness to keep live submission blocked');
+    assert(result.submitReady === false, 'expected delayed-only readiness to mark submitReady false');
+    assert(result.blockers.some((b) => /Broker readiness is not healthy/i.test(b.message || '')), 'expected delayed-only readiness blocker message');
+
     fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), holdingsText({ pricingSource: 'simulated' }));
     readiness = { configured: true, authenticated: true, reachable: true, fallbackRequired: false, reason: 'ready', message: 'ok' };
     result = await evaluateExecutionPolicy({ portfolioDir, order: liveOrder, live: true, requireApproval: true });

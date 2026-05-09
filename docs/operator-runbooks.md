@@ -23,5 +23,10 @@ This is the active incident and operator reference.
 - `runtime/execution-state.json`
 - `runtime/events/runtime-events.jsonl`
 
+## Broker readiness note
+- Treat `reason: delayed_data_only` as a degraded-but-connected state.
+- In that state, broker-backed pricing may use delayed fallback values for analysis/dry-runs.
+- Do not treat delayed-only pricing as permission for live submission.
+
 ## Obsolete material
 Old duplicate operator notes were folded into this file. If a runbook is no longer used, remove it instead of keeping multiple versions.
