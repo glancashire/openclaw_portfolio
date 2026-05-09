@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
+const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard } = require('../src/reporting/overviewBoard');
 const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
@@ -113,16 +113,23 @@ async function main() {
   assert(dailyMarkdown.includes('Why now'), 'Expected highlighted portfolio explanation line');
 
   const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
+  await generateOverviewBoard({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
   const approvalsHtml = fs.readFileSync(generated.approvalsQueueHtmlPath, 'utf8');
   const dailyHtml = fs.readFileSync(generated.dailySummaryHtmlPath, 'utf8');
   const overviewMarkdown = fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-overview.md'), 'utf8');
   const overviewHtml = fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-overview.html'), 'utf8');
+  const portfolioIndexJson = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-index.json'), 'utf8'));
   assert(fs.existsSync(generated.approvalsQueuePath), 'Expected approvals queue json artifact');
   assert(fs.existsSync(generated.approvalsQueueMarkdownPath), 'Expected approvals queue markdown artifact');
   assert(approvalsHtml.includes('Approvals Queue'), 'Expected approvals queue html artifact');
   assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
   assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
   assert(overviewMarkdown.includes('First handoffs'), 'Expected first-handoff column in generated overview markdown');
+  assert(Array.isArray(portfolioIndexJson.portfolios), 'Expected portfolio index portfolios array');
+  assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerQueue')), 'Expected openRunnerQueue in portfolio index rows');
+  assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerRetry')), 'Expected openRunnerRetry in portfolio index rows');
+  assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerQueue'), 'Expected openRunnerQueue in queue summary');
+  assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerRetry'), 'Expected openRunnerRetry in queue summary');
   assert(overviewMarkdown.includes('Retries'), 'Expected retry column in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner retries'), 'Expected retry queue summary in generated overview markdown');
