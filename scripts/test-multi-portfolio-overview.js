@@ -76,9 +76,12 @@ async function main() {
   assert(totals.pendingApprovals === 7, 'Expected pending approvals total');
   assert(totals.pendingActions === 2, 'Expected pending action total');
 
+  assert(buildRecommendedActionRows({ items: [] }) === '1. No pending cross-portfolio actions.', 'Expected empty recommended-actions helper text');
+
   const emptyMarkdown = formatOverviewMarkdown({ index: { generatedAt: '2026-05-06T00:00:00.000Z', totalValueChf: 0, portfolios: [] }, pending: { queueSummary: {}, items: [] } });
   assert(emptyMarkdown.includes('| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |'), 'Expected empty-state board header');
   assert(emptyMarkdown.includes('| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |'), 'Expected empty-state board row');
+  assert(emptyMarkdown.includes('## Cross-Portfolio Recommended Actions\n1. No pending cross-portfolio actions.'), 'Expected empty-state recommended actions section');
 
   const markdown = formatOverviewMarkdown({ index, pending });
   assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
