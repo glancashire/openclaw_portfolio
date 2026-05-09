@@ -1,7 +1,7 @@
 # Phase 77 Actionable Checklist
 
-- [ ] Inspect overview/reporting seams
-- [ ] Add concise open-runner status visibility
-- [ ] Update focused overview/reporting tests
-- [ ] Re-run targeted overview/reporting checks
+- [x] Inspect overview/reporting seams
+- [x] Add concise open-runner status visibility
+- [x] Update focused overview/reporting tests
+- [x] Re-run targeted overview/reporting checks
 - [ ] Commit and push

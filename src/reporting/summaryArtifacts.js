@@ -760,6 +760,8 @@ function buildPortfolioIndex(summaries = []) {
     blockers: summary.blockers.count,
     pendingActions: summary.pendingActions.length,
     recommendedNextStep: summary.recommendedNextStep,
+    openRunnerQueue: Number(summary.execution?.openRunnerRetryState?.queuedInitial || 0),
+    openRunnerRetry: Number(summary.execution?.openRunnerRetryState?.queuedRetry || 0),
     driftStatuses: summary.allocation.map((row) => ({ assetClass: row.assetClass, status: row.status, driftPct: row.driftPct })),
     brokerHealth: summary.status.brokerHealth,
     executionPosture: summary.status.executionPosture,
