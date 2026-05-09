@@ -176,6 +176,12 @@ async function main() {
   assert(Array.isArray(portfolioIndexJson.portfolios), 'Expected portfolio index portfolios array');
   assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerQueue')), 'Expected openRunnerQueue in portfolio index rows');
   assert(portfolioIndexJson.portfolios.every((item) => Object.prototype.hasOwnProperty.call(item, 'openRunnerRetry')), 'Expected openRunnerRetry in portfolio index rows');
+  const generatedEtfIndexRow = portfolioIndexJson.portfolios.find((item) => item.portfolio === 'etf');
+  const generatedAcceptanceIndexRow = portfolioIndexJson.portfolios.find((item) => item.portfolio === 'acceptance-closure');
+  assert(generatedEtfIndexRow && generatedEtfIndexRow.status === 'warning', 'Expected ETF row in generated portfolio index');
+  assert(generatedAcceptanceIndexRow && generatedAcceptanceIndexRow.status === 'warning', 'Expected acceptance row in generated portfolio index');
+  assert(typeof generatedEtfIndexRow.openRunnerQueue === 'number' && typeof generatedEtfIndexRow.openRunnerRetry === 'number', 'Expected ETF open-runner counters in generated portfolio index');
+  assert(typeof generatedAcceptanceIndexRow.openRunnerQueue === 'number' && typeof generatedAcceptanceIndexRow.openRunnerRetry === 'number', 'Expected acceptance open-runner counters in generated portfolio index');
   assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerQueue'), 'Expected openRunnerQueue in queue summary');
   assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerRetry'), 'Expected openRunnerRetry in queue summary');
   assert(typeof portfolioIndexJson.queueSummary.openRunnerQueue === 'number', 'Expected numeric openRunnerQueue in queue summary');
