@@ -13,6 +13,10 @@ const TRADE_HEADERS = [
   'Reason',
   'Approval',
   'Broker order id',
+  'Block code',
+  'Block reason',
+  'Blocked at',
+  'Next action',
 ];
 
 function readTradesTable(tradesPath) {
@@ -85,6 +89,10 @@ function appendTradeEvent(tradesPath, event, timestamp = new Date().toISOString(
     'Reason': event.reason || '',
     'Approval': event.approval || '',
     'Broker order id': event.brokerOrderId || '',
+    'Block code': event.blockCode || '',
+    'Block reason': event.blockReason || '',
+    'Blocked at': event.blockedAt || '',
+    'Next action': event.nextAction || '',
   });
   fs.writeFileSync(tradesPath, `${lines}\n${row}\n`);
   return { appended: true, row };
@@ -276,6 +284,39 @@ function listOpenBrokerOrderRows(tradesPath) {
     action: row.Action,
     status: row.Status,
     brokerOrderId: row['Broker order id'],
+    blockCode: row['Block code'] || '',
+    blockReason: row['Block reason'] || '',
+    nextAction: row['Next action'] || '',
+  }));
+}
+
+function listExecutableTradeRows(tradesPath) {
+  const table = readTradesTable(tradesPath);
+  return table.rows.filter((row) => {
+    const status = String(row.Status || '').trim().toLowerCase();
+    const approval = String(row.Approval || '').trim();
+    const blockCode = String(row['Block code'] || '').trim();
+    const action = String(row.Action || '').trim().toLowerCase();
+    const orderId = String(row['Broker order id'] || '').trim();
+
+    if (action === 'hold') return false;
+    if (blockCode) return false;
+    if (orderId) return false;
+    if (!['approved', 'planned', 'proposed'].includes(status)) return false;
+    if (!['user_approved', 'submitted_to_open_runner', 'ready_for_submission'].includes(approval)) return false;
+    return true;
+  }).map((row) => ({
+    dateTime: row['Date/time'],
+    status: row.Status,
+    action: row.Action,
+    tickerOrIsin: row['Ticker / ISIN'],
+    name: row.Name,
+    quantity: Number(row.Quantity || 0),
+    limitPrice: Number(row['Limit price'] || 0),
+    estimatedChf: Number(row['Estimated CHF'] || 0),
+    approval: row.Approval,
+    brokerOrderId: row['Broker order id'],
+    reason: row.Reason,
   }));
 }
 
@@ -284,6 +325,7 @@ module.exports = {
   updateTradeRows,
   appendTradeEvent,
   listOpenBrokerOrderRows,
+  listExecutableTradeRows,
   markTradeApproved,
   rejectTradeProposal,
   reconcileOrderStatus,

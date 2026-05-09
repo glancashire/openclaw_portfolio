@@ -1,0 +1,182 @@
+const fs = require('fs');
+const path = require('path');
+const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown } = require('../src/reporting/overviewBoard');
+const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+async function main() {
+  assert(classifyPortfolioKind({ portfolio: 'etf' }) === 'active', 'Expected active portfolio classification');
+  assert(classifyPortfolioKind({ portfolio: 'acceptance-closure' }) === 'demo_like', 'Expected demo-like classification');
+  assert(formatDriftSummary([{ status: 'out_of_bounds' }, { status: 'on_track' }]) === '1 out_of_bounds', 'Expected severe drift summary');
+  assert(formatDriftSummary([{ status: 'drifted' }]) === '1 drifted', 'Expected minor drift summary');
+  assert(formatDriftSummary([]) === 'n/a', 'Expected n/a drift summary');
+
+  const index = {
+    generatedAt: '2026-05-06T00:00:00.000Z',
+    totalValueChf: 5000,
+    portfolios: [
+      {
+        portfolio: 'etf',
+        status: 'warning',
+        totalValueChf: 5000,
+        blockers: 0,
+        pendingApprovals: 7,
+        pendingActions: 2,
+        recommendedNextStep: 'Restore broker connectivity.',
+        driftStatuses: [{ assetClass: 'Global equities', status: 'out_of_bounds', driftPct: -60 }],
+      },
+      {
+        portfolio: 'acceptance-closure',
+        status: 'warning',
+        totalValueChf: 0,
+        blockers: 5,
+        pendingApprovals: 0,
+        pendingActions: 6,
+        recommendedNextStep: 'Resolve blockers.',
+        driftStatuses: [{ assetClass: 'Global equities', status: 'out_of_bounds', driftPct: -50 }],
+      },
+    ],
+  };
+  const pending = {
+    queueSummary: { total: 2, blocking: 1, approvals: 0, execution: 0, recovery: 1, delivery: 0, data: 0, warnings: 0, workflow: 1 },
+    items: [
+      { portfolio: 'etf', queueType: 'recovery', severity: 'high', status: 'degraded', summary: 'Broker degraded.', recommendedOperatorAction: 'Fix broker.' },
+      { portfolio: 'acceptance-closure', queueType: 'workflow', severity: 'medium', status: 'pending', summary: 'Demo needs cleanup.', recommendedOperatorAction: 'Review demo.' },
+    ],
+  };
+
+  const totals = summarizeOverview(index, pending);
+  assert(totals.portfolioCount === 2, 'Expected portfolio count');
+  assert(totals.totalValueChf === 5000, 'Expected total value');
+  assert(totals.activeCount === 1, 'Expected one active portfolio');
+  assert(totals.demoLikeCount === 1, 'Expected one demo-like portfolio');
+  assert(totals.pendingApprovals === 7, 'Expected pending approvals total');
+  assert(totals.pendingActions === 2, 'Expected pending action total');
+
+  const markdown = formatOverviewMarkdown({ index, pending });
+  assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
+  assert(markdown.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | Restore broker connectivity. |'), 'Expected ETF board row');
+  assert(markdown.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | Resolve blockers. |'), 'Expected acceptance board row');
+  assert(markdown.includes('## Operator Queue Summary'), 'Expected operator queue summary section');
+  assert(markdown.includes('- Recovery items: 1'), 'Expected recovery count in queue summary');
+  assert(markdown.includes('1. [recovery/high/degraded] etf: Broker degraded. — Fix broker.'), 'Expected recommended action row');
+
+  const approvalsQueue = buildApprovalsQueue([
+    {
+      portfolio: 'etf',
+      operatorQueue: {
+        items: [
+          { queueType: 'approval', kind: 'approval', severity: 'medium', status: 'pending_user_approval', summary: '7 proposed trade row(s) still need user approval.', recommendedOperatorAction: 'Review the proposed trades and approve or reject them explicitly.' },
+        ],
+      },
+    },
+  ]);
+  const approvalsMarkdown = renderApprovalsQueueMarkdown(approvalsQueue);
+  assert(approvalsQueue.itemCount === 1, 'Expected one approval queue item');
+  assert(approvalsQueue.items[0].urgency === 'medium', 'Expected medium urgency approval item');
+  assert(approvalsMarkdown.includes('# Approvals Queue'), 'Expected approvals queue title');
+  assert(approvalsMarkdown.includes('Effect if approved'), 'Expected approval consequence text');
+
+  const dailySummary = buildDailySummary([
+    {
+      portfolio: 'etf',
+      status: { health: 'warning', brokerHealth: 'degraded', dataFreshness: 'current', deliveryPosture: 'ready' },
+      holdings: { cashChf: 5000 },
+      allocation: [{ assetClass: 'Global equities', driftPct: -60, status: 'out_of_bounds' }],
+      approvals: { pendingApprovalCount: 7 },
+      recommendedNextStep: 'Restore broker connectivity.',
+      explanations: {
+        biggestDrift: 'Global equities are 60% under target and outside the allowed band around the 100% target.',
+        executionBlock: 'Execution is blocked because broker readiness is degraded: broker offline.',
+        approvalBacklog: '7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly.',
+      },
+    },
+  ], approvalsQueue);
+  const dailyMarkdown = renderDailySummaryMarkdown(dailySummary);
+  assert(dailySummary.healthHeadline === 'warning', 'Expected warning daily headline');
+  assert(dailySummary.cashWaitingToDeployChf === 5000, 'Expected daily cash total');
+  assert(dailySummary.pendingApprovals === 1, 'Expected approval queue alignment in daily summary');
+  assert(dailyMarkdown.includes('# Daily Summary Page'), 'Expected daily summary title');
+  assert(dailyMarkdown.includes('Cash waiting to deploy CHF: 5000'), 'Expected daily cash line');
+  assert(dailyMarkdown.includes('Biggest Drift Today'), 'Expected biggest drift section');
+  assert(dailyMarkdown.includes('Why it matters'), 'Expected drift explanation line');
+  assert(dailyMarkdown.includes('Why now'), 'Expected highlighted portfolio explanation line');
+
+  const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
+  const approvalsHtml = fs.readFileSync(generated.approvalsQueueHtmlPath, 'utf8');
+  const dailyHtml = fs.readFileSync(generated.dailySummaryHtmlPath, 'utf8');
+  assert(fs.existsSync(generated.approvalsQueuePath), 'Expected approvals queue json artifact');
+  assert(fs.existsSync(generated.approvalsQueueMarkdownPath), 'Expected approvals queue markdown artifact');
+  assert(approvalsHtml.includes('Approvals Queue'), 'Expected approvals queue html artifact');
+  assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
+  assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
+  assert(fs.existsSync(generated.dailySummaryMarkdownPath), 'Expected daily summary markdown artifact');
+  assert(dailyHtml.includes('Daily Summary Page'), 'Expected daily summary html artifact');
+  assert(dailyHtml.includes('Cash waiting to deploy CHF'), 'Expected daily summary cash rendering');
+  assert(dailyHtml.includes('Why it matters'), 'Expected daily summary explanation rendering');
+
+  // Phase 39: report history
+  const reportHistory = buildReportHistory(path.resolve(__dirname, '..'), []);
+  assert(reportHistory.schemaVersion === '1.0', 'Expected report history schema version');
+  assert(typeof reportHistory.totalReports === 'number' && reportHistory.totalReports > 0, 'Expected at least one report in history');
+  assert(reportHistory.portfolios.some((p) => p.portfolio === 'etf'), 'Expected etf in report history');
+  const etfHistory = reportHistory.portfolios.find((p) => p.portfolio === 'etf');
+  assert(etfHistory.reports.length > 0, 'Expected etf reports in history');
+  assert(etfHistory.reports[0].formats.length > 0, 'Expected report formats');
+  assert(etfHistory.reports[0].date.length === 8, 'Expected 8-char date on report entry');
+  const historyMarkdown = renderReportHistoryMarkdown(reportHistory);
+  assert(historyMarkdown.includes('# Report History'), 'Expected report history title');
+  assert(historyMarkdown.includes('| Date | Period | Formats | Report |'), 'Expected report history table header');
+  assert(historyMarkdown.includes('etf'), 'Expected etf in report history markdown');
+
+  assert(fs.existsSync(generated.reportHistoryPath), 'Expected report history json artifact');
+  assert(fs.existsSync(generated.reportHistoryMarkdownPath), 'Expected report history markdown artifact');
+  assert(fs.existsSync(generated.reportHistoryHtmlPath), 'Expected report history html artifact');
+  const reportHistoryHtml = fs.readFileSync(generated.reportHistoryHtmlPath, 'utf8');
+  assert(reportHistoryHtml.includes('Report History'), 'Expected report history html title');
+  assert(reportHistoryHtml.includes('<table>'), 'Expected html table in report history');
+
+  // Phase 41: operator cockpit landing page
+  assert(fs.existsSync(generated.cockpitHtmlPath), 'Expected cockpit index.html artifact');
+  const cockpitHtml = fs.readFileSync(generated.cockpitHtmlPath, 'utf8');
+  assert(cockpitHtml.includes('Operator Cockpit'), 'Expected cockpit title');
+  assert(cockpitHtml.includes('status-grid'), 'Expected status grid in cockpit');
+  assert(cockpitHtml.includes('daily-summary.html'), 'Expected daily summary nav link');
+  assert(cockpitHtml.includes('approvals-queue.html'), 'Expected approvals queue nav link');
+  assert(cockpitHtml.includes('report-history.html'), 'Expected report history nav link');
+  assert(cockpitHtml.includes('portfolio-overview.html'), 'Expected overview nav link');
+  assert(cockpitHtml.includes('summary.html'), 'Expected portfolio summary link');
+  assert(cockpitHtml.includes('badge-'), 'Expected health badge in cockpit');
+  assert(cockpitHtml.includes('delivery-status.html'), 'Expected delivery status nav link in cockpit');
+
+  // Phase 42: delivery & alerting status
+  const deliveryOverview = buildDeliveryOverview(path.resolve(__dirname, '..'));
+  assert(deliveryOverview.schemaVersion === '1.0', 'Expected delivery overview schema version');
+  assert(typeof deliveryOverview.portfolioCount === 'number' && deliveryOverview.portfolioCount > 0, 'Expected at least one portfolio in delivery overview');
+  assert(deliveryOverview.portfolios.some((p) => p.portfolio === 'etf'), 'Expected etf in delivery overview');
+  const etfDelivery = deliveryOverview.portfolios.find((p) => p.portfolio === 'etf');
+  assert(typeof etfDelivery.deliveryMode === 'string', 'Expected delivery mode');
+  assert(Array.isArray(etfDelivery.intendedChannels), 'Expected intended channels array');
+  assert(typeof etfDelivery.ready === 'boolean', 'Expected ready boolean');
+  const deliveryMd = renderDeliveryStatusMarkdown(deliveryOverview);
+  assert(deliveryMd.includes('# Delivery & Alerting Status'), 'Expected delivery status title');
+  assert(deliveryMd.includes('etf'), 'Expected etf in delivery markdown');
+  assert(deliveryMd.includes('Delivery mode:'), 'Expected delivery mode line');
+
+  assert(fs.existsSync(generated.deliveryStatusPath), 'Expected delivery status json artifact');
+  assert(fs.existsSync(generated.deliveryStatusMarkdownPath), 'Expected delivery status markdown artifact');
+  assert(fs.existsSync(generated.deliveryStatusHtmlPath), 'Expected delivery status html artifact');
+  const deliveryHtml = fs.readFileSync(generated.deliveryStatusHtmlPath, 'utf8');
+  assert(deliveryHtml.includes('Delivery'), 'Expected delivery html title');
+  assert(deliveryHtml.includes('local_only') || deliveryHtml.includes('Delivery mode'), 'Expected delivery mode in html');
+
+  console.log(JSON.stringify({ ok: true }, null, 2));
+}
+
+main().catch((error) => {
+  console.error(error?.stack || error?.message || String(error));
+  process.exit(1);
+});

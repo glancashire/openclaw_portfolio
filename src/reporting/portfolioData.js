@@ -74,6 +74,7 @@ function executionLifecycleSummary(tradesPath) {
   const summary = {
     proposed: 0,
     approved: 0,
+    rejected: 0,
     staged: 0,
     submitted: 0,
     partiallyFilled: 0,
@@ -88,6 +89,7 @@ function executionLifecycleSummary(tradesPath) {
     const status = String(row.status || '').trim().toLowerCase();
     if (status === 'proposed') summary.proposed += 1;
     else if (status === 'approved') summary.approved += 1;
+    else if (status === 'rejected') summary.rejected += 1;
     else if (status === 'staged') summary.staged += 1;
     else if (status === 'submitted') summary.submitted += 1;
     else if (status === 'partially_filled') summary.partiallyFilled += 1;

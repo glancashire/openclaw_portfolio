@@ -16,6 +16,8 @@
     "next:questions": "node scripts/next-portfolio-questions.js portfolio/etf/portfolio.md",
     "apply:answers": "node scripts/apply-portfolio-answers.js portfolio/etf/portfolio.md /tmp/answers.json",
     "check:safety": "node scripts/check-safety-controls.js portfolio/etf",
+    "check:risk-observability": "node scripts/check-risk-observability.js portfolio/etf",
+    "show:runtime-events": "node scripts/show-runtime-events.js --portfolio etf",
     "suggest:etfs": "node scripts/suggest-etf-shortlist.js portfolio/etf/portfolio.md markdown",
     "propose:instrument-trades": "node scripts/propose-instrument-trades.js portfolio/etf/portfolio.md portfolio/etf/holdings.md",
     "ibkr:search": "node scripts/search-interactive-brokers-instruments.js",

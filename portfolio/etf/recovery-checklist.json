@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-07T12:56:28.498Z",
+  "portfolio": "etf",
+  "incidentStatus": "action_required",
+  "summary": {
+    "health": "warning",
+    "brokerHealth": "degraded",
+    "executionPosture": "degraded_dry_run_only",
+    "deliveryPosture": "ready",
+    "dataFreshness": "current",
+    "blockerCount": 0,
+    "queueItemCount": 2,
+    "pendingApprovals": 7,
+    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalWhy": "7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly."
+  },
+  "incidentDrivers": [
+    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
+    "7 approval-gated trade rows are still waiting for operator review."
+  ],
+  "activeBlockers": [],
+  "actionChecklist": [
+    {
+      "step": 1,
+      "priority": "high",
+      "title": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
+      "source": "broker_readiness"
+    },
+    {
+      "step": 2,
+      "priority": "medium",
+      "title": "7 proposed trade row(s) still need user approval.",
+      "action": "Review the proposed trades and approve or reject them explicitly.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "trade_lifecycle"
+    }
+  ],
+  "verificationChecks": [
+    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
+    "Freshness posture remains current.",
+    "All approval-gated rows are explicitly approved, rejected, or intentionally left pending.",
+    "No active blockers remain."
+  ],
+  "completionCriteria": [
+    "Blocking recovery items no longer appear in the operator queue.",
+    "Portfolio health no longer depends on unresolved blocker conditions.",
+    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
+  ],
+  "recentSignals": [
+    {
+      "rank": 1,
+      "severity": "warn",
+      "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "timestamp": null
+    },
+    {
+      "rank": 2,
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "timestamp": null
+    },
+    {
+      "rank": 3,
+      "severity": "warn",
+      "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "timestamp": null
+    },
+    {
+      "rank": 4,
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "timestamp": null
+    }
+  ]
+}

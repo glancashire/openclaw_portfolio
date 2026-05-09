@@ -15,9 +15,10 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - Interactive Brokers read-only connectivity and holdings sync are working
 - portfolio-aware execution gating and order staging scaffolding exist
 - execution lifecycle reconciliation now flows back into `trades.md`, `history.md`, and `dashboard.md`
+- local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The main reason the MVP is **not yet fully implemented** is that the broker execution surface is still intentionally incomplete in true writable mode. The system is now much more complete in dry-run/read-only/reconciliation behavior, but it still does not provide a fully enabled, operator-validated, durable live submit path.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now complete through Phase 42, having addressed all 8 expanded acceptance criteria and all 8 identified operator-experience gaps. The implementation includes: command-center dashboard uplift, structured UI-ready summary artifacts, multi-portfolio overview board, unified operator queue, decision-oriented reporting, guided onboarding workflow, per-portfolio HTML summary pages, recovery/incident checklists, clean approvals queue, daily summary page, better why explanations, report history navigation, improved report visual quality, operator cockpit landing page, and delivery/alerting status page. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
 
 ## Validation snapshot
 
@@ -62,8 +63,8 @@ Legend:
 | 14. Strategy and ETF Selection Workflow | partial | Strategy parsing, shortlist generation, rationale, and approval-gated application support exist. The shortlist approval/write-back workflow is still lighter than the specification implies. |
 | 15. Market Entry Workflow | partial | Staged-entry policy, portfolio-aware execution gating, approval transitions, status reconciliation, cancellation scaffolding, and demo flow are now present. Live writable execution after approval remains incomplete. |
 | 16. Rebalancing Workflow | partial | Holdings sync, drift analysis, trade proposal generation, dashboard refresh, and execution reconciliation exist. The final enabled execution leg still needs hardening. |
-| 17. Reporting | partial | Weekly/monthly/quarterly report generation exists, with Markdown and PDF outputs. Reporting is now being extended to surface execution lifecycle more clearly, but the work is not yet fully complete. |
-| 18. Scheduling | partial | Schedule docs and report-job docs exist, and cron wiring is in place. Operational alerting/delivery hardening remains light. |
+| 17. Reporting | done | Weekly/monthly/quarterly report generation exists, with Markdown and PDF outputs. Reporting now also surfaces delivery mode, readiness, pending operator actions, freshness, and generation/render state, with a dedicated local-only readiness check. |
+| 18. Scheduling | partial | Schedule docs and report-job docs exist, and cron wiring is in place. Report-cycle automation now emits workflow, failure, delivery-mode, readiness, and pending-action metadata, though broader observability/alerting remains light. |
 | 19. Safety / Operational Rules | partial | Key safeguards are implemented: no secrets in Markdown, read-only/dry-run posture, activation/safety checks, approval gating, broker error pause state, and execution verification bundle. |
 | 20. Error Handling Requirements | partial | Warnings/blocking behavior, execution reconciliation, and automation-stop behavior after repeated broker errors now exist. Centralized structured logging and live-failure handling can still mature further. |
 | 21. Template Portfolio | done | `portfolio/_template/` and the real ETF portfolio are in place and aligned with the intended starter shape. |
@@ -95,8 +96,16 @@ Legend:
 - trade-log writing exists
 - trade approval/status/cancel reconciliation exists
 - dashboard regeneration exists
+- command-center dashboard sections now surface health snapshot, blockers, pending actions, recent material events, and one recommended next step
+- structured summary artifacts now generate `portfolio/<name>/summary.json`, `runtime/overview/portfolio-index.json`, and `runtime/overview/pending-actions.json`
+- multi-portfolio board artifacts now generate `runtime/overview/portfolio-overview.md` and `runtime/overview/portfolio-overview.html`
+- dashboard/report/summary/overview outputs now share a structured operator queue model with queue type, severity, status, rank, and queue-summary rollups
+- reports now expose a clearer decision layer with blocker summary, change summary, and urgency-labeled recommendations
+- onboarding workflow helpers now expose grouped sections, progress metrics, and explicit next-step guidance for draft portfolios
+- per-portfolio structured summaries now also render a static `summary.html` page for operator/control-UI consumption
 - history snapshot writing exists with typed execution states
 - weekly/monthly/quarterly report generation exists
+- local-only report delivery readiness inspection exists
 - PDF export exists
 - safe demo execution flow exists
 
@@ -169,10 +178,8 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-After the writable execution lifecycle is complete, the next most valuable follow-up would be:
-- polishing the manual approval workflow for ETF shortlist adoption and trade approval
-- improving structured logging/alerts for scheduled operation
-- tightening report/dashboard presentation for execution operations
+The tracked post-MVP usability follow-on phases are complete through Phase 36, and Phase 37 one daily summary page is now the active implementation focus.
+Further work after that should be re-entered as a freshly defined roadmap phase list rather than guessed from old notes.
 
 ## Known environment caveat
 

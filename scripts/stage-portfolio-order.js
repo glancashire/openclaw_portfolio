@@ -4,12 +4,14 @@ const { stagePortfolioOrder } = require('../src/execution/portfolioExecution');
 async function main() {
   const [portfolioDirArg, orderJsonArg, modeArg] = process.argv.slice(2);
   if (!portfolioDirArg || !orderJsonArg) {
-    console.error('Usage: node scripts/stage-portfolio-order.js <portfolio-dir> <order-json> [dry-run|stage]');
+    console.error('Usage: node scripts/stage-portfolio-order.js <portfolio-dir> <order-json> [dry-run|stage|transmit-live]');
     process.exit(1);
   }
 
   const portfolioDir = path.resolve(portfolioDirArg);
-  const dryRun = (modeArg || 'dry-run') !== 'stage';
+  const requestedMode = modeArg || 'dry-run';
+  const dryRun = requestedMode === 'dry-run';
+  const transmitLive = requestedMode === 'transmit-live';
 
   let order;
   try {
@@ -24,6 +26,7 @@ async function main() {
     order,
     dryRun,
     revocableOnly: true,
+    transmitLive,
   });
 
   console.log(JSON.stringify(result, null, 2));

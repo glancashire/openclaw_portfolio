@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-05-07T12:55:20.300Z",
+  "portfolioCount": 2,
+  "allReady": true,
+  "portfolios": [
+    {
+      "portfolio": "acceptance-closure",
+      "deliveryMode": "local_only",
+      "intendedChannels": [
+        "repo_artifacts"
+      ],
+      "externalDeliveryEnabled": false,
+      "failureAlertMode": "local_operator_review",
+      "failureAlertTargets": [
+        "dashboard",
+        "markdown_report",
+        "report_cycle_json"
+      ],
+      "overrideLoaded": true,
+      "ready": true,
+      "pendingActions": []
+    },
+    {
+      "portfolio": "etf",
+      "deliveryMode": "local_only",
+      "intendedChannels": [
+        "repo_artifacts"
+      ],
+      "externalDeliveryEnabled": false,
+      "failureAlertMode": "local_operator_review",
+      "failureAlertTargets": [
+        "dashboard",
+        "markdown_report",
+        "report_cycle_json"
+      ],
+      "overrideLoaded": true,
+      "ready": true,
+      "pendingActions": []
+    }
+  ]
+}

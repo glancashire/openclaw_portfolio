@@ -1,6 +1,7 @@
 const { generateAndWriteReport } = require('../src/reporting/reportGenerator');
 const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
 const { appendHistorySnapshot } = require('../src/analysis/historyWriter');
+const { reportDeliveryStatus } = require('../src/reporting/deliveryPolicy');
 const path = require('path');
 
 function stepOk(name, extra = {}) {
@@ -41,11 +42,14 @@ async function runReportCycle({ portfolioDir, period, dateStamp }) {
 
   let report;
   try {
-    report = await generateAndWriteReport({ portfolioDir, period, dateStamp });
+    report = await generateAndWriteReport({ portfolioDir, period, dateStamp, workflow });
     workflow.push(stepOk('generate_report', {
       markdownPath: report.markdownPath,
       pdfMode: report.pdfMode,
       renderWarning: report.generationMeta?.renderWarning || null,
+      pendingActions: report.pendingActions || [],
+      deliveryMode: report.deliveryStatus?.deliveryMode || null,
+      deliveryReady: report.deliveryStatus?.ready ?? null,
     }));
   } catch (error) {
     workflow.push(stepFailed('generate_report', error, { resumable: true }));
@@ -58,6 +62,7 @@ async function runReportCycle({ portfolioDir, period, dateStamp }) {
     historyAppend,
     dashboardPath,
     workflow,
+    deliveryStatus: reportDeliveryStatus({ portfolioDir, generationMeta: report.generationMeta, workflow }),
     ...report,
   };
 }

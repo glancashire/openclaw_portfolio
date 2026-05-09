@@ -153,7 +153,41 @@ Goal: prove the full workflow works under realistic conditions for the accepted 
 3. Phase 26 — Production reporting and delivery polish
 4. Phase 27 — Risk, logging, and observability hardening
 
-## Current focus
-- Acceptance closure is complete for the in-scope read-only + dry-run MVP.
-- Phase 24 transmitted-live hardening is now closed with explicit opt-in `transmit-live` safeguards, a dedicated readiness check, and focused regression coverage.
-- The next highest-value lanes are operator incident/runbook maturity plus production reporting and observability polish.
+## Expanded roadmap follow-on phases
+
+### Phase 28 — Portfolio command-center dashboard
+Goal: turn the per-portfolio dashboard into a clearer operator command center.
+
+- [x] Add explicit health snapshot section
+- [x] Add broker health, execution posture, and delivery posture summary
+- [x] Add clearer pending approvals / active blockers sections
+- [x] Add recent material events timeline summary
+- [x] Add one explicit recommended next step section
+- [x] Improve severity/status labels for skimmability
+- [x] Add focused dashboard UX verification tests
+
+### Phase 29 — Structured UI summary artifacts
+Goal: generate machine-readable artifacts for future UI and compact digest surfaces.
+
+- [x] Generate `portfolio/<name>/summary.json`
+- [x] Generate `runtime/overview/portfolio-index.json`
+- [x] Generate `runtime/overview/pending-actions.json`
+- [x] Define stable schemas for these artifacts
+- [x] Ensure artifacts stay aligned with Markdown/dashboard state
+- [x] Add focused artifact/schema verification tests
+
+### Phase 30 — Multi-portfolio overview board
+Goal: provide one top-level operational view across portfolios.
+
+- [x] Build portfolio index aggregation across all portfolio folders
+- [x] Show total value / last sync / health / drift / blockers / pending approvals per portfolio
+- [x] Add a recommended-action summary across portfolios
+- [x] Generate Markdown and/or HTML multi-portfolio overview output
+- [x] Add tests for aggregation and missing-data edge cases
+
+### Current focus
+- Expanded follow-on roadmap is now active beyond Phase 27.
+- Phase 28 command-center dashboard is closed with explicit health, blockers, pending-actions, material-events, and recommended-next-step surfaces.
+- Phase 29 structured UI summary artifacts is now closed with per-portfolio summaries plus repo-level portfolio-index and pending-actions JSON artifacts.
+- Phase 30 multi-portfolio overview board is now closed with generated Markdown/HTML board outputs layered on top of the Phase 29 artifacts.
+- Next up: Phase 31 unified approvals and pending-actions queue.

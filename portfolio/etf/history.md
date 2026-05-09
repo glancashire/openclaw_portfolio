@@ -17,3 +17,4 @@
 | 2026-04-29 | end_of_day | 5000 | 0 | 5000 | 0 | 0 | weekly report cycle snapshot |
 | 2026-05-02 | end_of_day | 5000 | 0 | 5000 | 0 | 0 | Live IBKR read-only holdings sync and live-priced dry-run proposal refresh |
 | 2026-05-02 | end_of_day | 5000 | 0 | 5000 | 0 | 0 | Live IBKR read-only holdings sync and corrected live-priced dry-run proposal refresh |
+| 2026-05-06 | end_of_day | 5000 | 0 | 5000 | 0 | 0 | weekly report cycle snapshot |

@@ -1,0 +1,302 @@
+{
+  "schemaVersion": "1.1",
+  "generatedAt": "2026-05-07T12:55:20.286Z",
+  "portfolio": "acceptance-closure",
+  "status": {
+    "health": "warning",
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionPosture": "degraded_dry_run_only",
+    "deliveryPosture": "ready",
+    "dataFreshness": "current"
+  },
+  "holdings": {
+    "totalValueChf": 0,
+    "cashChf": 0,
+    "investedChf": 0,
+    "holdingCount": 0,
+    "baseCurrency": "CHF",
+    "lastSyncAt": "YYYY-MM-DD HH:mm:ss",
+    "source": "simulated",
+    "latestSnapshotDate": "YYYY-MM-DD",
+    "dailyChangeChf": 0,
+    "dailyChangePct": 0
+  },
+  "approvals": {
+    "proposedCount": 0,
+    "approvedCount": 0,
+    "pendingApprovalCount": 0
+  },
+  "operatorQueue": {
+    "summary": {
+      "total": 6,
+      "blocking": 6,
+      "approvals": 0,
+      "execution": 0,
+      "recovery": 1,
+      "delivery": 0,
+      "data": 0,
+      "warnings": 5,
+      "workflow": 0,
+      "bySeverity": {
+        "high": 6,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "items": [
+      {
+        "rank": 1,
+        "queueType": "blocker",
+        "portfolio": "acceptance-closure",
+        "kind": "blocker",
+        "severity": "high",
+        "status": "blocked",
+        "summary": "Holdings and pricing are still simulated.",
+        "blocking": true,
+        "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+        "source": "safety_controls"
+      },
+      {
+        "rank": 2,
+        "queueType": "blocker",
+        "portfolio": "acceptance-closure",
+        "kind": "blocker",
+        "severity": "high",
+        "status": "blocked",
+        "summary": "Missing concrete risk limit: Max cash drag after full deployment.",
+        "blocking": true,
+        "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+        "source": "safety_controls"
+      },
+      {
+        "rank": 3,
+        "queueType": "blocker",
+        "portfolio": "acceptance-closure",
+        "kind": "blocker",
+        "severity": "high",
+        "status": "blocked",
+        "summary": "Missing concrete risk limit: Max single ETF allocation.",
+        "blocking": true,
+        "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+        "source": "safety_controls"
+      },
+      {
+        "rank": 4,
+        "queueType": "blocker",
+        "portfolio": "acceptance-closure",
+        "kind": "blocker",
+        "severity": "high",
+        "status": "blocked",
+        "summary": "Missing concrete risk limit: Max single issuer allocation.",
+        "blocking": true,
+        "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+        "source": "safety_controls"
+      },
+      {
+        "rank": 5,
+        "queueType": "blocker",
+        "portfolio": "acceptance-closure",
+        "kind": "blocker",
+        "severity": "high",
+        "status": "blocked",
+        "summary": "Portfolio still has open questions; trade execution must remain blocked.",
+        "blocking": true,
+        "recommendedOperatorAction": "Resolve the blocking condition before proceeding.",
+        "source": "safety_controls"
+      },
+      {
+        "rank": 6,
+        "queueType": "recovery",
+        "portfolio": "acceptance-closure",
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
+      }
+    ]
+  },
+  "blockers": {
+    "count": 5,
+    "items": [
+      {
+        "severity": "error",
+        "message": "Portfolio still has open questions; trade execution must remain blocked."
+      },
+      {
+        "severity": "error",
+        "message": "Holdings and pricing are still simulated."
+      },
+      {
+        "severity": "error",
+        "message": "Missing concrete risk limit: Max single ETF allocation."
+      },
+      {
+        "severity": "error",
+        "message": "Missing concrete risk limit: Max single issuer allocation."
+      },
+      {
+        "severity": "error",
+        "message": "Missing concrete risk limit: Max cash drag after full deployment."
+      }
+    ]
+  },
+  "execution": {
+    "lifecycle": {
+      "proposed": 0,
+      "approved": 0,
+      "rejected": 0,
+      "staged": 0,
+      "submitted": 0,
+      "partiallyFilled": 0,
+      "filled": 0,
+      "cancelled": 0,
+      "failed": 0,
+      "simulated": 0,
+      "planned": 0,
+      "withBrokerOrderId": 0
+    },
+    "inFlightCount": 0,
+    "failedCount": 0,
+    "plan": {
+      "rows": [],
+      "totals": {
+        "intendedChf": 0,
+        "executableChf": 0,
+        "executionGapChf": 0
+      }
+    },
+    "proposalTotals": {
+      "plannedCashSleeve": 0,
+      "executableBuys": 0,
+      "residualTradableCash": 0
+    }
+  },
+  "allocation": [
+    {
+      "assetClass": "Global equities",
+      "currentPct": 0,
+      "targetPct": 50,
+      "driftPct": -50,
+      "minPct": 40,
+      "maxPct": 60,
+      "status": "out_of_bounds"
+    },
+    {
+      "assetClass": "Swiss equities",
+      "currentPct": 0,
+      "targetPct": 20,
+      "driftPct": -20,
+      "minPct": 10,
+      "maxPct": 30,
+      "status": "out_of_bounds"
+    },
+    {
+      "assetClass": "Bonds / cash-like",
+      "currentPct": 0,
+      "targetPct": 30,
+      "driftPct": -30,
+      "minPct": 20,
+      "maxPct": 40,
+      "status": "out_of_bounds"
+    }
+  ],
+  "instruments": [
+    {
+      "tickerOrIsin": "<ticker / isin>",
+      "name": "<name>",
+      "assetClass": "Global equities",
+      "targetPct": 50,
+      "minPct": 40,
+      "maxPct": 60,
+      "exchange": "<exchange>",
+      "currency": "CHF",
+      "latestProposal": null
+    },
+    {
+      "tickerOrIsin": "<ticker / isin>",
+      "name": "<name>",
+      "assetClass": "Swiss equities",
+      "targetPct": 20,
+      "minPct": 10,
+      "maxPct": 30,
+      "exchange": "<exchange>",
+      "currency": "CHF",
+      "latestProposal": null
+    },
+    {
+      "tickerOrIsin": "<ticker / isin>",
+      "name": "<name>",
+      "assetClass": "Bonds / cash-like",
+      "targetPct": 30,
+      "minPct": 20,
+      "maxPct": 40,
+      "exchange": "<exchange>",
+      "currency": "CHF",
+      "latestProposal": null
+    }
+  ],
+  "pendingActions": [
+    "Holdings and pricing are still simulated.",
+    "Missing concrete risk limit: Max cash drag after full deployment.",
+    "Missing concrete risk limit: Max single ETF allocation.",
+    "Missing concrete risk limit: Max single issuer allocation.",
+    "Portfolio still has open questions; trade execution must remain blocked.",
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+  ],
+  "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
+  "explanations": {
+    "biggestDrift": "Global equities is 50% under target and outside the allowed band around the 50% target.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionBlock": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
+    "approvalBacklog": "There is no active approval backlog."
+  },
+  "recentMaterialEvents": [
+    {
+      "time": "2026-05-07 12:55:20.272 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-07 12:55:09.285 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    }
+  ],
+  "observability": {
+    "eventsPresent": true,
+    "recentSummary": {
+      "total": 2,
+      "byLevel": {
+        "warn": 2
+      },
+      "byCategory": {
+        "risk": 2
+      },
+      "blockedTrades": 2,
+      "degradedBrokerEvents": 0,
+      "staleDataEvents": 0
+    }
+  },
+  "delivery": {
+    "ready": true,
+    "mode": "local_only",
+    "failureAlertMode": "local_operator_review",
+    "pendingActions": []
+  },
+  "runtimeState": {
+    "brokerAutomationPaused": false,
+    "consecutiveBrokerErrors": 0,
+    "lastBrokerErrorReason": null,
+    "lastBrokerErrorAt": null
+  },
+  "recentTrades": []
+}

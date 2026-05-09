@@ -10,15 +10,18 @@ if (!arg1) {
 }
 
 const { portfolioPath, holdingsPath, label } = resolveInputs(arg1, arg2);
-const blockers = evaluateSafetyControls({ portfolioPath, holdingsPath });
+const evaluation = evaluateSafetyControls({ portfolioPath, holdingsPath });
+const blockers = evaluation.blockers || [];
 
 if (!blockers.length) {
   console.log(`OK  ${label}`);
+  console.log(JSON.stringify({ diagnostics: evaluation.diagnostics || {} }, null, 2));
   process.exit(0);
 }
 
 console.log(`ISSUES  ${label}`);
 for (const blocker of blockers) console.log(`- [${blocker.severity}] ${blocker.message}`);
+console.log(JSON.stringify({ diagnostics: evaluation.diagnostics || {} }, null, 2));
 process.exit(blockers.some((b) => b.severity === 'error') ? 1 : 0);
 
 function resolveInputs(first, second) {

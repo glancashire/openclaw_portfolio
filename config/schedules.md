@@ -6,6 +6,7 @@
 - Refresh history snapshot when needed
 - Regenerate dashboard
 - Check rebalance drift / readiness warnings
+- Check whether broker automation is paused after repeated broker errors
 - Intended command path: holdings sync/read-only first, then `node scripts/regenerate-dashboard.js portfolio/etf`
 
 ## Weekly

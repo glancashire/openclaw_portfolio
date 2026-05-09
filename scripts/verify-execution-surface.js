@@ -32,6 +32,7 @@ const checks = [
   'test-history-material-events.js',
   'test-transmitted-live-gating.js',
   'test-transmitted-live-submission-surface.js',
+  'test-risk-observability.js',
 ];
 
 function run(script) {

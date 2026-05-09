@@ -1,43 +1,111 @@
 # Dashboard: etf
 
-## Summary
-- Total value: CHF 5000
-- Cash: CHF 5000
-- Invested: CHF 0
+## Health Snapshot
+- Portfolio status: warning
+- Strategy status: blocked
+- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Last successful sync: 2026-05-02 10:20:02
+- Data freshness: current
+- Execution posture: degraded_dry_run_only
+- Delivery posture: ready
+- Pending approvals: 7
+- Active blockers: 0
+
+## Portfolio Value Snapshot
+- Total value CHF: 5000
+- Cash CHF: 5000
+- Invested CHF: 0
+- Daily move CHF: 0
+- Daily move %: 0
+- Since last report CHF: 0
+- Since last report %: 0
 - Number of holdings: 0
-- Strategy status: rebalance_needed
-- Last sync: 2026-05-02 10:20:02
-- Last rebalance check: 2026-05-02 20:02:55
-- Broker readiness: Interactive Brokers read-only connectivity is available.
+- Latest snapshot date: 2026-05-06
 
-## Allocation vs Target
-| Asset class | Current % | Target % | Drift % | Status |
-|---|---:|---:|---:|---|
-| Global equities | 0 | 60 | -60 | out_of_bounds |
-| Swiss equities | 0 | 20 | -20 | out_of_bounds |
-| Bonds / cash-like | 0 | 20 | -20 | out_of_bounds |
+## Allocation Health
+| Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
+|---|---:|---:|---:|---|---|---|
+| Global equities | 0 | 60 | -60 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
+| Bonds / cash-like | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
 
-## Instrument Overview
-| Ticker / ISIN | Name | Planned CHF | Planned % | Target % | Drift % | Action |
-|---|---|---:|---:|---:|---:|---|
-| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | 1620 | 32.4 | 40 | -7.6 | buy 1620 CHF (3 @ 600) |
-| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 970.82 | 19.42 | 20 | -0.58 | buy 970.82 CHF (26 @ 38.895) |
-| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | 942.48 | 18.85 | 20 | -1.15 | buy 942.48 CHF (6 @ 157.08) |
-| CASH-CHF | CHF cash balance | 1000 | 20 | 20 | 0 | hold 1000 CHF (0 @ 0) |
+## Instrument Actions Queue
+| Instrument | Current % | Target % | Suggested action | Reason | Approval needed |
+|---|---:|---:|---|---|---|
+| IE00B5BMR087 | 32.4 | 40 | proposed: buy | Deploy available cash toward underweight Global equities using iShares Core S&P 500 UCITS ETF USD (Acc). | pending_user_approval |
+| LU0950668870 | 19.42 | 20 | proposed: buy | Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc. | pending_user_approval |
+| CH0032912732 | 18.85 | 20 | proposed: buy | Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet). | pending_user_approval |
+| CASH-CHF | 20 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | pending_user_approval |
 
-## Recommended Actions
-1. Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
-2. Keep the defensive sleeve in CHF cash for now, and leave residual tradable cash of CHF 466.7 unallocated until live pricing is available.
+## Safety / Risk Diagnostics
+- Safety status: clear
+- Risk-limit warnings: 0
+- Broker/API warnings: 1
+- Stale data warnings: 0
+- Execution pause state: active
+- Active blocker detail:
+- none
+
+## Pending Operator Actions
+1. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+2. [approval/pending_user_approval/medium] There are 7 proposed trade row(s) awaiting approval.
+
+## Recent Material Events
+| Time | Event type | Severity | Summary | Next step |
+|---|---|---|---|---|
+| 2026-05-06 13:50:22.805 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
+| 2026-05-06 13:50:22.803 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-06 13:49:27.492 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
+| 2026-05-06 13:49:27.490 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+
+## Report / Delivery Status
+- Weekly report: latest history 2026-05-06
+- Monthly report: local_only
+- Quarterly report: local_operator_review
+- Delivery readiness: ready
+- Failure alert readiness: local_operator_review
+
+## Recommended Next Step
+Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+
+## Status Labels
+- Pending approvals queue count: 7
+- In-flight execution rows: 0
+- Latest action recommendations:
+  - Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
+  - Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 466.7 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: Live IBKR read-only holdings sync and corrected live-priced dry-run proposal refresh
+- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Latest history note: weekly report cycle snapshot
+- Observability shows 4 recent blocked execution-policy event(s).
+
+## Observability Status
+- Runtime event file present: yes
+- Recent runtime events scanned: 4
+- Recent blocked trade events: 4
+- Recent degraded broker events: 0
+- Recent stale-data events: 0
+
+## Execution Lifecycle
+- Proposed: 7
+- Approved: 0
+- Rejected: 0
+- Staged: 0
+- Submitted: 0
+- Partially filled: 0
+- Filled: 0
+- Cancelled: 0
+- Failed: 0
+- Planned-only entries: 1
+- Rows with broker order id: 0
 
 ## Execution Plan
-- IE00B5BMR087: target 40% | intended CHF 1620 | executable CHF 1620 | gap CHF 0
 - LU0950668870: target 20% | intended CHF 970.82 | executable CHF 970.82 | gap CHF 0
 - CH0032912732: target 20% | intended CHF 942.48 | executable CHF 942.48 | gap CHF 0
+- IE00B5BMR087: target 40% | intended CHF 1620 | executable CHF 1620 | gap CHF 0
 - CASH-CHF: target 20% | intended CHF 1000 | executable CHF 1000 | gap CHF 0
 - Totals: intended CHF 4533.3 | executable CHF 4533.3 | gap CHF 0
 

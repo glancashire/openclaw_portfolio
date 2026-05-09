@@ -1,0 +1,419 @@
+{
+  "schemaVersion": "1.1",
+  "generatedAt": "2026-05-07T12:56:28.498Z",
+  "portfolio": "etf",
+  "status": {
+    "health": "warning",
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionPosture": "degraded_dry_run_only",
+    "deliveryPosture": "ready",
+    "dataFreshness": "current"
+  },
+  "holdings": {
+    "totalValueChf": 5000,
+    "cashChf": 5000,
+    "investedChf": 0,
+    "holdingCount": 0,
+    "baseCurrency": "CHF",
+    "lastSyncAt": "2026-05-02 10:20:02",
+    "source": "broker_api",
+    "latestSnapshotDate": "2026-05-06",
+    "dailyChangeChf": 0,
+    "dailyChangePct": 0
+  },
+  "approvals": {
+    "proposedCount": 7,
+    "approvedCount": 0,
+    "pendingApprovalCount": 7
+  },
+  "operatorQueue": {
+    "summary": {
+      "total": 2,
+      "blocking": 1,
+      "approvals": 1,
+      "execution": 0,
+      "recovery": 1,
+      "delivery": 0,
+      "data": 0,
+      "warnings": 0,
+      "workflow": 0,
+      "bySeverity": {
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      }
+    },
+    "items": [
+      {
+        "rank": 1,
+        "queueType": "recovery",
+        "portfolio": "etf",
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
+      },
+      {
+        "rank": 2,
+        "queueType": "approval",
+        "portfolio": "etf",
+        "kind": "approval",
+        "severity": "medium",
+        "status": "pending_user_approval",
+        "summary": "7 proposed trade row(s) still need user approval.",
+        "blocking": false,
+        "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",
+        "source": "trade_lifecycle"
+      }
+    ]
+  },
+  "blockers": {
+    "count": 0,
+    "items": []
+  },
+  "execution": {
+    "lifecycle": {
+      "proposed": 7,
+      "approved": 0,
+      "rejected": 0,
+      "staged": 0,
+      "submitted": 0,
+      "partiallyFilled": 0,
+      "filled": 0,
+      "cancelled": 0,
+      "failed": 0,
+      "simulated": 0,
+      "planned": 1,
+      "withBrokerOrderId": 0
+    },
+    "inFlightCount": 0,
+    "failedCount": 0,
+    "plan": {
+      "rows": [
+        {
+          "tickerOrIsin": "LU0950668870",
+          "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+          "action": "buy",
+          "status": "proposed",
+          "quantity": 26,
+          "limitPrice": 38.895,
+          "targetPct": 20,
+          "intendedChf": 970.82,
+          "intendedPct": 19.42,
+          "executableChf": 970.82,
+          "executablePct": 19.42,
+          "executionGapChf": 0,
+          "approval": "pending_user_approval",
+          "reason": "Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc.; allocation before 0%; target 20%; allocation after 19.42%; drift before -60%; drift after -0.58%; drift corrected 59.42%; expected cost CHF 970.82; funding source cash; Dry-run instrument proposal only; Sized with Interactive Brokers market data (ask 38.895 EUR, FX 0.96 to CHF)."
+        },
+        {
+          "tickerOrIsin": "CH0032912732",
+          "name": "UBS SLI ETF (SMI gleichgewichtet)",
+          "action": "buy",
+          "status": "proposed",
+          "quantity": 6,
+          "limitPrice": 157.08,
+          "targetPct": 20,
+          "intendedChf": 942.48,
+          "intendedPct": 18.85,
+          "executableChf": 942.48,
+          "executablePct": 18.85,
+          "executionGapChf": 0,
+          "approval": "pending_user_approval",
+          "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; allocation before 0%; target 20%; allocation after 18.85%; drift before -20%; drift after -1.15%; drift corrected 18.85%; expected cost CHF 942.48; funding source cash; Dry-run instrument proposal only; Sized with Interactive Brokers market data (ask 157.08 CHF, FX 1 to CHF)."
+        },
+        {
+          "tickerOrIsin": "IE00B5BMR087",
+          "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+          "action": "buy",
+          "status": "proposed",
+          "quantity": 3,
+          "limitPrice": 600,
+          "targetPct": 40,
+          "intendedChf": 1620,
+          "intendedPct": 32.4,
+          "executableChf": 1620,
+          "executablePct": 32.4,
+          "executionGapChf": 0,
+          "approval": "pending_user_approval",
+          "reason": "Deploy available cash toward underweight Global equities using iShares Core S&P 500 UCITS ETF USD (Acc).; allocation before 0%; target 40%; allocation after 32.4%; drift before -60%; drift after -7.6%; drift corrected 52.4%; expected cost CHF 1620; funding source cash; Dry-run instrument proposal only; Sized with draft price assumptions (600 USD, FX 0.9 to CHF)."
+        },
+        {
+          "tickerOrIsin": "CASH-CHF",
+          "name": "CHF cash balance",
+          "action": "hold",
+          "status": "planned",
+          "quantity": 0,
+          "limitPrice": 0,
+          "targetPct": 20,
+          "intendedChf": 1000,
+          "intendedPct": 20,
+          "executableChf": 1000,
+          "executablePct": 20,
+          "executionGapChf": 0,
+          "approval": "pending_user_approval",
+          "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 20%; drift before -20%; drift after 0%; drift corrected 20%; expected cost CHF 1000; funding source cash; Planning entry only; no broker order required for the cash sleeve."
+        }
+      ],
+      "totals": {
+        "intendedChf": 4533.3,
+        "executableChf": 4533.3,
+        "executionGapChf": 0
+      }
+    },
+    "proposalTotals": {
+      "plannedCashSleeve": 1000,
+      "executableBuys": 3533.3,
+      "residualTradableCash": 466.7
+    }
+  },
+  "allocation": [
+    {
+      "assetClass": "Global equities",
+      "currentPct": 0,
+      "targetPct": 60,
+      "driftPct": -60,
+      "minPct": 50,
+      "maxPct": 70,
+      "status": "out_of_bounds"
+    },
+    {
+      "assetClass": "Swiss equities",
+      "currentPct": 0,
+      "targetPct": 20,
+      "driftPct": -20,
+      "minPct": 10,
+      "maxPct": 30,
+      "status": "out_of_bounds"
+    },
+    {
+      "assetClass": "Bonds / cash-like",
+      "currentPct": 0,
+      "targetPct": 20,
+      "driftPct": -20,
+      "minPct": 10,
+      "maxPct": 30,
+      "status": "out_of_bounds"
+    }
+  ],
+  "instruments": [
+    {
+      "tickerOrIsin": "IE00B5BMR087",
+      "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+      "assetClass": "Global equities",
+      "targetPct": 40,
+      "minPct": 30,
+      "maxPct": 50,
+      "exchange": "LSE / IBKR-supported venue",
+      "currency": "USD",
+      "latestProposal": {
+        "status": "proposed",
+        "action": "buy",
+        "estimatedChf": 1620,
+        "approval": "pending_user_approval",
+        "reason": "Deploy available cash toward underweight Global equities using iShares Core S&P 500 UCITS ETF USD (Acc).; allocation before 0%; target 40%; allocation after 32.4%; drift before -60%; drift after -7.6%; drift corrected 52.4%; expected cost CHF 1620; funding source cash; Dry-run instrument proposal only; Sized with draft price assumptions (600 USD, FX 0.9 to CHF)."
+      }
+    },
+    {
+      "tickerOrIsin": "LU0950668870",
+      "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+      "assetClass": "Global equities",
+      "targetPct": 20,
+      "minPct": 10,
+      "maxPct": 30,
+      "exchange": "Xetra / IBKR-supported venue",
+      "currency": "EUR",
+      "latestProposal": {
+        "status": "proposed",
+        "action": "buy",
+        "estimatedChf": 970.82,
+        "approval": "pending_user_approval",
+        "reason": "Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc.; allocation before 0%; target 20%; allocation after 19.42%; drift before -60%; drift after -0.58%; drift corrected 59.42%; expected cost CHF 970.82; funding source cash; Dry-run instrument proposal only; Sized with Interactive Brokers market data (ask 38.895 EUR, FX 0.96 to CHF)."
+      }
+    },
+    {
+      "tickerOrIsin": "CH0032912732",
+      "name": "UBS SLI ETF (SMI gleichgewichtet)",
+      "assetClass": "Swiss equities",
+      "targetPct": 20,
+      "minPct": 10,
+      "maxPct": 30,
+      "exchange": "SIX",
+      "currency": "CHF",
+      "latestProposal": {
+        "status": "proposed",
+        "action": "buy",
+        "estimatedChf": 942.48,
+        "approval": "pending_user_approval",
+        "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; allocation before 0%; target 20%; allocation after 18.85%; drift before -20%; drift after -1.15%; drift corrected 18.85%; expected cost CHF 942.48; funding source cash; Dry-run instrument proposal only; Sized with Interactive Brokers market data (ask 157.08 CHF, FX 1 to CHF)."
+      }
+    },
+    {
+      "tickerOrIsin": "CASH-CHF",
+      "name": "CHF cash balance",
+      "assetClass": "Bonds / cash-like",
+      "targetPct": 20,
+      "minPct": 10,
+      "maxPct": 30,
+      "exchange": "IBKR cash balance",
+      "currency": "CHF",
+      "latestProposal": {
+        "status": "planned",
+        "action": "hold",
+        "estimatedChf": 1000,
+        "approval": "pending_user_approval",
+        "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 20%; drift before -20%; drift after 0%; drift corrected 20%; expected cost CHF 1000; funding source cash; Planning entry only; no broker order required for the cash sleeve."
+      }
+    }
+  ],
+  "pendingActions": [
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "7 proposed trade row(s) still need user approval."
+  ],
+  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+  "explanations": {
+    "biggestDrift": "Global equities is 60% under target and outside the allowed band around the 60% target.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalBacklog": "7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly."
+  },
+  "recentMaterialEvents": [
+    {
+      "time": "2026-05-06 13:50:22.805 UTC",
+      "eventType": "live_execution_blocked",
+      "severity": "warn",
+      "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-06 13:50:22.803 UTC",
+      "eventType": "draft_execution_blocked",
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-06 13:49:27.492 UTC",
+      "eventType": "live_execution_blocked",
+      "severity": "warn",
+      "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-06 13:49:27.490 UTC",
+      "eventType": "draft_execution_blocked",
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    }
+  ],
+  "observability": {
+    "eventsPresent": true,
+    "recentSummary": {
+      "total": 4,
+      "byLevel": {
+        "warn": 4
+      },
+      "byCategory": {
+        "execution_policy": 4
+      },
+      "blockedTrades": 4,
+      "degradedBrokerEvents": 0,
+      "staleDataEvents": 0
+    }
+  },
+  "delivery": {
+    "ready": true,
+    "mode": "local_only",
+    "failureAlertMode": "local_operator_review",
+    "pendingActions": []
+  },
+  "runtimeState": {
+    "brokerAutomationPaused": false,
+    "consecutiveBrokerErrors": 0,
+    "lastBrokerErrorReason": null,
+    "lastBrokerErrorAt": null
+  },
+  "recentTrades": [
+    {
+      "date": "2026-05-02 10:25:27",
+      "status": "planned",
+      "action": "hold",
+      "tickerOrIsin": "CASH-CHF",
+      "instrument": "CHF cash balance",
+      "quantity": "0",
+      "limitPrice": "0",
+      "estimatedChf": "1000",
+      "amount": "1000",
+      "actualChf": "0",
+      "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 20%; drift before -20%; drift after 0%; drift corrected 20%; expected cost CHF 1000; funding source cash; Planning entry only; no broker order required for the cash sleeve.",
+      "approval": "pending_user_approval",
+      "brokerOrderId": ""
+    },
+    {
+      "date": "2026-05-02 10:25:27",
+      "status": "proposed",
+      "action": "buy",
+      "tickerOrIsin": "CH0032912732",
+      "instrument": "UBS SLI ETF (SMI gleichgewichtet)",
+      "quantity": "6",
+      "limitPrice": "157.08",
+      "estimatedChf": "942.48",
+      "amount": "942.48",
+      "actualChf": "0",
+      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; allocation before 0%; target 20%; allocation after 18.85%; drift before -20%; drift after -1.15%; drift corrected 18.85%; expected cost CHF 942.48; funding source cash; Dry-run instrument proposal only; Sized with Interactive Brokers market data (ask 157.08 CHF, FX 1 to CHF).",
+      "approval": "pending_user_approval",
+      "brokerOrderId": ""
+    },
+    {
+      "date": "2026-05-02 10:25:27",
+      "status": "proposed",
+      "action": "buy",
+      "tickerOrIsin": "LU0950668870",
+      "instrument": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+      "quantity": "26",
+      "limitPrice": "38.895",
+      "estimatedChf": "970.82",
+      "amount": "970.82",
+      "actualChf": "0",
+      "reason": "Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc.; allocation before 0%; target 20%; allocation after 19.42%; drift before -60%; drift after -0.58%; drift corrected 59.42%; expected cost CHF 970.82; funding source cash; Dry-run instrument proposal only; Sized with Interactive Brokers market data (ask 38.895 EUR, FX 0.96 to CHF).",
+      "approval": "pending_user_approval",
+      "brokerOrderId": ""
+    },
+    {
+      "date": "2026-05-02 10:25:27",
+      "status": "proposed",
+      "action": "buy",
+      "tickerOrIsin": "IE00B5BMR087",
+      "instrument": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+      "quantity": "3",
+      "limitPrice": "600",
+      "estimatedChf": "1620",
+      "amount": "1620",
+      "actualChf": "0",
+      "reason": "Deploy available cash toward underweight Global equities using iShares Core S&P 500 UCITS ETF USD (Acc).; allocation before 0%; target 40%; allocation after 32.4%; drift before -60%; drift after -7.6%; drift corrected 52.4%; expected cost CHF 1620; funding source cash; Dry-run instrument proposal only; Sized with draft price assumptions (600 USD, FX 0.9 to CHF).",
+      "approval": "pending_user_approval",
+      "brokerOrderId": ""
+    },
+    {
+      "date": "2026-05-02 10:05:00",
+      "status": "proposed",
+      "action": "buy",
+      "tickerOrIsin": "CH0032912732",
+      "instrument": "UBS SLI ETF (SMI gleichgewichtet)",
+      "quantity": "8",
+      "limitPrice": "120",
+      "estimatedChf": "960",
+      "amount": "960",
+      "actualChf": "0",
+      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; allocation before 0%; target 20%; allocation after 19.2%; drift before -20%; drift after -0.8%; drift corrected 19.2%; expected cost CHF 960; funding source cash; Dry-run instrument proposal only; Sized with draft price assumptions (120 CHF, FX 1 to CHF).",
+      "approval": "pending_user_approval",
+      "brokerOrderId": ""
+    }
+  ]
+}

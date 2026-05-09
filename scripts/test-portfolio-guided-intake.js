@@ -2,7 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { applyAnswersToPortfolio } = require('../src/workflows/applyPortfolioAnswers');
-const { guidedQuestions, activationReadiness, nextQuestions } = require('../src/workflows/portfolioDraftState');
+const { guidedQuestions, activationReadiness, nextQuestions, onboardingWorkflow } = require('../src/workflows/portfolioDraftState');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -95,9 +95,17 @@ function main() {
   assert(initialGuided.some((item) => item.key === 'brokerAccountReference' && /Interactive Brokers account alias/i.test(item.guidance)), 'Expected broker-account guided hint');
   assert(initialGuided.some((item) => item.key === 'maximumAcceptableDrawdown' && item.answerFormat === 'percentage'), 'Expected answer format metadata');
 
+  const initialWorkflow = onboardingWorkflow(dir);
+  assert(initialWorkflow.pendingCount === initialGuided.length, 'Expected workflow pending count to match guided questions');
+  assert(initialWorkflow.sections.length > 0, 'Expected grouped workflow sections');
+  assert(initialWorkflow.sections.some((section) => section.key === 'status'), 'Expected status section in grouped workflow');
+  assert(/Resolve .* next\./i.test(initialWorkflow.nextStep), 'Expected explicit next-step guidance');
+  assert(initialWorkflow.completionPct < 100, 'Expected incomplete onboarding progress before answers');
+
   let readiness = activationReadiness(dir);
   assert(readiness.guidedQuestions.length === initialGuided.length, 'Expected readiness guided questions to align with draft questions');
   assert(readiness.blockers.some((line) => /Unanswered draft questions remain/i.test(line)), 'Expected guided-question blocker');
+  assert(readiness.onboardingWorkflow.pendingCount === initialGuided.length, 'Expected readiness workflow to match pending guided questions');
 
   applyAnswersToPortfolio(portfolioPath, {
     brokerAccountReference: 'demo-account',
@@ -115,11 +123,17 @@ function main() {
   assert(afterAnswers.length === 0, 'Expected guided questions to clear after answers');
   assert(nextQuestions(portfolioPath).length === 0, 'Expected raw question list to clear after answers');
 
+  const completedWorkflow = onboardingWorkflow(dir);
+  assert(completedWorkflow.pendingCount === 0, 'Expected no pending onboarding questions after answers');
+  assert(completedWorkflow.completionPct === 100, 'Expected completed onboarding progress after answers');
+  assert(/complete/i.test(completedWorkflow.nextStep), 'Expected completion next-step guidance');
+
   readiness = activationReadiness(dir);
   assert(readiness.ready === true, 'Expected readiness after answers');
   assert(readiness.guidedQuestions.length === 0, 'Expected no guided blockers after answers');
+  assert(readiness.onboardingWorkflow.pendingCount === 0, 'Expected readiness workflow to show no pending items');
 
-  console.log(JSON.stringify({ ok: true, initialGuided, readiness }, null, 2));
+  console.log(JSON.stringify({ ok: true, initialGuided, initialWorkflow, completedWorkflow, readiness }, null, 2));
 }
 
 main();

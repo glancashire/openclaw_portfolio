@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Operator Cockpit</title>
+<style>
+:root {
+  --color-healthy: #16a34a;
+  --color-warning: #d97706;
+  --color-blocked: #dc2626;
+  --color-info: #2563eb;
+  --color-muted: #6b7280;
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-text: #1f2937;
+  --color-text-secondary: #4b5563;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 32px 40px; color: var(--color-text); background: var(--color-bg); line-height: 1.6; }
+.cockpit { max-width: 900px; margin: 0 auto; background: var(--color-surface); border-radius: 8px; padding: 32px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 8px 0; padding-bottom: 12px; border-bottom: 2px solid var(--color-border); }
+h2 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 12px 0; }
+a { color: var(--color-info); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.03em; }
+.badge-healthy { background: #dcfce7; color: var(--color-healthy); }
+.badge-warning { background: #fef3c7; color: var(--color-warning); }
+.badge-blocked { background: #fee2e2; color: var(--color-blocked); }
+.badge-info { background: #dbeafe; color: var(--color-info); }
+.status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.status-card { background: #f9fafb; border: 1px solid var(--color-border); border-radius: 6px; padding: 12px 16px; }
+.status-card .label { font-size: 0.75rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.status-card .value { font-size: 1.1rem; font-weight: 600; margin-top: 4px; }
+ul { list-style: none; padding: 0; }
+li { margin: 6px 0; }
+.meta { font-size: 0.8rem; color: var(--color-muted); margin-top: 24px; }
+nav a { display: inline-block; margin-right: 16px; margin-bottom: 8px; padding: 6px 12px; background: #f3f4f6; border-radius: 4px; font-size: 0.85rem; }
+nav a:hover { background: #dbeafe; }
+</style>
+</head>
+<body>
+<div class="cockpit">
+<h1>Operator Cockpit</h1>
+<div class="status-grid">
+  <div class="status-card"><div class="label">Overall Health</div><div class="value"><span class="badge badge-warning">warning</span></div></div>
+  <div class="status-card"><div class="label">Pending Approvals</div><div class="value">1</div></div>
+  <div class="status-card"><div class="label">Cash to Deploy (CHF)</div><div class="value">5000</div></div>
+  <div class="status-card"><div class="label">Biggest Drift</div><div class="value">Global equities -60%</div></div>
+  <div class="status-card"><div class="label">Broker Health</div><div class="value">degraded</div></div>
+  <div class="status-card"><div class="label">Reports Available</div><div class="value">11</div></div>
+</div>
+
+<h2>Navigation</h2>
+<nav>
+  <a href="daily-summary.html">Daily Summary</a>
+  <a href="approvals-queue.html">Approvals Queue</a>
+  <a href="report-history.html">Report History</a>
+  <a href="delivery-status.html">Delivery &amp; Alerting</a>
+  <a href="portfolio-overview.html">Multi-Portfolio Overview</a>
+</nav>
+
+<h2>Portfolios</h2>
+<ul>
+<li><a href="../../portfolio/acceptance-closure/summary.html">acceptance-closure</a> <span class="badge badge-warning">warning</span></li>
+<li><a href="../../portfolio/etf/summary.html">etf</a> <span class="badge badge-warning">warning</span></li>
+</ul>
+
+<p class="meta">Generated: 2026-05-07T12:55:20.302Z</p>
+</div>
+</body>
+</html>

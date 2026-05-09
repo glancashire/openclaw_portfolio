@@ -21,29 +21,29 @@ Goal: introduce an explicitly opt-in transmitted live-order path with fail-close
 ## Phase 25 — Operator runbooks and incident handling
 Goal: make the system operable during degraded broker conditions, stale state, and execution incidents without relying on tribal knowledge.
 
-- [ ] Write operator runbooks for approve / reject / resync / cancel / broker-error pause / recovery
-- [ ] Document expected state transitions and failure cases with examples
-- [ ] Add CLI/helpful script surfaces where operator recovery is awkward today
-- [ ] Add verification for documented recovery workflows where practical
-- [ ] Tighten audit-trail visibility in Markdown/report artifacts for operator actions
+- [x] Write operator runbooks for approve / reject / resync / cancel / broker-error pause / recovery
+- [x] Document expected state transitions and failure cases with examples
+- [x] Add CLI/helpful script surfaces where operator recovery is awkward today
+- [x] Add verification for documented recovery workflows where practical
+- [x] Tighten audit-trail visibility in Markdown/report artifacts for operator actions
 
 ## Phase 26 — Production reporting and delivery polish
 Goal: make scheduled outputs more production-ready for real operator use.
 
-- [ ] Define report delivery policy and failure-alert policy
-- [ ] Harden scheduled report/digest metadata for operator consumption
-- [ ] Improve dashboard/report surfacing for freshness, failure, and pending-action state
-- [ ] Add verification for delivery-policy/readiness behavior that does not require external side effects
-- [ ] Update docs for production reporting operations and limits
+- [x] Define report delivery policy and failure-alert policy
+- [x] Harden scheduled report/digest metadata for operator consumption
+- [x] Improve dashboard/report surfacing for freshness, failure, and pending-action state
+- [x] Add verification for delivery-policy/readiness behavior that does not require external side effects
+- [x] Update docs for production reporting operations and limits
 
 ## Phase 27 — Risk, logging, and observability hardening
 Goal: improve trust in real operations through stronger runtime evidence, risk-limit visibility, and failure diagnosis.
 
-- [ ] Centralize structured runtime logging guidance/artifacts
-- [ ] Strengthen deeper risk-limit enforcement visibility and operator-facing diagnostics
-- [ ] Add targeted failure-drill coverage for live-path edge cases that can be safely simulated
-- [ ] Improve observability docs around broker degradation, stale data, and blocked trading states
-- [ ] Update verification bundles and status docs to reflect the stronger observability posture
+- [x] Centralize structured runtime logging guidance/artifacts
+- [x] Strengthen deeper risk-limit enforcement visibility and operator-facing diagnostics
+- [x] Add targeted failure-drill coverage for live-path edge cases that can be safely simulated
+- [x] Improve observability docs around broker degradation, stale data, and blocked trading states
+- [x] Update verification bundles and status docs to reflect the stronger observability posture
 
 ## Suggested execution order
 1. Phase 24 — Transmitted live execution hardening

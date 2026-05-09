@@ -1,0 +1,34 @@
+{
+  "brokerErrors": {
+    "test-portfolio": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-06T11:14:53.452Z"
+    },
+    "portfolio": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-09T12:36:13.703Z"
+    },
+    "execution-safety-closure-404Wwt": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-06T09:35:41.671Z"
+    },
+    "execution-safety-closure-Wq0s2u": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-06T09:36:06.392Z"
+    },
+    "demo": {
+      "consecutive": 1,
+      "lastReason": "status_error",
+      "lastMessage": "temporary issue",
+      "lastAt": "2026-05-06T11:14:30.015Z"
+    }
+  }
+}
