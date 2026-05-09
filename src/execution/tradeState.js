@@ -303,7 +303,7 @@ function listExecutableTradeRows(tradesPath) {
     if (blockCode) return false;
     if (orderId) return false;
     if (!['approved', 'planned', 'proposed'].includes(status)) return false;
-    if (!['user_approved', 'submitted_to_open_runner', 'ready_for_submission'].includes(approval)) return false;
+    if (!['user_approved', 'submitted_to_open_runner', 'ready_for_submission', 'queued_for_open_runner'].includes(approval)) return false;
     return true;
   }).map((row) => ({
     dateTime: row['Date/time'],
