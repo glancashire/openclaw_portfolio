@@ -19,6 +19,7 @@ const flags = args.slice(1);
 const hasFlag = (f) => flags.includes(f);
 const DRY_RUN = hasFlag('--dry-run');
 const JSON_OUT = hasFlag('--json');
+const FORCE = hasFlag('--force');
 
 function ibkr(cmd) {
   return execSync(`python3 ${IBKR_CLI} ${cmd}`, { encoding: 'utf8', cwd: ROOT, timeout: 30000 }).trim();
@@ -122,9 +123,8 @@ function cmdStatus() {
 
 function cmdSubmit() {
   const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
-  const { validateTradeList } = require('../lib/etfQualityFilter');
 
-  if (!DRY_RUN && !hasFlag('--force')) {
+  if (!DRY_RUN && !FORCE) {
     const market = isMarketOpen('EBS');
     if (!market.open) {
       const msg = `Market is closed: ${market.reason}. Next open: ${nextOpenTime('EBS')}`;
@@ -134,10 +134,10 @@ function cmdSubmit() {
   }
 
   // Delegate to submit-orders-at-open.js
-  const extraArgs = DRY_RUN ? '--dry-run' : '';
-  const forceArg = hasFlag('--force') ? '--force' : '';
+  const extraArgs = DRY_RUN ? ['--dry-run'] : [];
+  const forceArg = FORCE ? ['--force'] : [];
   try {
-    const out = execSync(`node ${path.join(__dirname, 'submit-orders-at-open.js')} ${extraArgs} ${forceArg}`, { encoding: 'utf8', cwd: ROOT, timeout: 120000 });
+    const out = execSync(`node ${path.join(__dirname, 'submit-orders-at-open.js')} ${[...extraArgs, ...forceArg].join(' ')}`, { encoding: 'utf8', cwd: ROOT, timeout: 120000 });
     console.log(out);
   } catch (e) {
     console.error(e.stdout || e.stderr || e.message);

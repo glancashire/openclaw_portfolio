@@ -14,9 +14,12 @@ const { readApprovedInstruments } = require('../src/analysis/approvedInstruments
 const { evaluateExecutionPolicy } = require('../src/execution/portfolioExecution');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
-const DRY_RUN = process.argv.includes('--dry-run');
-const FORCE = process.argv.includes('--force');
-const portfolioDir = path.resolve(process.argv[2] || path.join(__dirname, '..', 'portfolio', 'etf'));
+const cliArgs = process.argv.slice(2);
+const DRY_RUN = cliArgs.includes('--dry-run');
+const FORCE = cliArgs.includes('--force');
+const HELP = cliArgs.includes('--help') || cliArgs.includes('-h');
+const positionalArgs = cliArgs.filter((arg) => !arg.startsWith('-'));
+const portfolioDir = path.resolve(positionalArgs[0] || path.join(__dirname, '..', 'portfolio', 'etf'));
 const tradesPath = path.join(portfolioDir, 'trades.md');
 const portfolioPath = path.join(portfolioDir, 'portfolio.md');
 
@@ -83,6 +86,11 @@ function buildExecutableOrders() {
 }
 
 async function main() {
+  if (HELP) {
+    console.log('Usage: node scripts/submit-orders-at-open.js [portfolio-dir] [--dry-run] [--force]');
+    return;
+  }
+
   console.log(`=== Smart Market-Open Execution ${DRY_RUN ? '(DRY RUN)' : '(LIVE)'} ===`);
   console.log(`Time: ${new Date().toISOString()}`);
   console.log(`Portfolio: ${portfolioDir}`);
@@ -101,7 +109,12 @@ async function main() {
 
   const executable = buildExecutableOrders();
   if (executable.length === 0) {
-    console.error('✗ No approved executable trade rows found for market-open submission.');
+    const message = 'No approved executable trade rows found for market-open submission.';
+    if (DRY_RUN) {
+      console.log(`✓ ${message}`);
+      return;
+    }
+    console.error(`✗ ${message}`);
     process.exit(2);
   }
 
