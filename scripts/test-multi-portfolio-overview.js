@@ -64,6 +64,10 @@ async function main() {
     ],
   };
 
+  const queueSummaryText = formatQueueSummary(pending.queueSummary);
+  assert(queueSummaryText.includes('- Open-runner first handoffs: 1'), 'Expected helper first-handoff summary line');
+  assert(queueSummaryText.includes('- Open-runner retries: 0'), 'Expected helper retry summary line');
+
   const totals = summarizeOverview(index, pending);
   assert(totals.portfolioCount === 2, 'Expected portfolio count');
   assert(totals.totalValueChf === 5000, 'Expected total value');
