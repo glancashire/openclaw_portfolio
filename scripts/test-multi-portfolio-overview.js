@@ -68,6 +68,10 @@ async function main() {
   assert(queueSummaryText.includes('- Open-runner first handoffs: 1'), 'Expected helper first-handoff summary line');
   assert(queueSummaryText.includes('- Open-runner retries: 0'), 'Expected helper retry summary line');
 
+  const recommendedActionText = buildRecommendedActionRows(pending);
+  assert(recommendedActionText.includes('1. [open_runner/first_handoff] etf: First market-open handoff is queued. — Confirm the row still belongs in the next open-runner batch.'), 'Expected helper first-handoff recommended action text');
+  assert(recommendedActionText.includes('2. [open_runner/retry] acceptance-closure: Blocked row was requeued for the next intended market-open run. — Verify blocker recovery before the retry window opens.'), 'Expected helper retry recommended action text');
+
   const totals = summarizeOverview(index, pending);
   assert(totals.portfolioCount === 2, 'Expected portfolio count');
   assert(totals.totalValueChf === 5000, 'Expected total value');
