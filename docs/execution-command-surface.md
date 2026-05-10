@@ -10,6 +10,8 @@ Use `node scripts/trade.js ...` as the primary operator command family.
 ### Canonical commands
 - `trade preflight` — canonical live-readiness / Monday-execution truth surface
 - `trade authority` — canonical effective-config / execution-authority truth surface
+- `trade config` — canonical effective-config diagnostic surface with redacted broker configuration and execution authority context
+- `trade delivery` — canonical delivery-posture diagnostic surface
 - `trade arm-open` — explicitly arm the next market-open execution window
 - `trade disarm-open` — clear any armed market-open execution window
 - `trade submit` — submit/stage approved orders via the market-open path
@@ -39,6 +41,15 @@ These remain callable for now but should not be treated as the primary operator 
 
 ## Debug / diagnostic scripts
 The `debug-native-*` and similar broker-diagnostic scripts are investigative tools, not canonical operator commands.
+
+## Diagnostic guidance
+Use the canonical diagnostics together when checking whether the system is truly ready for action:
+- `trade preflight` answers whether live execution is currently safe/allowed
+- `trade authority` answers whether execution authority could allow live action in principle under current portfolio/runtime conditions
+- `trade config` answers what broker/runtime configuration is effectively loaded without exposing secrets
+- `trade delivery` answers whether reporting/delivery posture needs operator attention
+
+If these surfaces disagree with a dashboard or summary artifact, prefer the canonical command output and investigate the derived artifact drift.
 
 ## Safety rule
 Canonicalization does not widen permissions. Live transmission remains blocked unless policy, readiness, approval state, and explicit arming all pass.
