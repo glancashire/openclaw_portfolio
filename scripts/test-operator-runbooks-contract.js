@@ -1,0 +1,25 @@
+const fs = require('fs');
+const path = require('path');
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function main() {
+  const runbookPath = path.join(process.cwd(), 'docs', 'operator-runbooks.md');
+  const text = fs.readFileSync(runbookPath, 'utf8');
+
+  assert(text.includes('# Operator runbooks'), 'Expected operator runbooks title');
+  assert(text.includes('## Use when'), 'Expected Use when section');
+  assert(text.includes('## Key commands'), 'Expected Key commands section');
+  assert(text.includes('## What to check after action'), 'Expected post-action checks section');
+  assert(text.includes('## Broker readiness note'), 'Expected broker readiness note section');
+  assert(text.includes('## Operator reading guide'), 'Expected operator reading guide section');
+  assert(text.includes('scripts/operator-incident-summary.js') || text.includes('operator incident summary'), 'Expected operator incident surface reference');
+  assert(text.includes('runtime/events/runtime-events.jsonl'), 'Expected runtime events evidence reference');
+  assert(text.includes('check-transmitted-live-readiness.js'), 'Expected transmitted live readiness command reference');
+
+  console.log(JSON.stringify({ ok: true }, null, 2));
+}
+
+main();

@@ -16,6 +16,8 @@ const checks = [
   ['test:execution-authority', ['scripts/test-execution-authority.js']],
   ['test:system-policy-contract', ['scripts/test-system-policy-contract.js']],
   ['test:artifact-policy-contract', ['scripts/test-artifact-policy-contract.js']],
+  ['test:operator-incident-summary', ['scripts/test-operator-incident-summary.js']],
+  ['test:operator-runbooks-contract', ['scripts/test-operator-runbooks-contract.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];

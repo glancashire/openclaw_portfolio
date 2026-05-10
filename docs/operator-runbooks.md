@@ -19,6 +19,7 @@ This is the active incident and operator reference.
 - `runtime/overview/portfolio-overview.md`
 - `node scripts/check-transmitted-live-readiness.js portfolio/etf '<json>'`
 - `node scripts/resync-portfolio-orders.js portfolio/etf`
+- `node scripts/operator-incident-summary.js portfolio/etf`
 
 ## What to check after action
 - `trades.md`
