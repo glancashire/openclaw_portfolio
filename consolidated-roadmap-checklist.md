@@ -186,8 +186,7 @@ Goal: provide one top-level operational view across portfolios.
 - [x] Add tests for aggregation and missing-data edge cases
 
 ### Current focus
-- Expanded follow-on roadmap is now active beyond Phase 27.
-- Phase 28 command-center dashboard is closed with explicit health, blockers, pending-actions, material-events, and recommended-next-step surfaces.
-- Phase 29 structured UI summary artifacts is now closed with per-portfolio summaries plus repo-level portfolio-index and pending-actions JSON artifacts.
-- Phase 30 multi-portfolio overview board is now closed with generated Markdown/HTML board outputs layered on top of the Phase 29 artifacts.
-- Next up: Phase 31 unified approvals and pending-actions queue.
+- Expanded follow-on roadmap is no longer sitting at Phase 30; the repo’s tracked implementation and test history now extends through Phase 100.
+- Phases 31-42 are closed across unified queue surfacing, decision-oriented reporting, onboarding/workflow polish, static summary pages, recovery/incident views, approvals queue cleanup, daily summary, better explanations, report history, report polish, operator cockpit, and delivery/alerting status.
+- Phases 60-100 are also closed in the repo’s later reporting/overview lane, covering open-runner visibility, runtime-event/reporting alignment, overview artifact surfacing, and contract hardening through `runtime/overview/pending-actions.json`.
+- Remaining intentionally incomplete area is explicit transmitted live broker execution hardening, which is outside the accepted read-only + dry-run MVP closure unless we choose to open that lane.

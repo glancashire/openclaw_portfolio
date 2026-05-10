@@ -1,7 +1,7 @@
 # Portfolio Manager Progress Report
 
-Last updated: 2026-05-03 20:46 UTC  
-Repo HEAD: `6c84cc5`
+Last updated: 2026-05-10 11:18 UTC  
+Repo HEAD: `e78308b`
 
 This report maps the current implementation against `SPECIFICATION.md` and highlights the single highest-priority remaining implementation path.
 
@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is now complete through Phase 42, having addressed all 8 expanded acceptance criteria and all 8 identified operator-experience gaps. The implementation includes: command-center dashboard uplift, structured UI-ready summary artifacts, multi-portfolio overview board, unified operator queue, decision-oriented reporting, guided onboarding workflow, per-portfolio HTML summary pages, recovery/incident checklists, clean approvals queue, daily summary page, better why explanations, report history navigation, improved report visual quality, operator cockpit landing page, and delivery/alerting status page. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is complete through Phase 42, and the later reporting/overview hardening sequence is now complete through Phase 100. The implementation includes: command-center dashboard uplift, structured UI-ready summary artifacts, multi-portfolio overview board, unified operator queue, decision-oriented reporting, guided onboarding workflow, per-portfolio HTML summary pages, recovery/incident checklists, clean approvals queue, daily summary page, better why explanations, report history navigation, improved report visual quality, operator cockpit landing page, delivery/alerting status page, open-runner queue/runtime-event/reporting visibility, and explicit contract hardening for overview and pending-actions artifacts. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
 
 ## Validation snapshot
 
@@ -122,11 +122,11 @@ Legend:
 - completed-order lookup exists
 - cancel-path scaffolding exists
 
-## Highest-priority missing implementation path
+## Highest-priority remaining implementation path
 
-## Complete the Interactive Brokers writable execution lifecycle safely
+## Decide whether to harden explicit live broker execution beyond the accepted dry-run/read-only posture
 
-This is still the single highest-priority missing path because it is the main blocker between “strong dry-run/read-only/reconciled MVP foundation” and “spec-complete MVP”.
+This is now the clearest remaining path only if the goal is to go beyond the already accepted reporting/overview/operator UX closure and deliberately expand into opt-in live execution hardening.
 
 ### Why this remains the top priority
 
@@ -178,8 +178,8 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-The tracked post-MVP usability follow-on phases are complete through Phase 36, and Phase 37 one daily summary page is now the active implementation focus.
-Further work after that should be re-entered as a freshly defined roadmap phase list rather than guessed from old notes.
+The tracked operator-UX and reporting follow-on phases are no longer the active gap; the visible phase sequence in the repo now runs through Phase 100 and the targeted verification for those overview/reporting surfaces is passing.
+Further work should be entered as a freshly defined roadmap phase list rather than guessed from older phase notes.
 
 ## Known environment caveat
 

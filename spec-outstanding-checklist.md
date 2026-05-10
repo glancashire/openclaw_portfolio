@@ -12,16 +12,16 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [~] Implement durable order status tracking after submission
 - [~] Implement robust cancel flow in writable mode
 - [x] Preserve confirmation workflow before any real buy/sell
-- [~] Handle partial fills / failed submissions / retries safely
-- [~] Strengthen broker-write logging and audit trail
+- [x] Handle partial fills / failed submissions / retries safely
+- [x] Strengthen broker-write logging and audit trail
 
 ## 2. Approval-gated execution workflow
-- [~] Implement proposal -> approval -> submission state transitions
-- [~] Define and enforce `trades.md` update rules for approvals and executions
+- [x] Implement proposal -> approval -> submission state transitions
+- [x] Define and enforce `trades.md` update rules for approvals and executions
 - [x] Implement first-purchase approval handling
 - [x] Implement sales approval handling
 - [x] Implement blocked-state behavior for unresolved strategy questions
-- [~] Add clear operator actions for approve / reject / cancel / resync
+- [x] Add clear operator actions for approve / reject / cancel / resync
 
 ## 3. Order lifecycle hardening and reconciliation
 - [x] Add reconciliation for submitted / open / filled / cancelled orders
@@ -125,6 +125,17 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Update holdings / history / dashboard / trades end-to-end
 - [x] Generate weekly / monthly / quarterly reports end-to-end
 - [x] Verify safety blocks prevent bad trades end-to-end
+
+## 13. Expanded roadmap and overview/reporting hardening
+- [x] Complete command-center dashboard uplift (Phase 28)
+- [x] Complete structured UI summary artifacts (Phase 29)
+- [x] Complete multi-portfolio overview board (Phase 30)
+- [x] Complete unified pending-actions queue surfacing (Phase 31)
+- [x] Complete decision-oriented reporting uplift (Phase 32)
+- [x] Complete guided onboarding/workflow polish (Phase 33)
+- [x] Complete per-portfolio static summary page generation (Phase 34)
+- [x] Complete Phases 35-42 operator UX follow-ons tracked in repo plans
+- [x] Complete later reporting/overview hardening through Phase 100, including open-runner visibility, runtime-event/reporting alignment, overview artifact surfacing, and pending-actions contract assertions
 
 ## Working summary
 - Acceptance closure is complete for the in-scope read-only + dry-run MVP.
