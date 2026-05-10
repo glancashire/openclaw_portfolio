@@ -79,6 +79,7 @@ Derived artifacts include:
 - queue/recovery/reporting JSON/HTML/Markdown outputs
 
 Derived artifacts must reflect canonical source state and must never be treated as permission-granting inputs.
+For classification of source, derived-versioned, and runtime-ephemeral artifacts, see `artifact-policy.md`.
 
 ## 7. Live-execution prerequisites
 
