@@ -47,3 +47,4 @@
 2. [warn] Requested instrument is not in Approved Instruments.
 3. [warn] Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 4. [warn] Requested instrument is not in Approved Instruments.
+5. [warn] Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.

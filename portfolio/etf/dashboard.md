@@ -50,13 +50,27 @@
 1. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 2. [approval/pending_user_approval/medium] There are 7 proposed trade row(s) awaiting approval.
 
+## Operator Queue Summary
+- Total queue items: 2
+- Blocking items: 0
+- Approval items: 1
+- Execution items: 0
+- Open-runner first handoffs: 0
+- Open-runner retries: 0
+- Recovery items: 1
+- Delivery items: 0
+- Data items: 0
+- Warning items: 0
+- Workflow items: 0
+
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-06 13:50:22.805 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
-| 2026-05-06 13:50:22.803 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-06 13:49:27.492 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
-| 2026-05-06 13:49:27.490 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-09 13:36:11.464 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
+| 2026-05-09 13:36:11.463 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-09 13:05:55.603 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
+| 2026-05-09 13:05:55.602 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-09 13:05:34.196 UTC | live_execution_blocked | warn | Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-06
@@ -80,12 +94,14 @@ Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pr
 - Whole-share draft sizing leaves CHF 466.7 unallocated beyond the intentional CHF cash sleeve.
 - Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 - Latest history note: weekly report cycle snapshot
-- Observability shows 4 recent blocked execution-policy event(s).
+- Observability shows 16 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
-- Recent runtime events scanned: 4
-- Recent blocked trade events: 4
+- Recent runtime events scanned: 16
+- Recent blocked trade events: 16
+- Open-runner first handoff events: 0
+- Open-runner retry events: 0
 - Recent degraded broker events: 0
 - Recent stale-data events: 0
 

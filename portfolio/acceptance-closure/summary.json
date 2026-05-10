@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-07T12:55:20.286Z",
+  "generatedAt": "2026-05-10T11:14:36.636Z",
   "portfolio": "acceptance-closure",
   "status": {
     "health": "warning",
@@ -8,8 +8,8 @@
     "brokerHealth": "degraded",
     "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
     "executionPosture": "degraded_dry_run_only",
-    "deliveryPosture": "ready",
-    "dataFreshness": "current"
+    "deliveryPosture": "needs_operator_attention",
+    "dataFreshness": "stale"
   },
   "holdings": {
     "totalValueChf": 0,
@@ -30,18 +30,20 @@
   },
   "operatorQueue": {
     "summary": {
-      "total": 6,
+      "total": 7,
       "blocking": 6,
       "approvals": 0,
       "execution": 0,
+      "openRunnerQueue": 0,
+      "openRunnerRetry": 0,
       "recovery": 1,
-      "delivery": 0,
+      "delivery": 1,
       "data": 0,
       "warnings": 5,
       "workflow": 0,
       "bySeverity": {
         "high": 6,
-        "medium": 0,
+        "medium": 1,
         "low": 0
       }
     },
@@ -117,6 +119,18 @@
         "blocking": true,
         "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
         "source": "broker_readiness"
+      },
+      {
+        "rank": 7,
+        "queueType": "delivery",
+        "portfolio": "acceptance-closure",
+        "kind": "delivery",
+        "severity": "medium",
+        "status": "pending",
+        "summary": "Dashboard/report freshness is stale relative to source state.",
+        "blocking": false,
+        "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
+        "source": "delivery_policy"
       }
     ]
   },
@@ -159,6 +173,15 @@
       "simulated": 0,
       "planned": 0,
       "withBrokerOrderId": 0
+    },
+    "tradeState": {
+      "queuedForOpenRunner": 0,
+      "blocked": 0,
+      "blockedByCode": {}
+    },
+    "openRunnerRetryState": {
+      "queuedInitial": 0,
+      "queuedRetry": 0
     },
     "inFlightCount": 0,
     "failedCount": 0,
@@ -246,7 +269,8 @@
     "Missing concrete risk limit: Max single ETF allocation.",
     "Missing concrete risk limit: Max single issuer allocation.",
     "Portfolio still has open questions; trade execution must remain blocked.",
-    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "Dashboard/report freshness is stale relative to source state."
   ],
   "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
   "explanations": {
@@ -257,14 +281,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-07 12:55:20.272 UTC",
+      "time": "2026-05-10 11:14:36.633 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-07 12:55:09.285 UTC",
+      "time": "2026-05-10 11:14:36.604 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-10 09:06:52.527 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-10 09:06:52.494 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-09 21:59:10.959 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
@@ -274,23 +319,27 @@
   "observability": {
     "eventsPresent": true,
     "recentSummary": {
-      "total": 2,
+      "total": 55,
       "byLevel": {
-        "warn": 2
+        "warn": 55
       },
       "byCategory": {
-        "risk": 2
+        "risk": 55
       },
-      "blockedTrades": 2,
+      "blockedTrades": 55,
       "degradedBrokerEvents": 0,
-      "staleDataEvents": 0
+      "staleDataEvents": 0,
+      "openRunnerQueueEvents": 0,
+      "openRunnerRetryEvents": 0
     }
   },
   "delivery": {
-    "ready": true,
+    "ready": false,
     "mode": "local_only",
     "failureAlertMode": "local_operator_review",
-    "pendingActions": []
+    "pendingActions": [
+      "Dashboard/report freshness is stale relative to source state."
+    ]
   },
   "runtimeState": {
     "brokerAutomationPaused": false,

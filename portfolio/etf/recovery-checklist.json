@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-07T12:56:28.498Z",
+  "generatedAt": "2026-05-10T11:14:36.762Z",
   "portfolio": "etf",
   "incidentStatus": "action_required",
   "summary": {
@@ -73,6 +73,12 @@
       "rank": 4,
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
+      "timestamp": null
+    },
+    {
+      "rank": 5,
+      "severity": "warn",
+      "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
       "timestamp": null
     }
   ]

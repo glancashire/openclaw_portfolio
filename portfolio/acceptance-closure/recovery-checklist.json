@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-07T12:55:20.286Z",
+  "generatedAt": "2026-05-10T11:14:36.636Z",
   "portfolio": "acceptance-closure",
   "incidentStatus": "action_required",
   "summary": {
     "health": "warning",
     "brokerHealth": "degraded",
     "executionPosture": "degraded_dry_run_only",
-    "deliveryPosture": "ready",
-    "dataFreshness": "current",
+    "deliveryPosture": "needs_operator_attention",
+    "dataFreshness": "stale",
     "blockerCount": 5,
-    "queueItemCount": 6,
+    "queueItemCount": 7,
     "pendingApprovals": 0,
     "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
     "executionWhy": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
@@ -18,6 +18,7 @@
   },
   "incidentDrivers": [
     "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
+    "Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.",
     "5 explicit blocker(s) are preventing a healthy operating posture."
   ],
   "activeBlockers": [
@@ -95,11 +96,19 @@
       "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
       "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
       "source": "broker_readiness"
+    },
+    {
+      "step": 7,
+      "priority": "medium",
+      "title": "Dashboard/report freshness is stale relative to source state.",
+      "action": "Review report delivery readiness and clear the pending action.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "delivery_policy"
     }
   ],
   "verificationChecks": [
     "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
-    "Freshness posture remains current.",
+    "Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.",
     "No approval backlog remains.",
     "Active blockers are cleared or explicitly documented as accepted constraints."
   ],
@@ -117,6 +126,24 @@
     },
     {
       "rank": 2,
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "timestamp": null
+    },
+    {
+      "rank": 3,
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "timestamp": null
+    },
+    {
+      "rank": 4,
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "timestamp": null
+    },
+    {
+      "rank": 5,
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "timestamp": null

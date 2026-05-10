@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-07T12:55:20.295Z",
+  "generatedAt": "2026-05-10T11:14:36.643Z",
   "portfolioCount": 2,
   "totalValueChf": 5000,
   "portfolios": [
@@ -15,8 +15,10 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 6,
+      "pendingActions": 7,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
+      "openRunnerQueue": 0,
+      "openRunnerRetry": 0,
       "driftStatuses": [
         {
           "assetClass": "Global equities",
@@ -36,8 +38,8 @@
       ],
       "brokerHealth": "degraded",
       "executionPosture": "degraded_dry_run_only",
-      "deliveryPosture": "ready",
-      "dataFreshness": "current"
+      "deliveryPosture": "needs_operator_attention",
+      "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
@@ -52,6 +54,8 @@
       "blockers": 0,
       "pendingActions": 2,
       "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "openRunnerQueue": 0,
+      "openRunnerRetry": 0,
       "driftStatuses": [
         {
           "assetClass": "Global equities",
@@ -76,18 +80,20 @@
     }
   ],
   "queueSummary": {
-    "total": 8,
+    "total": 9,
     "blocking": 7,
     "approvals": 1,
     "execution": 0,
+    "openRunnerQueue": 0,
+    "openRunnerRetry": 0,
     "recovery": 2,
-    "delivery": 0,
+    "delivery": 1,
     "data": 0,
     "warnings": 5,
     "workflow": 0,
     "bySeverity": {
       "high": 7,
-      "medium": 1,
+      "medium": 2,
       "low": 0
     }
   }

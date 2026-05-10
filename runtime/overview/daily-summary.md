@@ -6,7 +6,7 @@
 - Cash waiting to deploy CHF: 5000
 - Pending approvals: 1
 - Broker health: degraded
-- Reporting health: ready
+- Reporting health: attention_needed
 - Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 
 ## Biggest Drift Today
