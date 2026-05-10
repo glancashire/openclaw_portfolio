@@ -94,7 +94,30 @@ Checklist summary:
 - [x] Improve observability docs around broker degradation, stale data, and blocked trading states
 - [x] Update verification bundles and status docs to reflect stronger observability posture
 
-## C. Tracking / overview documents
+## C. Later expanded and hardening arcs
+
+### Expanded follow-on roadmap through Phase 42
+Status: complete
+
+Summary coverage:
+- operator command-center/dashboard uplift
+- structured summary artifacts and multi-portfolio overview surfaces
+- unified operator queue and decision-oriented reporting
+- onboarding/workflow polish, static summary pages, and recovery/incident views
+- approvals queue cleanup, daily summary, report history, and delivery/alerting status surfaces
+
+### Later reporting/verification/hardening phases through Phase 120
+Status: complete
+
+Summary coverage:
+- overview/reporting contract hardening through the later Phase 60-100 lane
+- canonical live readiness preflight and execution command rationalization
+- canonical execution-authority, effective-config, and delivery-posture diagnostics
+- transmitted-live acceptance coverage and operator incident verification
+- documentation/contract alignment across execution, observability, workflow, and transmitted-live operator surfaces
+- progress and master-roadmap reconciliation through Phase 120
+
+## D. Tracking / overview documents
 - `IMPLEMENTATION_PLAN.md`
 - `consolidated-roadmap-checklist.md`
 - `spec-outstanding-checklist.md`
@@ -102,12 +125,14 @@ Checklist summary:
 - `PROGRESS_REPORT.md`
 - `post-mvp-roadmap.md`
 
-## D. Current closure state
+## E. Current closure state
 - Original implementation roadmap: closed
 - Post-MVP roadmap through Phase 27: closed
+- Expanded follow-on roadmap through Phase 42: closed
+- Later reporting/verification/hardening phases through Phase 120: closed
 - Remaining explicit phases in tracked docs: none
 
-## E. Quick file index
+## F. Quick file index
 - Strategy / master overview: `IMPLEMENTATION_PLAN.md`
 - Post-MVP forward roadmap: `post-mvp-roadmap.md`
 - Detailed phase plans: `phase-*-plan.md`
