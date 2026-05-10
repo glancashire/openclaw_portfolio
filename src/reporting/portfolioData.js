@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { summarizeLifecycleStatuses } = require('../execution/lifecycleStatus');
 
 function tableRowsFromFile(filePath, headingStartsWith) {
   const text = fs.readFileSync(filePath, 'utf8');
@@ -71,36 +72,7 @@ function latestHistory(historyPath) {
 
 function executionLifecycleSummary(tradesPath) {
   const rows = tableRowsFromFile(tradesPath, '## Trade Log').map(parseTradeRow);
-  const summary = {
-    proposed: 0,
-    approved: 0,
-    rejected: 0,
-    staged: 0,
-    submitted: 0,
-    partiallyFilled: 0,
-    filled: 0,
-    cancelled: 0,
-    failed: 0,
-    simulated: 0,
-    planned: 0,
-    withBrokerOrderId: 0,
-  };
-  for (const row of rows) {
-    const status = String(row.status || '').trim().toLowerCase();
-    if (status === 'proposed') summary.proposed += 1;
-    else if (status === 'approved') summary.approved += 1;
-    else if (status === 'rejected') summary.rejected += 1;
-    else if (status === 'staged') summary.staged += 1;
-    else if (status === 'submitted') summary.submitted += 1;
-    else if (status === 'partially_filled') summary.partiallyFilled += 1;
-    else if (status === 'filled') summary.filled += 1;
-    else if (status === 'cancelled') summary.cancelled += 1;
-    else if (status === 'failed') summary.failed += 1;
-    else if (status === 'simulated') summary.simulated += 1;
-    else if (status === 'planned') summary.planned += 1;
-    if (String(row.brokerOrderId || '').trim()) summary.withBrokerOrderId += 1;
-  }
-  return summary;
+  return summarizeLifecycleStatuses(rows);
 }
 
 module.exports = { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary };
