@@ -15,6 +15,10 @@ function main() {
   assert(text.includes('## What to check after action'), 'Expected post-action checks section');
   assert(text.includes('## Broker readiness note'), 'Expected broker readiness note section');
   assert(text.includes('## Operator reading guide'), 'Expected operator reading guide section');
+  assert(text.includes('trade.js preflight'), 'Expected canonical preflight command reference');
+  assert(text.includes('trade.js authority'), 'Expected canonical authority command reference');
+  assert(text.includes('trade.js config'), 'Expected canonical config command reference');
+  assert(text.includes('trade.js delivery'), 'Expected canonical delivery command reference');
   assert(text.includes('scripts/operator-incident-summary.js') || text.includes('operator incident summary'), 'Expected operator incident surface reference');
   assert(text.includes('runtime/events/runtime-events.jsonl'), 'Expected runtime events evidence reference');
   assert(text.includes('check-transmitted-live-readiness.js'), 'Expected transmitted live readiness command reference');

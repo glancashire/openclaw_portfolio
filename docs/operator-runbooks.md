@@ -10,6 +10,10 @@ This is the active incident and operator reference.
 - reconciling fills and cancels
 
 ## Key commands
+- `node scripts/trade.js preflight portfolio/etf --json`
+- `node scripts/trade.js authority portfolio/etf --json`
+- `node scripts/trade.js config portfolio/etf --json`
+- `node scripts/trade.js delivery portfolio/etf --json`
 - `node scripts/approve-portfolio-trade.js portfolio/etf '<json>'`
 - `node scripts/reject-portfolio-trade.js portfolio/etf '<json>'`
 - `node scripts/trade.js queue-open --ticker <tickerOrIsin> --action <buy|sell>`
@@ -36,6 +40,10 @@ This is the active incident and operator reference.
 - Do not treat delayed-only pricing as permission for live submission.
 
 ## Operator reading guide
+- Start with `trade.js preflight` for decisive live-readiness truth before treating any portfolio as transmission-ready.
+- Use `trade.js authority` when you need the canonical execution-authority view across execution mode, broker readiness, runtime pause, and live-arm state.
+- Use `trade.js config` when you need the effective broker/runtime config surface without exposing secrets.
+- Use `trade.js delivery` when you need the canonical delivery-posture answer instead of inferring from dashboards.
 - If `Queued for open runner` is non-zero, confirm those rows are still intended before the market-open run.
 - `Open-runner first handoffs` should usually reflect newly queued rows that have not yet had a market-open attempt.
 - `Open-runner retries` should only reflect rows that were blocked, reviewed, and intentionally requeued.

@@ -1,12 +1,12 @@
 # Phase 116 — Actionable Checklist
 
 ## Operator doc alignment
-- [ ] Audit `docs/operator-runbooks.md` and `docs/observability.md`
-- [ ] Update the docs to reference canonical trade diagnostics
-- [ ] Keep guidance aligned with fail-closed live-readiness posture
+- [x] Audit `docs/operator-runbooks.md` and `docs/observability.md`
+- [x] Update the docs to reference canonical trade diagnostics
+- [x] Keep guidance aligned with fail-closed live-readiness posture
 
 ## Verification
-- [ ] Add focused doc contract coverage for the diagnostic references
-- [ ] Run the focused doc contract test(s)
-- [ ] Run full repo verification
-- [ ] Iterate until all checks pass
+- [x] Add focused doc contract coverage for the diagnostic references
+- [x] Run the focused doc contract test(s)
+- [x] Run full repo verification
+- [x] Iterate until all checks pass

@@ -21,6 +21,7 @@ const checks = [
   ['test:artifact-policy-contract', ['scripts/test-artifact-policy-contract.js']],
   ['test:operator-incident-summary', ['scripts/test-operator-incident-summary.js']],
   ['test:operator-runbooks-contract', ['scripts/test-operator-runbooks-contract.js']],
+  ['test:observability-doc-contract', ['scripts/test-observability-doc-contract.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];

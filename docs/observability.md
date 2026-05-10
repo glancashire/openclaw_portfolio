@@ -6,6 +6,10 @@
 - portfolio dashboards and history files for operator-facing state
 
 ## Typical checks
+- `node scripts/trade.js preflight portfolio/etf --json`
+- `node scripts/trade.js authority portfolio/etf --json`
+- `node scripts/trade.js config portfolio/etf --json`
+- `node scripts/trade.js delivery portfolio/etf --json`
 - `node scripts/trade.js status portfolio/etf`
 - `runtime/overview/portfolio-overview.md`
 - `node scripts/show-runtime-events.js --portfolio etf`
@@ -26,6 +30,13 @@
 - Summary artifacts now surface queued and blocked counts alongside approval and broker-readiness posture.
 - `trade.js status` should agree with dashboard/summary surfaces on the split between `Open-runner first handoffs` and `Open-runner retries`.
 - `runtime/overview/portfolio-overview.md` should surface the same posture across portfolios through its `First handoffs` and `Retries` columns.
+
+## Diagnostic interpretation guide
+- Use `trade.js preflight` as the decisive live-readiness answer.
+- Use `trade.js authority` when you need to understand whether execution authority could permit action in principle.
+- Use `trade.js config` to inspect the effective redacted broker/runtime config behind the current posture.
+- Use `trade.js delivery` to confirm whether reporting or delivery posture needs operator attention.
+- If a dashboard or summary disagrees with these diagnostic surfaces, prefer the canonical command output and treat the rendered artifact as potentially stale.
 
 ## Rule
 Keep runtime evidence local, structured, and short. Use Markdown for the operator view, JSONL for detail.
