@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { markdownToBasicHtml } = require('./pdfExport');
 const { generateOverviewArtifacts } = require('./summaryArtifacts');
+const { evaluateLiveReadinessPreflight } = require('../execution/liveReadinessPreflight');
 
 function classifyPortfolioKind(item = {}) {
   const name = String(item.portfolio || '').toLowerCase();
@@ -79,7 +80,8 @@ function formatOverviewMarkdown({ index, pending }) {
 }
 
 async function generateOverviewBoard({ repoRoot = process.cwd(), writeFiles = true } = {}) {
-  const { portfolioIndex, pendingActions } = await generateOverviewArtifacts({ repoRoot, writeFiles: true });
+  const readiness = await evaluateLiveReadinessPreflight({ portfolioDir: path.join(repoRoot, 'portfolio', 'etf') }).catch(() => null);
+  const { portfolioIndex, pendingActions } = await generateOverviewArtifacts({ repoRoot, writeFiles: true, readiness });
   const markdown = formatOverviewMarkdown({ index: portfolioIndex, pending: pendingActions });
   const overviewDir = path.join(repoRoot, 'runtime', 'overview');
   const markdownPath = path.join(overviewDir, 'portfolio-overview.md');

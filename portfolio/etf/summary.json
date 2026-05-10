@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-10T11:14:36.762Z",
+  "generatedAt": "2026-05-10T13:24:35.097Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
@@ -10,6 +10,76 @@
     "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "ready",
     "dataFreshness": "current"
+  },
+  "readiness": {
+    "ok": false,
+    "portfolio": "etf",
+    "generatedAt": "2026-05-10T13:24:35.071Z",
+    "executionMode": "require_confirmation",
+    "armedForMarketOpen": false,
+    "armExpiresAt": null,
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": false,
+      "reachable": false,
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "reason": "native_error",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    },
+    "marketWindow": {
+      "exchange": "EBS",
+      "openNow": false,
+      "reason": "Weekend (day 0)",
+      "nextOpen": "2026-05-11T09:00:00.000Z"
+    },
+    "approvalState": {
+      "proposedCount": 7,
+      "approvedCount": 0,
+      "executableCount": 0,
+      "latestApprovedAt": null,
+      "approvalAgeHours": null,
+      "staleApproval": false,
+      "maxApprovalAgeHours": 24,
+      "ambiguousQueuedCount": 0,
+      "hasAnyApprovedRows": false,
+      "hasExecutableApprovedRows": false,
+      "executableRows": []
+    },
+    "rows": [],
+    "blockers": [
+      {
+        "code": "execution_mode_not_live",
+        "message": "Execution mode is require_confirmation, not transmitted_live."
+      },
+      {
+        "code": "not_armed_for_market_open",
+        "message": "Live execution is not armed for the next market-open window."
+      },
+      {
+        "code": "broker_unready",
+        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+      },
+      {
+        "code": "no_approved_rows",
+        "message": "No approved trade rows exist in trades.md for live execution."
+      },
+      {
+        "code": "no_executable_rows",
+        "message": "No executable approved trade rows are currently eligible for submission."
+      },
+      {
+        "code": "approval_state_mismatch",
+        "message": "Trades remain proposed with no approved rows recorded, so approval intent is not reflected in the active trade log."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "market_closed",
+        "message": "Market is currently closed (Weekend (day 0)). Next open: 2026-05-11T09:00:00.000Z"
+      }
+    ],
+    "recommendedNextAction": "Do not transmit. Keep confirmation-first posture unless you explicitly switch execution mode."
   },
   "holdings": {
     "totalValueChf": 5000,
@@ -295,35 +365,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-09 13:36:11.464 UTC",
+      "time": "2026-05-10 13:24:33.498 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-09 13:36:11.463 UTC",
+      "time": "2026-05-10 13:24:33.496 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-09 13:05:55.603 UTC",
+      "time": "2026-05-10 12:02:05.588 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-09 13:05:55.602 UTC",
+      "time": "2026-05-10 12:02:05.586 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-09 13:05:34.196 UTC",
+      "time": "2026-05-10 11:59:54.295 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
@@ -333,14 +403,14 @@
   "observability": {
     "eventsPresent": true,
     "recentSummary": {
-      "total": 16,
+      "total": 25,
       "byLevel": {
-        "warn": 16
+        "warn": 25
       },
       "byCategory": {
-        "execution_policy": 16
+        "execution_policy": 25
       },
-      "blockedTrades": 16,
+      "blockedTrades": 25,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
       "openRunnerQueueEvents": 0,
