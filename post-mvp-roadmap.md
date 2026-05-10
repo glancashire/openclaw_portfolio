@@ -1,11 +1,16 @@
 # Post-MVP Roadmap
 
-This roadmap starts after the accepted read-only + dry-run MVP closure. It defines the next implementation phases explicitly instead of treating the repo as fully finished.
+This roadmap starts after the accepted read-only + dry-run MVP closure. Those explicit post-MVP phases are now complete; this file remains as the canonical record of that roadmap rather than an active todo list.
 
 ## Status key
 - [ ] not started
 - [~] in progress / partially complete
 - [x] complete
+
+## Current state
+- [x] All explicitly tracked post-MVP roadmap phases below are complete
+- [x] Remaining work, if any, should be defined as a new roadmap expansion rather than inferred from this closed list
+- [x] Real transmitted live execution remains guarded and environment-dependent despite roadmap completion
 
 ## Phase 24 — Transmitted live execution hardening
 Goal: introduce an explicitly opt-in transmitted live-order path with fail-closed safety boundaries, operator confirmation checkpoints, and auditable broker-write behavior.
@@ -45,8 +50,11 @@ Goal: improve trust in real operations through stronger runtime evidence, risk-l
 - [x] Improve observability docs around broker degradation, stale data, and blocked trading states
 - [x] Update verification bundles and status docs to reflect the stronger observability posture
 
-## Suggested execution order
+## Execution order used
 1. Phase 24 — Transmitted live execution hardening
 2. Phase 25 — Operator runbooks and incident handling
 3. Phase 26 — Production reporting and delivery polish
 4. Phase 27 — Risk, logging, and observability hardening
+
+## Closure note
+The explicit post-MVP roadmap is complete. Any additional work should be tracked as a fresh phase expansion with its own plan/checklist instead of reopening these phases implicitly.

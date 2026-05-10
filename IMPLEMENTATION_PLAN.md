@@ -83,16 +83,18 @@ Acceptance-closed MVP state:
 Intentional remaining limit:
 - the repo remains intentionally not live-writable-complete; Interactive Brokers execution is still confirmation-gated and read-only/dry-run first, so true transmitted live submission remains outside this closure milestone until explicitly enabled and hardened
 
-## Next post-MVP phases
+## Post-MVP roadmap status
 
-The accepted MVP is closed, but the repo still has meaningful follow-on work. The next phase set is tracked in `post-mvp-roadmap.md`:
+The accepted MVP is closed, and the explicitly tracked post-MVP roadmap phases in `post-mvp-roadmap.md` are also complete:
 
 24. Transmitted live execution hardening
 25. Operator runbooks and incident handling
 26. Production reporting and delivery polish
 27. Risk, logging, and observability hardening
 
-These phases are intentionally post-MVP. They extend the guarded execution path and operational maturity without redefining what was accepted in the read-only + dry-run MVP closure.
+Those phases extended the guarded execution path and operational maturity without redefining what was accepted in the read-only + dry-run MVP closure.
+
+Later repo hardening continued beyond that roadmap through additional focused phases covering readiness truth, execution authority, effective config, delivery posture, operator verification, and documentation alignment.
 
 ## Current command surface
 
@@ -114,6 +116,12 @@ These phases are intentionally post-MVP. They extend the guarded execution path 
 - `node scripts/cancel-portfolio-order.js <portfolio-dir> <order-id> [selector-json]`
 - `node scripts/demo-portfolio-execution-flow.js`
 - `npm run verify:execution`
+
+## Remaining real limits
+
+- Real transmitted live execution remains intentionally guarded and environment-dependent.
+- The actual ETF environment is not automatically live-ready just because roadmap phases are complete; readiness still depends on execution mode, broker health, approvals, and explicit arming.
+- Further work from here should be defined as a new roadmap expansion, not inferred from already-closed phase lists.
 
 ## Guardrails
 
