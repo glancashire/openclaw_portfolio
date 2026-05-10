@@ -36,6 +36,9 @@ Trading CLI — Unified entry point for portfolio trading operations
 Usage: node scripts/trade.js <command> [options]
 
 Commands:
+  preflight     Canonical live-readiness / Monday-execution truth surface
+  arm-open      Explicitly arm the next market-open execution window
+  disarm-open   Clear any armed market-open execution window
   propose       Generate trade proposal based on portfolio drift
   validate      Run ETF quality filter on current trade instruments
   submit        Place approved orders (respects market hours + quality filter)
@@ -52,6 +55,9 @@ Options:
   --help      Show this help
 
 Examples:
+  node scripts/trade.js preflight --json
+  node scripts/trade.js arm-open --hours 18
+  node scripts/trade.js disarm-open
   node scripts/trade.js status
   node scripts/trade.js validate
   node scripts/trade.js submit --dry-run
@@ -60,6 +66,64 @@ Examples:
   node scripts/trade.js cancel --all
   node scripts/trade.js history --json
 `);
+}
+
+function resolvePortfolioDir() {
+  const portfolioArg = flags.find((flag, idx) => !flag.startsWith('-') && (idx === 0 || !flags[idx - 1].startsWith('--')));
+  return portfolioArg ? path.resolve(portfolioArg) : path.join(ROOT, 'portfolio', 'etf');
+}
+
+function cmdPreflight() {
+  const portfolioDir = resolvePortfolioDir();
+  const { evaluateLiveReadinessPreflight } = require('../src/execution/liveReadinessPreflight');
+  evaluateLiveReadinessPreflight({ portfolioDir }).then((result) => {
+    if (JSON_OUT) {
+      printJson(result);
+    } else {
+      console.log(`Live readiness preflight for ${result.portfolio}`);
+      console.log(`- ok: ${result.ok}`);
+      console.log(`- execution mode: ${result.executionMode}`);
+      console.log(`- armed for market open: ${result.armedForMarketOpen}`);
+      console.log(`- arm expires at: ${result.armExpiresAt || 'n/a'}`);
+      console.log(`- broker readiness: ${result.brokerReadiness.message}`);
+      console.log(`- approved rows: ${result.approvalState.approvedCount}`);
+      console.log(`- executable rows: ${result.approvalState.executableCount}`);
+      if (result.blockers.length) {
+        console.log('Blockers:');
+        for (const blocker of result.blockers) console.log(`- [${blocker.code}] ${blocker.message}`);
+      }
+      if (result.warnings.length) {
+        console.log('Warnings:');
+        for (const warning of result.warnings) console.log(`- [${warning.code}] ${warning.message}`);
+      }
+      console.log(`Recommended next action: ${result.recommendedNextAction}`);
+    }
+    if (!result.ok) process.exit(2);
+  }).catch((error) => {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  });
+}
+
+function cmdArmOpen() {
+  const portfolioDir = resolvePortfolioDir();
+  const hoursIdx = flags.findIndex((flag) => flag === '--hours');
+  const hours = hoursIdx >= 0 ? Number(flags[hoursIdx + 1]) : 24;
+  const { armLiveExecutionWindow } = require('../src/execution/liveReadinessPreflight');
+  const armed = armLiveExecutionWindow(portfolioDir, {
+    expiresAt: new Date(Date.now() + hours * 36e5).toISOString(),
+    note: 'Armed from canonical trade CLI.',
+  });
+  if (JSON_OUT) printJson({ ok: true, armedForMarketOpen: true, ...armed });
+  else console.log(`✓ Armed live execution window until ${armed.expiresAt}`);
+}
+
+function cmdDisarmOpen() {
+  const portfolioDir = resolvePortfolioDir();
+  const { clearLiveExecutionArm } = require('../src/execution/liveReadinessPreflight');
+  clearLiveExecutionArm(portfolioDir);
+  if (JSON_OUT) printJson({ ok: true, armedForMarketOpen: false });
+  else console.log('✓ Cleared live execution arm');
 }
 
 function cmdValidate() {
@@ -379,6 +443,9 @@ function cmdPropose() {
 }
 
 switch (command) {
+  case 'preflight': cmdPreflight(); break;
+  case 'arm-open': cmdArmOpen(); break;
+  case 'disarm-open': cmdDisarmOpen(); break;
   case 'validate': cmdValidate(); break;
   case 'status': cmdStatus(); break;
   case 'submit': cmdSubmit(); break;
