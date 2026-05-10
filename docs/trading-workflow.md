@@ -3,23 +3,37 @@
 This document is the main operator guide for the active trading path.
 
 ## Active execution path
-Use these entry points:
+Start with the canonical diagnostics before taking action:
+- `node scripts/trade.js preflight portfolio/etf --json`
+- `node scripts/trade.js authority portfolio/etf --json`
+- `node scripts/trade.js config portfolio/etf --json`
+- `node scripts/trade.js delivery portfolio/etf --json`
+
+Then use the active workflow entry points:
 - `node scripts/trade.js propose`
 - `node scripts/trade.js validate`
+- `node scripts/trade.js queue-open --ticker <tickerOrIsin> --action <buy|sell>`
+- `node scripts/trade.js requeue-open --ticker <tickerOrIsin> --action <buy|sell>`
 - `node scripts/trade.js submit`
 - `node scripts/trade.js status portfolio/etf`
 - `node scripts/submit-orders-at-open.js`
 - `node scripts/resync-portfolio-orders.js portfolio/etf`
 
 ## Current lifecycle
-1. proposal is generated
-2. operator approves or rejects trade rows in `trades.md`
-3. operator uses `queue-open` for a first market-open handoff, or `requeue-open` after blocked-row recovery
-4. market-open submission loads executable approved rows from portfolio trade state
-5. broker status is reconciled back into portfolio state
-6. fills/cancels/failures refresh dashboard and history
+1. operator checks canonical diagnostics before action (`preflight`, `authority`, `config`, `delivery`)
+2. proposal is generated
+3. operator approves or rejects trade rows in `trades.md`
+4. operator uses `queue-open` for a first market-open handoff, or `requeue-open` after blocked-row recovery
+5. market-open submission loads executable approved rows from portfolio trade state
+6. broker status is reconciled back into portfolio state
+7. fills/cancels/failures refresh dashboard and history
 
 ## Safety rules
+- canonical diagnostic output should win over derived artifacts when they disagree
+- `trade preflight` is the decisive live-readiness answer
+- `trade authority` is the decisive execution-authority answer
+- `trade config` is the effective redacted broker/runtime configuration surface
+- `trade delivery` is the decisive delivery-posture answer
 - ETF quality filter must pass
 - market-hours guard applies unless explicitly forced
 - approval/staging/transmitted-live are separate lanes
