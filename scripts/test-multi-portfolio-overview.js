@@ -175,8 +175,10 @@ async function main() {
   const overviewMarkdown = fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-overview.md'), 'utf8');
   const overviewHtml = fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-overview.html'), 'utf8');
   const portfolioIndexJson = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-index.json'), 'utf8'));
+  const pendingActionsJson = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'pending-actions.json'), 'utf8'));
   assert(fs.existsSync(generated.approvalsQueuePath), 'Expected approvals queue json artifact');
   assert(fs.existsSync(generated.approvalsQueueMarkdownPath), 'Expected approvals queue markdown artifact');
+  assert(fs.existsSync(generated.pendingActionsPath), 'Expected pending-actions json artifact');
   assert(approvalsHtml.includes('Approvals Queue'), 'Expected approvals queue html artifact');
   assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
   assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
@@ -189,6 +191,11 @@ async function main() {
   assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
   assert(overviewMarkdown.includes('| etf | active | 5000 | warning |') && overviewMarkdown.includes('| 0 | 0 | Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. |'), 'Expected generated ETF row to retain queue columns and recommendation');
   assert(portfolioIndexJson.schemaVersion === '1.1', 'Expected portfolio index schema version');
+  assert(pendingActionsJson.schemaVersion === '1.1', 'Expected pending-actions schema version');
+  assert(typeof pendingActionsJson.generatedAt === 'string' && pendingActionsJson.generatedAt.length > 0, 'Expected pending-actions generatedAt timestamp');
+  assert(typeof pendingActionsJson.itemCount === 'number' && pendingActionsJson.itemCount === pendingActionsJson.items.length, 'Expected pending-actions itemCount metadata');
+  assert(Array.isArray(pendingActionsJson.items), 'Expected pending-actions items array');
+  assert(pendingActionsJson.queueSummary && typeof pendingActionsJson.queueSummary === 'object', 'Expected pending-actions queue summary object');
   assert(typeof portfolioIndexJson.generatedAt === 'string' && portfolioIndexJson.generatedAt.length > 0, 'Expected portfolio index generatedAt timestamp');
   assert(typeof portfolioIndexJson.portfolioCount === 'number' && portfolioIndexJson.portfolioCount === portfolioIndexJson.portfolios.length, 'Expected portfolio index count metadata');
   assert(Array.isArray(portfolioIndexJson.portfolios), 'Expected portfolio index portfolios array');
@@ -206,6 +213,17 @@ async function main() {
     assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, key), `Expected ${key} in queue summary`);
     assert(typeof portfolioIndexJson.queueSummary[key] === 'number', `Expected numeric ${key} in queue summary`);
     assert(portfolioIndexJson.queueSummary[key] >= 0, `Expected non-negative ${key} in queue summary`);
+  }
+  for (const key of ['total', 'blocking', 'approvals', 'execution', 'openRunnerQueue', 'openRunnerRetry', 'recovery', 'delivery', 'data', 'warnings', 'workflow']) {
+    assert(Object.prototype.hasOwnProperty.call(pendingActionsJson.queueSummary || {}, key), `Expected ${key} in pending-actions queue summary`);
+    assert(typeof pendingActionsJson.queueSummary[key] === 'number', `Expected numeric ${key} in pending-actions queue summary`);
+    assert(pendingActionsJson.queueSummary[key] >= 0, `Expected non-negative ${key} in pending-actions queue summary`);
+  }
+  assert(pendingActionsJson.queueSummary && typeof pendingActionsJson.queueSummary.bySeverity === 'object', 'Expected bySeverity in pending-actions queue summary');
+  for (const key of ['high', 'medium', 'low']) {
+    assert(Object.prototype.hasOwnProperty.call(pendingActionsJson.queueSummary.bySeverity || {}, key), `Expected ${key} in pending-actions queue summary bySeverity`);
+    assert(typeof pendingActionsJson.queueSummary.bySeverity[key] === 'number', `Expected numeric ${key} in pending-actions queue summary bySeverity`);
+    assert(pendingActionsJson.queueSummary.bySeverity[key] >= 0, `Expected non-negative ${key} in pending-actions queue summary bySeverity`);
   }
   assert(portfolioIndexJson.queueSummary && typeof portfolioIndexJson.queueSummary.bySeverity === 'object', 'Expected bySeverity in queue summary');
   for (const key of ['high', 'medium', 'low']) {
