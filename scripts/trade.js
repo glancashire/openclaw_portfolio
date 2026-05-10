@@ -39,6 +39,7 @@ Commands:
   preflight     Canonical live-readiness / Monday-execution truth surface
   authority     Canonical effective-config / execution-authority truth surface
   config        Canonical effective-config diagnostic surface
+  delivery      Canonical delivery-posture diagnostic surface
   arm-open      Explicitly arm the next market-open execution window
   disarm-open   Clear any armed market-open execution window
   propose       Generate trade proposal based on portfolio drift
@@ -60,6 +61,7 @@ Examples:
   node scripts/trade.js preflight --json
   node scripts/trade.js authority --json
   node scripts/trade.js config --json
+  node scripts/trade.js delivery --json
   node scripts/trade.js arm-open --hours 18
   node scripts/trade.js disarm-open
   node scripts/trade.js status
@@ -75,6 +77,33 @@ Examples:
 function resolvePortfolioDir() {
   const portfolioArg = flags.find((flag, idx) => !flag.startsWith('-') && (idx === 0 || !flags[idx - 1].startsWith('--')));
   return portfolioArg ? path.resolve(portfolioArg) : path.join(ROOT, 'portfolio', 'etf');
+}
+
+function cmdDelivery() {
+  const portfolioDir = resolvePortfolioDir();
+  const { evaluateDeliveryPosture } = require('../src/reporting/deliveryDiagnostic');
+  try {
+    const result = evaluateDeliveryPosture({ portfolioDir });
+    if (JSON_OUT) {
+      printJson(result);
+    } else {
+      console.log(`Delivery posture for ${result.portfolio}`);
+      console.log(`- delivery mode: ${result.policy.deliveryMode}`);
+      console.log(`- intended channels: ${(result.policy.intendedChannels || []).join(', ') || 'unknown'}`);
+      console.log(`- external delivery enabled: ${result.policy.externalDeliveryEnabled}`);
+      console.log(`- failure alert mode: ${result.policy.failureAlertMode}`);
+      console.log(`- override loaded: ${result.policy.overrideLoaded}`);
+      console.log(`- ready: ${result.deliveryPosture.ready}`);
+      console.log(`- pending delivery actions: ${result.deliveryPosture.pendingActionCount}`);
+      console.log(`- freshness stale: ${result.deliveryPosture.freshnessStale}`);
+      console.log(`- broker automation paused: ${result.deliveryPosture.brokerAutomationPaused}`);
+      console.log(`- recommended next action: ${result.deliveryPosture.recommendedNextAction}`);
+    }
+    if (!result.deliveryPosture.ready) process.exit(2);
+  } catch (error) {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  }
 }
 
 function cmdConfig() {
@@ -499,6 +528,7 @@ switch (command) {
   case 'preflight': cmdPreflight(); break;
   case 'authority': cmdAuthority(); break;
   case 'config': cmdConfig(); break;
+  case 'delivery': cmdDelivery(); break;
   case 'arm-open': cmdArmOpen(); break;
   case 'disarm-open': cmdDisarmOpen(); break;
   case 'validate': cmdValidate(); break;
