@@ -28,6 +28,7 @@ const checks = [
   'test-staged-order-approval-guard.js',
   'test-writable-execution-handoff-e2e.js',
   'test-writable-live-lane-acceptance.js',
+  'test-transmitted-live-lane-acceptance.js',
   'test-operator-action-audit-trail.js',
   'test-history-material-events.js',
   'test-transmitted-live-gating.js',

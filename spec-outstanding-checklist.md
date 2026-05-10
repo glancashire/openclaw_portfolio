@@ -120,8 +120,8 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Generate staged buy plan end-to-end
 - [x] Produce dry-run orders end-to-end
 - [x] Approve one order end-to-end (via execution workflow verification bundle)
-- [ ] Submit one order in writable mode end-to-end
-- [ ] Reconcile fill / cancel / failure end-to-end in transmitted writable mode
+- [x] Submit one order in writable mode end-to-end
+- [x] Reconcile fill / cancel / failure end-to-end in transmitted writable mode
 - [x] Update holdings / history / dashboard / trades end-to-end
 - [x] Generate weekly / monthly / quarterly reports end-to-end
 - [x] Verify safety blocks prevent bad trades end-to-end
