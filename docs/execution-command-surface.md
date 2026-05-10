@@ -1,6 +1,7 @@
 # Execution Command Surface
 
 This document defines the canonical operator command surface for execution workflows.
+For execution authority, automation limits, and live-execution safety boundaries, see `system-policy.md`.
 
 ## Canonical entrypoint
 

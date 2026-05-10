@@ -14,6 +14,7 @@ const checks = [
   ['test:dashboard-command-center', ['scripts/test-dashboard-command-center.js']],
   ['test:trade-cli-surface', ['scripts/test-trade-cli-surface.js']],
   ['test:execution-authority', ['scripts/test-execution-authority.js']],
+  ['test:system-policy-contract', ['scripts/test-system-policy-contract.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];
