@@ -51,7 +51,7 @@ The work must stay inside current repo constraints:
 - [ ] Add safe simulated failure-drill tests for observability logging
 - [ ] Add/update docs for runtime logs and degraded-state diagnosis
 - [ ] Add verification entry points in `package.json` / bundle scripts
-- [ ] Mark Phase 27 complete across roadmap/progress/report docs once verification passes
+- [x] Mark Phase 27 complete across roadmap/progress/report docs once verification passes
 
 ## Verification gates
 

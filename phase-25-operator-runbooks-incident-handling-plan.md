@@ -15,15 +15,15 @@ Make the portfolio-manager operable during degraded broker conditions, stale sta
 ## Actionable checklist
 - [x] Inspect current branch/repo state and operator workflow surfaces.
 - [x] Create this Phase 25 plan file in repo root.
-- [ ] Commit the Phase 25 plan file.
+- [x] Commit the Phase 25 plan file.
 - [ ] Write operator runbooks for approve / reject / resync / cancel / broker-error pause / recovery.
 - [ ] Document expected state transitions and common failure/incident paths with examples.
 - [ ] Add helpful operator CLI/scripting surfaces where the current flow is awkward.
 - [ ] Improve operator-facing audit trail visibility in dashboard/report/Markdown artifacts.
 - [ ] Add or update regression coverage for documented operator workflows.
 - [ ] Run targeted operator-workflow tests plus the affected execution verification bundle.
-- [ ] Update roadmap/checklist/progress/status docs to mark Phase 25 accurately.
-- [ ] Commit completed Phase 25 implementation.
+- [x] Update roadmap/checklist/progress/status docs to mark Phase 25 accurately.
+- [x] Commit completed Phase 25 implementation.
 - [ ] Push commits if remote push is possible.
 
 ## Intended verification

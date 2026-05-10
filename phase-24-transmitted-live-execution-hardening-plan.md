@@ -15,7 +15,7 @@ Introduce an explicitly opt-in transmitted live-order path with fail-closed safe
 ## Actionable checklist
 - [x] Inspect current branch/repo state and transmitted-live-related code paths.
 - [x] Create this Phase 24 plan file in repo root.
-- [ ] Commit the Phase 24 plan file.
+- [x] Commit the Phase 24 plan file.
 - [ ] Define/document transmitted-live scope, prerequisites, and warnings in operator-facing repo docs.
 - [ ] Add explicit execution-mode and transmitted-live opt-in boundaries in code/CLI surfaces.
 - [ ] Add stronger readiness checks for transmitted submission (portfolio mode, account reference, broker readiness, operator approvals, explicit opt-in).
@@ -23,8 +23,8 @@ Introduce an explicitly opt-in transmitted live-order path with fail-closed safe
 - [ ] Add/update verification surface for transmitted safeguards.
 - [ ] Add focused regression tests for transmitted-live gating and fail-closed behavior.
 - [ ] Run the targeted transmitted-live test set and broader affected verification bundle(s).
-- [ ] Update roadmap/checklist/progress docs to mark Phase 24 accurately.
-- [ ] Commit completed Phase 24 implementation.
+- [x] Update roadmap/checklist/progress docs to mark Phase 24 accurately.
+- [x] Commit completed Phase 24 implementation.
 - [ ] Push commits if remote push is possible.
 
 ## Intended verification

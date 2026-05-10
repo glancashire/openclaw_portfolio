@@ -14,14 +14,14 @@ Make scheduled reporting outputs more production-ready for real operator use by 
 ## Actionable checklist
 - [x] Inspect current branch/repo state and reporting/delivery surfaces.
 - [x] Create this Phase 26 plan file in repo root.
-- [ ] Commit the Phase 26 plan file.
+- [x] Commit the Phase 26 plan file.
 - [ ] Define/report the production delivery policy and failure-alert policy in docs/config-facing artifacts.
 - [ ] Add a report-delivery/readiness inspection surface that stays local-only by default.
 - [ ] Harden dashboard/report metadata for delivery policy, last-cycle status, freshness, pending-action, and degraded operator state.
 - [ ] Add/update focused regression coverage for delivery policy and reporting metadata behavior.
 - [ ] Run the targeted reporting test set and broader affected verification bundle(s).
-- [ ] Update roadmap/checklist/progress/status docs to mark Phase 26 accurately.
-- [ ] Commit completed Phase 26 implementation.
+- [x] Update roadmap/checklist/progress/status docs to mark Phase 26 accurately.
+- [x] Commit completed Phase 26 implementation.
 - [ ] Push commits if remote push is possible.
 
 ## Intended verification
