@@ -8,6 +8,7 @@ Use `node scripts/trade.js ...` as the primary operator command family.
 
 ### Canonical commands
 - `trade preflight` — canonical live-readiness / Monday-execution truth surface
+- `trade authority` — canonical effective-config / execution-authority truth surface
 - `trade arm-open` — explicitly arm the next market-open execution window
 - `trade disarm-open` — clear any armed market-open execution window
 - `trade submit` — submit/stage approved orders via the market-open path
