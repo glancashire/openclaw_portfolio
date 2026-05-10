@@ -1,3 +1,4 @@
+const https = require('https');
 const { loadInteractiveBrokersConfig, validateInteractiveBrokersConfig } = require('./config');
 const { logBrokerEvent } = require('../shared/safeLogger');
 const { normaliseOrder, normaliseOrderQuote, normaliseCancelResult } = require('./types');
@@ -118,29 +119,12 @@ class InteractiveBrokersClient {
   }
 
   async request(path, { method = 'GET', body } = {}) {
-    const previousTls = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-    const relaxTls = this.baseUrl.startsWith('https://localhost') || this.baseUrl.startsWith('https://127.0.0.1');
-    if (relaxTls) process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    try {
-      const response = await fetch(`${this.baseUrl}${path}`, {
-        method,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: body ? JSON.stringify(body) : undefined,
-      });
-      const text = await response.text();
-      if (!response.ok) {
-        throw new Error(`IBKR request failed (${response.status}): ${text}`);
-      }
-      return safeJson(text);
-    } finally {
-      if (relaxTls) {
-        if (previousTls === undefined) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-        else process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousTls;
-      }
+    const response = await fetch(`${this.baseUrl}${path}`, buildRequestOptions(`${this.baseUrl}${path}`, { method, body }));
+    const text = await response.text();
+    if (!response.ok) {
+      throw new Error(`IBKR request failed (${response.status}): ${text}`);
     }
+    return safeJson(text);
   }
 
   async sessionStatus() {
@@ -533,6 +517,30 @@ class InteractiveBrokersClient {
   }
 }
 
+function buildRequestOptions(url, { method = 'GET', body } = {}) {
+  const options = {
+    method,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  };
+  if (shouldUseInsecureLocalTls(url)) {
+    options.agent = new https.Agent({ rejectUnauthorized: false });
+  }
+  return options;
+}
+
+function shouldUseInsecureLocalTls(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1');
+  } catch {
+    return false;
+  }
+}
+
 function safeJson(text) {
   try {
     return JSON.parse(text);
@@ -647,4 +655,4 @@ function numberOrNull(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-module.exports = { InteractiveBrokersClient, aggregateExecutionFills, brokerDiagnostics, activeMode };
+module.exports = { InteractiveBrokersClient, aggregateExecutionFills, brokerDiagnostics, activeMode, buildRequestOptions, shouldUseInsecureLocalTls };
