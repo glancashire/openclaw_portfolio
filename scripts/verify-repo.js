@@ -14,6 +14,7 @@ const checks = [
   ['test:dashboard-command-center', ['scripts/test-dashboard-command-center.js']],
   ['test:trade-cli-surface', ['scripts/test-trade-cli-surface.js']],
   ['test:execution-authority', ['scripts/test-execution-authority.js']],
+  ['test:effective-config', ['scripts/test-effective-config.js']],
   ['test:system-policy-contract', ['scripts/test-system-policy-contract.js']],
   ['test:artifact-policy-contract', ['scripts/test-artifact-policy-contract.js']],
   ['test:operator-incident-summary', ['scripts/test-operator-incident-summary.js']],

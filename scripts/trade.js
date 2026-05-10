@@ -38,6 +38,7 @@ Usage: node scripts/trade.js <command> [options]
 Commands:
   preflight     Canonical live-readiness / Monday-execution truth surface
   authority     Canonical effective-config / execution-authority truth surface
+  config        Canonical effective-config diagnostic surface
   arm-open      Explicitly arm the next market-open execution window
   disarm-open   Clear any armed market-open execution window
   propose       Generate trade proposal based on portfolio drift
@@ -58,6 +59,7 @@ Options:
 Examples:
   node scripts/trade.js preflight --json
   node scripts/trade.js authority --json
+  node scripts/trade.js config --json
   node scripts/trade.js arm-open --hours 18
   node scripts/trade.js disarm-open
   node scripts/trade.js status
@@ -73,6 +75,32 @@ Examples:
 function resolvePortfolioDir() {
   const portfolioArg = flags.find((flag, idx) => !flag.startsWith('-') && (idx === 0 || !flags[idx - 1].startsWith('--')));
   return portfolioArg ? path.resolve(portfolioArg) : path.join(ROOT, 'portfolio', 'etf');
+}
+
+function cmdConfig() {
+  const portfolioDir = resolvePortfolioDir();
+  const { evaluateEffectiveConfig } = require('../src/execution/effectiveConfig');
+  evaluateEffectiveConfig({ portfolioDir }).then((result) => {
+    if (JSON_OUT) {
+      printJson(result);
+    } else {
+      console.log(`Effective config for ${result.portfolio}`);
+      console.log(`- broker mode: ${result.effectiveConfig.brokerMode}`);
+      console.log(`- broker runtime: ${result.effectiveConfig.brokerRuntime}`);
+      console.log(`- readonly: ${result.effectiveConfig.readonly}`);
+      console.log(`- base url: ${result.effectiveConfig.baseUrl}`);
+      console.log(`- host: ${result.effectiveConfig.host}`);
+      console.log(`- port: ${result.effectiveConfig.port}`);
+      console.log(`- config valid: ${result.brokerConfigStatus.ok}`);
+      console.log(`- execution mode: ${result.effectiveConfig.executionMode}`);
+      console.log(`- broker account reference: ${result.effectiveConfig.brokerAccountReference || 'n/a'}`);
+      console.log(`- live execution possible now: ${result.effectiveConfig.liveExecutionPossibleNow}`);
+      console.log(`- explicit operator action required: ${result.effectiveConfig.requiresExplicitOperatorAction}`);
+    }
+  }).catch((error) => {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  });
 }
 
 function cmdAuthority() {
@@ -470,6 +498,7 @@ function cmdPropose() {
 switch (command) {
   case 'preflight': cmdPreflight(); break;
   case 'authority': cmdAuthority(); break;
+  case 'config': cmdConfig(); break;
   case 'arm-open': cmdArmOpen(); break;
   case 'disarm-open': cmdDisarmOpen(); break;
   case 'validate': cmdValidate(); break;
