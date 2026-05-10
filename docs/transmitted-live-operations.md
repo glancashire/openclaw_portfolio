@@ -26,15 +26,18 @@ A transmitted live order should remain blocked unless all of the following are t
 If any prerequisite is missing, the repo should fail closed and return blockers rather than attempting a broker write.
 
 ## Recommended operator flow
-1. Run read-only readiness checks.
-2. Confirm the intended order is already approved and matches current strategy state.
-3. Run the transmitted-live readiness check command first.
-4. Verify the order JSON contains the explicit transmission intent and acknowledgement string.
-5. Only then run the transmitted live submission path.
-6. Immediately resync broker order state after submission and watch for fills, partial fills, rejects, or cancels.
+1. Run `node scripts/trade.js preflight <portfolio-dir> --json` and require a truthful green readiness result before treating the lane as transmit-capable.
+2. Run `node scripts/trade.js authority <portfolio-dir> --json` to confirm execution authority, runtime pause, live-arm state, and broker readiness posture.
+3. Run `node scripts/trade.js config <portfolio-dir> --json` to inspect the effective redacted broker/runtime configuration.
+4. Run `node scripts/trade.js delivery <portfolio-dir> --json` so delivery/reporting posture is not silently degraded while you operate the highest-risk lane.
+5. Confirm the intended order is already approved and matches current strategy state.
+6. Run the transmitted-live readiness check command for the specific order payload.
+7. Verify the order JSON contains the explicit transmission intent and acknowledgement string.
+8. Only then run the transmitted live submission path.
+9. Immediately resync broker order state after submission and watch for fills, partial fills, rejects, or cancels.
 
 ## Verification command
-Use this command before any transmitted-live attempt:
+Use this command before any transmitted-live attempt after the canonical diagnostics above:
 
 ```bash
 node scripts/check-transmitted-live-readiness.js <portfolio-dir> '<order-json>'
@@ -60,6 +63,9 @@ Example order JSON shape:
 ```
 
 ## Safety notes
+- Canonical diagnostic output should win over derived dashboards/summaries when they disagree.
+- `trade preflight` is the decisive readiness answer for whether live transmission is currently safe.
+- `trade authority` is the decisive authority answer for whether the portfolio/runtime posture could permit live action in principle.
 - `stage` and `transmit-live` are not equivalent.
 - A staged non-transmitted order is reversible scaffolding; a transmitted live order is a real broker write.
 - Keep transmitted usage rare, deliberate, and auditable.
