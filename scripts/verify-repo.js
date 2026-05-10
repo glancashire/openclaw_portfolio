@@ -12,6 +12,8 @@ const checks = [
   ['test:structured-summary-artifacts', ['scripts/test-structured-summary-artifacts.js']],
   ['test:multi-portfolio-overview', ['scripts/test-multi-portfolio-overview.js']],
   ['test:dashboard-command-center', ['scripts/test-dashboard-command-center.js']],
+  ['test:trade-cli-surface', ['scripts/test-trade-cli-surface.js']],
+  ['test:execution-authority', ['scripts/test-execution-authority.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];
