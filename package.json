@@ -5,6 +5,9 @@
   "description": "Structured Markdown portfolio manager foundation for OpenClaw",
   "type": "commonjs",
   "scripts": {
+    "test": "node scripts/verify-repo.js",
+    "verify": "node scripts/verify-repo.js",
+    "test:repo": "node scripts/verify-repo.js",
     "validate:portfolio": "node scripts/validate-portfolio.js portfolio/etf/portfolio.md",
     "validate:all-portfolios": "node scripts/validate-portfolio.js portfolio/etf/portfolio.md portfolio/_template/portfolio.md",
     "validate:strategy": "node scripts/validate-strategy.js portfolio/etf/portfolio.md",
