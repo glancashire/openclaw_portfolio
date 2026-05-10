@@ -1,7 +1,7 @@
 # Portfolio Manager Progress Report
 
-Last updated: 2026-05-10 11:18 UTC  
-Repo HEAD: `e78308b`
+Last updated: 2026-05-10 22:06 UTC  
+Repo HEAD: `ca52c51`
 
 This report maps the current implementation against `SPECIFICATION.md` and highlights the single highest-priority remaining implementation path.
 
@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is complete through Phase 42, and the later reporting/overview hardening sequence is now complete through Phase 100. The implementation includes: command-center dashboard uplift, structured UI-ready summary artifacts, multi-portfolio overview board, unified operator queue, decision-oriented reporting, guided onboarding workflow, per-portfolio HTML summary pages, recovery/incident checklists, clean approvals queue, daily summary page, better why explanations, report history navigation, improved report visual quality, operator cockpit landing page, delivery/alerting status page, open-runner queue/runtime-event/reporting visibility, and explicit contract hardening for overview and pending-actions artifacts. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, which is a safety posture rather than an untracked roadmap gap.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is complete through Phase 42, the later reporting/overview hardening sequence is complete through Phase 100, and the post-acceptance hardening sequence now extends through Phase 119. That later work includes: canonical live preflight, execution-authority, effective-config, and delivery-posture diagnostics; execution/readiness/reporting truth alignment across dashboard/summary/overview surfaces; transmitted-live acceptance coverage; operator incident/runbook verification; and doc-contract alignment across the execution command surface, operator runbooks, observability guide, trading workflow, and transmitted-live operations guide. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, and the real ETF environment is still operationally blocked unless readiness, execution mode, approval state, broker health, and explicit arming all align.
 
 ## Validation snapshot
 
@@ -178,7 +178,7 @@ Implement and harden the end-to-end repo-level writable execution surface for In
 
 ## Recommended next milestone after that
 
-The tracked operator-UX and reporting follow-on phases are no longer the active gap; the visible phase sequence in the repo now runs through Phase 100 and the targeted verification for those overview/reporting surfaces is passing.
+The tracked operator-UX and reporting follow-on phases are no longer the active gap; the visible phase sequence in the repo now runs through Phase 119 and the targeted verification for those operator/reporting/documentation surfaces is passing.
 Further work should be entered as a freshly defined roadmap phase list rather than guessed from older phase notes.
 
 ## Known environment caveat
