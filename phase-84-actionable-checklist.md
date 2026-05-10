@@ -2,5 +2,5 @@
 
 - [x] Inspect overview helper exports
 - [x] Add focused export-contract checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

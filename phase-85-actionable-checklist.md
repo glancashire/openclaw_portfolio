@@ -2,5 +2,5 @@
 
 - [x] Inspect queue-summary helper coverage gaps
 - [x] Add direct helper-level queue-summary checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

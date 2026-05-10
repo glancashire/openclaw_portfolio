@@ -2,5 +2,5 @@
 
 - [x] Audit queue/requeue runbook references
 - [x] Add runtime-event verification guidance
-- [ ] Re-run targeted command/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted command/reporting checks
+- [x] Commit and push

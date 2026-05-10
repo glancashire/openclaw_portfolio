@@ -2,5 +2,5 @@
 
 - [x] Inspect generated overview artifact assertions
 - [x] Add focused overview artifact checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

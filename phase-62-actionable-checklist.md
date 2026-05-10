@@ -4,5 +4,5 @@
 - [x] Keep submitted rows excluded from queueing
 - [x] Add focused queue command tests
 - [x] Update operator docs for queue command
-- [ ] Re-run targeted command-surface and trade-state tests
+- [x] Re-run targeted command-surface and trade-state tests
 - [ ] Commit and push

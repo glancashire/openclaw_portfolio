@@ -2,5 +2,5 @@
 
 - [x] Inspect queue-summary assertion gaps
 - [x] Add stronger overview queue-summary checks
-- [ ] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted overview/reporting checks
+- [x] Commit and push

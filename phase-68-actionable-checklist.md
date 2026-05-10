@@ -4,5 +4,5 @@
 - [x] Add distinct initial-vs-retry queue typing
 - [x] Update summary/reporting surfaces
 - [x] Add/update focused reporting tests
-- [ ] Re-run targeted reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted reporting checks
+- [x] Commit and push

@@ -4,4 +4,4 @@
 - [x] Add concise open-runner status visibility
 - [x] Update focused overview/reporting tests
 - [x] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Commit and push

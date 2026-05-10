@@ -4,5 +4,5 @@
 - [x] Add queue-vs-retry observability classification
 - [x] Surface it in operator-facing summaries if clean
 - [x] Add/update focused observability tests
-- [ ] Re-run targeted observability/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted observability/reporting checks
+- [x] Commit and push

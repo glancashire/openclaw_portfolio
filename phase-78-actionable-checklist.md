@@ -2,5 +2,5 @@
 
 - [x] Audit overview-surface docs
 - [x] Add first-handoff vs retry overview guidance
-- [ ] Re-run targeted overview/status/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted overview/status/reporting checks
+- [x] Commit and push

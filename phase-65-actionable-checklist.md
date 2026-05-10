@@ -4,5 +4,5 @@
 - [x] Extract shared quote/trend/limit blocker helper
 - [x] Refactor market-open script onto shared policy
 - [x] Add/update focused blocker-policy tests
-- [ ] Re-run targeted execution checks
-- [ ] Commit and push
+- [x] Re-run targeted execution checks
+- [x] Commit and push

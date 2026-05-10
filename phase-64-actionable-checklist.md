@@ -5,4 +5,4 @@
 - [x] Update operator docs/runbooks
 - [x] Add/update focused reporting checks
 - [x] Re-run targeted smoke checks
-- [ ] Commit and push
+- [x] Commit and push

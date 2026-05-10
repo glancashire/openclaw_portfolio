@@ -4,5 +4,5 @@
 - [x] Add dashboard first-vs-retry queue visibility
 - [x] Update dashboard queue summary if needed
 - [x] Add/update focused dashboard tests
-- [ ] Re-run targeted dashboard/reporting checks
-- [ ] Commit and push
+- [x] Re-run targeted dashboard/reporting checks
+- [x] Commit and push
