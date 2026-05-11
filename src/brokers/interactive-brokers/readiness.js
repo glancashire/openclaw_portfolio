@@ -124,7 +124,7 @@ function getPortfolioApprovedProbeCandidates({ portfolio = 'etf' } = {}) {
 function getGenericFallbackProbeCandidates() {
   return [
     { conid: '243939970', symbol: 'EMUAA', tickerOrIsin: 'LU0950668870', label: 'generic fallback EMUAA', source: 'generic_fallback' },
-    { conid: '498868144', symbol: 'UBSSLI', tickerOrIsin: 'CH0032912732', label: 'generic fallback UBSSLI', source: 'generic_fallback' },
+    { conid: '150029461', symbol: 'UBSSLI', tickerOrIsin: 'CH0032912732', label: 'generic fallback UBSSLI', source: 'generic_fallback' },
   ];
 }
 

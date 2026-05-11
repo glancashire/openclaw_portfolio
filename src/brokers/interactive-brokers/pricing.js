@@ -14,8 +14,14 @@ async function fetchLatestPrice({ conid, portfolio = 'etf', appCode = null, pref
     const bid = parseNumeric(readField(first, '84'));
     const ask = parseNumeric(readField(first, '86'));
     const last = parseNumeric(readField(first, '31'));
-    const close = parseNumeric(readField(first, '7295')) || parseNumeric(first?.close);
-    const currency = readField(first, '85') || first?.currency || null;
+    const delayedClose = parseNumeric(readField(first, '7295'));
+    const nativeClose = parseNumeric(first?.close);
+    const close = Number.isFinite(delayedClose) && delayedClose > 0
+      ? delayedClose
+      : Number.isFinite(nativeClose) && nativeClose > 0
+        ? nativeClose
+        : null;
+    const currency = readField(first, '85') ?? first?.currency ?? null;
     return {
       ok: true,
       conid,
