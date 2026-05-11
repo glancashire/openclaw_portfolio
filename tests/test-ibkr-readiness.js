@@ -28,6 +28,16 @@ function main() {
 
   summary = summarizeReadiness({
     config: { ok: true },
+    auth: { ok: true, reason: 'ready' },
+    marketData: { posture: 'unknown', detail: 'probe produced no usable quote posture' },
+  });
+  assert(summary.reason === 'unknown', 'expected auth-ok unknown posture to pass through');
+  assert(summary.fallbackRequired === true, 'expected auth-ok unknown posture to still require fallback');
+  assert(summary.marketDataMode === 'unknown', 'expected auth-ok unknown posture marketDataMode');
+  assert(/not yet yielding a usable live\/delayed quote posture/i.test(summary.message), 'expected auth-ok unknown posture message');
+
+  summary = summarizeReadiness({
+    config: { ok: true },
     auth: { ok: false, reason: 'native_error' },
     marketData: null,
   });

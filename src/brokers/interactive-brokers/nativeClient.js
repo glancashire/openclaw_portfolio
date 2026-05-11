@@ -84,9 +84,12 @@ class InteractiveBrokersNativeClient {
   }
 
   async withApi(fn) {
-    const { IBApi, EventName } = loadIbModule();
+    const { IBApi } = loadIbModule();
     const api = new IBApi({ host: this.config.host, port: this.config.port });
-    const connected = waitForEvent(api, EventName.nextValidId, 10000);
+    const connected = waitForNativeHandshake(api, {
+      timeoutMs: 15000,
+      label: 'native handshake',
+    });
     try {
       api.connect(this.config.clientId);
       return await fn({ api, connected });
@@ -361,28 +364,70 @@ function waitForMarketSnapshot(api, contract) {
   });
 }
 
-function waitForEvent(api, eventName, timeoutMs) {
+function waitForNativeHandshake(api, { timeoutMs = 15000, label = 'native handshake' } = {}) {
   return new Promise((resolve, reject) => {
-    const onEvent = (...args) => {
+    let settled = false;
+    let sawValidId = false;
+    let sawManagedAccounts = false;
+    let sawConnectionAck = false;
+    let lastIgnoredError = null;
+
+    const finish = (value, isError = false) => {
+      if (settled) return;
+      settled = true;
       cleanup();
-      resolve(args);
+      if (isError) reject(value);
+      else resolve(value);
+    };
+
+    const maybeResolve = () => {
+      if (sawValidId || sawManagedAccounts || sawConnectionAck) {
+        finish({
+          ok: true,
+          sawValidId,
+          sawManagedAccounts,
+          sawConnectionAck,
+          lastIgnoredError,
+        });
+      }
+    };
+
+    const onNextValidId = (nextValidId) => {
+      sawValidId = true;
+      maybeResolve();
+    };
+    const onManagedAccounts = () => {
+      sawManagedAccounts = true;
+      maybeResolve();
+    };
+    const onConnected = () => {
+      sawConnectionAck = true;
+      maybeResolve();
     };
     const onError = (err, code, reqId) => {
-      cleanup();
-      reject(normalizeError(err, code, reqId));
+      if (isIgnorableCode(code)) {
+        lastIgnoredError = normalizeError(err, code, reqId).message;
+        return;
+      }
+      finish(normalizeError(err, code, reqId), true);
     };
     const cleanup = () => {
       clearTimeout(timer);
       const { EventName } = loadIbModule();
-      api.off(eventName, onEvent);
+      api.off(EventName.nextValidId, onNextValidId);
+      api.off(EventName.managedAccounts, onManagedAccounts);
+      api.off(EventName.connected, onConnected);
       api.off(EventName.error, onError);
     };
+
     const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error(`Timed out waiting for ${eventName}`));
+      finish(new Error(`Timed out waiting for ${label}`), true);
     }, timeoutMs);
+
     const { EventName } = loadIbModule();
-    api.on(eventName, onEvent);
+    api.on(EventName.nextValidId, onNextValidId);
+    api.on(EventName.managedAccounts, onManagedAccounts);
+    api.on(EventName.connected, onConnected);
     api.on(EventName.error, onError);
   });
 }

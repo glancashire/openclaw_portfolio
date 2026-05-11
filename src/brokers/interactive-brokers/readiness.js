@@ -37,19 +37,30 @@ async function detectMarketDataPosture(client) {
 function summarizeReadiness({ config, auth, marketData }) {
   const delayedOnly = auth?.ok && marketData?.posture === 'delayed_only';
   const liveReady = auth?.ok && marketData?.posture === 'live_or_realtime';
+  const authReadyButUnpriced = auth?.ok && !liveReady && !delayedOnly;
   return {
     configured: Boolean(config?.ok),
     authenticated: Boolean(auth?.ok),
     reachable: auth?.reason !== 'http_error' ? Boolean(auth?.ok) : false,
-    fallbackRequired: !auth?.ok || delayedOnly,
-    marketDataMode: delayedOnly ? 'delayed' : liveReady ? 'live_or_realtime' : (auth?.ok ? (marketData?.posture || 'unknown') : 'unavailable'),
-    reason: liveReady ? 'ready' : delayedOnly ? 'delayed_data_only' : (auth?.ok ? (marketData?.posture || 'ready') : auth?.reason || 'unknown'),
+    fallbackRequired: !auth?.ok || delayedOnly || authReadyButUnpriced,
+    marketDataMode: delayedOnly
+      ? 'delayed'
+      : liveReady
+        ? 'live_or_realtime'
+        : (authReadyButUnpriced ? (marketData?.posture || 'unpriced') : 'unavailable'),
+    reason: liveReady
+      ? 'ready'
+      : delayedOnly
+        ? 'delayed_data_only'
+        : authReadyButUnpriced
+          ? (marketData?.posture || 'unpriced')
+          : auth?.reason || 'unknown',
     message: liveReady
       ? 'Interactive Brokers read-only connectivity and live/realtime market data are available.'
       : delayedOnly
         ? 'Interactive Brokers connectivity is available, but API pricing is delayed-only; broker-backed pricing may use delayed fallback values and live submission should remain blocked.'
-        : auth?.ok
-          ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not fully ready.'
+        : authReadyButUnpriced
+          ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.'
           : auth?.reason === 'http_error'
             ? 'Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.'
             : 'Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.',
