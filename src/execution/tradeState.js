@@ -335,11 +335,13 @@ function listExecutableTradeRows(tradesPath) {
     const status = String(row.Status || '').trim().toLowerCase();
     const approval = String(row.Approval || '').trim();
     const blockCode = String(row['Block code'] || '').trim();
+    const nextAction = String(row['Next action'] || '').trim().toLowerCase();
     const action = String(row.Action || '').trim().toLowerCase();
     const orderId = String(row['Broker order id'] || '').trim();
+    const retryableQueuedBlock = approval === 'queued_for_open_runner' && !orderId && blockCode && nextAction.includes('retry');
 
     if (action === 'hold') return false;
-    if (blockCode) return false;
+    if (blockCode && !retryableQueuedBlock) return false;
     if (orderId) return false;
     if (!['approved', 'planned', 'proposed'].includes(status)) return false;
     if (!['user_approved', 'submitted_to_open_runner', 'ready_for_submission', 'queued_for_open_runner'].includes(approval)) return false;

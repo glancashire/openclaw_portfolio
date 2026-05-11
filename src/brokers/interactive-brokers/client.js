@@ -11,7 +11,7 @@ class InteractiveBrokersClient {
     this.config = loadInteractiveBrokersConfig();
     this.baseUrl = this.config.baseUrl;
     this.native = this.config.mode === 'native' ? new InteractiveBrokersNativeClient(this.config) : null;
-    this.skill = this.config.mode === 'skill' ? new InteractiveBrokersSkillClient(this.config) : null;
+    this.skill = new InteractiveBrokersSkillClient(this.config);
   }
 
   configurationStatus() {
@@ -501,6 +501,32 @@ class InteractiveBrokersClient {
               summary: { orderId: completedMatch.orderId, status: completedMatch.status, symbol: completedMatch.symbol || null, source: 'completed_orders' },
               portfolio: this.options.portfolio,
             }),
+          };
+        }
+        const symbolHints = completedOrders
+          .filter((row) => row && row.symbol)
+          .map((row) => ({
+            orderId: row.orderId ?? null,
+            permId: row.permId ?? null,
+            symbol: row.symbol || null,
+            status: row.status || null,
+            quantity: row.quantity ?? null,
+          }));
+        if (symbolHints.length > 0) {
+          return {
+            ok: false,
+            reason: 'not_found',
+            orderId,
+            diagnostics: brokerDiagnostics({
+              mode: activeMode(this),
+              operation: 'get_order_status',
+              reason: 'not_found',
+              detail: 'No exact open/execution/completed order id match found, but completed-order hints are available for operator review.',
+            }),
+            message: 'No exact broker order id match was found, but completed-order hints are available.',
+            hints: {
+              completedOrders: symbolHints,
+            },
           };
         }
       }

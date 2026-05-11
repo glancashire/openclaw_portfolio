@@ -105,6 +105,18 @@ function markTradeBlocked(trade, { blockCode, blockReason, nextAction, status = 
   });
 }
 
+function clearTradeBlock(trade, { nextAction = 'Ready for market-open submission.' } = {}) {
+  updateTradeRows(tradesPath, { dateTime: trade.row.dateTime, tickerOrIsin: trade.row.tickerOrIsin, action: trade.row.action }, (row) => ({
+    ...row,
+    Status: 'approved',
+    Approval: 'queued_for_open_runner',
+    'Block code': '',
+    'Block reason': '',
+    'Blocked at': '',
+    'Next action': nextAction,
+  }));
+}
+
 function buildExecutableOrders() {
   const rows = listExecutableTradeRows(tradesPath);
   const instruments = readApprovedInstruments(portfolioPath);
@@ -200,6 +212,7 @@ async function main() {
       });
       continue;
     }
+    clearTradeBlock(trade);
     console.log(`  → Smart limit: ${policy.limitPrice} ${trade.currency}`);
     orders.push({ ...trade, limit: policy.limitPrice, quote, trendInfo });
   }

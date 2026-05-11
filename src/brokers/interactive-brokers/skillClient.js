@@ -3,8 +3,9 @@ const path = require('path');
 const { loadInteractiveBrokersConfig } = require('./config');
 
 class InteractiveBrokersSkillClient {
-  constructor(config = loadInteractiveBrokersConfig()) {
-    this.config = config;
+  constructor(config = null) {
+    const loaded = loadInteractiveBrokersConfig(config || {});
+    this.config = loaded;
     this.pythonPath = path.join(process.cwd(), 'skills', 'ibkr', '.venv', 'bin', 'python');
     this.cliPath = path.join(process.cwd(), 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
   }

@@ -23,6 +23,7 @@ import os
 import socket
 import sys
 from dataclasses import dataclass
+from datetime import timezone
 from typing import Any, Iterable, Optional
 
 _IB_IMPORT_ERROR: Optional[Exception] = None
@@ -129,11 +130,33 @@ def bool_flag(value: str) -> bool:
     raise argparse.ArgumentTypeError(f"invalid boolean value: {value}")
 
 
-def print_rows(rows: Iterable[dict[str, Any]], as_json: bool) -> None:
-    if as_json:
-        print(json.dumps(list(rows), indent=2, default=str))
-        return
+def safe_json_value(value: Any) -> Any:
+    if value is None:
+        return None
+    if isinstance(value, (str, int, float, bool)):
+        return value
+    iso = getattr(value, "isoformat", None)
+    if callable(iso):
+        try:
+            return iso()
+        except Exception:
+            pass
+    return str(value)
+
+
+def normalize_rows(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized = []
     for row in rows:
+        normalized.append({key: safe_json_value(value) for key, value in row.items()})
+    return normalized
+
+
+def print_rows(rows: Iterable[dict[str, Any]], as_json: bool) -> None:
+    normalized = normalize_rows(rows)
+    if as_json:
+        print(json.dumps(normalized, indent=2, default=str))
+        return
+    for row in normalized:
         print(" ".join(f"{k}={v}" for k, v in row.items()))
 
 
@@ -548,7 +571,15 @@ def cmd_open_orders(args: argparse.Namespace) -> int:
 def cmd_executions(args: argparse.Namespace) -> int:
     ib = connect_ib(create_connection_config(args))
     try:
-        fills = ib.reqExecutions()
+        try:
+            fills = ib.reqExecutions()
+        except Exception as exc:
+            if "ZoneInfoNotFoundError" in type(exc).__name__ or "No time zone found with key" in str(exc):
+                return die(
+                    "Execution decoding failed because local Python timezone data is missing for an IBKR timestamp zone. Install tzdata or harden the runtime timezone mapping.",
+                    5,
+                )
+            raise
         rows = [
             {
                 "time": f.time,
@@ -572,10 +603,20 @@ def cmd_executions(args: argparse.Namespace) -> int:
 def cmd_completed_orders(args: argparse.Namespace) -> int:
     ib = connect_ib(create_connection_config(args))
     try:
-        trades = ib.reqCompletedOrders(False)
+        try:
+            trades = ib.reqCompletedOrders(False)
+        except Exception as exc:
+            if "ZoneInfoNotFoundError" in type(exc).__name__ or "No time zone found with key" in str(exc):
+                return die(
+                    "Completed-order decoding failed because local Python timezone data is missing for an IBKR timestamp zone. Install tzdata or harden the runtime timezone mapping.",
+                    5,
+                )
+            raise
         rows = []
         for trade in trades:
             fills = getattr(trade, "fills", []) or []
+            order_state = getattr(trade, "orderState", None)
+            order_status = getattr(trade, "orderStatus", None)
             filled = sum(getattr(f.execution, "shares", 0) for f in fills)
             avg_fill = None
             if filled:
@@ -590,14 +631,14 @@ def cmd_completed_orders(args: argparse.Namespace) -> int:
                     "action": trade.order.action,
                     "orderType": trade.order.orderType,
                     "quantity": trade.order.totalQuantity,
-                    "status": trade.orderStatus.status or trade.orderState.status or trade.orderState.completedStatus,
+                    "status": getattr(order_status, "status", None) or getattr(order_state, "status", None) or getattr(order_state, "completedStatus", None),
                     "filled": filled,
                     "remaining": max(float(trade.order.totalQuantity or 0) - float(filled or 0), 0),
                     "limitPrice": getattr(trade.order, "lmtPrice", None),
                     "avgFillPrice": avg_fill,
                     "lastFillPrice": getattr(fills[-1].execution, "price", None) if fills else None,
-                    "completedTime": trade.orderState.completedTime,
-                    "completedStatus": trade.orderState.completedStatus,
+                    "completedTime": getattr(order_state, "completedTime", None),
+                    "completedStatus": getattr(order_state, "completedStatus", None),
                 }
             )
         print_rows(rows, args.json)

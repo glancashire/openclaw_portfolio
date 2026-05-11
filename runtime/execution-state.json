@@ -10,7 +10,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-11T06:45:40.314Z"
+      "lastAt": "2026-05-11T09:51:05.291Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -29,6 +29,12 @@
       "lastReason": "status_error",
       "lastMessage": "temporary issue",
       "lastAt": "2026-05-10T22:14:55.568Z"
+    },
+    "etf": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-11T10:01:45.766Z"
     }
   },
   "liveExecutionArms": {
