@@ -1,13 +1,17 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const { effectiveDeliveryPolicy, reportDeliveryStatus } = require('./deliveryPolicy');
+const { listBlockedTradeRows } = require('./summaryArtifacts');
 
 function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow = null } = {}) {
   if (!portfolioDir) throw new Error('portfolioDir is required');
 
   const status = reportDeliveryStatus({ portfolioDir, generationMeta, workflow });
   const policy = effectiveDeliveryPolicy(portfolioDir);
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const brokerBlockRows = fs.existsSync(tradesPath) ? listBlockedTradeRows(tradesPath) : [];
 
   return {
     schemaVersion: '1.0',
@@ -36,6 +40,17 @@ function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow
         + Number(status.lifecycleSummary?.submitted || 0)
         + Number(status.lifecycleSummary?.partiallyFilled || 0),
       brokerAutomationPaused: Boolean(status.brokerErrorState?.stopAutomation),
+      brokerBlockContext: {
+        blockedTradeCount: brokerBlockRows.length,
+        topBrokerBlock: brokerBlockRows.length ? {
+          tickerOrIsin: brokerBlockRows[0].tickerOrIsin || '',
+          name: brokerBlockRows[0].name || '',
+          blockCode: brokerBlockRows[0].blockCode || '',
+          blockReason: brokerBlockRows[0].blockReason || '',
+          nextAction: brokerBlockRows[0].nextAction || '',
+          brokerOrderId: brokerBlockRows[0].brokerOrderId || '',
+        } : null,
+      },
       recommendedNextAction: status.ready
         ? 'No delivery-side operator action is currently required.'
         : (Array.isArray(status.pendingActions) && status.pendingActions.some((item) => /notification backfill review/i.test(String(item))))
