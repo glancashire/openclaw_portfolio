@@ -11,7 +11,7 @@ const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { summarizeOperatorQueue } = require('./operatorQueue');
-const { summarizeOpenRunnerRetryState } = require('../execution/tradeState');
+const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 
 function readFillNotificationState(rootDir = path.resolve(__dirname, '..', '..')) {
   const statePath = path.join(rootDir, 'runtime', 'fill-notifications-state.json');
@@ -166,7 +166,32 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
   ];
 }
 
-function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, recommended = [] }) {
+function readBlockedTradeQueueItems(tradesPath) {
+  if (!tradesPath || !fs.existsSync(tradesPath)) return [];
+  const { rows } = readTradesTable(tradesPath);
+  const latestBlockedByInstrumentAction = new Map();
+  for (const row of rows) {
+    const blockCode = String(row['Block code'] || '').trim();
+    if (!blockCode) continue;
+    const instrument = String(row['Ticker / ISIN'] || '').trim();
+    const action = String(row.Action || '').trim().toLowerCase();
+    const key = `${instrument}::${action}`;
+    latestBlockedByInstrumentAction.set(key, row);
+  }
+
+  return Array.from(latestBlockedByInstrumentAction.values()).map((row) => ({
+    queueType: 'execution_block',
+    severity: 'high',
+    status: 'blocked',
+    summary: row['Block reason']
+      ? `${row['Ticker / ISIN'] || 'Trade row'}: ${row['Block reason']}`
+      : `${row['Ticker / ISIN'] || 'Trade row'} is blocked (${row['Block code']}).`,
+    blockCode: String(row['Block code'] || '').trim(),
+    recommendedOperatorAction: String(row['Next action'] || '').trim() || 'Review the broker-derived block and resolve it before retrying.',
+  }));
+}
+
+function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, recommended = [] }) {
   const actions = [];
   const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   for (const item of deliveryStatus?.pendingActions || []) {
@@ -180,6 +205,7 @@ function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = 
   if (brokerErrorState?.stopAutomation) {
     actions.push({ queueType: 'recovery', severity: 'high', status: 'paused', summary: `Broker automation paused after ${brokerErrorState.consecutive} consecutive errors; investigate before resuming.` });
   }
+  actions.push(...readBlockedTradeQueueItems(tradesPath));
   const queuedInitial = Number(openRunnerRetryState?.queuedInitial || 0);
   const queuedRetry = Number(openRunnerRetryState?.queuedRetry || 0);
   if (queuedInitial > 0) {
@@ -283,15 +309,16 @@ function bestNextStep({ pendingActions = [], blockers = [], recommendedActionsLi
       'delivery::backfill_review': 0,
       'backfill_review::backfill_review': 0,
       'approval::pending_user_approval': 1,
-      'execution::in_flight': 2,
-      'delivery::pending': 3,
-      'recovery::paused': 4,
-      'recovery::degraded': 5,
-      'approval::ready_for_review': 6,
-      'open_runner_retry::ready_for_review': 7,
-      'open_runner_queue::ready_for_review': 8,
-      'data::stale': 9,
-      'workflow::recommended': 10,
+      'execution_block::blocked': 2,
+      'execution::in_flight': 3,
+      'delivery::pending': 4,
+      'recovery::paused': 5,
+      'recovery::degraded': 6,
+      'approval::ready_for_review': 7,
+      'open_runner_retry::ready_for_review': 8,
+      'open_runner_queue::ready_for_review': 9,
+      'data::stale': 10,
+      'workflow::recommended': 11,
     };
     const prioritized = [...pendingActions].sort((a, b) => {
       const aKey = `${a.queueType || a.kind || 'unknown'}::${a.status}`;
@@ -379,6 +406,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   const strategy = strategyStatus(allocations, brokerReadiness, blockers);
   const recommended = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
   const pendingActions = buildPendingOperatorActions({
+    tradesPath,
     deliveryStatus,
     brokerReadiness,
     brokerErrorState,
