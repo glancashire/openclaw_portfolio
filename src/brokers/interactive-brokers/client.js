@@ -304,18 +304,76 @@ class InteractiveBrokersClient {
         order,
       });
     }
+    const action = String(order?.action || '').toUpperCase();
+    const orderType = String(order?.orderType || 'LMT').toUpperCase();
+     if (action === 'BUY' && orderType === 'MKT') {
+       return blockedBrokerOperation({
+         operation: 'place_order',
+         reason: 'policy_blocked',
+         message: 'Market buy orders are blocked; use a revocable limit-style path only.',
+         mode: activeMode(this),
+         portfolio: this.options.portfolio,
+         order,
+       });
+     }
+    if (transmitLive === true && this.native && typeof this.native.placeOrder === 'function') {
+      try {
+        const placed = await this.native.placeOrder(order);
+        const normalizedOrder = normaliseOrder(placed || {});
+        return {
+          ok: true,
+          dryRun: false,
+          submitted: true,
+          mode: 'transmitted_live',
+          order: { ...normalizedOrder, transmit: true },
+          brokerErrors: [],
+          quote: quoteResult.quote || null,
+          message: 'Interactive Brokers transmitted live order submitted via native client.',
+          log: logBrokerEvent({
+            broker: 'interactive-brokers',
+            operation: 'place_order',
+            status: 'transmitted_live',
+            summary: {
+              symbol: order?.symbol || null,
+              action,
+              quantity: Number(order?.quantity || 0),
+              orderType,
+              transmit: true,
+              transmittedLiveAck: 'present',
+              clientMode: 'native',
+            },
+            portfolio: this.options.portfolio,
+          }),
+        };
+      } catch (error) {
+        return {
+          ok: false,
+          reason: 'submit_error',
+          error: error.message,
+          diagnostics: brokerDiagnostics({ mode: activeMode(this), operation: 'place_order', reason: 'submit_error', detail: error.message }),
+          order,
+          log: logBrokerEvent({
+            broker: 'interactive-brokers',
+            operation: 'place_order',
+            status: 'submit_error',
+            summary: { message: error.message, symbol: order?.symbol || null, clientMode: 'native' },
+            portfolio: this.options.portfolio,
+          }),
+        };
+      }
+    }
     if (!this.skill || typeof this.skill.placeOrder !== 'function') {
       return blockedBrokerOperation({
         operation: 'place_order',
         reason: 'not_available',
-        message: 'Revocable non-transmitted live submission scaffold is only available via the skill-backed client right now.',
+        message: transmitLive === true
+          ? 'Transmitted live submission is not available because neither the native nor skill-backed order-placement client is ready.'
+          : 'Revocable non-transmitted live submission scaffold is only available via the skill-backed client right now.',
         mode: activeMode(this),
         portfolio: this.options.portfolio,
         order,
       });
     }
-    const action = String(order?.action || '').toUpperCase();
-    const orderType = String(order?.orderType || 'LMT').toUpperCase();
     if (action === 'BUY' && orderType === 'MKT') {
       return blockedBrokerOperation({
         operation: 'place_order',

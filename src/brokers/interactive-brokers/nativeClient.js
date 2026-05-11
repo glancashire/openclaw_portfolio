@@ -83,6 +83,13 @@ class InteractiveBrokersNativeClient {
     });
   }
 
+  async placeOrder(order) {
+    return this.withApi(async ({ api, connected }) => {
+      await connected;
+      return placeNativeOrder(api, order);
+    });
+  }
+
   async withApi(fn) {
     const { IBApi } = loadIbModule();
     const api = new IBApi({ host: this.config.host, port: this.config.port });
@@ -450,12 +457,100 @@ function buildSearchContracts(query) {
   ];
 }
 
-function buildConidContract(conid) {
+function buildConidContract(conid, overrides = {}) {
   return {
     conId: Number(conid),
-    exchange: 'SMART',
-    secType: 'STK',
+    exchange: overrides.exchange || 'SMART',
+    secType: overrides.secType || 'STK',
+    currency: overrides.currency || undefined,
+    primaryExch: overrides.primaryExch || undefined,
+    symbol: overrides.symbol || undefined,
   };
+}
+
+function placeNativeOrder(api, order) {
+  return new Promise((resolve, reject) => {
+    const { EventName } = loadIbModule();
+    const orderId = nextReqId();
+    const contract = buildConidContract(order?.conid, {
+      exchange: order?.exchange || 'SMART',
+      secType: order?.secType || 'STK',
+      currency: order?.currency || undefined,
+      primaryExch: order?.primaryExchange || undefined,
+      symbol: order?.symbol || undefined,
+    });
+    const nativeOrder = {
+      action: String(order?.action || '').toUpperCase(),
+      orderType: String(order?.orderType || 'LMT').toUpperCase(),
+      totalQuantity: Number(order?.quantity || 0),
+      lmtPrice: Number(order?.limitPrice || 0),
+      tif: String(order?.tif || 'DAY').toUpperCase(),
+      transmit: order?.transmit === true,
+    };
+
+    const onOpenOrder = (incomingOrderId, incomingContract, incomingOrder, orderState) => {
+      if (String(incomingOrderId) !== String(orderId)) return;
+      finish({
+        orderId: incomingOrderId,
+        permId: incomingOrder?.permId ?? null,
+        symbol: incomingContract?.symbol || order?.symbol || null,
+        secType: incomingContract?.secType || order?.secType || null,
+        action: incomingOrder?.action || nativeOrder.action,
+        orderType: incomingOrder?.orderType || nativeOrder.orderType,
+        quantity: Number(incomingOrder?.totalQuantity ?? nativeOrder.totalQuantity),
+        status: orderState?.status || 'Submitted',
+        filled: 0,
+        remaining: Number(incomingOrder?.totalQuantity ?? nativeOrder.totalQuantity),
+        limitPrice: Number.isFinite(Number(incomingOrder?.lmtPrice)) ? Number(incomingOrder.lmtPrice) : nativeOrder.lmtPrice,
+        transmit: incomingOrder?.transmit === true,
+      });
+    };
+    const onOrderStatus = (incomingOrderId, status, filled, remaining, avgFillPrice, permId) => {
+      if (String(incomingOrderId) !== String(orderId)) return;
+      finish({
+        orderId: incomingOrderId,
+        permId: permId ?? null,
+        symbol: order?.symbol || null,
+        secType: order?.secType || null,
+        action: nativeOrder.action,
+        orderType: nativeOrder.orderType,
+        quantity: nativeOrder.totalQuantity,
+        status: status || 'Submitted',
+        filled: Number(filled ?? 0),
+        remaining: Number(remaining ?? nativeOrder.totalQuantity),
+        avgFillPrice: Number.isFinite(Number(avgFillPrice)) ? Number(avgFillPrice) : null,
+        limitPrice: nativeOrder.lmtPrice,
+        transmit: nativeOrder.transmit === true,
+      });
+    };
+    const onError = (err, code, reqId) => {
+      if (isIgnorableCode(code)) return;
+      finish(normalizeError(err, code, reqId), true);
+    };
+
+    let settled = false;
+    const cleanup = () => {
+      clearTimeout(timer);
+      api.off(EventName.openOrder, onOpenOrder);
+      api.off(EventName.orderStatus, onOrderStatus);
+      api.off(EventName.error, onError);
+    };
+    const finish = (value, isError = false) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (isError) reject(value);
+      else resolve(value);
+    };
+    const timer = setTimeout(() => {
+      finish(new Error(`Timed out waiting for native order acknowledgement for ${order?.symbol || orderId}`), true);
+    }, 15000);
+
+    api.on(EventName.openOrder, onOpenOrder);
+    api.on(EventName.orderStatus, onOrderStatus);
+    api.on(EventName.error, onError);
+    api.placeOrder(orderId, contract, nativeOrder);
+  });
 }
 
 function normalizeContractDetails(details) {
