@@ -327,7 +327,10 @@ function waitForMarketSnapshot(api, contract) {
       if (tickType === IBApiTickType.LAST || tickType === IBApiTickType.DELAYED_LAST) state['31'] = price;
       if (tickType === IBApiTickType.BID || tickType === IBApiTickType.DELAYED_BID) state['84'] = price;
       if (tickType === IBApiTickType.ASK || tickType === IBApiTickType.DELAYED_ASK) state['86'] = price;
-      if (tickType === IBApiTickType.CLOSE) state.close = price;
+      if (tickType === IBApiTickType.CLOSE || tickType === IBApiTickType.DELAYED_CLOSE) {
+        state.close = price;
+        state['7295'] = price;
+      }
     };
     const onTickString = (incomingReqId, tickType, value) => {
       if (incomingReqId !== reqId) return;
@@ -479,6 +482,10 @@ function placeNativeOrder(api, order) {
       exchange: order?.exchange || 'SMART',
       secType: order?.secType || 'STK',
       currency: order?.currency || undefined,
+      primaryExch: order?.primaryExchange || order?.primaryExch || undefined,
+      includePrimaryExch: Boolean(order?.primaryExchange || order?.primaryExch),
+      symbol: order?.symbol || undefined,
+      includeSymbol: Boolean(order?.symbol),
     });
     const nativeOrder = {
       action: String(order?.action || '').toUpperCase(),
@@ -583,4 +590,4 @@ function normalizeError(err, code, reqId) {
   return new Error(`IB native error${code ? ` ${code}` : ''}${reqId ? ` reqId=${reqId}` : ''}: ${String(err)}`);
 }
 
-module.exports = { InteractiveBrokersNativeClient };
+module.exports = { InteractiveBrokersNativeClient, buildConidContract };

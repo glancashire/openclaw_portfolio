@@ -187,7 +187,7 @@ class InteractiveBrokersClient {
       const last = asNumber(first?.['31']);
       const close = asNumber(first?.close);
       const currency = first?.['85'] || contract.currency || 'CHF';
-      const referencePrice = preferredReferencePrice({ bid, ask, last, action: order?.action }) || close;
+      const referencePrice = preferredReferencePrice({ bid, ask, last, close, action: order?.action });
       const quantity = Number(order?.quantity || 0);
       const estimatedValue = Number.isFinite(referencePrice) ? Number((referencePrice * quantity).toFixed(2)) : null;
       const delayedFallbackUsed = !Number.isFinite(preferredReferencePrice({ bid, ask, last, action: order?.action })) && Number.isFinite(close);
@@ -687,6 +687,9 @@ function resolveOrderContract(order = {}) {
     conid: order.conid || order.ibkrConid || order.identifier || null,
     symbol: order.symbol || order.ticker || null,
     currency: order.currency || null,
+    exchange: order.exchange || null,
+    primaryExchange: order.primaryExchange || order.primaryExch || null,
+    secType: order.secType || null,
   };
 }
 
@@ -695,11 +698,11 @@ function asNumber(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-function preferredReferencePrice({ bid, ask, last, action }) {
+function preferredReferencePrice({ bid, ask, last, close, action }) {
   const normalizedAction = String(action || '').toUpperCase();
-  if (normalizedAction === 'BUY') return firstPositive([ask, last, bid]);
-  if (normalizedAction === 'SELL') return firstPositive([bid, last, ask]);
-  return firstPositive([last, ask, bid]);
+  if (normalizedAction === 'BUY') return firstPositive([ask, last, bid, close]);
+  if (normalizedAction === 'SELL') return firstPositive([bid, last, ask, close]);
+  return firstPositive([last, ask, bid, close]);
 }
 
 function firstPositive(values) {

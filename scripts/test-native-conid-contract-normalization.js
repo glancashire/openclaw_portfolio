@@ -1,13 +1,29 @@
-const fs = require('fs');
-const path = require('path');
 const assert = require('assert');
+const { buildConidContract } = require('../src/brokers/interactive-brokers/nativeClient');
 
 function main() {
-  const source = fs.readFileSync(path.resolve(process.cwd(), 'src/brokers/interactive-brokers/nativeClient.js'), 'utf8');
-  assert(source.includes('if (overrides.includeSymbol === true && overrides.symbol) contract.symbol = overrides.symbol;'), 'Expected symbol to be opt-in only for conid contracts');
-  assert(source.includes('if (overrides.includePrimaryExch === true && overrides.primaryExch) contract.primaryExch = overrides.primaryExch;'), 'Expected primaryExch to be opt-in only for conid contracts');
-  assert(source.includes("const contract = buildConidContract(order?.conid, {\n      exchange: order?.exchange || 'SMART',\n      secType: order?.secType || 'STK',\n      currency: order?.currency || undefined,\n    });"), 'Expected native order placement to build conid contracts without symbol/primaryExch overrides');
-  console.log(JSON.stringify({ ok: true }, null, 2));
+  const contract = buildConidContract('150029461', {
+    exchange: 'SMART',
+    secType: 'STK',
+    currency: 'CHF',
+    primaryExch: 'EBS',
+    includePrimaryExch: true,
+    symbol: 'UBSSLI',
+    includeSymbol: true,
+  });
+
+  assert.strictEqual(contract.conId, 150029461, 'expected numeric conId');
+  assert.strictEqual(contract.exchange, 'SMART', 'expected SMART exchange preserved');
+  assert.strictEqual(contract.secType, 'STK', 'expected secType preserved');
+  assert.strictEqual(contract.currency, 'CHF', 'expected currency preserved');
+  assert.strictEqual(contract.primaryExch, 'EBS', 'expected primaryExch included when requested');
+  assert.strictEqual(contract.symbol, 'UBSSLI', 'expected symbol included when requested');
+
+  const minimal = buildConidContract('243939970', { exchange: 'SMART', secType: 'STK' });
+  assert.strictEqual(minimal.primaryExch, undefined, 'expected primaryExch omitted by default');
+  assert.strictEqual(minimal.symbol, undefined, 'expected symbol omitted by default');
+
+  console.log(JSON.stringify({ ok: true, contract, minimal }, null, 2));
 }
 
 main();
