@@ -30,6 +30,9 @@ function main() {
   const row = readTradesTable(fixturePath).rows[0];
   assert.strictEqual(row.Status, 'inactive', 'expected inactive status');
   assert.strictEqual(row.Approval, 'broker_inactive', 'expected broker_inactive approval');
+  assert.strictEqual(row['Block code'], 'exchange_closed_at_submit', 'expected actionable exchange-closed block code');
+  assert(/target exchange was closed/i.test(String(row['Block reason'])), 'expected actionable block reason');
+  assert(/market-open runner|venue trading session/i.test(String(row['Next action'])), 'expected actionable retry next action');
   assert(/broker error code 201/i.test(String(row.Reason)), 'expected broker error code in reason');
   assert(/exchange is closed/i.test(String(row.Reason)), 'expected broker error message in reason');
 

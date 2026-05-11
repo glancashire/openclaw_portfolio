@@ -152,12 +152,16 @@ function reconcileOrderStatus(tradesPath, selector, brokerOrder = {}, options = 
       ? Number(brokerOrder.avgFillPrice) * Number(brokerOrder.filled)
       : brokerOrder.estimatedValue
   );
+  const brokerBlock = classifyBrokerOrderBlock(brokerOrder, mappedStatus);
   return updateTradeRows(tradesPath, selector, (row) => ({
     ...row,
     Status: mappedStatus,
     Approval: approval,
     'Broker order id': brokerOrder.orderId != null ? String(brokerOrder.orderId) : row['Broker order id'],
     'Actual CHF': actualChf || row['Actual CHF'],
+    'Block code': options.blockCode ?? brokerBlock.blockCode ?? row['Block code'] ?? '',
+    'Block reason': options.blockReason ?? brokerBlock.blockReason ?? row['Block reason'] ?? '',
+    'Next action': options.nextAction ?? brokerBlock.nextAction ?? row['Next action'] ?? '',
     Reason: appendReasonNote(row.Reason, options.reasonNote || buildBrokerReasonNote(brokerOrder, mappedStatus)),
   }));
 }
@@ -175,6 +179,59 @@ function inferApproval(status, brokerOrder = {}) {
   if (status === 'inactive') return 'broker_inactive';
   if (status === 'failed') return brokerOrder.notFound === true ? 'not_found' : 'broker_failed';
   return 'user_approved';
+}
+
+function classifyBrokerOrderBlock(brokerOrder = {}, mappedStatus = '') {
+  const status = String(mappedStatus || brokerOrder.status || '').trim().toLowerCase();
+  const code = Number(brokerOrder.brokerErrorCode);
+  const text = String(brokerOrder.brokerErrorMessage || brokerOrder.brokerReason || '').trim();
+  const lower = text.toLowerCase();
+
+  if (!['inactive', 'cancelled', 'failed'].includes(status)) {
+    return { blockCode: '', blockReason: '', nextAction: '' };
+  }
+
+  if (code === 201 && /exchange is closed/.test(lower)) {
+    return {
+      blockCode: 'exchange_closed_at_submit',
+      blockReason: 'Broker rejected the order because the target exchange was closed at submission time.',
+      nextAction: 'Retry during the venue trading session or hand the row back to the market-open runner.',
+    };
+  }
+
+  if (/exchange is closed/.test(lower) || /outside (regular )?trading hours/.test(lower)) {
+    return {
+      blockCode: 'exchange_closed_at_submit',
+      blockReason: 'Broker rejected the order because the venue was not open for trading.',
+      nextAction: 'Retry during the venue trading session or hand the row back to the market-open runner.',
+    };
+  }
+
+  if (/contract|security definition|no security definition|ambiguous/.test(lower)) {
+    return {
+      blockCode: 'contract_resolution_failed',
+      blockReason: 'Broker rejected the order because the contract identity or venue resolution was not accepted.',
+      nextAction: 'Verify conid, symbol, exchange, and primary exchange before retrying.',
+    };
+  }
+
+  if (/insufficient/.test(lower) || /buying power/.test(lower) || /cash/.test(lower)) {
+    return {
+      blockCode: 'insufficient_funds_or_buying_power',
+      blockReason: 'Broker rejected the order because available cash or buying power was insufficient.',
+      nextAction: 'Reduce size or restore buying power, then retry.',
+    };
+  }
+
+  if (text) {
+    return {
+      blockCode: 'broker_submit_rejected',
+      blockReason: `Broker rejected or inactivated the order: ${text}`,
+      nextAction: 'Review the broker rejection reason and correct the order before retrying.',
+    };
+  }
+
+  return { blockCode: '', blockReason: '', nextAction: '' };
 }
 
 function buildBrokerReasonNote(brokerOrder, mappedStatus) {
@@ -380,4 +437,5 @@ module.exports = {
   queueTradeRowForOpenRunner,
   requeueBlockedTradeRow,
   summarizeOpenRunnerRetryState,
+  classifyBrokerOrderBlock,
 };
