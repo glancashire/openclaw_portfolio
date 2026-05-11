@@ -25,13 +25,35 @@ const tradesPath = path.join(portfolioDir, 'trades.md');
 const portfolioPath = path.join(portfolioDir, 'portfolio.md');
 
 async function getLiveQuote(trade) {
-  if (!trade?.conid) return null;
+  if (!trade?.conid) return { ok: false, reason: 'missing_conid', error: 'No IBKR conid is configured for this trade.' };
   const quote = await fetchLatestPrice({ conid: trade.conid, portfolio: path.basename(portfolioDir) });
   if (!quote?.ok) {
     console.error(`[smart-exec] Quote failed for ${trade.symbol}: ${quote?.error || quote?.reason || 'unknown error'}`);
-    return null;
   }
   return quote;
+}
+
+function classifyQuoteFailure(quote) {
+  const message = String(quote?.error || quote?.reason || '').trim();
+  if (/Requested market data is not subscribed\. Displaying delayed market data\./i.test(message)) {
+    return {
+      blockCode: 'market_data_entitlement_required',
+      blockReason: 'Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.',
+      nextAction: 'Enable the required IBKR market-data entitlement for this venue/instrument, or rerun when a safe delayed-price policy exists.',
+    };
+  }
+  if (quote?.reason === 'missing_conid') {
+    return {
+      blockCode: 'instrument_mapping_incomplete',
+      blockReason: 'No IBKR contract identifier is configured for this approved trade row.',
+      nextAction: 'Add the correct IBKR conid metadata before retrying market-open submission.',
+    };
+  }
+  return {
+    blockCode: 'quote_unavailable',
+    blockReason: 'No broker quote was available during market-open execution.',
+    nextAction: 'Restore broker pricing and rerun the market-open submission path.',
+  };
 }
 
 
@@ -156,14 +178,10 @@ async function main() {
   for (const trade of executable) {
     console.log(`Fetching live quote for ${trade.symbol}...`);
     const quote = await getLiveQuote(trade);
-    if (!quote) {
-      const reason = 'No broker quote was available during market-open execution.';
-      console.error(`  ✗ No quote available for ${trade.symbol} — skipping`);
-      markTradeBlocked(trade, {
-        blockCode: 'quote_unavailable',
-        blockReason: reason,
-        nextAction: 'Restore broker pricing and rerun the market-open submission path.',
-      });
+    if (!quote?.ok) {
+      const classified = classifyQuoteFailure(quote);
+      console.error(`  ✗ ${classified.blockReason}`);
+      markTradeBlocked(trade, classified);
       continue;
     }
     const policy = evaluateMarketOpenBlock({ trade, quote, marketEntryPolicy });
@@ -225,7 +243,8 @@ async function main() {
         currency: order.currency,
         exchange: order.exchange,
         secType: 'STK',
-      }, { dryRun: false, revocableOnly: true, transmitLive: false });
+        transmit: true,
+      }, { dryRun: false, revocableOnly: true, transmitLive: true });
       if (!result.ok) throw new Error(result.error || result.message || result.reason || 'Broker placeOrder failed');
       const orderId = result.order?.orderId ? String(result.order.orderId) : '';
       updateTradeRows(tradesPath, { dateTime: order.row.dateTime, tickerOrIsin: order.row.tickerOrIsin, action: order.row.action }, (row) => ({

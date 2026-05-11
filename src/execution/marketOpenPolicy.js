@@ -76,11 +76,20 @@ function evaluateMarketOpenBlock({ trade, quote, marketEntryPolicy }) {
 
   const limitPrice = calculateSmartLimit(quote, trade?.action);
   if (!limitPrice) {
+    const hasAnyClose = Number.isFinite(Number(quote?.close)) && Number(quote?.close) > 0;
+    const hasAnyReference = Number.isFinite(Number(quote?.last)) && Number(quote?.last) > 0
+      || Number.isFinite(Number(quote?.ask)) && Number(quote?.ask) > 0
+      || Number.isFinite(Number(quote?.bid)) && Number(quote?.bid) > 0;
+    const pricingPostureReason = !hasAnyClose && !hasAnyReference
+      ? 'Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.'
+      : 'Could not determine a smart limit price from broker quote data.';
     return {
       blocked: true,
-      blockCode: 'limit_price_unavailable',
-      blockReason: 'Could not determine a smart limit price from broker quote data.',
-      nextAction: 'Inspect broker quote fields and retry when a usable reference price is available.',
+      blockCode: !hasAnyClose && !hasAnyReference ? 'pricing_reference_unavailable' : 'limit_price_unavailable',
+      blockReason: pricingPostureReason,
+      nextAction: !hasAnyClose && !hasAnyReference
+        ? 'Wait for a usable live/delayed reference price snapshot or restore the required market-data entitlement, then retry.'
+        : 'Inspect broker quote fields and retry when a usable reference price is available.',
       trendInfo,
       limitPrice: null,
     };
