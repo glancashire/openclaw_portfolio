@@ -8,7 +8,7 @@ const { appendTradeProposals } = require('../analysis/tradeLogWriter');
 const { appendHistorySnapshot } = require('../analysis/historyWriter');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-brokers/holdingsSync');
-const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows } = require('./tradeState');
+const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows, readTradesTable } = require('./tradeState');
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
 const { recordRuntimeEvent } = require('../observability/runtimeEvents');
 
@@ -388,21 +388,64 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
         });
 
     if (knownMissing) {
+      const table = readTradesTable(tradesPath);
+      const matchedRow = table.rows.find((row) => {
+        const rowOrderId = String(row['Broker order id'] || '').trim();
+        if (rowOrderId !== String(orderId)) return false;
+        if (selector.tickerOrIsin && String(row['Ticker / ISIN'] || '').trim() !== String(selector.tickerOrIsin)) return false;
+        if (selector.action && String(row.Action || '').trim().toLowerCase() !== String(selector.action).trim().toLowerCase()) return false;
+        return true;
+      }) || null;
+      const matchedQuantity = matchedRow ? Number(matchedRow.Quantity || 0) : null;
+      const hintRows = Array.isArray(statusResult.hints?.completedOrders) ? statusResult.hints.completedOrders : [];
+      const probableCancelledHint = hintRows.find((hint) => {
+        const status = String(hint.status || '').trim().toLowerCase();
+        if (!['cancelled', 'canceled'].includes(status)) return false;
+        if (matchedQuantity != null && Number(hint.quantity || 0) !== matchedQuantity) return false;
+        if (selector.tickerOrIsin) {
+          const selectorText = String(selector.tickerOrIsin).trim().toUpperCase();
+          const hintSymbol = String(hint.symbol || '').trim().toUpperCase();
+          const matchedName = String(matchedRow?.Name || '').trim().toUpperCase();
+          const matchedReason = String(matchedRow?.Reason || '').trim().toUpperCase();
+          const symbolReferencedByRow = hintSymbol && (
+            selectorText.includes(hintSymbol)
+            || hintSymbol.includes(selectorText)
+            || matchedName.includes(hintSymbol)
+            || matchedReason.includes(hintSymbol)
+          );
+          if (hintSymbol && selectorText && !symbolReferencedByRow) return false;
+        }
+        return true;
+      }) || null;
+
       const reconcile = reconcileOrderStatus(
         tradesPath,
         { ...selector, orderId },
-        { orderId, status: 'not_found', notFound: true },
-        { reasonNote: reasonNote || 'Broker order status lookup returned not_found.' }
+        probableCancelledHint
+          ? { orderId, status: 'cancelled', notFound: true, transmit: true, hintPermId: probableCancelledHint.permId || null, hintSymbol: probableCancelledHint.symbol || null }
+          : { orderId, status: 'not_found', notFound: true },
+        { approval: probableCancelledHint ? 'broker_cancelled' : 'not_found', reasonNote: probableCancelledHint
+            ? (reasonNote || `Broker order id match was unavailable, but completed-order evidence suggests cancellation (symbol ${probableCancelledHint.symbol || 'unknown'}, quantity ${probableCancelledHint.quantity ?? 'unknown'}, permId ${probableCancelledHint.permId ?? 'unknown'}).`)
+            : (reasonNote || 'Broker order status lookup returned not_found.') }
       );
       if (reconcile.updated > 0) {
-        appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', `Broker order ${orderId} status sync: not_found`, { executionStatus: 'not_found' });
+        appendHistorySnapshot(
+          historyPath,
+          holdingsPath,
+          'execution_status',
+          probableCancelledHint
+            ? `Broker order ${orderId} status sync: probable cancelled via completed-order evidence`
+            : `Broker order ${orderId} status sync: not_found`,
+          { executionStatus: probableCancelledHint ? 'cancelled' : 'not_found' }
+        );
         await regenerateDashboard(portfolioDir);
       }
       return {
         ok: reconcile.updated > 0,
-        reason: 'not_found',
+        reason: probableCancelledHint ? 'probable_cancelled' : 'not_found',
         statusResult,
         reconcile,
+        hint: probableCancelledHint,
       };
     }
 
@@ -468,9 +511,10 @@ async function resyncPortfolioOrders({ portfolioDir, refreshHoldingsOnFill = tru
   }
 
   return {
-    ok: results.every((entry) => entry.outcome.ok || entry.outcome.reason === 'not_found'),
+    ok: results.every((entry) => entry.outcome.ok || ['not_found', 'probable_cancelled'].includes(entry.outcome.reason)),
     scanned: rows.length,
     synced: results.filter((entry) => entry.outcome.ok).length,
+    cancelled: results.filter((entry) => entry.outcome.reason === 'probable_cancelled').length,
     results,
   };
 }

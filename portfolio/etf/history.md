@@ -23,3 +23,4 @@
 | 2026-05-11 | execution_not_found | 5000 | 0 | 5000 | 0 | 0 | Broker order 9107 status sync: not_found |
 | 2026-05-11 | execution_filled | 4048.26 | 0 | 4048.26 | 0 | 0 | Broker order 9107 status sync: Filled |
 | 2026-05-11 | execution_not_found | 4048.26 | 0 | 4048.26 | 0 | 0 | Broker order 9105 status sync: not_found |
+| 2026-05-11 | execution_cancelled | 4048.26 | 0 | 4048.26 | 0 | 0 | Broker order 9105 status sync: probable cancelled via completed-order evidence |

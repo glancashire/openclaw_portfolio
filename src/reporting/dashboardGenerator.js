@@ -318,7 +318,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   }
   if (brokerReadiness?.fallbackRequired) warnings.push(`- ${brokerReadiness.message}`);
   if (brokerErrorState?.stopAutomation) warnings.push(`- Broker automation is paused after ${brokerErrorState.consecutive} consecutive broker errors (${brokerErrorState.lastReason || 'unknown reason'}).`);
-  if ((lifecycleSummary?.failed || 0) > 0) warnings.push(`- ${lifecycleSummary.failed} trade log row(s) are currently marked failed and may need manual review.`);
+  if ((lifecycleSummary?.failed || 0) > 0) warnings.push(`- ${lifecycleSummary.failed} actionable trade row(s) are currently marked failed and may need manual review.`);
   if ((lifecycleSummary?.rejected || 0) > 0) warnings.push(`- ${lifecycleSummary.rejected} trade log row(s) were explicitly rejected by an operator.`);
   if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) warnings.push('- There are in-flight broker order states; avoid overlapping execution plans until reconciliation is current.');
   if (freshness?.stale) warnings.push(`- Dashboard freshness warning: source state changed after the dashboard was last written (${freshness.newestSourcePath || 'unknown source'}).`);
@@ -401,7 +401,7 @@ async function regenerateDashboard(portfolioDir) {
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
     brokerReadiness,
-    lifecycleSummary: executionLifecycleSummary(tradesPath),
+    lifecycleSummary: executionLifecycleSummary(tradesPath, { actionableOnly: true }),
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
@@ -422,7 +422,7 @@ async function regenerateDashboard(portfolioDir) {
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
     brokerReadiness,
-    lifecycleSummary: executionLifecycleSummary(tradesPath),
+    lifecycleSummary: executionLifecycleSummary(tradesPath, { actionableOnly: true }),
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,

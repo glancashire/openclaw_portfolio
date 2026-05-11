@@ -19,18 +19,18 @@ The operator-visible state is still inconsistent after the first transmitted-liv
 5. Reduce or safely contain the noisy tzdata traceback in operator status flows when possible without unsafe env assumptions.
 
 ## Actionable checklist
-- [ ] Re-run canonical evidence surfaces for execution, authority, delivery, and status.
-- [ ] Inspect runtime notification state and fill-monitor logic to determine why EMUAA produced no confirmation.
-- [ ] Inspect reconciliation/history write paths for `not_found`, probable-cancelled, and filled outcomes.
-- [ ] Implement conservative probable-cancelled surfacing for SPYL/9105 in portfolio/runtime artifacts.
-- [ ] Implement/report the exact reason UBSSLI did not submit and ensure it remains queued truthfully.
-- [ ] Refresh dashboard/delivery/reporting summaries so failed/manual-review counts match current reconciled rows.
-- [ ] Add focused regression tests for:
+- [x] Re-run canonical evidence surfaces for execution, authority, delivery, and status.
+- [x] Inspect runtime notification state and fill-monitor logic to determine why EMUAA produced no confirmation.
+- [x] Inspect reconciliation/history write paths for `not_found`, probable-cancelled, and filled outcomes.
+- [x] Implement conservative probable-cancelled surfacing for SPYL/9105 in portfolio/runtime artifacts.
+- [x] Implement/report the exact reason UBSSLI did not submit and ensure it remains queued truthfully.
+- [x] Refresh dashboard/delivery/reporting summaries so failed/manual-review counts match current reconciled rows.
+- [x] Add focused regression tests for:
   - probable-cancelled status surfacing
   - fill notification state after a reconciled fill
   - dashboard/delivery counts after reconciliation
   - status path tolerance of tzdata execution noise where possible
-- [ ] Re-run relevant tests and canonical commands; iterate until green.
+- [x] Re-run relevant tests and canonical commands; iterate until green.
 - [ ] Commit and push once Phase 138 passes.
 
 ## Verification target

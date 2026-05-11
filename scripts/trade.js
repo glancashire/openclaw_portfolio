@@ -21,8 +21,14 @@ const DRY_RUN = hasFlag('--dry-run');
 const JSON_OUT = hasFlag('--json');
 const FORCE = hasFlag('--force');
 
-function ibkr(cmd) {
-  return execSync(`python3 ${IBKR_CLI} ${cmd}`, { encoding: 'utf8', cwd: ROOT, timeout: 30000 }).trim();
+function ibkr(cmd, options = {}) {
+  const result = execSync(`python3 ${IBKR_CLI} ${cmd} 2>${options.stderrPath || '/tmp/openclaw-ibkr-stderr.log'}`, {
+    encoding: 'utf8',
+    cwd: ROOT,
+    timeout: 30000,
+    shell: '/bin/bash',
+  }).trim();
+  return result;
 }
 
 function printJson(data) {
@@ -332,8 +338,9 @@ function cmdStatus() {
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   let openOrders = [];
+  const statusStderrPath = '/tmp/openclaw-trade-status-ibkr-stderr.log';
   try {
-    openOrders = JSON.parse(ibkr('open-orders --json'));
+    openOrders = JSON.parse(ibkr('open-orders --json', { stderrPath: statusStderrPath }));
   } catch (error) {
     if (JSON_OUT) {
       printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [], openRunnerRetryState });

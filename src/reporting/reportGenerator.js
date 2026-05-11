@@ -405,7 +405,7 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   const bounds = defaultPeriodBounds(period, latestSnapshot);
   const executionPlan = buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(latestSnapshot?.totalValue || 0) });
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
-  const lifecycleSummary = executionLifecycleSummary(tradesPath);
+  const lifecycleSummary = executionLifecycleSummary(tradesPath, { actionableOnly: true });
   const freshness = fileFreshnessSummary({ dashboardPath, sourcePaths: [portfolioPath, path.join(portfolioDir, 'holdings.md'), tradesPath, historyPath] });
   const brokerErrorState = brokerErrorStatus(portfolioName);
   const initialGenerationMeta = { markdownWritten: true, pdfMode: 'pending', pdfPath: null, htmlPath: null, renderWarning: null };

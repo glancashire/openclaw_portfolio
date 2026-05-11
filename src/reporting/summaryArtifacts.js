@@ -556,7 +556,7 @@ async function collectPortfolioSummary({ portfolioDir, readiness = null }) {
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
     brokerReadiness,
-    lifecycleSummary: executionLifecycleSummary(tradesPath),
+    lifecycleSummary: executionLifecycleSummary(tradesPath, { actionableOnly: true }),
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
