@@ -73,6 +73,34 @@ function summarizeTradeStateRows(tradesPath) {
   return summary;
 }
 
+function listBlockedTradeRows(tradesPath) {
+  if (!tradesPath || !fs.existsSync(tradesPath)) return [];
+  const { rows } = readTradesTable(tradesPath);
+  const latestBlockedByInstrumentAction = new Map();
+  for (const row of rows) {
+    const blockCode = String(row['Block code'] || '').trim();
+    if (!blockCode) continue;
+    const instrument = String(row['Ticker / ISIN'] || '').trim();
+    const action = String(row.Action || '').trim().toLowerCase();
+    const key = `${instrument}::${action}`;
+    latestBlockedByInstrumentAction.set(key, row);
+  }
+
+  return Array.from(latestBlockedByInstrumentAction.values()).map((row) => ({
+    dateTime: String(row['Date/time'] || '').trim(),
+    tickerOrIsin: String(row['Ticker / ISIN'] || '').trim(),
+    name: String(row.Name || '').trim(),
+    action: String(row.Action || '').trim().toLowerCase(),
+    status: String(row.Status || '').trim().toLowerCase(),
+    approval: String(row.Approval || '').trim(),
+    brokerOrderId: String(row['Broker order id'] || '').trim(),
+    blockCode: String(row['Block code'] || '').trim(),
+    blockReason: String(row['Block reason'] || '').trim(),
+    blockedAt: String(row['Blocked at'] || '').trim(),
+    nextAction: String(row['Next action'] || '').trim(),
+  }));
+}
+
 function parseHoldingsSummary(text) {
   const get = (label) => {
     const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
@@ -388,6 +416,7 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
   const holdingCount = countHoldingRows(holdingsText);
   const blockers = safetyDiagnostics?.blockers || [];
   const tradeStateSummary = summarizeTradeStateRows(tradesPath);
+  const blockedTradeRows = listBlockedTradeRows(tradesPath);
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   const latestActions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
   const pendingActions = buildPendingActionItems({
@@ -481,6 +510,7 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
     execution: {
       lifecycle: lifecycleSummary || {},
       tradeState: tradeStateSummary,
+      blockedRows: blockedTradeRows,
       openRunnerRetryState,
       inFlightCount: Number(lifecycleSummary?.staged || 0) + Number(lifecycleSummary?.submitted || 0) + Number(lifecycleSummary?.partiallyFilled || 0),
       failedCount: Number(lifecycleSummary?.failed || 0),
@@ -677,6 +707,9 @@ function buildRecoveryChecklist(summary = {}) {
     },
     incidentDrivers,
     activeBlockers: blockers.map((item, index) => ({ rank: index + 1, severity: item.severity || 'info', message: item.message || String(item) })),
+    activeBrokerBlocks: Array.isArray(summary.execution?.blockedRows)
+      ? summary.execution.blockedRows.map((item, index) => ({ rank: index + 1, ...item }))
+      : [],
     actionChecklist: derivedActions,
     verificationChecks,
     completionCriteria,
@@ -708,8 +741,11 @@ function renderRecoveryChecklistMarkdown(checklist = {}) {
   const recentSignals = Array.isArray(checklist.recentSignals) && checklist.recentSignals.length
     ? checklist.recentSignals.map((item, index) => `${index + 1}. [${item.severity}] ${item.summary}${item.timestamp ? ` (${item.timestamp})` : ''}`).join('\n')
     : '1. No recent signals captured.';
+  const brokerBlocks = Array.isArray(checklist.activeBrokerBlocks) && checklist.activeBrokerBlocks.length
+    ? checklist.activeBrokerBlocks.map((item, index) => `${index + 1}. [${item.blockCode}] ${item.tickerOrIsin}${item.name ? ` — ${item.name}` : ''}\n   - Reason: ${item.blockReason || 'No broker block reason recorded.'}\n   - Next action: ${item.nextAction || 'No next action recorded.'}\n   - Broker order id: ${item.brokerOrderId || 'n/a'}`).join('\n')
+    : '1. No broker-derived trade blocks are currently recorded.';
 
-  return `# Recovery Checklist: ${checklist.portfolio || 'unknown'}\n\n## Incident Status\n- Status: ${checklist.incidentStatus || 'unknown'}\n- Health: ${checklist.summary?.health || 'unknown'}\n- Broker health: ${checklist.summary?.brokerHealth || 'unknown'}\n- Execution posture: ${checklist.summary?.executionPosture || 'unknown'}\n- Delivery posture: ${checklist.summary?.deliveryPosture || 'unknown'}\n- Data freshness: ${checklist.summary?.dataFreshness || 'unknown'}\n- Pending approvals: ${checklist.summary?.pendingApprovals || 0}\n- Recommended next step: ${checklist.summary?.recommendedNextStep || 'No recommendation available.'}\n\n## Why This Incident Exists\n- ${checklist.summary?.executionWhy || 'No execution explanation available.'}\n- ${checklist.summary?.approvalWhy || 'No approval explanation available.'}\n\n## Incident Drivers\n${drivers}\n\n## Active Blockers\n${blockers}\n\n## Action Checklist\n${actions}\n\n## Verification Checks\n${verification}\n\n## Completion Criteria\n${completion}\n\n## Recent Signals\n${recentSignals}\n`;
+  return `# Recovery Checklist: ${checklist.portfolio || 'unknown'}\n\n## Incident Status\n- Status: ${checklist.incidentStatus || 'unknown'}\n- Health: ${checklist.summary?.health || 'unknown'}\n- Broker health: ${checklist.summary?.brokerHealth || 'unknown'}\n- Execution posture: ${checklist.summary?.executionPosture || 'unknown'}\n- Delivery posture: ${checklist.summary?.deliveryPosture || 'unknown'}\n- Data freshness: ${checklist.summary?.dataFreshness || 'unknown'}\n- Pending approvals: ${checklist.summary?.pendingApprovals || 0}\n- Recommended next step: ${checklist.summary?.recommendedNextStep || 'No recommendation available.'}\n\n## Why This Incident Exists\n- ${checklist.summary?.executionWhy || 'No execution explanation available.'}\n- ${checklist.summary?.approvalWhy || 'No approval explanation available.'}\n\n## Incident Drivers\n${drivers}\n\n## Active Blockers\n${blockers}\n\n## Active Broker Blocks\n${brokerBlocks}\n\n## Action Checklist\n${actions}\n\n## Verification Checks\n${verification}\n\n## Completion Criteria\n${completion}\n\n## Recent Signals\n${recentSignals}\n`;
 }
 
 function renderPortfolioSummaryMarkdown(summary = {}) {
@@ -1253,4 +1289,5 @@ module.exports = {
   renderDeliveryStatusMarkdown,
   renderCockpitPage,
   generateOverviewArtifacts,
+  listBlockedTradeRows,
 };
