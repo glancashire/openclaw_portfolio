@@ -15,14 +15,14 @@ After Phase 138, the operator-truth surfaces are much better, but two residual i
 4. Ensure dashboard/status/delivery/operator surfaces converge after the mapping and notification-state fixes.
 
 ## Actionable checklist
-- [ ] Reproduce and inspect the unmatched-holdings safety blocker source.
-- [ ] Identify the exact instrument mapping mismatch in holdings/portfolio/approval metadata.
-- [ ] Implement the smallest conservative mapping fix.
-- [ ] Test safety controls, dashboard generation, and related reporting after the mapping fix.
-- [ ] Inspect fill-notification runtime state and notifier behavior for EMUAA/9107.
-- [ ] Implement a safe state-convergence path for already-reconciled fills if appropriate.
-- [ ] Add focused regression tests for holdings mapping and fill-notification state convergence.
-- [ ] Re-run relevant tests and canonical commands; iterate until green.
+- [x] Reproduce and inspect the unmatched-holdings safety blocker source.
+- [x] Identify the exact instrument mapping mismatch in holdings/portfolio/approval metadata.
+- [x] Implement the smallest conservative mapping fix.
+- [x] Test safety controls, dashboard generation, and related reporting after the mapping fix.
+- [x] Inspect fill-notification runtime state and notifier behavior for EMUAA/9107.
+- [x] Implement a safe state-convergence path for already-reconciled fills if appropriate.
+- [x] Add focused regression tests for holdings mapping and fill-notification state convergence.
+- [x] Re-run relevant tests and canonical commands; iterate until green.
 - [ ] Commit and push once Phase 139 passes.
 
 ## Verification target

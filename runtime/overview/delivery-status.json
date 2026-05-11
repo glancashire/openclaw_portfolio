@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-10T13:24:35.101Z",
+  "generatedAt": "2026-05-11T09:14:45.510Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -37,8 +37,10 @@
         "report_cycle_json"
       ],
       "overrideLoaded": true,
-      "ready": true,
-      "pendingActions": []
+      "ready": false,
+      "pendingActions": [
+        "4 trade row(s) are marked failed and need operator review."
+      ]
     }
   ]
 }

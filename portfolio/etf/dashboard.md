@@ -1,20 +1,20 @@
 # Dashboard: etf
 
 ## Health Snapshot
-- Portfolio status: warning
-- Strategy status: blocked
+- Portfolio status: attention_needed
+- Strategy status: rebalance_needed
 - Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
-- Last successful sync: 2026-05-11 10:01:45
+- Last successful sync: 2026-05-11 21:27:45
 - Data freshness: current
 - Execution posture: ready_for_review
 - Delivery posture: ready
 - Pending approvals: 1
-- Active blockers: 1
+- Active blockers: 0
 
 ## Portfolio Value Snapshot
-- Total value CHF: 4048.26
+- Total value CHF: 5083.34
 - Cash CHF: 4048.26
-- Invested CHF: 0
+- Invested CHF: 1035.08
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
@@ -25,7 +25,7 @@
 ## Allocation Health
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 0 | 60 | -60 | out_of_bounds | yes | outside min/max band |
+| Global equities | 100 | 60 | 40 | out_of_bounds | yes | outside min/max band |
 | Swiss equities | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
 | Bonds / cash-like | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
 
@@ -34,30 +34,31 @@
 |---|---:|---:|---|---|---|
 | IE000XZSV718 | 0 | 40 | watch | No active proposal | watch |
 | LU0950668870 | 0 | 20 | watch | No active proposal | watch |
-| CH0032912732 | 23.28 | 20 | approved: buy | Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet). | queued_for_open_runner |
-| CASH-CHF | 24.7 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | pending_user_approval |
+| CH0032912732 | 18.54 | 20 | approved: buy | Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet). | queued_for_open_runner |
+| CASH-CHF | 19.67 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | pending_user_approval |
 
 ## Safety / Risk Diagnostics
-- Safety status: blocked_or_warning
+- Safety status: clear
 - Risk-limit warnings: 0
 - Broker/API warnings: 0
 - Stale data warnings: 0
 - Execution pause state: active
 - Active blocker detail:
-- error: Holdings contain unmatched instruments: review instrument mapping
+- none
 
 ## Pending Operator Actions
 1. [approval/ready_for_review/medium] There are 1 approved trade row(s) ready for staging/review.
+2. [delivery/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
 
 ## Operator Queue Summary
-- Total queue items: 1
+- Total queue items: 2
 - Blocking items: 0
 - Approval items: 1
 - Execution items: 0
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
 - Recovery items: 0
-- Delivery items: 0
+- Delivery items: 1
 - Data items: 0
 - Warning items: 0
 - Workflow items: 0
@@ -65,11 +66,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
+| 2026-05-11 21:23:23.526 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:21:56.258 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:21:43.122 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:21:13.133 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:19:34.255 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:15:21.204 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-11
@@ -77,9 +78,11 @@
 - Quarterly report: local_operator_review
 - Delivery readiness: ready
 - Failure alert readiness: local_operator_review
+- Notified fills: 0
+- Reconciled fills pending notification backfill: 1
 
 ## Recommended Next Step
-Resolve the active blocker: Holdings contain unmatched instruments: review instrument mapping
+There are 1 approved trade row(s) ready for staging/review.
 
 ## Status Labels
 - Pending approvals queue count: 1
@@ -90,14 +93,15 @@ Resolve the active blocker: Holdings contain unmatched instruments: review instr
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 2105.78 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 3140.86 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: Broker order 9105 status sync: probable cancelled via completed-order evidence
-- Observability shows 85 recent blocked execution-policy event(s).
+- 1 reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.
+- Observability shows 86 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
-- Recent runtime events scanned: 91
-- Recent blocked trade events: 85
+- Recent runtime events scanned: 92
+- Recent blocked trade events: 86
 - Open-runner first handoff events: 0
 - Open-runner retry events: 6
 - Recent degraded broker events: 0

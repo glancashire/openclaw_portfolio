@@ -1,6 +1,6 @@
 # Delivery & Alerting Status
 
-- Generated at: 2026-05-10T13:24:35.101Z
+- Generated at: 2026-05-11T09:14:45.510Z
 - Portfolios: 2
 - All ready: no
 
@@ -24,6 +24,6 @@
 - Failure alert mode: local_operator_review
 - Alert targets: dashboard, markdown_report, report_cycle_json
 - Policy override loaded: yes
-- Ready: yes
+- Ready: no
 - Pending actions:
-  - None
+  - 4 trade row(s) are marked failed and need operator review.

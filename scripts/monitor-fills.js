@@ -10,15 +10,11 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
+const { readTradesTable } = require('../src/execution/tradeState');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const STATE_FILE = path.join(__dirname, '..', 'runtime', 'fill-notifications-state.json');
-
-const KNOWN_ORDERS = [
-  { orderId: 8, symbol: 'SLICHA', name: 'UBS ETF SLI', action: 'BUY', qty: 4, limit: 222.50, currency: 'CHF', targetPct: 20.0 },
-  { orderId: 12, symbol: 'EMUAA', name: 'UBS MSCI EMU A Acc', action: 'BUY', qty: 27, limit: 40.30, currency: 'EUR', targetPct: 20.0 },
-  { orderId: 40, symbol: 'VUSA', name: 'Vanguard S&P 500 UCITS', action: 'BUY', qty: 18, limit: 109.50, currency: 'CHF', targetPct: 40.0 },
-];
+const DEFAULT_PORTFOLIO_DIR = path.join(__dirname, '..', 'portfolio', 'etf');
 
 function ibkrJson(args) {
   const cmd = `python3 ${IBKR_CLI} ${args} --json`;
@@ -33,9 +29,13 @@ function ibkrJson(args) {
 
 function loadState() {
   try {
-    return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    const parsed = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    return {
+      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
+      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
+    };
   } catch {
-    return { notifiedFills: [] };
+    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
   }
 }
 
@@ -44,27 +44,45 @@ function saveState(state) {
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 }
 
+function loadKnownOrders(portfolioDir = DEFAULT_PORTFOLIO_DIR) {
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  if (!fs.existsSync(tradesPath)) return [];
+  const { rows } = readTradesTable(tradesPath);
+  return rows
+    .map((row) => ({
+      orderId: Number(row['Broker order id'] || 0),
+      symbol: String(row['Ticker / ISIN'] || '').trim(),
+      name: String(row.Name || '').trim(),
+      action: String(row.Action || '').trim().toUpperCase(),
+      qty: Number(row.Quantity || 0),
+      limit: Number(row['Limit price'] || 0),
+      estimatedChf: Number(row['Estimated CHF'] || 0),
+      actualChf: Number(row['Actual CHF'] || 0),
+      status: String(row.Status || '').trim().toLowerCase(),
+    }))
+    .filter((row) => Number.isFinite(row.orderId) && row.orderId > 0)
+    .filter((row) => ['submitted', 'partially_filled', 'filled', 'failed', 'cancelled', 'inactive'].includes(row.status));
+}
+
 async function main() {
   console.log(`[monitor] Checking fills at ${new Date().toISOString()}`);
 
-  // Get current open orders
+  const knownOrders = loadKnownOrders();
   const openOrders = ibkrJson('open-orders') || [];
   const executions = ibkrJson('executions') || [];
 
   const state = loadState();
-  const openOrderIds = new Set(openOrders.map(o => o.orderId));
+  const openOrderIds = new Set(openOrders.map(o => Number(o.orderId)));
 
-  // Check which known orders are no longer open (= filled or cancelled)
   let newFills = 0;
-  for (const order of KNOWN_ORDERS) {
+  for (const order of knownOrders) {
     if (state.notifiedFills.includes(order.orderId)) continue;
+    if (state.reconciledUnnotifiedFills.includes(order.orderId)) continue;
     if (openOrderIds.has(order.orderId)) continue;
 
-    // Order is no longer open — check if it was filled
-    const fill = executions.find(e => e.orderId === order.orderId);
-    if (!fill && openOrders.length > 0) {
-      // Might be cancelled, skip
-      console.log(`[monitor] Order ${order.orderId} (${order.symbol}) no longer open but no fill found — may be cancelled`);
+    const fill = executions.find(e => Number(e.orderId) === Number(order.orderId));
+    if (!fill) {
+      console.log(`[monitor] Order ${order.orderId} (${order.symbol}) no longer open but no fill record found — likely cancelled/inactive`);
       continue;
     }
 
@@ -86,14 +104,13 @@ async function main() {
     const holdings = positions.map(p => {
       const mv = p.marketValue || (p.avgCost * p.position);
       const allocPct = totalValue > 0 ? (mv / totalValue) * 100 : 0;
-      const known = KNOWN_ORDERS.find(k => k.symbol === (p.contract?.symbol || p.symbol));
       return {
         symbol: p.contract?.symbol || p.symbol || '?',
-        name: known ? known.name : '',
+        name: '',
         valueChf: mv,
         allocPct,
-        targetPct: known ? known.targetPct : 0,
-        driftPct: allocPct - (known ? known.targetPct : 0),
+        targetPct: 0,
+        driftPct: allocPct,
       };
     });
 
@@ -120,8 +137,8 @@ async function main() {
         price: order.limit,
         fillPrice,
         fillQty,
-        currency: order.currency,
-        costChf: fillPrice * fillQty,
+        currency: fill?.currency || 'CHF',
+        costChf: order.actualChf || (fillPrice * fillQty),
         fees: 1.50,
         orderId: String(order.orderId),
         time: fill ? fill.time : new Date().toISOString().slice(0, 16),

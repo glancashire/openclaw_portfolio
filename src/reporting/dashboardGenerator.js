@@ -13,6 +13,19 @@ const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { summarizeOperatorQueue } = require('./operatorQueue');
 const { summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 
+function readFillNotificationState(rootDir = path.resolve(__dirname, '..', '..')) {
+  const statePath = path.join(rootDir, 'runtime', 'fill-notifications-state.json');
+  try {
+    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    return {
+      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
+      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
+    };
+  } catch {
+    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
+  }
+}
+
 function parseHoldingsSummary(text) {
   const get = (label) => {
     const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
@@ -153,7 +166,7 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
   ];
 }
 
-function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, recommended = [] }) {
+function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, recommended = [] }) {
   const actions = [];
   for (const item of deliveryStatus?.pendingActions || []) {
     actions.push({ queueType: 'delivery', severity: 'medium', status: 'pending', summary: item });
@@ -184,6 +197,10 @@ function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = 
   }
   if (safetyDiagnostics?.holdingsHealth?.stalePricing) {
     actions.push({ queueType: 'data', severity: 'high', status: 'stale', summary: 'Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.' });
+  }
+  const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
+  if (unnotifiedFillCount > 0) {
+    actions.push({ queueType: 'delivery', severity: 'medium', status: 'backfill_review', summary: `${unnotifiedFillCount} reconciled fill(s) were detected after the live window and still need notification backfill review.` });
   }
   if (!actions.length && recommended[0]) actions.push({ queueType: 'workflow', severity: 'low', status: 'recommended', summary: recommended[0] });
 
@@ -300,7 +317,7 @@ function formatBlockerLines(blockers = []) {
   return blockers.map((item) => `- ${item.severity || 'info'}: ${item.message || item}`).join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [] }) {
+function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [] }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -323,6 +340,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
   if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0) warnings.push('- There are in-flight broker order states; avoid overlapping execution plans until reconciliation is current.');
   if (freshness?.stale) warnings.push(`- Dashboard freshness warning: source state changed after the dashboard was last written (${freshness.newestSourcePath || 'unknown source'}).`);
   if (latestSnapshot?.notes) warnings.push(`- Latest history note: ${latestSnapshot.notes}`);
+  if ((fillNotificationState?.reconciledUnnotifiedFills?.length || 0) > 0) warnings.push(`- ${fillNotificationState.reconciledUnnotifiedFills.length} reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.`);
   if ((observability?.recentSummary?.blockedTrades || 0) > 0) warnings.push(`- Observability shows ${observability.recentSummary.blockedTrades} recent blocked execution-policy event(s).`);
   if (safetyDiagnostics?.diagnostics?.holdingsHealth?.stalePricing || safetyDiagnostics?.holdingsHealth?.stalePricing) warnings.push('- Safety diagnostics currently mark holdings pricing as stale.');
 
@@ -335,6 +353,7 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     lifecycleSummary,
     openRunnerRetryState,
     safetyDiagnostics: safetyDiagnostics?.diagnostics || safetyDiagnostics,
+    fillNotificationState,
     recommended,
   });
   const materialEvents = buildMaterialEvents(recentEvents);
@@ -363,6 +382,8 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     `- Quarterly report: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
     `- Delivery readiness: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}`,
     `- Failure alert readiness: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
+    `- Notified fills: ${fillNotificationState?.notifiedFills?.length || 0}`,
+    `- Reconciled fills pending notification backfill: ${fillNotificationState?.reconciledUnnotifiedFills?.length || 0}`,
   ].join('\n');
   const pendingActionRows = formatPendingQueueRows(pendingActions);
 
@@ -389,6 +410,7 @@ async function regenerateDashboard(portfolioDir) {
     eventsPathPresent: recentEvents.length > 0,
     recentSummary: summarizeRuntimeEvents(recentEvents),
   };
+  const fillNotificationState = readFillNotificationState();
   let freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   let deliveryStatus = reportDeliveryStatus({ portfolioDir });
   let dashboard = generateDashboard({
@@ -407,6 +429,7 @@ async function regenerateDashboard(portfolioDir) {
     deliveryStatus,
     observability,
     safetyDiagnostics: safetyEvaluation,
+    fillNotificationState,
     recentEvents,
   });
   fs.writeFileSync(dashboardPath, dashboard);
@@ -428,10 +451,11 @@ async function regenerateDashboard(portfolioDir) {
     deliveryStatus,
     observability,
     safetyDiagnostics: safetyEvaluation,
+    fillNotificationState,
     recentEvents,
   });
   fs.writeFileSync(dashboardPath, dashboard);
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatPendingQueueRows, formatQueueSummary };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatPendingQueueRows, formatQueueSummary, readFillNotificationState };

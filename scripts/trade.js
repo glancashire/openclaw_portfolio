@@ -343,26 +343,41 @@ function cmdStatus() {
     openOrders = JSON.parse(ibkr('open-orders --json', { stderrPath: statusStderrPath }));
   } catch (error) {
     if (JSON_OUT) {
-      printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [], openRunnerRetryState });
+      printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [], reconciledUnnotifiedFills: [], openRunnerRetryState });
       return;
     }
     console.log('Open Orders\n');
     console.log('  ⚠️ IB Gateway not connected. Cannot fetch open orders.');
     console.log(`  Error: ${error.message.split('\n')[0]}`);
     const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
-    let state = { notifiedFills: [] };
-    try { state = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
+    let state = { notifiedFills: [], reconciledUnnotifiedFills: [] };
+    try {
+      const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+      state = {
+        notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
+        reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
+      };
+    } catch {}
     console.log(`\nOpen-runner queue: ${openRunnerRetryState.queuedInitial} first handoff, ${openRunnerRetryState.queuedRetry} retry`);
     console.log(`\nNotified fills: ${state.notifiedFills.length}`);
+    if (state.notifiedFills.length > 0) console.log(`  Order IDs: ${state.notifiedFills.join(', ')}`);
+    console.log(`Reconciled fills pending notification backfill: ${state.reconciledUnnotifiedFills.length}`);
+    if (state.reconciledUnnotifiedFills.length > 0) console.log(`  Order IDs: ${state.reconciledUnnotifiedFills.join(', ')}`);
     return;
   }
 
   const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
-  let state = { notifiedFills: [] };
-  try { state = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
+  let state = { notifiedFills: [], reconciledUnnotifiedFills: [] };
+  try {
+    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+    state = {
+      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
+      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
+    };
+  } catch {}
 
   if (JSON_OUT) {
-    printJson({ openOrders, notifiedFills: state.notifiedFills, openRunnerRetryState });
+    printJson({ openOrders, notifiedFills: state.notifiedFills, reconciledUnnotifiedFills: state.reconciledUnnotifiedFills, openRunnerRetryState });
     return;
   }
 
@@ -378,6 +393,10 @@ function cmdStatus() {
   console.log(`\nNotified fills: ${state.notifiedFills.length}`);
   if (state.notifiedFills.length > 0) {
     console.log(`  Order IDs: ${state.notifiedFills.join(', ')}`);
+  }
+  console.log(`Reconciled fills pending notification backfill: ${state.reconciledUnnotifiedFills.length}`);
+  if (state.reconciledUnnotifiedFills.length > 0) {
+    console.log(`  Order IDs: ${state.reconciledUnnotifiedFills.join(', ')}`);
   }
 }
 

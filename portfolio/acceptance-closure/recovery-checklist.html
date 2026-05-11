@@ -43,17 +43,17 @@ pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 
 <div class="report-container">
 <h1>Recovery Checklist: acceptance-closure</h1>
 <h2>Incident Status</h2>
-<ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: needs_operator_attention</li><li>Data freshness: stale</li><li>Pending approvals: 0</li><li>Recommended next step: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.</li></ul>
+<ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: healthy</li><li>Execution posture: ready_for_review</li><li>Delivery posture: needs_operator_attention</li><li>Data freshness: stale</li><li>Pending approvals: 0</li><li>Recommended next step: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.</li></ul>
 <h2>Why This Incident Exists</h2>
 <ul><li>Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.</li><li>There is no active approval backlog.</li></ul>
 <h2>Incident Drivers</h2>
-<ul><li>Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.</li><li>Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.</li><li>5 explicit blocker(s) are preventing a healthy operating posture.</li></ul>
+<ul><li>Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.</li><li>5 explicit blocker(s) are preventing a healthy operating posture.</li></ul>
 <h2>Active Blockers</h2>
 <ol><li>[error] Portfolio still has open questions; trade execution must remain blocked.</li><li>[error] Holdings and pricing are still simulated.</li><li>[error] Missing concrete risk limit: Max single ETF allocation.</li><li>[error] Missing concrete risk limit: Max single issuer allocation.</li><li>[error] Missing concrete risk limit: Max cash drag after full deployment.</li></ol>
 <h2>Action Checklist</h2>
-<ol><li>[high] Holdings and pricing are still simulated.</li><li>[high] Missing concrete risk limit: Max cash drag after full deployment.</li><li>[high] Missing concrete risk limit: Max single ETF allocation.</li><li>[high] Missing concrete risk limit: Max single issuer allocation.</li><li>[high] Portfolio still has open questions; trade execution must remain blocked.</li><li>[high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.</li><li>[medium] Dashboard/report freshness is stale relative to source state.</li></ol>
+<ol><li>[high] Holdings and pricing are still simulated.</li><li>[high] Missing concrete risk limit: Max cash drag after full deployment.</li><li>[high] Missing concrete risk limit: Max single ETF allocation.</li><li>[high] Missing concrete risk limit: Max single issuer allocation.</li><li>[high] Portfolio still has open questions; trade execution must remain blocked.</li><li>[medium] Dashboard/report freshness is stale relative to source state.</li></ol>
 <h2>Verification Checks</h2>
-<ul><li>Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.</li><li>Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.</li><li>No approval backlog remains.</li><li>Active blockers are cleared or explicitly documented as accepted constraints.</li></ul>
+<ul><li>Broker health remains healthy or intentionally degraded with operator awareness.</li><li>Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.</li><li>No approval backlog remains.</li><li>Active blockers are cleared or explicitly documented as accepted constraints.</li></ul>
 <h2>Completion Criteria</h2>
 <ul><li>Blocking recovery items no longer appear in the operator queue.</li><li>Portfolio health no longer depends on unresolved blocker conditions.</li><li>The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.</li></ul>
 <h2>Recent Signals</h2>
