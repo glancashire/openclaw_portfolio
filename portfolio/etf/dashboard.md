@@ -7,7 +7,7 @@
 - Last successful sync: 2026-05-11 21:27:45
 - Data freshness: current
 - Execution posture: ready_for_review
-- Delivery posture: ready
+- Delivery posture: needs_operator_attention
 - Pending approvals: 1
 - Active blockers: 0
 
@@ -77,7 +77,7 @@
 - Weekly report: latest history 2026-05-11
 - Monthly report: local_only
 - Quarterly report: local_operator_review
-- Delivery readiness: ready
+- Delivery readiness: needs_operator_attention
 - Failure alert readiness: local_operator_review
 - Notified fills: 0
 - Reconciled fills pending notification backfill: 1

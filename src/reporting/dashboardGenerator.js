@@ -168,8 +168,11 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
 
 function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, recommended = [] }) {
   const actions = [];
+  const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   for (const item of deliveryStatus?.pendingActions || []) {
-    actions.push({ queueType: 'delivery', severity: 'medium', status: 'pending', summary: item });
+    const normalized = String(item || '');
+    if (unnotifiedFillCount > 0 && /notification backfill review/i.test(normalized)) continue;
+    actions.push({ queueType: 'delivery', severity: 'medium', status: 'pending', summary: normalized });
   }
   if (brokerReadiness?.fallbackRequired) {
     actions.push({ queueType: 'recovery', severity: 'high', status: 'degraded', summary: `Broker connectivity recovery: ${brokerReadiness.message}` });
@@ -198,7 +201,6 @@ function buildPendingOperatorActions({ deliveryStatus = null, brokerReadiness = 
   if (safetyDiagnostics?.holdingsHealth?.stalePricing) {
     actions.push({ queueType: 'data', severity: 'high', status: 'stale', summary: 'Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.' });
   }
-  const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   if (unnotifiedFillCount > 0) {
     actions.push({ queueType: 'delivery', severity: 'medium', status: 'backfill_review', summary: `${unnotifiedFillCount} reconciled fill(s) were detected after the live window and still need notification backfill review.` });
   }
