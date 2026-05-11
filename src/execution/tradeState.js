@@ -172,6 +172,7 @@ function inferApproval(status, brokerOrder = {}) {
   if (status === 'submitted') return brokerOrder.transmit === false ? 'staged_not_transmitted' : 'submitted_to_broker';
   if (status === 'partially_filled' || status === 'filled') return 'broker_filled';
   if (status === 'cancelled') return 'cancelled';
+  if (status === 'inactive') return 'broker_inactive';
   if (status === 'failed') return 'broker_failed';
   return 'user_approved';
 }

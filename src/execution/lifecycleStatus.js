@@ -19,7 +19,8 @@ function normalizeLifecycleStatus(status, brokerOrder = {}) {
     return brokerOrder.transmit === false ? 'staged' : 'submitted';
   }
   if (['cancelled', 'canceled', 'cancel_requested', 'pending_cancel'].includes(raw)) return 'cancelled';
-  if (['inactive', 'rejected', 'failed', 'error', 'not_found', 'missing'].includes(raw)) return 'failed';
+  if (raw === 'inactive') return 'inactive';
+  if (['rejected', 'failed', 'error', 'not_found', 'missing'].includes(raw)) return 'failed';
   if (raw === 'simulated') return 'simulated';
   if (raw === 'quote_unavailable') return 'planned';
   if (['proposed', 'approved', 'planned', 'staged', 'submitted'].includes(raw)) return raw;
@@ -37,6 +38,7 @@ function summarizeLifecycleStatuses(rows = []) {
     filled: 0,
     cancelled: 0,
     failed: 0,
+    inactive: 0,
     simulated: 0,
     planned: 0,
     withBrokerOrderId: 0,
@@ -53,6 +55,7 @@ function summarizeLifecycleStatuses(rows = []) {
     else if (normalized === 'filled') summary.filled += 1;
     else if (normalized === 'cancelled') summary.cancelled += 1;
     else if (normalized === 'failed') summary.failed += 1;
+    else if (normalized === 'inactive') summary.inactive += 1;
     else if (normalized === 'simulated') summary.simulated += 1;
     else if (normalized === 'planned') summary.planned += 1;
 

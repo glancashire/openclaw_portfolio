@@ -458,14 +458,17 @@ function buildSearchContracts(query) {
 }
 
 function buildConidContract(conid, overrides = {}) {
-  return {
+  const contract = {
     conId: Number(conid),
     exchange: overrides.exchange || 'SMART',
     secType: overrides.secType || 'STK',
-    currency: overrides.currency || undefined,
-    primaryExch: overrides.primaryExch || undefined,
-    symbol: overrides.symbol || undefined,
   };
+
+  if (overrides.currency) contract.currency = overrides.currency;
+  if (overrides.includeSymbol === true && overrides.symbol) contract.symbol = overrides.symbol;
+  if (overrides.includePrimaryExch === true && overrides.primaryExch) contract.primaryExch = overrides.primaryExch;
+
+  return contract;
 }
 
 function placeNativeOrder(api, order) {
@@ -476,8 +479,6 @@ function placeNativeOrder(api, order) {
       exchange: order?.exchange || 'SMART',
       secType: order?.secType || 'STK',
       currency: order?.currency || undefined,
-      primaryExch: order?.primaryExchange || undefined,
-      symbol: order?.symbol || undefined,
     });
     const nativeOrder = {
       action: String(order?.action || '').toUpperCase(),
