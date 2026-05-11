@@ -83,7 +83,7 @@
 - Reconciled fills pending notification backfill: 1
 
 ## Recommended Next Step
-1 trade row(s) were requeued for market-open retry after operator recovery.
+1 reconciled fill(s) were detected after the live window and still need notification backfill review.
 
 ## Status Labels
 - Pending approvals queue count: 1

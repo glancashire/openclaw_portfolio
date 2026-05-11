@@ -11,7 +11,7 @@ const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { markdownToBasicHtml } = require('./pdfExport');
-const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep } = require('./dashboardGenerator');
+const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep } = require('./dashboardGenerator');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 
@@ -184,7 +184,7 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
   ];
 }
 
-function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, tradeStateSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, recommended = [], latestProposals = [] }) {
+function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, tradeStateSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, recommended = [], latestProposals = [] }) {
   const actions = [];
   const blockers = safetyDiagnostics?.blockers || [];
 
@@ -201,13 +201,16 @@ function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerR
     });
   }
 
+  const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   for (const item of deliveryStatus?.pendingActions || []) {
+    const summary = String(item || '');
+    if (unnotifiedFillCount > 0 && /notification backfill review/i.test(summary)) continue;
     actions.push({
       portfolio: portfolioName,
       kind: 'delivery',
       severity: 'medium',
       status: 'pending',
-      summary: item,
+      summary,
       blocking: false,
       recommendedOperatorAction: 'Review report delivery readiness and clear the pending action.',
       source: 'delivery_policy',
@@ -263,6 +266,20 @@ function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerR
       blocking: false,
       recommendedOperatorAction: 'Review the proposed trades and approve or reject them explicitly.',
       source: 'trade_lifecycle',
+    });
+  }
+
+  if (unnotifiedFillCount > 0) {
+    actions.push({
+      portfolio: portfolioName,
+      kind: 'delivery',
+      queueType: 'backfill_review',
+      severity: 'medium',
+      status: 'backfill_review',
+      summary: `${unnotifiedFillCount} reconciled fill(s) were detected after the live window and still need notification backfill review.`,
+      blocking: false,
+      recommendedOperatorAction: 'Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.',
+      source: 'fill_notification_state',
     });
   }
 
@@ -358,7 +375,7 @@ function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerR
 
   return deduped.sort((a, b) => {
     const severityRank = { high: 0, medium: 1, low: 2 };
-    const statusRank = { blocked: 0, degraded: 1, paused: 2, failed: 3, pending_user_approval: 4, ready_for_review: 5, in_flight: 6, pending: 7, stale: 8, warning: 9, recommended: 10 };
+    const statusRank = { blocked: 0, backfill_review: 1, degraded: 2, paused: 3, failed: 4, pending_user_approval: 5, ready_for_review: 6, in_flight: 7, pending: 8, stale: 9, warning: 10, recommended: 11 };
     return (severityRank[a.severity] ?? 99) - (severityRank[b.severity] ?? 99)
       || (statusRank[a.status] ?? 99) - (statusRank[b.status] ?? 99)
       || a.summary.localeCompare(b.summary);
@@ -382,6 +399,7 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
     tradeStateSummary,
     openRunnerRetryState,
     safetyDiagnostics,
+    fillNotificationState: deliveryStatus?.fillNotificationState || null,
     recommended: latestActions,
     latestProposals,
   });
@@ -389,13 +407,13 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
   const strategy = strategyStatus(allocations, brokerReadiness, blockers);
   const proposalTotals = proposalSummary(latestProposals, totalValue);
   const proposalByInstrument = latestProposalByInstrument(latestProposals);
-  const recommendedNextStep = bestNextStep({
-    pendingActions: pendingActions.map((item) => item.summary),
+  const recommendedNextStep = formatRecommendedStep(bestNextStep({
+    pendingActions,
     blockers,
     recommendedActionsList: latestActions,
     brokerReadiness,
     lifecycleSummary,
-  });
+  }));
   const materialEvents = buildMaterialEvents(recentEvents);
   const explanationSummary = {
     biggestDrift: allocations.length

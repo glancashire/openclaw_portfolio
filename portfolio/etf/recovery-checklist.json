@@ -1,38 +1,38 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-11T09:14:45.506Z",
+  "generatedAt": "2026-05-11T22:13:57.127Z",
   "portfolio": "etf",
-  "incidentStatus": "action_required",
+  "incidentStatus": "monitor_only",
   "summary": {
-    "health": "warning",
+    "health": "attention_needed",
     "brokerHealth": "healthy",
     "executionPosture": "ready_for_review",
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "current",
     "blockerCount": 0,
-    "queueItemCount": 4,
-    "pendingApprovals": 3,
-    "recommendedNextStep": "4 trade row(s) are marked failed and need operator review.",
+    "queueItemCount": 3,
+    "pendingApprovals": 1,
+    "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
     "executionWhy": "No explicit execution block is currently surfaced.",
-    "approvalWhy": "3 approval-gated trade row(s), 3 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly."
+    "approvalWhy": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s), 1 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
-    "3 approval-gated trade rows are still waiting for operator review."
+    "1 approval-gated trade rows are still waiting for operator review."
   ],
   "activeBlockers": [],
   "actionChecklist": [
     {
       "step": 1,
-      "priority": "high",
-      "title": "4 trade row(s) are marked failed and need operator review.",
-      "action": "Review the failed trade rows and resolve the root cause before retrying.",
-      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
-      "source": "trade_lifecycle"
+      "priority": "medium",
+      "title": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+      "action": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "fill_notification_state"
     },
     {
       "step": 2,
       "priority": "medium",
-      "title": "3 approved trade row(s) are ready for staging or review.",
+      "title": "1 approved trade row(s) are ready for staging or review.",
       "action": "Stage or review the approved trades when readiness gates are satisfied.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
       "source": "trade_lifecycle"
@@ -40,18 +40,10 @@
     {
       "step": 3,
       "priority": "medium",
-      "title": "3 trade row(s) were requeued for market-open retry after operator recovery.",
+      "title": "1 trade row(s) were requeued for market-open retry after operator recovery.",
       "action": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
       "source": "trade_state"
-    },
-    {
-      "step": 4,
-      "priority": "medium",
-      "title": "4 trade row(s) are marked failed and need operator review.",
-      "action": "Review report delivery readiness and clear the pending action.",
-      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
-      "source": "delivery_policy"
     }
   ],
   "verificationChecks": [
@@ -61,9 +53,9 @@
     "No active blockers remain."
   ],
   "completionCriteria": [
-    "Blocking recovery items no longer appear in the operator queue.",
-    "Portfolio health no longer depends on unresolved blocker conditions.",
-    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
+    "Portfolio remains in a healthy or intentionally monitored posture.",
+    "No blocker-class recovery work is outstanding.",
+    "The next operating step is clear from the summary surface."
   ],
   "recentSignals": [
     {
@@ -80,20 +72,20 @@
     },
     {
       "rank": 3,
-      "severity": "info",
-      "summary": "Queued IE00B5BMR087 buy for market-open runner retry after operator recovery.",
+      "severity": "warn",
+      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
       "timestamp": null
     },
     {
       "rank": 4,
       "severity": "warn",
-      "summary": "CSPX blocked before submission: Could not determine a smart limit price from broker quote data.",
+      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
       "timestamp": null
     },
     {
       "rank": 5,
       "severity": "warn",
-      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
+      "summary": "Holdings contain unmatched instruments: review instrument mapping",
       "timestamp": null
     }
   ]

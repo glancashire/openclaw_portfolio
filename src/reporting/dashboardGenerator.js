@@ -269,9 +269,39 @@ function formatMaterialEventRows(events = []) {
   return events.map((event) => `| ${event.time} | ${event.eventType} | ${event.severity} | ${event.summary} | ${event.nextStep} |`).join('\n');
 }
 
+function formatRecommendedStep(step) {
+  if (step == null) return '';
+  if (typeof step === 'string') return step;
+  if (typeof step === 'object' && step.summary) return String(step.summary);
+  return String(step);
+}
+
 function bestNextStep({ pendingActions = [], blockers = [], recommendedActionsList = [], brokerReadiness = null, lifecycleSummary = null }) {
   if (blockers.length > 0) return `Resolve the active blocker: ${blockers[0].message || blockers[0]}`;
-  if (pendingActions.length > 0) return pendingActions[0];
+  if (pendingActions.length > 0) {
+    const recommendationPriority = {
+      'delivery::backfill_review': 0,
+      'backfill_review::backfill_review': 0,
+      'approval::pending_user_approval': 1,
+      'execution::in_flight': 2,
+      'delivery::pending': 3,
+      'recovery::paused': 4,
+      'recovery::degraded': 5,
+      'approval::ready_for_review': 6,
+      'open_runner_retry::ready_for_review': 7,
+      'open_runner_queue::ready_for_review': 8,
+      'data::stale': 9,
+      'workflow::recommended': 10,
+    };
+    const prioritized = [...pendingActions].sort((a, b) => {
+      const aKey = `${a.queueType || a.kind || 'unknown'}::${a.status}`;
+      const bKey = `${b.queueType || b.kind || 'unknown'}::${b.status}`;
+      const aRank = recommendationPriority[aKey] ?? 99;
+      const bRank = recommendationPriority[bKey] ?? 99;
+      return aRank - bRank || String(a.summary || '').localeCompare(String(b.summary || ''));
+    });
+    return prioritized[0];
+  }
   if ((lifecycleSummary?.approved || 0) > 0) return 'Review and stage approved trades once broker readiness is healthy.';
   if (brokerReadiness?.fallbackRequired) return 'Restore Interactive Brokers readiness, then refresh broker-backed proposals.';
   return recommendedActionsList[0] || 'Continue normal monitoring and refresh the portfolio workflow after the next material state change.';
@@ -368,13 +398,13 @@ function generateDashboard({ portfolioName, holdingsText, allocations = [], appr
     lifecycleSummary,
     pendingActions: pendingActions.map((item) => item.summary),
   });
-  const recommendation = bestNextStep({
-    pendingActions: pendingActions.map((item) => item.summary),
+  const recommendation = formatRecommendedStep(bestNextStep({
+    pendingActions,
     blockers,
     recommendedActionsList: recommended,
     brokerReadiness,
     lifecycleSummary,
-  });
+  }));
   const pendingApprovalCount = (lifecycleSummary?.proposed || 0) + (lifecycleSummary?.approved || 0);
   const inFlightCount = (lifecycleSummary?.staged || 0) + (lifecycleSummary?.submitted || 0) + (lifecycleSummary?.partiallyFilled || 0);
   const latestDate = latestSnapshot?.date || summary.syncTime || 'unknown';
@@ -463,4 +493,4 @@ async function regenerateDashboard(portfolioDir) {
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatPendingQueueRows, formatQueueSummary, readFillNotificationState };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, readFillNotificationState };
