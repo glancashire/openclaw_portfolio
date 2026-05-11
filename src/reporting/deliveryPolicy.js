@@ -4,6 +4,20 @@ const { fileFreshnessSummary } = require('./freshness');
 const { latestHistory, executionLifecycleSummary } = require('./portfolioData');
 const { brokerErrorStatus } = require('../execution/runtimeState');
 
+function readFillNotificationState(repoRoot) {
+  try {
+    const statePath = path.join(repoRoot, 'runtime', 'fill-notifications-state.json');
+    if (!fs.existsSync(statePath)) return { notifiedFills: [], reconciledUnnotifiedFills: [] };
+    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    return {
+      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
+      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
+    };
+  } catch {
+    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
+  }
+}
+
 function repoRootFromPortfolioDir(portfolioDir) {
   return path.resolve(portfolioDir, '..', '..');
 }
@@ -59,7 +73,7 @@ function effectiveDeliveryPolicy(portfolioDir) {
   };
 }
 
-function reportPendingActions({ lifecycleSummary = {}, freshness = null, brokerErrorState = null, generationMeta = null, workflow = null, policy = null }) {
+function reportPendingActions({ lifecycleSummary = {}, freshness = null, brokerErrorState = null, generationMeta = null, workflow = null, policy = null, fillNotificationState = null }) {
   const actions = [];
   const thresholds = policy?.pendingActionThresholds || defaultDeliveryPolicy().pendingActionThresholds;
   if (thresholds.staleDashboard && freshness?.stale) {
@@ -78,6 +92,10 @@ function reportPendingActions({ lifecycleSummary = {}, freshness = null, brokerE
   if (generationMeta?.renderWarning) {
     actions.push(`Report rendering used fallback handling (${generationMeta.renderWarning}).`);
   }
+  const reconciledUnnotified = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
+  if (reconciledUnnotified > 0) {
+    actions.push(`${reconciledUnnotified} reconciled fill(s) still need notification backfill review.`);
+  }
   const failedWorkflow = Array.isArray(workflow) ? workflow.filter((step) => step.ok === false) : [];
   for (const step of failedWorkflow) {
     actions.push(`Report workflow step failed: ${step.name} (${step.error || 'unknown error'}).`);
@@ -88,6 +106,7 @@ function reportPendingActions({ lifecycleSummary = {}, freshness = null, brokerE
 function reportDeliveryStatus({ portfolioDir, generationMeta = null, workflow = null }) {
   const portfolioName = path.basename(portfolioDir);
   const policy = effectiveDeliveryPolicy(portfolioDir);
+  const repoRoot = repoRootFromPortfolioDir(portfolioDir);
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const tradesPath = path.join(portfolioDir, 'trades.md');
@@ -97,10 +116,11 @@ function reportDeliveryStatus({ portfolioDir, generationMeta = null, workflow = 
     dashboardPath,
     sourcePaths: [portfolioPath, holdingsPath, tradesPath, historyPath].filter((filePath) => fs.existsSync(filePath)),
   });
-  const lifecycleSummary = fs.existsSync(tradesPath) ? executionLifecycleSummary(tradesPath) : {};
+  const lifecycleSummary = fs.existsSync(tradesPath) ? executionLifecycleSummary(tradesPath, { actionableOnly: true }) : {};
   const brokerErrorState = brokerErrorStatus(portfolioName);
   const latestSnapshot = fs.existsSync(historyPath) ? latestHistory(historyPath) : null;
-  const pendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta, workflow, policy });
+  const fillNotificationState = readFillNotificationState(repoRoot);
+  const pendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta, workflow, policy, fillNotificationState });
   return {
     portfolio: portfolioName,
     deliveryMode: policy.deliveryMode,
@@ -114,6 +134,7 @@ function reportDeliveryStatus({ portfolioDir, generationMeta = null, workflow = 
     freshness,
     lifecycleSummary,
     brokerErrorState,
+    fillNotificationState,
     pendingActions,
     ready: pendingActions.length === 0,
   };

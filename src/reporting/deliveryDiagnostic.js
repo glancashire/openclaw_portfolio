@@ -38,7 +38,9 @@ function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow
       brokerAutomationPaused: Boolean(status.brokerErrorState?.stopAutomation),
       recommendedNextAction: status.ready
         ? 'No delivery-side operator action is currently required.'
-        : 'Review pending delivery actions and clear the underlying reporting or runtime blocker.',
+        : (Array.isArray(status.pendingActions) && status.pendingActions.some((item) => /notification backfill review/i.test(String(item))))
+          ? 'Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.'
+          : 'Review pending delivery actions and clear the underlying reporting or runtime blocker.',
     },
   };
 }
