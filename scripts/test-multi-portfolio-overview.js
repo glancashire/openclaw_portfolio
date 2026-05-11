@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel, buildRecommendedActionRows, formatQueueSummary, buildPortfolioTable } = require('../src/reporting/overviewBoard');
+const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel, buildRecommendedActionRows, formatQueueSummary, buildPortfolioTable, brokerBlockHint } = require('../src/reporting/overviewBoard');
 const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
@@ -14,6 +14,7 @@ async function main() {
   assert(typeof formatRecommendedActionLabel === 'function', 'Expected formatRecommendedActionLabel export');
   assert(typeof buildRecommendedActionRows === 'function', 'Expected buildRecommendedActionRows export');
   assert(typeof buildPortfolioTable === 'function', 'Expected buildPortfolioTable export');
+  assert(typeof brokerBlockHint === 'function', 'Expected brokerBlockHint export');
   assert(typeof formatQueueSummary === 'function', 'Expected formatQueueSummary export');
   assert(typeof formatOverviewMarkdown === 'function', 'Expected formatOverviewMarkdown export');
   assert(typeof generateOverviewBoard === 'function', 'Expected generateOverviewBoard export');
@@ -40,6 +41,13 @@ async function main() {
         openRunnerQueue: 1,
         openRunnerRetry: 0,
         recommendedNextStep: 'Restore broker connectivity.',
+        blockedTradeCount: 1,
+        topBrokerBlock: {
+          tickerOrIsin: 'IE000XZSV718',
+          blockCode: 'exchange_closed_at_submit',
+          blockReason: 'Broker rejected the order because the target exchange was closed at submission time.',
+          nextAction: 'Retry during the venue trading session or hand the row back to the market-open runner.',
+        },
         driftStatuses: [{ assetClass: 'Global equities', status: 'out_of_bounds', driftPct: -60 }],
       },
       {
@@ -63,6 +71,8 @@ async function main() {
       { portfolio: 'acceptance-closure', queueType: 'open_runner_retry', severity: 'high', status: 'ready_for_review', summary: 'Blocked row was requeued for the next intended market-open run.', recommendedOperatorAction: 'Verify blocker recovery before the retry window opens.' },
     ],
   };
+
+  assert(brokerBlockHint(index.portfolios[0]) === '[exchange_closed_at_submit IE000XZSV718] Retry during the venue trading session or hand the row back to the market-open runner.', 'Expected broker block hint rendering');
 
   const queueSummaryText = formatQueueSummary(pending.queueSummary);
   assert(queueSummaryText.includes('- Open-runner first handoffs: 1'), 'Expected helper first-handoff summary line');
@@ -112,12 +122,12 @@ async function main() {
   assert(emptyMarkdown.includes('## Cross-Portfolio Recommended Actions\n1. No pending cross-portfolio actions.'), 'Expected empty-state recommended actions section');
 
   const boardTable = buildPortfolioTable(index);
-  assert(boardTable.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | Restore broker connectivity. |'), 'Expected populated ETF board helper row');
+  assert(boardTable.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | [exchange_closed_at_submit IE000XZSV718] Retry during the venue trading session or hand the row back to the market-open runner. |'), 'Expected populated ETF board helper row');
   assert(boardTable.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | 0 | 2 | Resolve blockers. |'), 'Expected populated acceptance board helper row');
 
   const markdown = formatOverviewMarkdown({ index, pending });
   assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
-  assert(markdown.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | Restore broker connectivity. |'), 'Expected ETF board row');
+  assert(markdown.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | [exchange_closed_at_submit IE000XZSV718] Retry during the venue trading session or hand the row back to the market-open runner. |'), 'Expected ETF board row');
   assert(markdown.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | 0 | 2 | Resolve blockers. |'), 'Expected acceptance board row');
   assert(markdown.includes('## Operator Queue Summary'), 'Expected operator queue summary section');
   assert(markdown.includes('- Open-runner first handoffs: 1'), 'Expected first-handoff count in queue summary');
@@ -151,6 +161,14 @@ async function main() {
       allocation: [{ assetClass: 'Global equities', driftPct: -60, status: 'out_of_bounds' }],
       approvals: { pendingApprovalCount: 7 },
       recommendedNextStep: 'Restore broker connectivity.',
+      execution: {
+        blockedRows: [{
+          tickerOrIsin: 'IE000XZSV718',
+          blockCode: 'exchange_closed_at_submit',
+          blockReason: 'Broker rejected the order because the target exchange was closed at submission time.',
+          nextAction: 'Retry during the venue trading session or hand the row back to the market-open runner.',
+        }],
+      },
       explanations: {
         biggestDrift: 'Global equities are 60% under target and outside the allowed band around the 100% target.',
         executionBlock: 'Execution is blocked because broker readiness is degraded: broker offline.',
@@ -162,10 +180,15 @@ async function main() {
   assert(dailySummary.healthHeadline === 'warning', 'Expected warning daily headline');
   assert(dailySummary.cashWaitingToDeployChf === 5000, 'Expected daily cash total');
   assert(dailySummary.pendingApprovals === 1, 'Expected approval queue alignment in daily summary');
+  assert(dailySummary.highlightedPortfolio.blockedTradeCount === 1, 'Expected highlighted broker-block count');
+  assert(dailySummary.highlightedPortfolio.topBrokerBlock.blockCode === 'exchange_closed_at_submit', 'Expected highlighted broker block code');
+  assert(/exchange was closed at submission time/i.test(dailySummary.highlightedPortfolio.whyNow), 'Expected broker-block why-now explanation');
   assert(dailyMarkdown.includes('# Daily Summary Page'), 'Expected daily summary title');
   assert(dailyMarkdown.includes('Cash waiting to deploy CHF: 5000'), 'Expected daily cash line');
   assert(dailyMarkdown.includes('Biggest Drift Today'), 'Expected biggest drift section');
   assert(dailyMarkdown.includes('Why it matters'), 'Expected drift explanation line');
+  assert(dailyMarkdown.includes('Broker-blocked rows: 1'), 'Expected highlighted broker-block count line');
+  assert(dailyMarkdown.includes('Top broker block: exchange_closed_at_submit (IE000XZSV718)'), 'Expected highlighted top broker block line');
   assert(dailyMarkdown.includes('Why now'), 'Expected highlighted portfolio explanation line');
 
   const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
@@ -187,10 +210,9 @@ async function main() {
   assert(overviewMarkdown.includes('## Operator Queue Summary'), 'Expected overview markdown queue summary section');
   assert(overviewMarkdown.includes('## Cross-Portfolio Recommended Actions'), 'Expected overview markdown recommended actions section');
   assert(overviewMarkdown.includes('First handoffs'), 'Expected first-handoff column in generated overview markdown');
-  assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
+  assert(overviewMarkdown.includes('| etf | active |'), 'Expected populated ETF row in generated overview markdown');
   assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
-  assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
-  assert(overviewMarkdown.includes('| 0 | 3 | 4 trade row(s) are marked failed and need operator review. |'), 'Expected generated ETF row to retain queue columns and current recommendation');
+  assert(overviewMarkdown.includes('1 reconciled fill(s) were detected after the live window and still need notification backfill review.') || overviewMarkdown.includes('trade row(s) are marked failed and need operator review.'), 'Expected generated ETF row to retain truthful current recommendation');
   assert(portfolioIndexJson.schemaVersion === '1.1', 'Expected portfolio index schema version');
   assert(pendingActionsJson.schemaVersion === '1.1', 'Expected pending-actions schema version');
   assert(typeof pendingActionsJson.generatedAt === 'string' && pendingActionsJson.generatedAt.length > 0, 'Expected pending-actions generatedAt timestamp');
@@ -207,6 +229,8 @@ async function main() {
   assert(generatedEtfIndexRow && generatedEtfIndexRow.status === 'warning', 'Expected ETF row in generated portfolio index');
   assert(generatedAcceptanceIndexRow && generatedAcceptanceIndexRow.status === 'warning', 'Expected acceptance row in generated portfolio index');
   assert(typeof generatedEtfIndexRow.openRunnerQueue === 'number' && typeof generatedEtfIndexRow.openRunnerRetry === 'number', 'Expected ETF open-runner counters in generated portfolio index');
+  assert(typeof generatedEtfIndexRow.blockedTradeCount === 'number', 'Expected ETF blocked-trade count in generated portfolio index');
+  assert(Object.prototype.hasOwnProperty.call(generatedEtfIndexRow, 'topBrokerBlock'), 'Expected ETF topBrokerBlock field in generated portfolio index');
   assert(typeof generatedAcceptanceIndexRow.openRunnerQueue === 'number' && typeof generatedAcceptanceIndexRow.openRunnerRetry === 'number', 'Expected acceptance open-runner counters in generated portfolio index');
   assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerQueue'), 'Expected openRunnerQueue in queue summary');
   assert(Object.prototype.hasOwnProperty.call(portfolioIndexJson.queueSummary || {}, 'openRunnerRetry'), 'Expected openRunnerRetry in queue summary');

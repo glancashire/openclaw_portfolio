@@ -66,12 +66,18 @@ function formatQueueSummary(summary = {}) {
   ].join('\n');
 }
 
+function brokerBlockHint(item = {}) {
+  if (!item.topBrokerBlock?.blockCode) return item.recommendedNextStep;
+  const instrument = item.topBrokerBlock.tickerOrIsin ? ` ${item.topBrokerBlock.tickerOrIsin}` : '';
+  return `[${item.topBrokerBlock.blockCode}${instrument}] ${item.topBrokerBlock.nextAction || item.recommendedNextStep}`;
+}
+
 function buildPortfolioTable(index = {}) {
   const portfolios = Array.isArray(index.portfolios) ? index.portfolios : [];
   if (!portfolios.length) {
     return '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |\n';
   }
-  return portfolios.map((item) => `| ${item.portfolio} | ${classifyPortfolioKind(item)} | ${item.totalValueChf} | ${item.status} | ${formatDriftSummary(item.driftStatuses)} | ${item.blockers} | ${item.pendingApprovals} | ${item.pendingActions} | ${item.openRunnerQueue || 0} | ${item.openRunnerRetry || 0} | ${item.recommendedNextStep} |`).join('\n');
+  return portfolios.map((item) => `| ${item.portfolio} | ${classifyPortfolioKind(item)} | ${item.totalValueChf} | ${item.status} | ${formatDriftSummary(item.driftStatuses)} | ${item.blockers} | ${item.pendingApprovals} | ${item.pendingActions} | ${item.openRunnerQueue || 0} | ${item.openRunnerRetry || 0} | ${brokerBlockHint(item)} |`).join('\n');
 }
 
 function formatOverviewMarkdown({ index, pending }) {
@@ -107,6 +113,7 @@ module.exports = {
   formatRecommendedActionLabel,
   buildRecommendedActionRows,
   buildPortfolioTable,
+  brokerBlockHint,
   formatOverviewMarkdown,
   formatQueueSummary,
   generateOverviewBoard,

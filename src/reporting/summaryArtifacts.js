@@ -813,27 +813,40 @@ function listPortfolioDirectories(repoRoot = process.cwd()) {
 }
 
 function buildPortfolioIndex(summaries = []) {
-  const portfolios = summaries.map((summary) => ({
-    portfolio: summary.portfolio,
-    status: summary.status.health,
-    strategyStatus: summary.status.strategy,
-    totalValueChf: summary.holdings.totalValueChf,
-    cashChf: summary.holdings.cashChf,
-    investedChf: summary.holdings.investedChf,
-    lastSyncAt: summary.holdings.lastSyncAt,
-    latestSnapshotDate: summary.holdings.latestSnapshotDate,
-    pendingApprovals: summary.approvals.pendingApprovalCount,
-    blockers: summary.blockers.count,
-    pendingActions: summary.pendingActions.length,
-    recommendedNextStep: summary.recommendedNextStep,
-    openRunnerQueue: Number(summary.execution?.openRunnerRetryState?.queuedInitial || 0),
-    openRunnerRetry: Number(summary.execution?.openRunnerRetryState?.queuedRetry || 0),
-    driftStatuses: summary.allocation.map((row) => ({ assetClass: row.assetClass, status: row.status, driftPct: row.driftPct })),
-    brokerHealth: summary.status.brokerHealth,
-    executionPosture: summary.status.executionPosture,
-    deliveryPosture: summary.status.deliveryPosture,
-    dataFreshness: summary.status.dataFreshness,
-  }));
+  const portfolios = summaries.map((summary) => {
+    const brokerBlocks = Array.isArray(summary.execution?.blockedRows) ? summary.execution.blockedRows : [];
+    const topBrokerBlock = brokerBlocks[0] || null;
+    return {
+      portfolio: summary.portfolio,
+      status: summary.status.health,
+      strategyStatus: summary.status.strategy,
+      totalValueChf: summary.holdings.totalValueChf,
+      cashChf: summary.holdings.cashChf,
+      investedChf: summary.holdings.investedChf,
+      lastSyncAt: summary.holdings.lastSyncAt,
+      latestSnapshotDate: summary.holdings.latestSnapshotDate,
+      pendingApprovals: summary.approvals.pendingApprovalCount,
+      blockers: summary.blockers.count,
+      pendingActions: summary.pendingActions.length,
+      recommendedNextStep: summary.recommendedNextStep,
+      openRunnerQueue: Number(summary.execution?.openRunnerRetryState?.queuedInitial || 0),
+      openRunnerRetry: Number(summary.execution?.openRunnerRetryState?.queuedRetry || 0),
+      blockedTradeCount: brokerBlocks.length,
+      topBrokerBlock: topBrokerBlock ? {
+        tickerOrIsin: topBrokerBlock.tickerOrIsin || '',
+        name: topBrokerBlock.name || '',
+        blockCode: topBrokerBlock.blockCode || '',
+        blockReason: topBrokerBlock.blockReason || '',
+        nextAction: topBrokerBlock.nextAction || '',
+        brokerOrderId: topBrokerBlock.brokerOrderId || '',
+      } : null,
+      driftStatuses: summary.allocation.map((row) => ({ assetClass: row.assetClass, status: row.status, driftPct: row.driftPct })),
+      brokerHealth: summary.status.brokerHealth,
+      executionPosture: summary.status.executionPosture,
+      deliveryPosture: summary.status.deliveryPosture,
+      dataFreshness: summary.status.dataFreshness,
+    };
+  });
 
   return {
     schemaVersion: '1.1',
@@ -947,7 +960,10 @@ function buildDailySummary(summaries = [], approvalsQueue = null) {
     .slice()
     .sort((a, b) => {
       const healthRank = { blocked: 0, warning: 1, attention_needed: 1, healthy: 2 };
+      const aBlockedTrades = Array.isArray(a.execution?.blockedRows) ? a.execution.blockedRows.length : 0;
+      const bBlockedTrades = Array.isArray(b.execution?.blockedRows) ? b.execution.blockedRows.length : 0;
       return (healthRank[a.status?.health] ?? 99) - (healthRank[b.status?.health] ?? 99)
+        || bBlockedTrades - aBlockedTrades
         || Number(b.approvals?.pendingApprovalCount || 0) - Number(a.approvals?.pendingApprovalCount || 0)
         || String(a.portfolio).localeCompare(String(b.portfolio));
     })[0] || null;
@@ -976,8 +992,20 @@ function buildDailySummary(summaries = [], approvalsQueue = null) {
       brokerHealth: highlightedPortfolio.status?.brokerHealth,
       deliveryPosture: highlightedPortfolio.status?.deliveryPosture,
       pendingApprovals: highlightedPortfolio.approvals?.pendingApprovalCount || 0,
+      blockedTradeCount: Array.isArray(highlightedPortfolio.execution?.blockedRows) ? highlightedPortfolio.execution.blockedRows.length : 0,
+      topBrokerBlock: Array.isArray(highlightedPortfolio.execution?.blockedRows) && highlightedPortfolio.execution.blockedRows.length
+        ? {
+            tickerOrIsin: highlightedPortfolio.execution.blockedRows[0].tickerOrIsin || '',
+            name: highlightedPortfolio.execution.blockedRows[0].name || '',
+            blockCode: highlightedPortfolio.execution.blockedRows[0].blockCode || '',
+            blockReason: highlightedPortfolio.execution.blockedRows[0].blockReason || '',
+            nextAction: highlightedPortfolio.execution.blockedRows[0].nextAction || '',
+          }
+        : null,
       recommendedNextStep: highlightedPortfolio.recommendedNextStep,
-      whyNow: highlightedPortfolio.explanations?.executionBlock || highlightedPortfolio.explanations?.approvalBacklog || 'No highlighted explanation available.',
+      whyNow: Array.isArray(highlightedPortfolio.execution?.blockedRows) && highlightedPortfolio.execution.blockedRows.length
+        ? (highlightedPortfolio.execution.blockedRows[0].blockReason || highlightedPortfolio.explanations?.executionBlock || highlightedPortfolio.explanations?.approvalBacklog || 'No highlighted explanation available.')
+        : (highlightedPortfolio.explanations?.executionBlock || highlightedPortfolio.explanations?.approvalBacklog || 'No highlighted explanation available.'),
     } : null,
   };
 }
@@ -985,7 +1013,7 @@ function buildDailySummary(summaries = [], approvalsQueue = null) {
 function renderDailySummaryMarkdown(daily = {}) {
   const drift = daily.biggestDrift;
   const highlight = daily.highlightedPortfolio;
-  return `# Daily Summary Page\n\n## Headline\n- Overall health: ${daily.healthHeadline || 'unknown'}\n- Portfolios tracked: ${daily.totals?.portfolioCount || 0}\n- Cash waiting to deploy CHF: ${daily.cashWaitingToDeployChf || 0}\n- Pending approvals: ${daily.pendingApprovals || 0}\n- Broker health: ${daily.brokerHealth || 'unknown'}\n- Reporting health: ${daily.reportingHealth || 'unknown'}\n- Recommended next step: ${daily.recommendedNextStep || 'No recommendation available.'}\n\n## Biggest Drift Today\n- ${drift ? `${drift.portfolio}: ${drift.assetClass} drift ${drift.driftPct}% (${drift.status})` : 'No drift data available.'}\n- Why it matters: ${daily.biggestDriftWhy || 'No drift explanation available.'}\n\n## Highlighted Portfolio\n- Portfolio: ${highlight?.portfolio || 'none'}\n- Health: ${highlight?.health || 'unknown'}\n- Cash CHF: ${highlight?.cashChf || 0}\n- Broker health: ${highlight?.brokerHealth || 'unknown'}\n- Delivery posture: ${highlight?.deliveryPosture || 'unknown'}\n- Pending approvals: ${highlight?.pendingApprovals || 0}\n- Recommended next step: ${highlight?.recommendedNextStep || 'No recommendation available.'}\n- Why now: ${highlight?.whyNow || 'No highlighted explanation available.'}\n`;
+  return `# Daily Summary Page\n\n## Headline\n- Overall health: ${daily.healthHeadline || 'unknown'}\n- Portfolios tracked: ${daily.totals?.portfolioCount || 0}\n- Cash waiting to deploy CHF: ${daily.cashWaitingToDeployChf || 0}\n- Pending approvals: ${daily.pendingApprovals || 0}\n- Broker health: ${daily.brokerHealth || 'unknown'}\n- Reporting health: ${daily.reportingHealth || 'unknown'}\n- Recommended next step: ${daily.recommendedNextStep || 'No recommendation available.'}\n\n## Biggest Drift Today\n- ${drift ? `${drift.portfolio}: ${drift.assetClass} drift ${drift.driftPct}% (${drift.status})` : 'No drift data available.'}\n- Why it matters: ${daily.biggestDriftWhy || 'No drift explanation available.'}\n\n## Highlighted Portfolio\n- Portfolio: ${highlight?.portfolio || 'none'}\n- Health: ${highlight?.health || 'unknown'}\n- Cash CHF: ${highlight?.cashChf || 0}\n- Broker health: ${highlight?.brokerHealth || 'unknown'}\n- Delivery posture: ${highlight?.deliveryPosture || 'unknown'}\n- Pending approvals: ${highlight?.pendingApprovals || 0}\n- Broker-blocked rows: ${highlight?.blockedTradeCount || 0}\n- Top broker block: ${highlight?.topBrokerBlock ? `${highlight.topBrokerBlock.blockCode}${highlight.topBrokerBlock.tickerOrIsin ? ` (${highlight.topBrokerBlock.tickerOrIsin})` : ''}` : 'none'}\n- Recommended next step: ${highlight?.recommendedNextStep || 'No recommendation available.'}\n- Why now: ${highlight?.whyNow || 'No highlighted explanation available.'}\n`;
 }
 
 function renderApprovalsQueueMarkdown(queue = {}) {
