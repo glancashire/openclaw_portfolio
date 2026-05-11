@@ -1,6 +1,6 @@
 'use strict';
 
-const { summarizeReadiness } = require('../src/brokers/interactive-brokers/readiness');
+const { summarizeReadiness, getGenericFallbackProbeCandidates } = require('../src/brokers/interactive-brokers/readiness');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -35,6 +35,11 @@ function main() {
   assert(summary.fallbackRequired === true, 'expected auth-ok unknown posture to still require fallback');
   assert(summary.marketDataMode === 'unknown', 'expected auth-ok unknown posture marketDataMode');
   assert(/not yet yielding a usable live\/delayed quote posture/i.test(summary.message), 'expected auth-ok unknown posture message');
+
+  const fallbackCandidates = getGenericFallbackProbeCandidates();
+  assert(Array.isArray(fallbackCandidates) && fallbackCandidates.length >= 2, 'expected generic fallback probe candidates');
+  assert(fallbackCandidates.some((row) => row.symbol === 'EMUAA'), 'expected EMUAA fallback candidate');
+  assert(fallbackCandidates.some((row) => row.symbol === 'UBSSLI'), 'expected UBSSLI fallback candidate');
 
   summary = summarizeReadiness({
     config: { ok: true },

@@ -1,37 +1,131 @@
+const fs = require('fs');
+const path = require('path');
 const { InteractiveBrokersClient } = require('./client');
+const { readApprovedInstruments } = require('../../analysis/approvedInstruments');
+const { readTradesTable, listExecutableTradeRows } = require('../../execution/tradeState');
 
 async function getInteractiveBrokersReadiness({ portfolio = 'etf' } = {}) {
   const client = new InteractiveBrokersClient({ portfolio });
   const config = client.configurationStatus();
   const auth = await client.authenticate();
-  const marketData = auth?.ok ? await detectMarketDataPosture(client).catch(() => null) : null;
+  const marketData = auth?.ok ? await detectMarketDataPosture(client, { portfolio }).catch(() => null) : null;
   return summarizeReadiness({ config, auth, marketData });
 }
 
-async function detectMarketDataPosture(client) {
-  try {
-    const contracts = await client.searchContracts('IEF');
-    const first = Array.isArray(contracts) ? contracts.find((row) => row?.conid) : null;
-    if (!first?.conid) return { posture: 'unknown', detail: 'No probe contract conid available.' };
-    const snapshot = await client.fetchMarketSnapshot([first.conid]);
-    const quote = Array.isArray(snapshot) ? snapshot[0] : snapshot;
-    const bid = asNumber(quote?.['84']);
-    const ask = asNumber(quote?.['86']);
-    const last = asNumber(quote?.['31']);
-    const close = asNumber(quote?.close);
-    if ([bid, ask, last].some(Number.isFinite)) {
-      return { posture: 'live_or_realtime', detail: 'Live/realtime bid/ask/last values are available.' };
+async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
+  const probeCandidates = getProbeCandidates({ portfolio });
+  const errors = [];
+
+  for (const candidate of probeCandidates) {
+    try {
+      const conid = candidate?.conid || null;
+      if (!conid) continue;
+      const snapshot = await client.fetchMarketSnapshot([conid]);
+      const quote = Array.isArray(snapshot) ? snapshot[0] : snapshot;
+      const bid = asNumber(quote?.['84']);
+      const ask = asNumber(quote?.['86']);
+      const last = asNumber(quote?.['31']);
+      const close = asNumber(quote?.['7295']) ?? asNumber(quote?.close);
+      if ([bid, ask, last].some(Number.isFinite)) {
+        return {
+          posture: 'live_or_realtime',
+          detail: `Live/realtime bid/ask/last values are available via ${candidate.label}.`,
+          probe: candidate,
+        };
+      }
+      if (Number.isFinite(close)) {
+        return {
+          posture: 'delayed_only',
+          detail: `Delayed close fallback is available via ${candidate.label}, but live bid/ask/last are unavailable.`,
+          probe: candidate,
+        };
+      }
+      errors.push(`${candidate.label}: market data request returned no usable price fields`);
+    } catch (error) {
+      const message = String(error?.message || error || 'Unknown market data posture error.');
+      if (/Delayed market data is available/i.test(message)) {
+        return {
+          posture: 'delayed_only',
+          detail: `Interactive Brokers reports delayed market data is available via ${candidate.label}.`,
+          probe: candidate,
+        };
+      }
+      errors.push(`${candidate.label}: ${message}`);
     }
-    if (Number.isFinite(close)) {
-      return { posture: 'delayed_only', detail: 'Delayed close fallback is available but live bid/ask/last are unavailable.' };
-    }
-    return { posture: 'unpriced', detail: 'Market data request succeeded but returned no usable price fields.' };
-  } catch (error) {
-    if (/Delayed market data is available/i.test(String(error?.message || ''))) {
-      return { posture: 'delayed_only', detail: 'Interactive Brokers reports delayed market data is available.' };
-    }
-    return { posture: 'unknown', detail: String(error?.message || error || 'Unknown market data posture error.') };
   }
+
+  if (errors.length > 0) {
+    return { posture: 'unknown', detail: errors.join(' | ') };
+  }
+  return { posture: 'unknown', detail: 'No probe contract conid available.' };
+}
+
+function getProbeCandidates({ portfolio = 'etf' } = {}) {
+  const byKey = new Map();
+  for (const candidate of [
+    ...getPortfolioExecutableProbeCandidates({ portfolio }),
+    ...getPortfolioApprovedProbeCandidates({ portfolio }),
+    ...getGenericFallbackProbeCandidates(),
+  ]) {
+    const conid = String(candidate?.conid || '').trim();
+    if (!conid) continue;
+    const key = `${conid}::${candidate.label}`;
+    if (!byKey.has(key)) byKey.set(key, candidate);
+  }
+  return Array.from(byKey.values());
+}
+
+function getPortfolioExecutableProbeCandidates({ portfolio = 'etf' } = {}) {
+  try {
+    const portfolioDir = path.join(process.cwd(), 'portfolio', portfolio);
+    const tradesPath = path.join(portfolioDir, 'trades.md');
+    const portfolioPath = path.join(portfolioDir, 'portfolio.md');
+    if (!fs.existsSync(tradesPath) || !fs.existsSync(portfolioPath)) return [];
+    const executableRows = listExecutableTradeRows(tradesPath);
+    const approved = readApprovedInstruments(portfolioPath);
+    const approvedByTicker = new Map(approved.map((row) => [String(row.tickerOrIsin || '').trim().toUpperCase(), row]));
+    return executableRows
+      .map((row) => {
+        const ticker = String(row.tickerOrIsin || '').trim().toUpperCase();
+        const instrument = approvedByTicker.get(ticker);
+        const conid = instrument?.ibkrConid || null;
+        return conid ? {
+          conid,
+          symbol: instrument?.ibkrSymbol || ticker || null,
+          tickerOrIsin: ticker || null,
+          label: `executable trade ${ticker}`,
+          source: 'executable_trade',
+        } : null;
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function getPortfolioApprovedProbeCandidates({ portfolio = 'etf' } = {}) {
+  try {
+    const portfolioPath = path.join(process.cwd(), 'portfolio', portfolio, 'portfolio.md');
+    if (!fs.existsSync(portfolioPath)) return [];
+    return readApprovedInstruments(portfolioPath)
+      .map((instrument) => instrument?.ibkrConid ? {
+        conid: instrument.ibkrConid,
+        symbol: instrument.ibkrSymbol || instrument.tickerOrIsin || null,
+        tickerOrIsin: instrument.tickerOrIsin || null,
+        label: `approved instrument ${instrument.tickerOrIsin || instrument.ibkrSymbol || instrument.ibkrConid}`,
+        source: 'approved_instrument',
+      } : null)
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function getGenericFallbackProbeCandidates() {
+  return [
+    { conid: '243939970', symbol: 'EMUAA', tickerOrIsin: 'LU0950668870', label: 'generic fallback EMUAA', source: 'generic_fallback' },
+    { conid: '498868144', symbol: 'UBSSLI', tickerOrIsin: 'CH0032912732', label: 'generic fallback UBSSLI', source: 'generic_fallback' },
+  ];
 }
 
 function summarizeReadiness({ config, auth, marketData }) {
@@ -72,4 +166,12 @@ function asNumber(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-module.exports = { getInteractiveBrokersReadiness, summarizeReadiness, detectMarketDataPosture };
+module.exports = {
+  getInteractiveBrokersReadiness,
+  summarizeReadiness,
+  detectMarketDataPosture,
+  getGenericFallbackProbeCandidates,
+  getPortfolioApprovedProbeCandidates,
+  getPortfolioExecutableProbeCandidates,
+  getProbeCandidates,
+};
