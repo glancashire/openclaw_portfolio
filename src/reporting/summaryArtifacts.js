@@ -1088,11 +1088,12 @@ function renderReportHistoryMarkdown(history = {}) {
 }
 
 function buildDeliveryOverview(repoRoot) {
-  const { reportDeliveryStatus } = require('./deliveryPolicy');
+  const { evaluateDeliveryPosture } = require('./deliveryDiagnostic');
   const portfolioDirs = listPortfolioDirectories(repoRoot);
   const portfolios = [];
   for (const portfolioDir of portfolioDirs) {
-    const status = reportDeliveryStatus({ portfolioDir });
+    const posture = evaluateDeliveryPosture({ portfolioDir });
+    const status = posture.status;
     portfolios.push({
       portfolio: status.portfolio,
       deliveryMode: status.deliveryMode,
@@ -1103,6 +1104,7 @@ function buildDeliveryOverview(repoRoot) {
       overrideLoaded: status.overrideLoaded,
       ready: status.ready,
       pendingActions: status.pendingActions,
+      deliveryPosture: posture.deliveryPosture,
     });
   }
   const allReady = portfolios.every((p) => p.ready);
@@ -1120,7 +1122,11 @@ function renderDeliveryStatusMarkdown(overview = {}) {
     const actions = p.pendingActions.length
       ? p.pendingActions.map((a) => `  - ${a}`).join('\n')
       : '  - None';
-    return `### ${p.portfolio}\n- Delivery mode: ${p.deliveryMode}\n- Channels: ${(p.intendedChannels || []).join(', ')}\n- External delivery: ${p.externalDeliveryEnabled ? 'enabled' : 'disabled'}\n- Failure alert mode: ${p.failureAlertMode}\n- Alert targets: ${(p.failureAlertTargets || []).join(', ')}\n- Policy override loaded: ${p.overrideLoaded ? 'yes' : 'no'}\n- Ready: ${p.ready ? 'yes' : 'no'}\n- Pending actions:\n${actions}`;
+    const brokerBlock = p.deliveryPosture?.brokerBlockContext?.topBrokerBlock;
+    const brokerBlockSection = brokerBlock
+      ? `\n- Broker block context:\n  - Count: ${p.deliveryPosture?.brokerBlockContext?.blockedTradeCount || 0}\n  - Top block: [${brokerBlock.blockCode || 'blocked'}] ${brokerBlock.tickerOrIsin || 'unknown'}${brokerBlock.name ? ` — ${brokerBlock.name}` : ''}\n  - Reason: ${brokerBlock.blockReason || 'No broker block reason recorded.'}\n  - Next action: ${brokerBlock.nextAction || 'No next action recorded.'}`
+      : '';
+    return `### ${p.portfolio}\n- Delivery mode: ${p.deliveryMode}\n- Channels: ${(p.intendedChannels || []).join(', ')}\n- External delivery: ${p.externalDeliveryEnabled ? 'enabled' : 'disabled'}\n- Failure alert mode: ${p.failureAlertMode}\n- Alert targets: ${(p.failureAlertTargets || []).join(', ')}\n- Policy override loaded: ${p.overrideLoaded ? 'yes' : 'no'}\n- Ready: ${p.ready ? 'yes' : 'no'}\n- Pending actions:\n${actions}${brokerBlockSection}`;
   }).join('\n\n');
   return `# Delivery & Alerting Status\n\n- Generated at: ${overview.generatedAt || 'unknown'}\n- Portfolios: ${overview.portfolioCount || 0}\n- All ready: ${overview.allReady ? 'yes' : 'no'}\n\n## Per-Portfolio Delivery Posture\n\n${portfolioSections}\n`;
 }
