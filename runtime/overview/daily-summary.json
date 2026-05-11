@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-10T13:24:35.098Z",
+  "generatedAt": "2026-05-11T09:14:45.507Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 5000,
@@ -18,19 +18,19 @@
     "status": "out_of_bounds",
     "absDrift": 60
   },
-  "brokerHealth": "degraded",
+  "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
   "pendingApprovals": 1,
-  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+  "recommendedNextStep": "4 trade row(s) are marked failed and need operator review.",
   "biggestDriftWhy": "Global equities is 60% under target and outside the allowed band around the 60% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",
     "cashChf": 5000,
-    "brokerHealth": "degraded",
-    "deliveryPosture": "ready",
-    "pendingApprovals": 7,
-    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-    "whyNow": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    "brokerHealth": "healthy",
+    "deliveryPosture": "needs_operator_attention",
+    "pendingApprovals": 3,
+    "recommendedNextStep": "4 trade row(s) are marked failed and need operator review.",
+    "whyNow": "No explicit execution block is currently surfaced."
   }
 }

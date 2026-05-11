@@ -3,36 +3,43 @@
 ## Incident Status
 - Status: action_required
 - Health: warning
-- Broker health: degraded
-- Execution posture: degraded_dry_run_only
-- Delivery posture: ready
+- Broker health: healthy
+- Execution posture: ready_for_review
+- Delivery posture: needs_operator_attention
 - Data freshness: current
-- Pending approvals: 7
-- Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Pending approvals: 3
+- Recommended next step: 4 trade row(s) are marked failed and need operator review.
 
 ## Why This Incident Exists
-- Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-- 7 approval-gated trade row(s) still need explicit operator review before the workflow can advance cleanly.
+- No explicit execution block is currently surfaced.
+- 3 approval-gated trade row(s), 3 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly.
 
 ## Incident Drivers
-- Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
-- 7 approval-gated trade rows are still waiting for operator review.
+- 3 approval-gated trade rows are still waiting for operator review.
 
 ## Active Blockers
 1. No active blockers.
 
 ## Action Checklist
-1. [high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-   - Action: Restore broker connectivity before relying on broker-backed pricing or live execution paths.
+1. [high] 4 trade row(s) are marked failed and need operator review.
+   - Action: Review the failed trade rows and resolve the root cause before retrying.
    - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
-   - Source: broker_readiness
-2. [medium] 7 proposed trade row(s) still need user approval.
-   - Action: Review the proposed trades and approve or reject them explicitly.
+   - Source: trade_lifecycle
+2. [medium] 3 approved trade row(s) are ready for staging or review.
+   - Action: Stage or review the approved trades when readiness gates are satisfied.
    - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
    - Source: trade_lifecycle
+3. [medium] 3 trade row(s) were requeued for market-open retry after operator recovery.
+   - Action: Re-check the prior blocker cause before allowing the retry handoff to proceed.
+   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
+   - Source: trade_state
+4. [medium] 4 trade row(s) are marked failed and need operator review.
+   - Action: Review report delivery readiness and clear the pending action.
+   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
+   - Source: delivery_policy
 
 ## Verification Checks
-- Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.
+- Broker health remains healthy or intentionally degraded with operator awareness.
 - Freshness posture remains current.
 - All approval-gated rows are explicitly approved, rejected, or intentionally left pending.
 - No active blockers remain.
@@ -43,8 +50,8 @@
 - The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.
 
 ## Recent Signals
-1. [warn] Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-2. [warn] Requested instrument is not in Approved Instruments.
-3. [warn] Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-4. [warn] Requested instrument is not in Approved Instruments.
-5. [warn] Live execution requires explicit user approval flag. | Portfolio requires confirmation before first live trade. | Portfolio requires explicit user approval before the first live purchase. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+1. [warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.
+2. [warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.
+3. [info] Queued IE00B5BMR087 buy for market-open runner retry after operator recovery.
+4. [warn] CSPX blocked before submission: Could not determine a smart limit price from broker quote data.
+5. [warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.

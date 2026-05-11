@@ -189,7 +189,8 @@ async function main() {
   assert(overviewMarkdown.includes('First handoffs'), 'Expected first-handoff column in generated overview markdown');
   assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
   assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
-  assert(overviewMarkdown.includes('| etf | active | 5000 | warning |') && overviewMarkdown.includes('| 0 | 0 | Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. |'), 'Expected generated ETF row to retain queue columns and recommendation');
+  assert(overviewMarkdown.includes('| etf | active | 5000 | warning |'), 'Expected populated ETF row in generated overview markdown');
+  assert(overviewMarkdown.includes('| 0 | 3 | 4 trade row(s) are marked failed and need operator review. |'), 'Expected generated ETF row to retain queue columns and current recommendation');
   assert(portfolioIndexJson.schemaVersion === '1.1', 'Expected portfolio index schema version');
   assert(pendingActionsJson.schemaVersion === '1.1', 'Expected pending-actions schema version');
   assert(typeof pendingActionsJson.generatedAt === 'string' && pendingActionsJson.generatedAt.length > 0, 'Expected pending-actions generatedAt timestamp');

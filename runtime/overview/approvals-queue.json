@@ -1,18 +1,18 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-10T13:24:35.098Z",
+  "generatedAt": "2026-05-11T09:14:45.507Z",
   "itemCount": 1,
   "items": [
     {
       "rank": 1,
       "portfolio": "etf",
       "urgency": "medium",
-      "status": "pending_user_approval",
-      "summary": "7 proposed trade row(s) still need user approval.",
-      "explanation": "7 proposed trade row(s) still need user approval.",
-      "effectIfApproved": "The operator can move this proposal from review into the next staging / execution decision step.",
+      "status": "ready_for_review",
+      "summary": "3 approved trade row(s) are ready for staging or review.",
+      "explanation": "3 approved trade row(s) are ready for staging or review.",
+      "effectIfApproved": "The operator can advance the reviewed item into the next workflow step with fewer manual joins.",
       "effectIfIgnored": "The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.",
-      "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",
+      "recommendedOperatorAction": "Stage or review the approved trades when readiness gates are satisfied.",
       "queueType": "approval",
       "severity": "medium"
     }
