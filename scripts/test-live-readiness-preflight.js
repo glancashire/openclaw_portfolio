@@ -10,7 +10,8 @@ const target = path.resolve(process.cwd(), 'src/execution/liveReadinessPreflight
 
 function createPortfolioFixture({ executionMode = 'require_confirmation', trades = '', state = {} } = {}) {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'live-readiness-preflight-'));
-  const portfolioDir = path.join(tempDir, 'etf');
+  const portfolioRoot = path.join(tempDir, 'portfolio');
+  const portfolioDir = path.join(portfolioRoot, 'etf');
   fs.mkdirSync(portfolioDir, { recursive: true });
   fs.mkdirSync(path.join(tempDir, 'runtime'), { recursive: true });
 
@@ -20,12 +21,36 @@ function createPortfolioFixture({ executionMode = 'require_confirmation', trades
   return { tempDir, portfolioDir };
 }
 
-function loadWithMocks(readiness) {
+function loadWithMocks(readiness, runtimeState = { brokerErrors: {}, liveExecutionArms: {} }) {
   const original = Module._load;
   delete require.cache[target];
+  const clonedState = JSON.parse(JSON.stringify(runtimeState));
+  clonedState.liveExecutionArms ||= {};
+  clonedState.brokerErrors ||= {};
   Module._load = function(request, parent, isMain) {
     if (request.endsWith('../brokers/interactive-brokers/readiness') || request === '../brokers/interactive-brokers/readiness') {
       return { getInteractiveBrokersReadiness: async () => readiness };
+    }
+    if (request.endsWith('./runtimeState') || request === './runtimeState') {
+      return {
+        readExecutionState: () => clonedState,
+        writeExecutionState: (next) => {
+          clonedState.brokerErrors = next.brokerErrors || {};
+          clonedState.liveExecutionArms = next.liveExecutionArms || {};
+          return 'mock-runtime-state';
+        },
+        brokerErrorStatus: (portfolio, threshold = 3) => {
+          const bucket = clonedState.brokerErrors?.[portfolio] || { consecutive: 0 };
+          return {
+            consecutive: Number(bucket.consecutive || 0),
+            lastReason: bucket.lastReason || null,
+            lastMessage: bucket.lastMessage || null,
+            lastAt: bucket.lastAt || null,
+            stopAutomation: Number(bucket.consecutive || 0) >= threshold,
+            threshold,
+          };
+        },
+      };
     }
     return original.apply(this, arguments);
   };
@@ -69,19 +94,24 @@ function loadWithMocks(readiness) {
     process.chdir(cwd);
   }
 
-  // green path
+  // green path with one excluded approved row surfaced explicitly
   {
     const { tempDir, portfolioDir } = createPortfolioFixture({
       executionMode: 'transmitted_live',
-      trades: '| 2026-05-10 10:30:00 | approved | buy | AAA | ETF A | 1 | 100 | 100 | 0 | approved row | user_approved |  |  |  |  |  |\n',
+      trades: '| 2026-05-10 10:30:00 | approved | buy | AAA | ETF A | 1 | 100 | 100 | 0 | approved row | user_approved |  |  |  |  |  |\n| 2026-05-10 10:31:00 | approved | buy | BBB | ETF B | 2 | 101 | 202 | 0 | blocked approved row | user_approved |  | quote_unavailable | No broker quote was available. | 2026-05-10 10:32:00 | Restore broker pricing and retry. |\n',
     });
     process.chdir(tempDir);
     const mod = loadWithMocks({ configured: true, authenticated: true, reachable: true, fallbackRequired: false, message: 'ready' });
-    mod.armLiveExecutionWindow(portfolioDir, { expiresAt: '2026-05-10T18:00:00Z', note: 'armed' });
+    mod.armLiveExecutionWindow(portfolioDir, { expiresAt: '2099-05-10T18:00:00Z', note: 'armed' });
     const result = await mod.evaluateLiveReadinessPreflight({ portfolioDir, now: new Date('2026-05-10T11:00:00Z'), maxApprovalAgeHours: 24 });
     assert.strictEqual(result.ok, true, JSON.stringify(result.blockers));
     assert.strictEqual(result.armedForMarketOpen, true);
-    assert.strictEqual(result.approvalState.approvedCount, 1);
+    assert.strictEqual(result.approvalState.approvedCount, 2);
+    assert.strictEqual(result.approvalState.executableCount, 1);
+    assert.strictEqual(result.approvalState.excludedApprovedRows.length, 1);
+    assert.strictEqual(result.approvalState.excludedApprovedRows[0].tickerOrIsin, 'BBB');
+    assert.strictEqual(result.approvalState.excludedApprovedRows[0].blockCode, 'quote_unavailable');
+    assert(result.warnings.some((w) => w.code === 'excluded_approved_rows'));
     process.chdir(cwd);
   }
 
