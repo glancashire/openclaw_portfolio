@@ -12,6 +12,8 @@ function loadIbModule() {
   return ibModule;
 }
 
+const WAIT_FOR_POST_ACK_MS = 2500;
+
 class InteractiveBrokersNativeClient {
   constructor(config) {
     this.config = config;
@@ -496,27 +498,51 @@ function placeNativeOrder(api, order) {
       transmit: order?.transmit === true,
     };
 
+    let settled = false;
+    let lastAck = buildAck({
+      orderId,
+      symbol: order?.symbol || null,
+      secType: order?.secType || null,
+      action: nativeOrder.action,
+      orderType: nativeOrder.orderType,
+      quantity: nativeOrder.totalQuantity,
+      remaining: nativeOrder.totalQuantity,
+      limitPrice: nativeOrder.lmtPrice,
+      transmit: nativeOrder.transmit,
+      status: 'Submitted',
+    });
+
+    const finish = (value, isError = false) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (isError) reject(value);
+      else resolve(value);
+    };
+
     const onOpenOrder = (incomingOrderId, incomingContract, incomingOrder, orderState) => {
       if (String(incomingOrderId) !== String(orderId)) return;
-      finish({
-        orderId: incomingOrderId,
+      lastAck = buildAck({
+        orderId,
         permId: incomingOrder?.permId ?? null,
         symbol: incomingContract?.symbol || order?.symbol || null,
         secType: incomingContract?.secType || order?.secType || null,
         action: incomingOrder?.action || nativeOrder.action,
         orderType: incomingOrder?.orderType || nativeOrder.orderType,
         quantity: Number(incomingOrder?.totalQuantity ?? nativeOrder.totalQuantity),
-        status: orderState?.status || 'Submitted',
+        status: orderState?.status || incomingOrder?.status || 'Submitted',
         filled: 0,
         remaining: Number(incomingOrder?.totalQuantity ?? nativeOrder.totalQuantity),
         limitPrice: Number.isFinite(Number(incomingOrder?.lmtPrice)) ? Number(incomingOrder.lmtPrice) : nativeOrder.lmtPrice,
         transmit: incomingOrder?.transmit === true,
       });
+      if (shouldResolveNow(lastAck.status)) finish(lastAck);
     };
+
     const onOrderStatus = (incomingOrderId, status, filled, remaining, avgFillPrice, permId) => {
       if (String(incomingOrderId) !== String(orderId)) return;
-      finish({
-        orderId: incomingOrderId,
+      lastAck = buildAck({
+        orderId,
         permId: permId ?? null,
         symbol: order?.symbol || null,
         secType: order?.secType || null,
@@ -530,35 +556,65 @@ function placeNativeOrder(api, order) {
         limitPrice: nativeOrder.lmtPrice,
         transmit: nativeOrder.transmit === true,
       });
+      if (shouldResolveNow(lastAck.status)) finish(lastAck);
     };
+
     const onError = (err, code, reqId) => {
       if (isIgnorableCode(code)) return;
+      if (String(reqId || '') === String(orderId)) {
+        lastAck = buildAck({
+          ...lastAck,
+          status: 'Inactive',
+          brokerReason: 'broker_error',
+          brokerErrorCode: code ?? null,
+          brokerErrorMessage: normalizeError(err, code, reqId).message,
+        });
+        finish(lastAck);
+        return;
+      }
       finish(normalizeError(err, code, reqId), true);
     };
 
-    let settled = false;
     const cleanup = () => {
       clearTimeout(timer);
       api.off(EventName.openOrder, onOpenOrder);
       api.off(EventName.orderStatus, onOrderStatus);
       api.off(EventName.error, onError);
     };
-    const finish = (value, isError = false) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      if (isError) reject(value);
-      else resolve(value);
-    };
-    const timer = setTimeout(() => {
-      finish(new Error(`Timed out waiting for native order acknowledgement for ${order?.symbol || orderId}`), true);
-    }, 15000);
+
+    const timer = setTimeout(() => finish(lastAck), WAIT_FOR_POST_ACK_MS);
 
     api.on(EventName.openOrder, onOpenOrder);
     api.on(EventName.orderStatus, onOrderStatus);
     api.on(EventName.error, onError);
     api.placeOrder(orderId, contract, nativeOrder);
   });
+}
+
+function buildAck(base = {}) {
+  return {
+    orderId: base.orderId,
+    permId: base.permId ?? null,
+    symbol: base.symbol || null,
+    secType: base.secType || null,
+    action: base.action || null,
+    orderType: base.orderType || null,
+    quantity: Number(base.quantity ?? 0),
+    status: base.status || 'Submitted',
+    filled: Number(base.filled ?? 0),
+    remaining: Number(base.remaining ?? 0),
+    avgFillPrice: Number.isFinite(Number(base.avgFillPrice)) ? Number(base.avgFillPrice) : null,
+    limitPrice: Number.isFinite(Number(base.limitPrice)) ? Number(base.limitPrice) : null,
+    transmit: base.transmit === true,
+    brokerReason: base.brokerReason || null,
+    brokerErrorCode: base.brokerErrorCode ?? null,
+    brokerErrorMessage: base.brokerErrorMessage || null,
+  };
+}
+
+function shouldResolveNow(status) {
+  const raw = String(status || '').trim().toLowerCase();
+  return ['inactive', 'cancelled', 'filled', 'submitted', 'presubmitted', 'api_pending', 'pending_submit', 'pendingcancel'].includes(raw);
 }
 
 function normalizeContractDetails(details) {

@@ -187,6 +187,9 @@ function buildBrokerReasonNote(brokerOrder, mappedStatus) {
   if (brokerOrder.execId) parts.push(`exec id ${brokerOrder.execId}`);
   if (brokerOrder.executedAt) parts.push(`executed at ${brokerOrder.executedAt}`);
   if (brokerOrder.completedStatus) parts.push(`completed status ${brokerOrder.completedStatus}`);
+  if (brokerOrder.brokerReason) parts.push(`broker reason ${brokerOrder.brokerReason}`);
+  if (brokerOrder.brokerErrorCode != null) parts.push(`broker error code ${brokerOrder.brokerErrorCode}`);
+  if (brokerOrder.brokerErrorMessage) parts.push(`broker error ${brokerOrder.brokerErrorMessage}`);
   return `Execution reconciliation: ${parts.join(', ')}`;
 }
 
