@@ -84,6 +84,15 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
   const proposedRows = rows.filter((row) => String(row.Status || '').trim().toLowerCase() === 'proposed');
   const approvedRows = rows.filter((row) => String(row.Status || '').trim().toLowerCase() === 'approved');
   const executableRows = listExecutableTradeRows(tradesPath);
+  const enrichedExecutableRows = executableRows.map((row) => {
+    const match = rows.find((candidate) => `${candidate['Date/time']}::${candidate['Ticker / ISIN']}::${String(candidate.Action || '').toLowerCase()}` === `${row.dateTime}::${row.tickerOrIsin}::${String(row.action || '').toLowerCase()}`);
+    return {
+      ...row,
+      blockCode: match?.['Block code'] || '',
+      blockReason: match?.['Block reason'] || '',
+      nextAction: match?.['Next action'] || '',
+    };
+  });
   const executableKeys = new Set(executableRows.map((row) => `${row.dateTime}::${row.tickerOrIsin}::${String(row.action || '').toLowerCase()}`));
   const excludedApprovedRows = approvedRows
     .filter((row) => !executableKeys.has(`${row['Date/time']}::${row['Ticker / ISIN']}::${String(row.Action || '').toLowerCase()}`))
@@ -129,7 +138,7 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
     ambiguousQueuedCount: ambiguousQueuedRows.length,
     hasAnyApprovedRows: approvedRows.length > 0,
     hasExecutableApprovedRows: executableRows.length > 0,
-    executableRows,
+    executableRows: enrichedExecutableRows,
     excludedApprovedRows,
   };
 }

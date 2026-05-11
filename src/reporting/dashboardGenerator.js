@@ -411,6 +411,7 @@ async function regenerateDashboard(portfolioDir) {
     recentSummary: summarizeRuntimeEvents(recentEvents),
   };
   const fillNotificationState = readFillNotificationState();
+  const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   let freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   let deliveryStatus = reportDeliveryStatus({ portfolioDir });
   let dashboard = generateDashboard({
@@ -424,6 +425,7 @@ async function regenerateDashboard(portfolioDir) {
     latestSnapshot: latestHistory(historyPath),
     brokerReadiness,
     lifecycleSummary: executionLifecycleSummary(tradesPath, { actionableOnly: true }),
+    openRunnerRetryState,
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,
@@ -446,6 +448,7 @@ async function regenerateDashboard(portfolioDir) {
     latestSnapshot: latestHistory(historyPath),
     brokerReadiness,
     lifecycleSummary: executionLifecycleSummary(tradesPath, { actionableOnly: true }),
+    openRunnerRetryState,
     freshness,
     brokerErrorState: currentBrokerErrorState,
     deliveryStatus,

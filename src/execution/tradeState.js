@@ -171,9 +171,9 @@ function inferApproval(status, brokerOrder = {}) {
   if (status === 'staged') return 'staged_not_transmitted';
   if (status === 'submitted') return brokerOrder.transmit === false ? 'staged_not_transmitted' : 'submitted_to_broker';
   if (status === 'partially_filled' || status === 'filled') return 'broker_filled';
-  if (status === 'cancelled') return 'cancelled';
+  if (status === 'cancelled') return brokerOrder.notFound === true ? 'broker_cancelled' : 'cancelled';
   if (status === 'inactive') return 'broker_inactive';
-  if (status === 'failed') return 'broker_failed';
+  if (status === 'failed') return brokerOrder.notFound === true ? 'not_found' : 'broker_failed';
   return 'user_approved';
 }
 
@@ -281,8 +281,10 @@ function summarizeOpenRunnerRetryState(tradesPath) {
     const approval = String(row.Approval || '').trim();
     const orderId = String(row['Broker order id'] || '').trim();
     if (approval !== 'queued_for_open_runner' || orderId) return;
+    const blockCode = String(row['Block code'] || '').trim().toLowerCase();
     const nextAction = String(row['Next action'] || '').trim().toLowerCase();
-    if (nextAction.includes('retry')) summary.queuedRetry += 1;
+    const retryableBlocked = Boolean(blockCode) || nextAction.includes('retry');
+    if (retryableBlocked) summary.queuedRetry += 1;
     else summary.queuedInitial += 1;
   });
   return summary;

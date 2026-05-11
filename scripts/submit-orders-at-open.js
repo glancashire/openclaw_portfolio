@@ -105,7 +105,7 @@ function markTradeBlocked(trade, { blockCode, blockReason, nextAction, status = 
   });
 }
 
-function clearTradeBlock(trade, { nextAction = 'Ready for market-open submission.' } = {}) {
+function clearTradeBlock(trade, { nextAction = 'Quote validated for this run; ready for market-open submission.' } = {}) {
   updateTradeRows(tradesPath, { dateTime: trade.row.dateTime, tickerOrIsin: trade.row.tickerOrIsin, action: trade.row.action }, (row) => ({
     ...row,
     Status: 'approved',

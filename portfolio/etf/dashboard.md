@@ -47,16 +47,17 @@
 - none
 
 ## Pending Operator Actions
-1. [approval/ready_for_review/medium] There are 1 approved trade row(s) ready for staging/review.
-2. [delivery/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
+1. [open_runner_retry/ready_for_review/medium] 1 trade row(s) were requeued for market-open retry after operator recovery.
+2. [approval/ready_for_review/medium] There are 1 approved trade row(s) ready for staging/review.
+3. [delivery/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
 
 ## Operator Queue Summary
-- Total queue items: 2
+- Total queue items: 3
 - Blocking items: 0
 - Approval items: 1
 - Execution items: 0
 - Open-runner first handoffs: 0
-- Open-runner retries: 0
+- Open-runner retries: 1
 - Recovery items: 0
 - Delivery items: 1
 - Data items: 0
@@ -66,11 +67,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
+| 2026-05-11 21:46:56.727 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
+| 2026-05-11 21:45:40.109 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
+| 2026-05-11 21:41:08.702 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
+| 2026-05-11 21:39:57.415 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:23:23.526 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:21:56.258 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:21:43.122 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:21:13.133 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:19:34.255 UTC | safety_controls_blocked | warn | Holdings contain unmatched instruments: review instrument mapping | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-11
@@ -82,7 +83,7 @@
 - Reconciled fills pending notification backfill: 1
 
 ## Recommended Next Step
-There are 1 approved trade row(s) ready for staging/review.
+1 trade row(s) were requeued for market-open retry after operator recovery.
 
 ## Status Labels
 - Pending approvals queue count: 1
@@ -96,12 +97,12 @@ There are 1 approved trade row(s) ready for staging/review.
 - Whole-share draft sizing leaves CHF 3140.86 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: Broker order 9105 status sync: probable cancelled via completed-order evidence
 - 1 reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.
-- Observability shows 86 recent blocked execution-policy event(s).
+- Observability shows 90 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
-- Recent runtime events scanned: 92
-- Recent blocked trade events: 86
+- Recent runtime events scanned: 96
+- Recent blocked trade events: 90
 - Open-runner first handoff events: 0
 - Open-runner retry events: 6
 - Recent degraded broker events: 0
