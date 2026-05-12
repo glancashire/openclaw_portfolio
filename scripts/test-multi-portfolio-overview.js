@@ -1,10 +1,27 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel, buildRecommendedActionRows, formatQueueSummary, buildPortfolioTable, brokerBlockHint } = require('../src/reporting/overviewBoard');
 const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function seedGeneratedArtifactBrokerBlockRepo(repoRoot) {
+  const portfolioDir = path.join(repoRoot, 'portfolio', 'demo');
+  const reportsDir = path.join(portfolioDir, 'reports');
+  fs.mkdirSync(portfolioDir, { recursive: true });
+  fs.mkdirSync(reportsDir, { recursive: true });
+  fs.mkdirSync(path.join(repoRoot, 'runtime'), { recursive: true });
+
+  fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), `# Portfolio: demo\n\n## Status\n- Status: active\n- Base currency: CHF\n- Broker: interactive-brokers\n- Broker account reference: demo\n- Execution mode: transmitted_live\n- Delivery mode: local_only\n- Delivery channels: operator-console\n`);
+  fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), '# Holdings\n');
+  fs.writeFileSync(path.join(portfolioDir, 'dashboard.md'), '# Dashboard\n');
+  fs.writeFileSync(path.join(portfolioDir, 'history.md'), `# History\n\n## Daily Valuation History\n| Date | Snapshot | Total value CHF | Invested CHF | Cash CHF | Daily change CHF | Daily change % | Notes |\n|---|---|---:|---:|---:|---:|---:|---|\n| 2026-05-11 | close | 5000 | 1000 | 4000 | 0 | 0 | ok |\n`);
+  fs.writeFileSync(path.join(portfolioDir, 'trades.md'), `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| 2026-05-11 09:40:00 | inactive | buy | IE000XZSV718 | SPYL | 105 | 15.5 | 1560.83 | 0 | live submit | broker_inactive | 9105 | exchange_closed_at_submit | Broker rejected the order because the target exchange was closed at submission time. | 2026-05-11 09:40:02 | Retry during the venue trading session or hand the row back to the market-open runner. |\n`);
+  fs.writeFileSync(path.join(repoRoot, 'runtime', 'fill-notifications-state.json'), JSON.stringify({ notifiedFills: [], reconciledUnnotifiedFills: [9105] }, null, 2));
+  fs.writeFileSync(path.join(reportsDir, 'demo-weekly-20260511.md'), '# Demo Weekly Report\n');
 }
 
 async function main() {
@@ -327,6 +344,31 @@ async function main() {
   const deliveryHtml = fs.readFileSync(generated.deliveryStatusHtmlPath, 'utf8');
   assert(deliveryHtml.includes('Delivery'), 'Expected delivery html title');
   assert(deliveryHtml.includes('local_only') || deliveryHtml.includes('Delivery mode'), 'Expected delivery mode in html');
+
+  const generatedFixtureRepo = fs.mkdtempSync(path.join(os.tmpdir(), 'generated-overview-broker-block-'));
+  seedGeneratedArtifactBrokerBlockRepo(generatedFixtureRepo);
+  const generatedFixture = await generateOverviewArtifacts({ repoRoot: generatedFixtureRepo, writeFiles: true });
+  const generatedDeliveryJson = JSON.parse(fs.readFileSync(generatedFixture.deliveryStatusPath, 'utf8'));
+  const generatedDeliveryMd = fs.readFileSync(generatedFixture.deliveryStatusMarkdownPath, 'utf8');
+  const generatedDeliveryHtml = fs.readFileSync(generatedFixture.deliveryStatusHtmlPath, 'utf8');
+  const generatedCockpitHtml = fs.readFileSync(generatedFixture.cockpitHtmlPath, 'utf8');
+  const generatedDemoDelivery = generatedDeliveryJson.portfolios.find((p) => p.portfolio === 'demo');
+  assert(generatedDemoDelivery, 'Expected demo portfolio in generated delivery json');
+  assert(generatedDemoDelivery.deliveryPosture && generatedDemoDelivery.deliveryPosture.brokerBlockContext, 'Expected brokerBlockContext in generated delivery json');
+  assert(generatedDemoDelivery.deliveryPosture.brokerBlockContext.blockedTradeCount === 1, 'Expected blocked trade count in generated delivery json');
+  assert(generatedDemoDelivery.deliveryPosture.brokerBlockContext.topBrokerBlock, 'Expected top broker block in generated delivery json');
+  assert(generatedDemoDelivery.deliveryPosture.brokerBlockContext.topBrokerBlock.blockCode === 'exchange_closed_at_submit', 'Expected broker block code in generated delivery json');
+  assert(/exchange was closed at submission time/i.test(generatedDemoDelivery.deliveryPosture.brokerBlockContext.topBrokerBlock.blockReason), 'Expected broker block reason in generated delivery json');
+  assert(/market-open runner/i.test(generatedDemoDelivery.deliveryPosture.brokerBlockContext.topBrokerBlock.nextAction), 'Expected broker block next action in generated delivery json');
+  assert(generatedDeliveryMd.includes('Broker block context:'), 'Expected broker block context section in generated delivery markdown');
+  assert(generatedDeliveryMd.includes('Reason: Broker rejected the order because the target exchange was closed at submission time.'), 'Expected broker block reason in generated delivery markdown');
+  assert(generatedDeliveryMd.includes('Next action: Retry during the venue trading session or hand the row back to the market-open runner.'), 'Expected broker block next action in generated delivery markdown');
+  assert(generatedDeliveryHtml.includes('Broker block context:'), 'Expected broker block context section in generated delivery html');
+  assert(generatedDeliveryHtml.includes('<h3>demo</h3>'), 'Expected demo portfolio section in generated delivery html');
+  assert(generatedCockpitHtml.includes('Delivery Broker Blocks'), 'Expected delivery broker block section in generated cockpit html');
+  assert(generatedCockpitHtml.includes('<strong>demo</strong>: [exchange_closed_at_submit] IE000XZSV718 — SPYL'), 'Expected broker block summary row in generated cockpit html');
+  assert(generatedCockpitHtml.includes('Reason: Broker rejected the order because the target exchange was closed at submission time.'), 'Expected broker block reason in generated cockpit html');
+  assert(generatedCockpitHtml.includes('Next action: Retry during the venue trading session or hand the row back to the market-open runner.'), 'Expected broker block next action in generated cockpit html');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
