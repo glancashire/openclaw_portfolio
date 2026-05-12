@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 const { parseExecutionMode, parsePortfolioStatus } = require('./portfolioExecution');
-const { readTradesTable, listExecutableTradeRows } = require('./tradeState');
+const { readTradesTable, listExecutableTradeRows, classifyExecutableRow } = require('./tradeState');
 const { brokerErrorStatus, readExecutionState, writeExecutionState } = require('./runtimeState');
 const { isMarketOpen, nextOpenTime } = require('../../lib/marketHours');
 
@@ -96,22 +96,26 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
   const executableKeys = new Set(executableRows.map((row) => `${row.dateTime}::${row.tickerOrIsin}::${String(row.action || '').toLowerCase()}`));
   const excludedApprovedRows = approvedRows
     .filter((row) => !executableKeys.has(`${row['Date/time']}::${row['Ticker / ISIN']}::${String(row.Action || '').toLowerCase()}`))
-    .map((row) => ({
-      dateTime: row['Date/time'],
-      status: row.Status,
-      action: row.Action,
-      tickerOrIsin: row['Ticker / ISIN'],
-      name: row.Name,
-      quantity: Number(row.Quantity || 0),
-      limitPrice: Number(row['Limit price'] || 0),
-      estimatedChf: Number(row['Estimated CHF'] || 0),
-      approval: row.Approval,
-      brokerOrderId: row['Broker order id'],
-      reason: row.Reason,
-      blockCode: row['Block code'] || '',
-      blockReason: row['Block reason'] || inferExcludedApprovedReason(row),
-      nextAction: row['Next action'] || '',
-    }));
+    .map((row) => {
+      const classification = classifyExecutableRow(row);
+      return {
+        dateTime: row['Date/time'],
+        status: row.Status,
+        action: row.Action,
+        tickerOrIsin: row['Ticker / ISIN'],
+        name: row.Name,
+        quantity: Number(row.Quantity || 0),
+        limitPrice: Number(row['Limit price'] || 0),
+        estimatedChf: Number(row['Estimated CHF'] || 0),
+        approval: row.Approval,
+        brokerOrderId: row['Broker order id'],
+        reason: row.Reason,
+        blockCode: row['Block code'] || classification.reasonCode || '',
+        blockReason: row['Block reason'] || classification.reason || inferExcludedApprovedReason(row),
+        nextAction: row['Next action'] || classification.nextAction || '',
+        exclusionReasonCode: classification.reasonCode || '',
+      };
+    });
   const latestApprovedAt = approvedRows
     .map((row) => parseTradeDate(row['Date/time']))
     .filter(Boolean)
@@ -144,6 +148,8 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
 }
 
 function inferExcludedApprovedReason(row) {
+  const classification = classifyExecutableRow(row);
+  if (classification?.reason) return classification.reason;
   const blockReason = String(row['Block reason'] || '').trim();
   if (blockReason) return blockReason;
   const blockCode = String(row['Block code'] || '').trim();
@@ -196,7 +202,11 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
     blockers.push({ code: 'no_executable_rows', message: 'No executable approved trade rows are currently eligible for submission.' });
   }
   if (approvalState.excludedApprovedRows.length > 0) {
-    warnings.push({ code: 'excluded_approved_rows', message: `${approvalState.excludedApprovedRows.length} approved row(s) are currently excluded from execution; inspect approvalState.excludedApprovedRows for reasons.` });
+    const sample = approvalState.excludedApprovedRows[0];
+    warnings.push({
+      code: 'excluded_approved_rows',
+      message: `${approvalState.excludedApprovedRows.length} approved row(s) are currently excluded from execution; inspect approvalState.excludedApprovedRows for reasons.${sample?.tickerOrIsin ? ` Example: ${sample.tickerOrIsin} (${sample.exclusionReasonCode || sample.blockCode || 'excluded'})` : ''}`,
+    });
   }
   if (approvalState.staleApproval) {
     blockers.push({ code: 'stale_approval', message: `Latest approval is stale at ${approvalState.approvalAgeHours}h; max allowed is ${approvalState.maxApprovalAgeHours}h.` });

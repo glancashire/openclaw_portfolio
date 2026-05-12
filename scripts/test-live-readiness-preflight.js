@@ -111,7 +111,9 @@ function loadWithMocks(readiness, runtimeState = { brokerErrors: {}, liveExecuti
     assert.strictEqual(result.approvalState.excludedApprovedRows.length, 1);
     assert.strictEqual(result.approvalState.excludedApprovedRows[0].tickerOrIsin, 'BBB');
     assert.strictEqual(result.approvalState.excludedApprovedRows[0].blockCode, 'quote_unavailable');
-    assert(result.warnings.some((w) => w.code === 'excluded_approved_rows'));
+    assert.strictEqual(result.approvalState.excludedApprovedRows[0].exclusionReasonCode, 'quote_unavailable');
+    assert.match(result.approvalState.excludedApprovedRows[0].blockReason, /No broker quote was available/i);
+    assert(result.warnings.some((w) => w.code === 'excluded_approved_rows' && /BBB|quote_unavailable/i.test(w.message)));
     process.chdir(cwd);
   }
 

@@ -3,7 +3,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { listExecutableTradeRows } = require('../src/execution/tradeState');
+const { listExecutableTradeRows, classifyExecutableRow, readTradesTable } = require('../src/execution/tradeState');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -18,7 +18,15 @@ function main() {
   assert(rows.length === 2, `expected exactly two executable rows, got ${rows.length}`);
   assert(rows.some((row) => row.tickerOrIsin === 'AAA'), 'expected AAA selected');
   assert(rows.some((row) => row.tickerOrIsin === 'BBB'), 'expected queued BBB selected');
-  console.log(JSON.stringify({ ok: true, rows }, null, 2));
+
+  const table = readTradesTable(tradesPath);
+  const blocked = table.rows.find((row) => row['Ticker / ISIN'] === 'CCC');
+  const blockedClassification = classifyExecutableRow(blocked);
+  assert(blockedClassification.executable === false, 'expected blocked CCC row to be non-executable');
+  assert(blockedClassification.reasonCode === 'approval_required', `expected approval_required reason code, got ${blockedClassification.reasonCode}`);
+  assert(/blocked/i.test(blockedClassification.reason), 'expected blocked row reason text');
+
+  console.log(JSON.stringify({ ok: true, rows, blockedClassification }, null, 2));
 }
 
 main();
