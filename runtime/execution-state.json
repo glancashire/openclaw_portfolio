@@ -31,10 +31,10 @@
       "lastAt": "2026-05-10T22:14:55.568Z"
     },
     "etf": {
-      "consecutive": 0,
-      "lastReason": null,
-      "lastMessage": null,
-      "lastAt": "2026-05-11T10:01:45.766Z"
+      "consecutive": 1,
+      "lastReason": "status_error",
+      "lastMessage": "Unable to reach Interactive Brokers API at 127.0.0.1:4001. TWS or IB Gateway does not appear to be running or API access is disabled. If you do not have access to TWS/IB Gateway on this machine, you will need a reachable IBKR API host/port. You can override defaults with --host/--port or IBKR_HOST/IBKR_PORT. Original error:",
+      "lastAt": "2026-05-11T21:15:28.890Z"
     }
   },
   "liveExecutionArms": {

@@ -1,12 +1,12 @@
 # Dashboard: etf
 
 ## Health Snapshot
-- Portfolio status: attention_needed
-- Strategy status: rebalance_needed
-- Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
+- Portfolio status: warning
+- Strategy status: blocked
+- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 - Last successful sync: 2026-05-11 21:27:45
 - Data freshness: current
-- Execution posture: ready_for_review
+- Execution posture: degraded_dry_run_only
 - Delivery posture: needs_operator_attention
 - Pending approvals: 1
 - Active blockers: 0
@@ -40,25 +40,26 @@
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
-- Broker/API warnings: 0
+- Broker/API warnings: 1
 - Stale data warnings: 0
 - Execution pause state: active
 - Active blocker detail:
 - none
 
 ## Pending Operator Actions
-1. [open_runner_retry/ready_for_review/medium] 1 trade row(s) were requeued for market-open retry after operator recovery.
-2. [approval/ready_for_review/medium] There are 1 approved trade row(s) ready for staging/review.
-3. [delivery/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
+1. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+2. [open_runner_queue/ready_for_review/medium] 1 trade row(s) are queued for a first market-open handoff.
+3. [approval/ready_for_review/medium] There are 1 approved trade row(s) ready for staging/review.
+4. [delivery/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
 
 ## Operator Queue Summary
-- Total queue items: 3
+- Total queue items: 4
 - Blocking items: 0
 - Approval items: 1
 - Execution items: 0
-- Open-runner first handoffs: 0
-- Open-runner retries: 1
-- Recovery items: 0
+- Open-runner first handoffs: 1
+- Open-runner retries: 0
+- Recovery items: 1
 - Delivery items: 1
 - Data items: 0
 - Warning items: 0
@@ -89,12 +90,13 @@
 - Pending approvals queue count: 1
 - In-flight execution rows: 0
 - Latest action recommendations:
-  - Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.
-  - Keep unapproved proposals separate from broker-ready approved trades to avoid execution confusion.
+  - Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
+  - Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 3140.86 unallocated beyond the intentional CHF cash sleeve.
+- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 - Latest history note: Broker order 9105 status sync: probable cancelled via completed-order evidence
 - 1 reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.
 - Observability shows 90 recent blocked execution-policy event(s).

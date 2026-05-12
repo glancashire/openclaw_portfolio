@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-11T22:13:57.127Z",
+  "generatedAt": "2026-05-12T22:07:37.593Z",
   "portfolio": "etf",
   "status": {
-    "health": "attention_needed",
-    "strategy": "rebalance_needed",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
+    "health": "warning",
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "current"
   },
@@ -31,19 +31,19 @@
   },
   "operatorQueue": {
     "summary": {
-      "total": 3,
-      "blocking": 0,
+      "total": 4,
+      "blocking": 1,
       "approvals": 1,
       "execution": 0,
-      "openRunnerQueue": 0,
-      "openRunnerRetry": 1,
-      "recovery": 0,
+      "openRunnerQueue": 1,
+      "openRunnerRetry": 0,
+      "recovery": 1,
       "delivery": 0,
       "data": 0,
       "warnings": 0,
       "workflow": 1,
       "bySeverity": {
-        "high": 0,
+        "high": 1,
         "medium": 3,
         "low": 0
       }
@@ -51,6 +51,18 @@
     "items": [
       {
         "rank": 1,
+        "queueType": "recovery",
+        "portfolio": "etf",
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
+      },
+      {
+        "rank": 2,
         "queueType": "backfill_review",
         "portfolio": "etf",
         "kind": "delivery",
@@ -62,7 +74,7 @@
         "source": "fill_notification_state"
       },
       {
-        "rank": 2,
+        "rank": 3,
         "queueType": "approval",
         "portfolio": "etf",
         "kind": "approval",
@@ -74,15 +86,15 @@
         "source": "trade_lifecycle"
       },
       {
-        "rank": 3,
-        "queueType": "open_runner_retry",
+        "rank": 4,
+        "queueType": "open_runner_queue",
         "portfolio": "etf",
         "kind": "execution",
         "severity": "medium",
         "status": "ready_for_review",
-        "summary": "1 trade row(s) were requeued for market-open retry after operator recovery.",
+        "summary": "1 trade row(s) are queued for a first market-open handoff.",
         "blocking": false,
-        "recommendedOperatorAction": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
+        "recommendedOperatorAction": "Confirm the queued rows are still intended before the next market-open run.",
         "source": "trade_state"
       }
     ]
@@ -109,14 +121,13 @@
     },
     "tradeState": {
       "queuedForOpenRunner": 1,
-      "blocked": 1,
-      "blockedByCode": {
-        "pricing_reference_unavailable": 1
-      }
+      "blocked": 0,
+      "blockedByCode": {}
     },
+    "blockedRows": [],
     "openRunnerRetryState": {
-      "queuedInitial": 0,
-      "queuedRetry": 1
+      "queuedInitial": 1,
+      "queuedRetry": 0
     },
     "inFlightCount": 0,
     "failedCount": 0,
@@ -255,16 +266,17 @@
     }
   ],
   "pendingActions": [
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
     "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
     "1 approved trade row(s) are ready for staging or review.",
-    "1 trade row(s) were requeued for market-open retry after operator recovery."
+    "1 trade row(s) are queued for a first market-open handoff."
   ],
   "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
   "explanations": {
     "biggestDrift": "Global equities is 40% over target and outside the allowed band around the 60% target.",
-    "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
-    "executionBlock": "No explicit execution block is currently surfaced.",
-    "approvalBacklog": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s), 1 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalBacklog": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
     {

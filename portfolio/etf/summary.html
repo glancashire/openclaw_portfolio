@@ -43,21 +43,23 @@ pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 
 <div class="report-container">
 <h1>Portfolio Summary Page: etf</h1>
 <h2>Status Snapshot</h2>
-<ul><li>Generated at: 2026-05-11T22:13:57.127Z</li><li>Health: attention_needed</li><li>Strategy status: rebalance_needed</li><li>Broker health: healthy</li><li>Execution posture: ready_for_review</li><li>Delivery posture: needs_operator_attention</li><li>Data freshness: current</li><li>Live readiness: not-evaluated</li><li>Live arm state: not-evaluated</li><li>Live readiness next step: n/a</li></ul>
+<ul><li>Generated at: 2026-05-12T22:07:37.593Z</li><li>Health: warning</li><li>Strategy status: blocked</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: needs_operator_attention</li><li>Data freshness: current</li><li>Live readiness: not-evaluated</li><li>Live arm state: not-evaluated</li><li>Live readiness next step: n/a</li></ul>
 <h2>Why This Portfolio Looks This Way</h2>
-<ul><li>Drift: Global equities is 40% over target and outside the allowed band around the 60% target.</li><li>Execution: No explicit execution block is currently surfaced.</li><li>Approvals: 1 approval-gated trade row(s), 1 queued-for-open-runner row(s), 1 blocked row(s) still need explicit operator review before the workflow can advance cleanly.</li><li>Trade posture: Trade posture is driven by the current proposal and approval state.</li></ul>
+<ul><li>Drift: Global equities is 40% over target and outside the allowed band around the 60% target.</li><li>Execution: Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.</li><li>Approvals: 1 approval-gated trade row(s), 1 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly.</li><li>Trade posture: No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.</li></ul>
 <h2>Holdings Snapshot</h2>
 <ul><li>Total value CHF: 5083.34</li><li>Cash CHF: 4048.26</li><li>Invested CHF: 1035.08</li><li>Holding count: 2</li><li>Last sync: 2026-05-11 21:27:45</li><li>Latest snapshot date: 2026-05-11</li></ul>
 <h2>Recommended Next Step</h2>
 <ul><li>1 reconciled fill(s) were detected after the live window and still need notification backfill review.</li></ul>
 <h2>Operator Queue Summary</h2>
-<ul><li>Total queue items: 3</li><li>Blocking items: 0</li><li>Approval items: 1</li><li>Open-runner first handoffs: 0</li><li>Open-runner retries: 1</li><li>Recovery items: 0</li><li>Warning items: 0</li></ul>
+<ul><li>Total queue items: 4</li><li>Blocking items: 1</li><li>Approval items: 1</li><li>Open-runner first handoffs: 1</li><li>Open-runner retries: 0</li><li>Recovery items: 1</li><li>Warning items: 0</li></ul>
 <h2>Operator Queue Items</h2>
-<ol><li>[backfill_review/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review. — Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.</li><li>[approval/ready_for_review/medium] 1 approved trade row(s) are ready for staging or review. — Stage or review the approved trades when readiness gates are satisfied.</li><li>[open_runner_retry/ready_for_review/medium] 1 trade row(s) were requeued for market-open retry after operator recovery. — Re-check the prior blocker cause before allowing the retry handoff to proceed.</li></ol>
+<ol><li>[recovery/degraded/high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. — Restore broker connectivity before relying on broker-backed pricing or live execution paths.</li><li>[backfill_review/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review. — Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.</li><li>[approval/ready_for_review/medium] 1 approved trade row(s) are ready for staging or review. — Stage or review the approved trades when readiness gates are satisfied.</li><li>[open_runner_queue/ready_for_review/medium] 1 trade row(s) are queued for a first market-open handoff. — Confirm the queued rows are still intended before the next market-open run.</li></ol>
 <h2>Blockers</h2>
 <ol><li>No active blockers.</li></ol>
 <h2>Execution Posture</h2>
-<ul><li>Proposed trades: 0</li><li>Approved trades: 1</li><li>Pending approvals: 1</li><li>Queued for open runner: 1</li><li>Queued retries: 1</li><li>Blocked rows: 1</li><li>In-flight rows: 0</li><li>Failed rows: 0</li></ul>
+<ul><li>Proposed trades: 0</li><li>Approved trades: 1</li><li>Pending approvals: 1</li><li>Queued for open runner: 1</li><li>Queued retries: 0</li><li>Blocked rows: 0</li><li>In-flight rows: 0</li><li>Failed rows: 0</li></ul>
+<h2>Broker Block Details</h2>
+<ol><li>No broker-blocked trade rows are currently recorded.</li></ol>
 <h2>Observability Status</h2>
 <ul><li>Runtime event file present: yes</li><li>Recent runtime events scanned: 96</li><li>Blocked execution-policy events: 90</li><li>Open-runner first handoff events: 0</li><li>Open-runner retry events: 6</li><li>Degraded broker events: 0</li><li>Stale-data events: 0</li></ul>
 <h2>Allocation</h2>

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-11T09:14:45.507Z",
+  "generatedAt": "2026-05-12T22:07:37.366Z",
   "itemCount": 1,
   "items": [
     {
@@ -8,8 +8,8 @@
       "portfolio": "etf",
       "urgency": "medium",
       "status": "ready_for_review",
-      "summary": "3 approved trade row(s) are ready for staging or review.",
-      "explanation": "3 approved trade row(s) are ready for staging or review.",
+      "summary": "1 approved trade row(s) are ready for staging or review.",
+      "explanation": "1 approved trade row(s) are ready for staging or review.",
       "effectIfApproved": "The operator can advance the reviewed item into the next workflow step with fewer manual joins.",
       "effectIfIgnored": "The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.",
       "recommendedOperatorAction": "Stage or review the approved trades when readiness gates are satisfied.",

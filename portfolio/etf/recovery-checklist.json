@@ -1,28 +1,38 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-11T22:13:57.127Z",
+  "generatedAt": "2026-05-12T22:07:37.593Z",
   "portfolio": "etf",
-  "incidentStatus": "monitor_only",
+  "incidentStatus": "action_required",
   "summary": {
-    "health": "attention_needed",
-    "brokerHealth": "healthy",
-    "executionPosture": "ready_for_review",
+    "health": "warning",
+    "brokerHealth": "degraded",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "current",
     "blockerCount": 0,
-    "queueItemCount": 3,
+    "queueItemCount": 4,
     "pendingApprovals": 1,
     "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-    "executionWhy": "No explicit execution block is currently surfaced.",
-    "approvalWhy": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s), 1 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalWhy": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
+    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
     "1 approval-gated trade rows are still waiting for operator review."
   ],
   "activeBlockers": [],
+  "activeBrokerBlocks": [],
   "actionChecklist": [
     {
       "step": 1,
+      "priority": "high",
+      "title": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
+      "source": "broker_readiness"
+    },
+    {
+      "step": 2,
       "priority": "medium",
       "title": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
       "action": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
@@ -30,7 +40,7 @@
       "source": "fill_notification_state"
     },
     {
-      "step": 2,
+      "step": 3,
       "priority": "medium",
       "title": "1 approved trade row(s) are ready for staging or review.",
       "action": "Stage or review the approved trades when readiness gates are satisfied.",
@@ -38,24 +48,24 @@
       "source": "trade_lifecycle"
     },
     {
-      "step": 3,
+      "step": 4,
       "priority": "medium",
-      "title": "1 trade row(s) were requeued for market-open retry after operator recovery.",
-      "action": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
+      "title": "1 trade row(s) are queued for a first market-open handoff.",
+      "action": "Confirm the queued rows are still intended before the next market-open run.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
       "source": "trade_state"
     }
   ],
   "verificationChecks": [
-    "Broker health remains healthy or intentionally degraded with operator awareness.",
+    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
     "Freshness posture remains current.",
     "All approval-gated rows are explicitly approved, rejected, or intentionally left pending.",
     "No active blockers remain."
   ],
   "completionCriteria": [
-    "Portfolio remains in a healthy or intentionally monitored posture.",
-    "No blocker-class recovery work is outstanding.",
-    "The next operating step is clear from the summary surface."
+    "Blocking recovery items no longer appear in the operator queue.",
+    "Portfolio health no longer depends on unresolved blocker conditions.",
+    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
   ],
   "recentSignals": [
     {
