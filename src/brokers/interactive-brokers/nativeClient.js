@@ -1,6 +1,8 @@
 let ibModule = null;
+let testLoadIbModule = null;
 
 function loadIbModule() {
+  if (testLoadIbModule) return testLoadIbModule();
   if (!ibModule) {
     try {
       ibModule = require('@stoqey/ib');
@@ -15,8 +17,9 @@ function loadIbModule() {
 const WAIT_FOR_POST_ACK_MS = 2500;
 
 class InteractiveBrokersNativeClient {
-  constructor(config) {
+  constructor(config, options = {}) {
     this.config = config;
+    this.options = options || {};
   }
 
   async authenticate() {
@@ -98,6 +101,7 @@ class InteractiveBrokersNativeClient {
     const connected = waitForNativeHandshake(api, {
       timeoutMs: 15000,
       label: 'native handshake',
+      ...this.options.handshake,
     });
     try {
       api.connect(this.config.clientId);
@@ -376,13 +380,24 @@ function waitForMarketSnapshot(api, contract) {
   });
 }
 
-function waitForNativeHandshake(api, { timeoutMs = 15000, label = 'native handshake' } = {}) {
+function waitForNativeHandshake(api, {
+  timeoutMs = 15000,
+  label = 'native handshake',
+  settleDelayMs = 250,
+  requireConnectedAck = false,
+} = {}) {
   return new Promise((resolve, reject) => {
     let settled = false;
     let sawValidId = false;
     let sawManagedAccounts = false;
     let sawConnectionAck = false;
     let lastIgnoredError = null;
+    let settleTimer = null;
+
+    const clearSettleTimer = () => {
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = null;
+    };
 
     const finish = (value, isError = false) => {
       if (settled) return;
@@ -392,29 +407,41 @@ function waitForNativeHandshake(api, { timeoutMs = 15000, label = 'native handsh
       else resolve(value);
     };
 
-    const maybeResolve = () => {
-      if (sawValidId || sawManagedAccounts || sawConnectionAck) {
-        finish({
-          ok: true,
-          sawValidId,
-          sawManagedAccounts,
-          sawConnectionAck,
-          lastIgnoredError,
-        });
+    const buildSuccess = () => ({
+      ok: true,
+      sawValidId,
+      sawManagedAccounts,
+      sawConnectionAck,
+      lastIgnoredError,
+    });
+
+    const hasHandshakeSignal = () => (sawValidId || sawManagedAccounts || sawConnectionAck);
+    const hasStrongReadinessSignal = () => (sawValidId || sawManagedAccounts);
+
+    const scheduleResolve = () => {
+      if (!hasHandshakeSignal()) return;
+      if (requireConnectedAck && !sawConnectionAck) return;
+      clearSettleTimer();
+      if (hasStrongReadinessSignal()) {
+        finish(buildSuccess());
+        return;
       }
+      settleTimer = setTimeout(() => {
+        finish(buildSuccess());
+      }, settleDelayMs);
     };
 
-    const onNextValidId = (nextValidId) => {
+    const onNextValidId = () => {
       sawValidId = true;
-      maybeResolve();
+      scheduleResolve();
     };
     const onManagedAccounts = () => {
       sawManagedAccounts = true;
-      maybeResolve();
+      scheduleResolve();
     };
     const onConnected = () => {
       sawConnectionAck = true;
-      maybeResolve();
+      scheduleResolve();
     };
     const onError = (err, code, reqId) => {
       if (isIgnorableCode(code)) {
@@ -425,6 +452,7 @@ function waitForNativeHandshake(api, { timeoutMs = 15000, label = 'native handsh
     };
     const cleanup = () => {
       clearTimeout(timer);
+      clearSettleTimer();
       const { EventName } = loadIbModule();
       api.off(EventName.nextValidId, onNextValidId);
       api.off(EventName.managedAccounts, onManagedAccounts);
@@ -646,4 +674,10 @@ function normalizeError(err, code, reqId) {
   return new Error(`IB native error${code ? ` ${code}` : ''}${reqId ? ` reqId=${reqId}` : ''}: ${String(err)}`);
 }
 
-module.exports = { InteractiveBrokersNativeClient, buildConidContract };
+module.exports = {
+  InteractiveBrokersNativeClient,
+  buildConidContract,
+  waitForNativeHandshake,
+  __setTestLoadIbModule(fn) { testLoadIbModule = fn; },
+  __resetTestLoadIbModule() { testLoadIbModule = null; },
+};
