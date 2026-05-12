@@ -376,7 +376,7 @@ function formatBlockerLines(blockers = []) {
   return blockers.map((item) => `- ${item.severity || 'info'}: ${item.message || item}`).join('\n');
 }
 
-function generateDashboard({ portfolioName, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [] }) {
+function generateDashboard({ portfolioName, tradesPath = '', holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [] }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -476,6 +476,7 @@ async function regenerateDashboard(portfolioDir) {
   let deliveryStatus = reportDeliveryStatus({ portfolioDir });
   let dashboard = generateDashboard({
     portfolioName,
+    tradesPath,
     holdingsText,
     allocations,
     approvedInstruments,
@@ -499,6 +500,7 @@ async function regenerateDashboard(portfolioDir) {
   deliveryStatus = reportDeliveryStatus({ portfolioDir });
   dashboard = generateDashboard({
     portfolioName,
+    tradesPath,
     holdingsText,
     allocations,
     approvedInstruments,

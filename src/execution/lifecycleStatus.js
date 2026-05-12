@@ -18,6 +18,7 @@ function normalizeLifecycleStatus(status, brokerOrder = {}) {
   if (['submitted', 'presubmitted', 'api_pending', 'pending_submit', 'pendingcancel'].includes(raw)) {
     return brokerOrder.transmit === false ? 'staged' : 'submitted';
   }
+  if (['broker_cancelled'].includes(raw)) return 'cancelled';
   if (['cancelled', 'canceled', 'cancel_requested', 'pending_cancel'].includes(raw)) return 'cancelled';
   if (raw === 'inactive') return 'inactive';
   if (['rejected', 'failed', 'error', 'not_found', 'missing'].includes(raw)) return 'failed';

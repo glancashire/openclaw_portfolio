@@ -19,7 +19,7 @@ function loadInteractiveBrokersConfig() {
     host: process.env.IBKR_HOST || cfg.host || '127.0.0.1',
     port: Number(process.env.IBKR_PORT || cfg.port || defaultNativePort),
     clientId: Number(process.env.IBKR_CLIENT_ID || cfg.clientId || 101),
-    readonly: String(process.env.IBKR_READONLY || cfg.readonly || 'true') !== 'false',
+    readonly: String(process.env.IBKR_READONLY ?? cfg.readonly ?? 'true') !== 'false',
     username: process.env.IBKR_USERNAME || cfg.username || '',
     password: process.env.IBKR_PASSWORD || cfg.password || '',
     accountId: process.env.IBKR_ACCOUNT_ID || cfg.accountId || '',

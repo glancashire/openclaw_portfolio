@@ -70,9 +70,21 @@ function latestHistory(historyPath) {
   };
 }
 
-function executionLifecycleSummary(tradesPath) {
+function actionableLifecycleRows(tradesPath) {
   const rows = tableRowsFromFile(tradesPath, '## Trade Log').map(parseTradeRow);
+  const latestByInstrumentAction = new Map();
+  for (const row of rows) {
+    const key = `${row.tickerOrIsin}::${String(row.action || '').toLowerCase()}`;
+    latestByInstrumentAction.set(key, row);
+  }
+  return Array.from(latestByInstrumentAction.values());
+}
+
+function executionLifecycleSummary(tradesPath, options = {}) {
+  const rows = options.actionableOnly
+    ? actionableLifecycleRows(tradesPath)
+    : tableRowsFromFile(tradesPath, '## Trade Log').map(parseTradeRow);
   return summarizeLifecycleStatuses(rows);
 }
 
-module.exports = { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary };
+module.exports = { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary, actionableLifecycleRows };

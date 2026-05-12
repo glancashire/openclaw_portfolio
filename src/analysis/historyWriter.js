@@ -52,7 +52,7 @@ function normalizeSnapshotType(snapshot, notes = '', options = {}) {
     if (status === 'submitted' || status === 'presubmitted') return 'execution_submitted';
     if (status === 'partially_filled') return 'execution_partially_filled';
     if (status === 'filled') return 'execution_filled';
-    if (status === 'cancelled' || status === 'canceled') return 'execution_cancelled';
+    if (status === 'cancelled' || status === 'canceled' || status === 'broker_cancelled') return 'execution_cancelled';
     if (status === 'failed' || status === 'rejected' || status === 'inactive') return 'execution_failed';
     if (status === 'not_found') return 'execution_not_found';
   }
