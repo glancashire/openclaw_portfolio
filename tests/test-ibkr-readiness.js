@@ -1,12 +1,12 @@
 'use strict';
 
-const { summarizeReadiness, getGenericFallbackProbeCandidates } = require('../src/brokers/interactive-brokers/readiness');
+const { summarizeReadiness, getGenericFallbackProbeCandidates, getProbeCandidates, detectMarketDataPosture } = require('../src/brokers/interactive-brokers/readiness');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function main() {
+async function main() {
   let summary = summarizeReadiness({
     config: { ok: true },
     auth: { ok: true, reason: 'ready' },
@@ -41,6 +41,27 @@ function main() {
   assert(fallbackCandidates.some((row) => row.symbol === 'EMUAA'), 'expected EMUAA fallback candidate');
   assert(fallbackCandidates.some((row) => row.symbol === 'UBSSLI'), 'expected UBSSLI fallback candidate');
 
+  const probeCandidates = getProbeCandidates({ portfolio: 'etf' });
+  assert(probeCandidates.length >= 2, 'expected at least two probe candidates');
+  const uniqueConids = new Set(probeCandidates.map((row) => row.conid));
+  assert(uniqueConids.size === probeCandidates.length, 'expected probe candidates to be deduped by conid');
+  if (probeCandidates.some((row) => row.source === 'executable_trade')) {
+    assert(probeCandidates[0].source === 'executable_trade', 'expected executable-trade probes to lead ordering when present');
+  } else if (probeCandidates.some((row) => row.source === 'approved_instrument')) {
+    assert(probeCandidates[0].source === 'approved_instrument', 'expected approved-instrument probes to lead ordering when no executable probes exist');
+  } else {
+    assert(probeCandidates[0].source === 'generic_fallback', 'expected fallback probes first only when no portfolio probes exist');
+  }
+
+  const posture = await detectMarketDataPosture({
+    fetchMarketSnapshot: async ([conid]) => {
+      if (String(conid) === '243939970') return [{ '7295': '101.25' }];
+      throw new Error('missing');
+    },
+  }, { portfolio: 'missing-portfolio' });
+  assert(posture.posture === 'delayed_only', 'expected delayed-only posture from fallback close');
+  assert(posture.probeSource === 'generic_fallback', 'expected probe source to report generic fallback');
+
   summary = summarizeReadiness({
     config: { ok: true },
     auth: { ok: false, reason: 'native_error' },
@@ -52,4 +73,7 @@ function main() {
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
 
-main();
+main().catch((error) => {
+  console.error(error?.stack || error?.message || String(error));
+  process.exit(1);
+});

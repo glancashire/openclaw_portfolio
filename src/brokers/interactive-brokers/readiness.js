@@ -31,6 +31,7 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
           posture: 'live_or_realtime',
           detail: `Live/realtime bid/ask/last values are available via ${candidate.label}.`,
           probe: candidate,
+          probeSource: candidate?.source || 'unknown',
         };
       }
       if (Number.isFinite(close)) {
@@ -38,6 +39,7 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
           posture: 'delayed_only',
           detail: `Delayed close fallback is available via ${candidate.label}, but live bid/ask/last are unavailable.`,
           probe: candidate,
+          probeSource: candidate?.source || 'unknown',
         };
       }
       errors.push(`${candidate.label}: market data request returned no usable price fields`);
@@ -48,6 +50,7 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
           posture: 'delayed_only',
           detail: `Interactive Brokers reports delayed market data is available via ${candidate.label}.`,
           probe: candidate,
+          probeSource: candidate?.source || 'unknown',
         };
       }
       errors.push(`${candidate.label}: ${message}`);
@@ -61,18 +64,26 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
 }
 
 function getProbeCandidates({ portfolio = 'etf' } = {}) {
-  const byKey = new Map();
-  for (const candidate of [
-    ...getPortfolioExecutableProbeCandidates({ portfolio }),
-    ...getPortfolioApprovedProbeCandidates({ portfolio }),
-    ...getGenericFallbackProbeCandidates(),
-  ]) {
-    const conid = String(candidate?.conid || '').trim();
-    if (!conid) continue;
-    const key = `${conid}::${candidate.label}`;
-    if (!byKey.has(key)) byKey.set(key, candidate);
+  const orderedGroups = [
+    { source: 'executable_trade', items: getPortfolioExecutableProbeCandidates({ portfolio }) },
+    { source: 'approved_instrument', items: getPortfolioApprovedProbeCandidates({ portfolio }) },
+    { source: 'generic_fallback', items: getGenericFallbackProbeCandidates() },
+  ];
+  const byConid = new Map();
+  const ordered = [];
+  for (const group of orderedGroups) {
+    for (const candidate of group.items) {
+      const conid = String(candidate?.conid || '').trim();
+      if (!conid || byConid.has(conid)) continue;
+      const normalized = {
+        ...candidate,
+        source: candidate?.source || group.source,
+      };
+      byConid.set(conid, normalized);
+      ordered.push(normalized);
+    }
   }
-  return Array.from(byKey.values());
+  return ordered;
 }
 
 function getPortfolioExecutableProbeCandidates({ portfolio = 'etf' } = {}) {
