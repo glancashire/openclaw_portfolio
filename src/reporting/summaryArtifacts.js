@@ -1140,6 +1140,19 @@ function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHisto
     const bc = h === 'healthy' ? 'badge-healthy' : h === 'blocked' ? 'badge-blocked' : 'badge-warning';
     return `<li><a href="../../portfolio/${s.portfolio}/summary.html">${s.portfolio}</a> <span class="badge ${bc}">${h}</span></li>`;
   }).join('\n');
+  const deliveryBrokerBlockItems = (deliveryOverview.portfolios || [])
+    .filter((p) => p.deliveryPosture?.brokerBlockContext?.topBrokerBlock)
+    .map((p) => {
+      const block = p.deliveryPosture.brokerBlockContext.topBrokerBlock;
+      return `<li><strong>${p.portfolio}</strong>: [${block.blockCode || 'blocked'}] ${block.tickerOrIsin || 'unknown'}${block.name ? ` — ${block.name}` : ''}<br />Reason: ${block.blockReason || 'No broker block reason recorded.'}<br />Next action: ${block.nextAction || 'No next action recorded.'}</li>`;
+    }).join('\n');
+  const deliveryBrokerBlockSection = deliveryBrokerBlockItems
+    ? `
+<h2>Delivery Broker Blocks</h2>
+<ul>
+${deliveryBrokerBlockItems}
+</ul>`
+    : '';
   return `<!doctype html>
 <html>
 <head>
@@ -1204,7 +1217,7 @@ nav a:hover { background: #dbeafe; }
 <h2>Portfolios</h2>
 <ul>
 ${portfolioCards}
-</ul>
+</ul>${deliveryBrokerBlockSection}
 
 <p class="meta">Generated: ${new Date().toISOString()}</p>
 </div>
