@@ -54,6 +54,8 @@ Commands:
   queue-open    Queue a trade row for the market-open runner
   requeue-open  Requeue a blocked trade row for a retry at market open
   reconcile-live Refresh broker/live-state truth and derived operator artifacts
+  health        Classify current portfolio execution health
+  self-heal     Show a bounded dry-run remediation plan
   status        Show open orders and fill notification state
   cancel        Cancel open orders (--order-id <id> or --all)
   history       Show recent trade executions
@@ -77,6 +79,8 @@ Examples:
   node scripts/trade.js queue-open --ticker AAA --action buy
   node scripts/trade.js requeue-open --ticker AAA --action buy
   node scripts/trade.js reconcile-live --json
+  node scripts/trade.js health --json
+  node scripts/trade.js self-heal --dry-run --json
   node scripts/trade.js cancel --all
   node scripts/trade.js history --json
 `);
@@ -363,6 +367,45 @@ function cmdReconcileLive() {
   });
 }
 
+function cmdHealth() {
+  const portfolioDir = resolvePortfolioDir();
+  const { buildSelfHealPlan } = require('../src/execution/portfolioHealth');
+  buildSelfHealPlan({ portfolioDir }).then((result) => {
+    if (JSON_OUT) {
+      printJson(result.health);
+      return;
+    }
+    console.log(`Portfolio health for ${result.portfolio}`);
+    console.log(`- health: ${result.health.health}`);
+    console.log(`- severity: ${result.health.severity}`);
+    console.log(`- blockers: ${result.health.blockerCount}`);
+    console.log(`- next action: ${result.health.nextAction}`);
+  }).catch((error) => {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  });
+}
+
+function cmdSelfHeal() {
+  const portfolioDir = resolvePortfolioDir();
+  const { buildSelfHealPlan } = require('../src/execution/portfolioHealth');
+  buildSelfHealPlan({ portfolioDir }).then((result) => {
+    if (JSON_OUT) {
+      printJson(result);
+      return;
+    }
+    console.log(`Self-heal dry-run for ${result.portfolio}`);
+    console.log(`- health: ${result.health.health}`);
+    console.log(`- next action: ${result.health.nextAction}`);
+    for (const action of result.actions) {
+      console.log(`- ${action.reason}${action.command ? ` -> ${action.command}` : ''}`);
+    }
+  }).catch((error) => {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  });
+}
+
 function cmdStatus() {
   const { summarizeOpenRunnerRetryState } = require('../src/execution/tradeState');
   const portfolioArg = flags.find((flag) => !flag.startsWith('-'));
@@ -591,6 +634,8 @@ switch (command) {
   case 'disarm-open': cmdDisarmOpen(); break;
   case 'validate': cmdValidate(); break;
   case 'reconcile-live': cmdReconcileLive(); break;
+  case 'health': cmdHealth(); break;
+  case 'self-heal': cmdSelfHeal(); break;
   case 'status': cmdStatus(); break;
   case 'submit': cmdSubmit(); break;
   case 'queue-open': cmdQueueOpen(); break;

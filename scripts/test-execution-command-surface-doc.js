@@ -14,6 +14,8 @@ const assert = require('assert');
     '`trade config`',
     '`trade delivery`',
     '`trade reconcile-live`',
+    '`trade health`',
+    '`trade self-heal`',
     '`trade arm-open`',
     '`trade disarm-open`',
     '`trade submit`',
