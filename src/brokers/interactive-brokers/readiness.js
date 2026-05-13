@@ -143,16 +143,29 @@ function summarizeReadiness({ config, auth, marketData }) {
   const delayedOnly = auth?.ok && marketData?.posture === 'delayed_only';
   const liveReady = auth?.ok && marketData?.posture === 'live_or_realtime';
   const authReadyButUnpriced = auth?.ok && !liveReady && !delayedOnly;
+  const mode = auth?.mode || 'unknown';
+  const marketDataMode = delayedOnly
+    ? 'delayed'
+    : liveReady
+      ? 'live_or_realtime'
+      : (authReadyButUnpriced ? (marketData?.posture || 'unpriced') : 'unavailable');
+  const portalLikelyDiverged = mode === 'native-socket' && (liveReady || delayedOnly || authReadyButUnpriced);
+  const guidance = !auth?.ok
+    ? 'Restore native connectivity first.'
+    : delayedOnly
+      ? 'Keep live submission blocked or explicitly accept delayed-only pricing policy.'
+      : authReadyButUnpriced
+        ? 'Prefer native raw contract details / market-data probes before assuming the portal session is required.'
+        : 'Broker path is healthy.';
   return {
     configured: Boolean(config?.ok),
     authenticated: Boolean(auth?.ok),
     reachable: auth?.reason !== 'http_error' ? Boolean(auth?.ok) : false,
+    mode,
     fallbackRequired: !auth?.ok || delayedOnly || authReadyButUnpriced,
-    marketDataMode: delayedOnly
-      ? 'delayed'
-      : liveReady
-        ? 'live_or_realtime'
-        : (authReadyButUnpriced ? (marketData?.posture || 'unpriced') : 'unavailable'),
+    marketDataMode,
+    marketDataDetail: marketData?.detail || null,
+    marketDataProbe: marketData?.probe || null,
     reason: liveReady
       ? 'ready'
       : delayedOnly
@@ -160,6 +173,8 @@ function summarizeReadiness({ config, auth, marketData }) {
         : authReadyButUnpriced
           ? (marketData?.posture || 'unpriced')
           : auth?.reason || 'unknown',
+    portalSessionState: portalLikelyDiverged ? 'unknown_or_separate' : 'not_applicable',
+    guidance,
     message: liveReady
       ? 'Interactive Brokers read-only connectivity and live/realtime market data are available.'
       : delayedOnly

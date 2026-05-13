@@ -53,6 +53,7 @@ Commands:
   submit        Place approved orders (respects market hours + quality filter)
   queue-open    Queue a trade row for the market-open runner
   requeue-open  Requeue a blocked trade row for a retry at market open
+  reconcile-live Refresh broker/live-state truth and derived operator artifacts
   status        Show open orders and fill notification state
   cancel        Cancel open orders (--order-id <id> or --all)
   history       Show recent trade executions
@@ -75,6 +76,7 @@ Examples:
   node scripts/trade.js submit --dry-run
   node scripts/trade.js queue-open --ticker AAA --action buy
   node scripts/trade.js requeue-open --ticker AAA --action buy
+  node scripts/trade.js reconcile-live --json
   node scripts/trade.js cancel --all
   node scripts/trade.js history --json
 `);
@@ -150,6 +152,9 @@ function cmdAuthority() {
       console.log(`- execution mode: ${result.executionMode}`);
       console.log(`- broker account reference: ${result.brokerAccountReference || 'n/a'}`);
       console.log(`- broker readiness: ${result.brokerReadiness.message}`);
+      console.log(`- broker mode: ${result.brokerReadiness.mode || 'unknown'}`);
+      console.log(`- market data mode: ${result.brokerReadiness.marketDataMode || 'unknown'}`);
+      console.log(`- guidance: ${result.brokerReadiness.guidance || 'n/a'}`);
       console.log(`- live arm: ${result.liveArm.armedForMarketOpen ? `armed until ${result.liveArm.armExpiresAt || 'unknown'}` : 'not armed'}`);
       console.log(`- runtime pause: ${result.runtimePause.stopAutomation ? `paused after ${result.runtimePause.consecutive} errors` : 'not paused'}`);
       console.log(`- live execution possible now: ${result.effectiveAuthority.liveExecutionPossibleNow}`);
@@ -174,6 +179,9 @@ function cmdPreflight() {
       console.log(`- armed for market open: ${result.armedForMarketOpen}`);
       console.log(`- arm expires at: ${result.armExpiresAt || 'n/a'}`);
       console.log(`- broker readiness: ${result.brokerReadiness.message}`);
+      console.log(`- broker mode: ${result.brokerReadiness.mode || 'unknown'}`);
+      console.log(`- market data mode: ${result.brokerReadiness.marketDataMode || 'unknown'}`);
+      console.log(`- guidance: ${result.brokerReadiness.guidance || 'n/a'}`);
       console.log(`- approved rows: ${result.approvalState.approvedCount}`);
       console.log(`- executable rows: ${result.approvalState.executableCount}`);
       if (result.blockers.length) {
@@ -329,6 +337,30 @@ function cmdRequeueOpen() {
   };
   if (JSON_OUT) printJson(payload);
   else console.log(`✓ Requeued ${ticker} ${action} for market-open retry`);
+}
+
+function cmdReconcileLive() {
+  const portfolioDir = resolvePortfolioDir();
+  const { reconcilePortfolioLiveState } = require('../src/execution/liveReconciliation');
+  reconcilePortfolioLiveState({ portfolioDir }).then((result) => {
+    if (JSON_OUT) {
+      printJson(result);
+      return;
+    }
+    console.log(`Live reconciliation for ${result.portfolio}`);
+    console.log(`- broker open-order rows: ${result.brokerEvidence?.openOrders?.count ?? 0}`);
+    console.log(`- broker executions: ${result.brokerEvidence?.executions?.count ?? 0}`);
+    console.log(`- broker completed orders: ${result.brokerEvidence?.completedOrders?.count ?? 0}`);
+    console.log(`- order rows scanned: ${result.orderResync?.scanned ?? 0}`);
+    console.log(`- order rows synced: ${result.orderResync?.synced ?? 0}`);
+    console.log(`- order rows cancelled: ${result.orderResync?.cancelled ?? 0}`);
+    console.log(`- reconciled unnotified fills: ${result.fillBackfill?.state?.reconciledUnnotifiedFills?.length ?? 0}`);
+    console.log(`- dashboard refreshed: ${Boolean(result.artifacts?.dashboardPath)}`);
+    console.log(`- summary refreshed: ${Boolean(result.artifacts?.summaryPath)}`);
+  }).catch((error) => {
+    console.error(error.stack || String(error));
+    process.exit(1);
+  });
 }
 
 function cmdStatus() {
@@ -558,6 +590,7 @@ switch (command) {
   case 'arm-open': cmdArmOpen(); break;
   case 'disarm-open': cmdDisarmOpen(); break;
   case 'validate': cmdValidate(); break;
+  case 'reconcile-live': cmdReconcileLive(); break;
   case 'status': cmdStatus(); break;
   case 'submit': cmdSubmit(); break;
   case 'queue-open': cmdQueueOpen(); break;
