@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 
 const SECRET_PATH = path.join(__dirname, '..', '..', '..', 'secrets', 'interactive-brokers.json');
+const { loadWorkspaceEnv } = require('../../shared/env');
 
 function loadInteractiveBrokersConfig() {
+  loadWorkspaceEnv();
   let file = {};
   if (fs.existsSync(SECRET_PATH)) {
     file = JSON.parse(fs.readFileSync(SECRET_PATH, 'utf8'));
