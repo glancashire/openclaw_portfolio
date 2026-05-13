@@ -1,11 +1,11 @@
 const { InteractiveBrokersClient } = require('./client');
 const { logBrokerEvent } = require('../shared/safeLogger');
 
-async function searchEtfInstruments({ query, portfolio = 'etf', appCode = null, preferBrowserSession = false }) {
+async function searchEtfInstruments({ query, portfolio = 'etf' }) {
   const client = new InteractiveBrokersClient({ portfolio });
   const auth = await client.authenticate();
 
-  if (!auth.ok && !preferBrowserSession) {
+  if (!auth.ok) {
     return {
       ok: false,
       query,
@@ -23,9 +23,7 @@ async function searchEtfInstruments({ query, portfolio = 'etf', appCode = null, 
   }
 
   try {
-    const raw = preferBrowserSession
-      ? await searchViaBrowserSession({ query, portfolio, appCode, auth })
-      : await client.searchContracts(query);
+    const raw = await client.searchContracts(query);
     const rows = normalizeSearchResults(raw).filter((row) => isLikelyEtf(row));
     return {
       ok: true,
@@ -43,41 +41,18 @@ async function searchEtfInstruments({ query, portfolio = 'etf', appCode = null, 
   } catch (error) {
     return {
       ok: false,
-      reason: preferBrowserSession ? 'browser_session_error' : 'http_error',
+      reason: 'native_search_error',
       error: error.message,
       auth,
+      guidance: 'Use native raw contract details / ISIN search before falling back to any browser-session tooling.',
       log: logBrokerEvent({
         broker: 'interactive-brokers',
         operation: 'search_instruments',
-        status: preferBrowserSession ? 'browser_session_error' : 'http_error',
+        status: 'native_search_error',
         summary: { query, message: error.message },
         portfolio,
       }),
     };
-  }
-}
-
-async function searchViaBrowserSession({ query, portfolio, appCode, auth }) {
-  if (!appCode) {
-    throw new Error('Interactive Brokers browser-session search requires appCode');
-  }
-  const { InteractiveBrokersBrowserSessionClient } = loadBrowserSessionClient();
-  const browserClient = new InteractiveBrokersBrowserSessionClient({ portfolio });
-  const response = await browserClient.searchContracts(query, appCode);
-  if (!response.ok) {
-    throw new Error(`IBKR browser-session search failed (${response.status}): ${response.text}`);
-  }
-  return response.json;
-}
-
-function loadBrowserSessionClient() {
-  try {
-    return require('./browserSessionClient');
-  } catch (error) {
-    if (error && error.code === 'MODULE_NOT_FOUND' && String(error.message || '').includes("'playwright'")) {
-      throw new Error('Interactive Brokers browser-session search requires the optional playwright dependency to be installed.');
-    }
-    throw error;
   }
 }
 
@@ -101,4 +76,4 @@ function isLikelyEtf(row) {
   return haystack.includes('etf') || haystack.includes('fund') || row.secType === 'ETF';
 }
 
-module.exports = { searchEtfInstruments, normalizeSearchResults, isLikelyEtf, loadBrowserSessionClient };
+module.exports = { searchEtfInstruments, normalizeSearchResults, isLikelyEtf };

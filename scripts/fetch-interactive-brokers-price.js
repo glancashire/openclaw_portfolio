@@ -5,9 +5,7 @@ async function main() {
   if (!conid) {
     throw new Error('Usage: node scripts/fetch-interactive-brokers-price.js <conid>');
   }
-  const appCode = process.env.IBKR_2FA || null;
-  const preferBrowserSession = process.env.IBKR_BROWSER_SESSION === '1';
-  const result = await fetchLatestPrice({ conid, portfolio: 'etf', appCode, preferBrowserSession });
+  const result = await fetchLatestPrice({ conid, portfolio: 'etf' });
   console.log(JSON.stringify(result, null, 2));
 }
 

@@ -9,7 +9,7 @@ function loadInteractiveBrokersConfig() {
     file = JSON.parse(fs.readFileSync(SECRET_PATH, 'utf8'));
   }
   const cfg = file.interactiveBrokers || file || {};
-  const mode = process.env.IBKR_MODE || cfg.mode || 'client-portal';
+  const mode = process.env.IBKR_MODE || cfg.mode || 'native';
   const runtime = process.env.IBKR_RUNTIME || cfg.runtime || 'live';
   const defaultNativePort = runtime === 'live' ? 4001 : 4002;
   return {

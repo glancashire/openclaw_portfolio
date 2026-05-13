@@ -5,9 +5,7 @@ async function main() {
   if (!query) {
     throw new Error('Usage: node scripts/search-interactive-brokers-instruments.js <query>');
   }
-  const appCode = process.env.IBKR_2FA || null;
-  const preferBrowserSession = process.env.IBKR_BROWSER_SESSION === '1';
-  const result = await searchEtfInstruments({ query, portfolio: 'etf', appCode, preferBrowserSession });
+  const result = await searchEtfInstruments({ query, portfolio: 'etf' });
   console.log(JSON.stringify(result, null, 2));
 }
 
