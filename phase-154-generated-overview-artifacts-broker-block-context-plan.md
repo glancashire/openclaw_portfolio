@@ -4,12 +4,12 @@
 Prove that generated overview artifacts carry broker-block context end-to-end by validating the emitted runtime delivery-status JSON/HTML and cockpit HTML after artifact generation, not just isolated render helpers.
 
 ## Checklist
-- [ ] Inspect existing generated-overview regression coverage for the best extension point.
-- [ ] Add assertions that generated delivery-status JSON keeps `deliveryPosture.brokerBlockContext` when a broker-blocked row exists.
-- [ ] Add assertions that generated delivery-status markdown/html expose the broker-block reason and next action.
-- [ ] Add assertions that generated cockpit HTML exposes the delivery broker-block section.
-- [ ] Re-run the focused overview/reporting regression suite and iterate until green.
-- [ ] Commit and push once green.
+- [x] Inspect existing generated-overview regression coverage for the best extension point.
+- [x] Add assertions that generated delivery-status JSON keeps `deliveryPosture.brokerBlockContext` when a broker-blocked row exists.
+- [x] Add assertions that generated delivery-status markdown/html expose the broker-block reason and next action.
+- [x] Add assertions that generated cockpit HTML exposes the delivery broker-block section.
+- [x] Re-run the focused overview/reporting regression suite and iterate until green.
+- [x] Commit and push once green.
 
 ## Verification
 - `scripts/test-multi-portfolio-overview.js` passes with generated-artifact assertions.
