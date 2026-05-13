@@ -229,7 +229,8 @@ async function main() {
   assert(overviewMarkdown.includes('First handoffs'), 'Expected first-handoff column in generated overview markdown');
   assert(overviewMarkdown.includes('| etf | active |'), 'Expected populated ETF row in generated overview markdown');
   assert(overviewMarkdown.includes('| acceptance-closure | demo_like | 0 | warning |'), 'Expected populated acceptance row in generated overview markdown');
-  assert(overviewMarkdown.includes('1 reconciled fill(s) were detected after the live window and still need notification backfill review.') || overviewMarkdown.includes('trade row(s) are marked failed and need operator review.'), 'Expected generated ETF row to retain truthful current recommendation');
+  assert(/\| etf \| active \| .* \| \[quote_unavailable CH0032912732\] Restore broker pricing and rerun the market-open submission path\. \|/.test(overviewMarkdown), 'Expected generated ETF row to surface the top broker-block next step in overview markdown');
+  assert(pendingActionsJson.items.some((item) => item.portfolio === 'etf' && /reconciled fill\(s\) were detected after the live window/i.test(item.summary || '')), 'Expected pending actions to retain the delivery backfill recommendation context');
   assert(portfolioIndexJson.schemaVersion === '1.1', 'Expected portfolio index schema version');
   assert(pendingActionsJson.schemaVersion === '1.1', 'Expected pending-actions schema version');
   assert(typeof pendingActionsJson.generatedAt === 'string' && pendingActionsJson.generatedAt.length > 0, 'Expected pending-actions generatedAt timestamp');
