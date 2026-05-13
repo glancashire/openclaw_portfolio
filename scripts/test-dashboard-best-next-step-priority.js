@@ -14,7 +14,7 @@ const { bestNextStep } = require('../src/reporting/dashboardGenerator');
     lifecycleSummary: { approved: 1 },
   });
 
-  assert(result && result.queueType === 'delivery', `expected delivery item prioritized, got ${JSON.stringify(result)}`);
-  assert(result.status === 'backfill_review', `expected backfill_review status, got ${result.status}`);
+  assert(result && result.queueType === 'approval', `expected approval item prioritized ahead of delivery cleanup, got ${JSON.stringify(result)}`);
+  assert(result.status === 'ready_for_review', `expected ready_for_review status, got ${result.status}`);
   console.log(JSON.stringify({ ok: true, bestNextStep: result }, null, 2));
 })();

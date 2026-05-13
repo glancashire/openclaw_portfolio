@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { normalizeLifecycleStatus } = require('./lifecycleStatus');
+const { classifyTradeRowExecution } = require('./executionClassification');
 
 const TRADE_HEADERS = [
   'Date/time',
@@ -391,59 +392,34 @@ function requeueBlockedTradeRow(tradesPath, selector, options = {}) {
   });
 }
 
-function classifyExecutableRow(row) {
-  const status = String(row.Status || '').trim().toLowerCase();
-  const approval = String(row.Approval || '').trim();
-  const blockCode = String(row['Block code'] || '').trim();
-  const blockReason = String(row['Block reason'] || '').trim();
-  const nextAction = String(row['Next action'] || '').trim();
-  const nextActionLower = nextAction.toLowerCase();
-  const action = String(row.Action || '').trim().toLowerCase();
-  const orderId = String(row['Broker order id'] || '').trim();
-  const retryableQueuedBlock = approval === 'queued_for_open_runner' && !orderId && blockCode && nextActionLower.includes('retry');
-
-  if (action === 'hold') {
-    return { executable: false, reasonCode: 'hold_action', reason: 'Hold rows are informational and never executable.', nextAction: nextAction || 'No execution action required for hold rows.' };
-  }
-  if (orderId) {
-    return { executable: false, reasonCode: 'already_submitted', reason: `Row already has broker order id ${orderId}.`, nextAction: nextAction || 'Reconcile the existing broker order before attempting another submission.' };
-  }
-  if (!['approved', 'planned', 'proposed'].includes(status)) {
-    return { executable: false, reasonCode: 'status_not_executable', reason: `Row status ${status || 'unknown'} is not eligible for executable selection.`, nextAction: nextAction || 'Normalize the row status before attempting submission.' };
-  }
-  if (!['user_approved', 'submitted_to_open_runner', 'ready_for_submission', 'queued_for_open_runner'].includes(approval)) {
-    return { executable: false, reasonCode: 'approval_not_ready', reason: `Row approval state ${approval || 'unknown'} is not executable.`, nextAction: nextAction || 'Approve or queue the row explicitly before attempting submission.' };
-  }
-  if (blockCode && !retryableQueuedBlock) {
-    return { executable: false, reasonCode: blockCode || 'blocked', reason: blockReason || `Blocked by ${blockCode}.`, nextAction: nextAction || 'Resolve the blocking condition before retrying submission.' };
-  }
-  return {
-    executable: true,
-    reasonCode: retryableQueuedBlock ? 'retryable_queued_block' : 'ready',
-    reason: String(row.Reason || '').trim(),
-    nextAction: nextAction || (retryableQueuedBlock ? 'Retry at next intended market-open run after operator recovery.' : 'Ready for submission.'),
-    retryableQueuedBlock,
-  };
+function classifyExecutableRow(row, options = {}) {
+  return classifyTradeRowExecution(row, options);
 }
 
-function listExecutableTradeRows(tradesPath) {
+function listExecutableTradeRows(tradesPath, options = {}) {
   const table = readTradesTable(tradesPath);
-  return table.rows.filter((row) => classifyExecutableRow(row).executable).map((row) => ({
-    dateTime: row['Date/time'],
-    status: row.Status,
-    action: row.Action,
-    tickerOrIsin: row['Ticker / ISIN'],
-    name: row.Name,
-    quantity: Number(row.Quantity || 0),
-    limitPrice: Number(row['Limit price'] || 0),
-    estimatedChf: Number(row['Estimated CHF'] || 0),
-    approval: row.Approval,
-    brokerOrderId: row['Broker order id'],
-    reason: row.Reason,
-    blockCode: row['Block code'] || '',
-    blockReason: row['Block reason'] || '',
-    nextAction: row['Next action'] || '',
-  }));
+  return table.rows.filter((row) => classifyExecutableRow(row, options).executable).map((row) => {
+    const classification = classifyExecutableRow(row, options);
+    return {
+      dateTime: row['Date/time'],
+      status: row.Status,
+      action: row.Action,
+      tickerOrIsin: row['Ticker / ISIN'],
+      name: row.Name,
+      quantity: Number(row.Quantity || 0),
+      limitPrice: Number(row['Limit price'] || 0),
+      estimatedChf: Number(row['Estimated CHF'] || 0),
+      approval: row.Approval,
+      brokerOrderId: row['Broker order id'],
+      reason: row.Reason,
+      blockCode: row['Block code'] || '',
+      blockReason: row['Block reason'] || '',
+      nextAction: row['Next action'] || '',
+      canonicalState: classification.canonicalState,
+      approvalAgeHours: classification.approvalAgeHours,
+      staleApproval: classification.staleApproval,
+    };
+  });
 }
 
 module.exports = {

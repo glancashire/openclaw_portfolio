@@ -214,8 +214,13 @@ function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null,
   if (queuedRetry > 0) {
     actions.push({ queueType: 'open_runner_retry', severity: 'medium', status: 'ready_for_review', summary: `${queuedRetry} trade row(s) were requeued for market-open retry after operator recovery.` });
   }
-  if ((lifecycleSummary?.approved || 0) > 0) {
-    actions.push({ queueType: 'approval', severity: 'medium', status: 'ready_for_review', summary: `There are ${lifecycleSummary.approved} approved trade row(s) ready for staging/review.` });
+  const staleNeedsReapproval = Number(lifecycleSummary?.staleNeedsReapproval || 0);
+  const approvedReady = Math.max(0, Number(lifecycleSummary?.approved || 0) - staleNeedsReapproval);
+  if (staleNeedsReapproval > 0) {
+    actions.push({ queueType: 'approval', severity: 'high', status: 'stale_needs_reapproval', summary: `${staleNeedsReapproval} approved trade row(s) need fresh approval before live submission.` });
+  }
+  if (approvedReady > 0) {
+    actions.push({ queueType: 'approval', severity: 'medium', status: 'ready_for_review', summary: `There are ${approvedReady} executable approved trade row(s) ready for staging/review.` });
   }
   if ((lifecycleSummary?.proposed || 0) > 0) {
     actions.push({ queueType: 'approval', severity: 'medium', status: 'pending_user_approval', summary: `There are ${lifecycleSummary.proposed} proposed trade row(s) awaiting approval.` });
@@ -306,18 +311,19 @@ function bestNextStep({ pendingActions = [], blockers = [], recommendedActionsLi
   if (blockers.length > 0) return `Resolve the active blocker: ${blockers[0].message || blockers[0]}`;
   if (pendingActions.length > 0) {
     const recommendationPriority = {
-      'delivery::backfill_review': 0,
-      'backfill_review::backfill_review': 0,
-      'approval::pending_user_approval': 1,
-      'execution_block::blocked': 2,
-      'execution::in_flight': 3,
-      'delivery::pending': 4,
-      'recovery::paused': 5,
-      'recovery::degraded': 6,
-      'approval::ready_for_review': 7,
-      'open_runner_retry::ready_for_review': 8,
-      'open_runner_queue::ready_for_review': 9,
-      'data::stale': 10,
+      'execution_block::blocked': 0,
+      'recovery::paused': 1,
+      'recovery::degraded': 2,
+      'approval::stale_needs_reapproval': 3,
+      'execution::in_flight': 4,
+      'approval::pending_user_approval': 5,
+      'approval::ready_for_review': 6,
+      'open_runner_retry::ready_for_review': 7,
+      'open_runner_queue::ready_for_review': 8,
+      'delivery::backfill_review': 9,
+      'backfill_review::backfill_review': 9,
+      'delivery::pending': 10,
+      'data::stale': 11,
       'workflow::recommended': 11,
     };
     const prioritized = [...pendingActions].sort((a, b) => {

@@ -6,23 +6,11 @@ const { getInteractiveBrokersReadiness } = require('../brokers/interactive-broke
 const { parseExecutionMode, parsePortfolioStatus } = require('./portfolioExecution');
 const { readTradesTable, listExecutableTradeRows, classifyExecutableRow } = require('./tradeState');
 const { brokerErrorStatus, readExecutionState, writeExecutionState } = require('./runtimeState');
+const { parseTradeDate, hoursBetween } = require('./executionClassification');
 const { isMarketOpen, nextOpenTime } = require('../../lib/marketHours');
 
 const DEFAULT_APPROVAL_MAX_AGE_HOURS = 24;
 const DEFAULT_ARM_WINDOW_HOURS = 24;
-
-function parseTradeDate(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return null;
-  const isoLike = raw.replace(' ', 'T') + (raw.includes('T') ? '' : 'Z');
-  const d = new Date(isoLike);
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function hoursBetween(earlier, later = new Date()) {
-  if (!(earlier instanceof Date) || Number.isNaN(earlier.getTime())) return null;
-  return (later.getTime() - earlier.getTime()) / 36e5;
-}
 
 function readPortfolioBasics(portfolioDir) {
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
@@ -83,7 +71,7 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
   const rows = table.rows;
   const proposedRows = rows.filter((row) => String(row.Status || '').trim().toLowerCase() === 'proposed');
   const approvedRows = rows.filter((row) => String(row.Status || '').trim().toLowerCase() === 'approved');
-  const executableRows = listExecutableTradeRows(tradesPath);
+  const executableRows = listExecutableTradeRows(tradesPath, { now, maxApprovalAgeHours: maxAgeHours });
   const enrichedExecutableRows = executableRows.map((row) => {
     const match = rows.find((candidate) => `${candidate['Date/time']}::${candidate['Ticker / ISIN']}::${String(candidate.Action || '').toLowerCase()}` === `${row.dateTime}::${row.tickerOrIsin}::${String(row.action || '').toLowerCase()}`);
     return {
@@ -97,7 +85,7 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
   const excludedApprovedRows = approvedRows
     .filter((row) => !executableKeys.has(`${row['Date/time']}::${row['Ticker / ISIN']}::${String(row.Action || '').toLowerCase()}`))
     .map((row) => {
-      const classification = classifyExecutableRow(row);
+      const classification = classifyExecutableRow(row, { now, maxApprovalAgeHours: maxAgeHours });
       return {
         dateTime: row['Date/time'],
         status: row.Status,
@@ -114,8 +102,12 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
         blockReason: row['Block reason'] || classification.reason || inferExcludedApprovedReason(row),
         nextAction: row['Next action'] || classification.nextAction || '',
         exclusionReasonCode: classification.reasonCode || '',
+        canonicalState: classification.canonicalState || '',
+        staleApproval: Boolean(classification.staleApproval),
+        approvalAgeHours: classification.approvalAgeHours,
       };
     });
+  const staleApprovedRows = approvedRows.filter((row) => classifyExecutableRow(row, { now, maxApprovalAgeHours: maxAgeHours }).staleApproval);
   const latestApprovedAt = approvedRows
     .map((row) => parseTradeDate(row['Date/time']))
     .filter(Boolean)
@@ -138,6 +130,12 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
     latestApprovedAt: latestApprovedAt ? latestApprovedAt.toISOString() : null,
     approvalAgeHours: approvalAgeHours == null ? null : Number(approvalAgeHours.toFixed(2)),
     staleApproval,
+    staleApprovedRows: staleApprovedRows.map((row) => ({
+      dateTime: row['Date/time'],
+      tickerOrIsin: row['Ticker / ISIN'],
+      action: row.Action,
+      approval: row.Approval,
+    })),
     maxApprovalAgeHours: maxAgeHours,
     ambiguousQueuedCount: ambiguousQueuedRows.length,
     hasAnyApprovedRows: approvedRows.length > 0,

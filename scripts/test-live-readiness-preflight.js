@@ -91,6 +91,8 @@ function loadWithMocks(readiness, runtimeState = { brokerErrors: {}, liveExecuti
     const result = await mod.evaluateLiveReadinessPreflight({ portfolioDir, now: new Date('2026-05-10T11:00:00Z'), maxApprovalAgeHours: 24 });
     assert.strictEqual(result.ok, false);
     assert(result.blockers.some((b) => b.code === 'stale_approval'));
+    assert.strictEqual(result.approvalState.staleApprovedRows.length, 1);
+    assert.strictEqual(result.approvalState.staleApprovedRows[0].tickerOrIsin, 'AAA');
     process.chdir(cwd);
   }
 
@@ -112,6 +114,7 @@ function loadWithMocks(readiness, runtimeState = { brokerErrors: {}, liveExecuti
     assert.strictEqual(result.approvalState.excludedApprovedRows[0].tickerOrIsin, 'BBB');
     assert.strictEqual(result.approvalState.excludedApprovedRows[0].blockCode, 'quote_unavailable');
     assert.strictEqual(result.approvalState.excludedApprovedRows[0].exclusionReasonCode, 'quote_unavailable');
+    assert.strictEqual(result.approvalState.excludedApprovedRows[0].canonicalState, 'blocked_retryable');
     assert.match(result.approvalState.excludedApprovedRows[0].blockReason, /No broker quote was available/i);
     assert(result.warnings.some((w) => w.code === 'excluded_approved_rows' && /BBB|quote_unavailable/i.test(w.message)));
     process.chdir(cwd);

@@ -14,6 +14,7 @@ const { markdownToBasicHtml } = require('./pdfExport');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep } = require('./dashboardGenerator');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
+const { classifyTradeRowExecution } = require('../execution/executionClassification');
 
 function explainAllocationRow(row = {}) {
   const assetClass = row.assetClass || 'This sleeve';
@@ -54,21 +55,22 @@ function explainApprovalBacklog(lifecycleSummary = {}, tradeStateSummary = {}) {
   return 'There is no active approval backlog.';
 }
 
-function summarizeTradeStateRows(tradesPath) {
+function summarizeTradeStateRows(tradesPath, options = {}) {
   if (!tradesPath || !fs.existsSync(tradesPath)) {
-    return { queuedForOpenRunner: 0, blocked: 0, blockedByCode: {} };
+    return { queuedForOpenRunner: 0, blocked: 0, blockedByCode: {}, staleNeedsReapproval: 0, canonicalStates: {} };
   }
   const { rows } = readTradesTable(tradesPath);
-  const summary = { queuedForOpenRunner: 0, blocked: 0, blockedByCode: {} };
+  const summary = { queuedForOpenRunner: 0, blocked: 0, blockedByCode: {}, staleNeedsReapproval: 0, canonicalStates: {} };
   for (const row of rows) {
-    const approval = String(row.Approval || '').trim();
-    const blockCode = String(row['Block code'] || '').trim();
-    const orderId = String(row['Broker order id'] || '').trim();
-    if (approval === 'queued_for_open_runner' && !orderId) summary.queuedForOpenRunner += 1;
-    if (blockCode) {
+    const classification = classifyTradeRowExecution(row, options);
+    summary.canonicalStates[classification.canonicalState] = (summary.canonicalStates[classification.canonicalState] || 0) + 1;
+    if (classification.canonicalState === 'queued_first_handoff' || classification.canonicalState === 'queued_retry') summary.queuedForOpenRunner += 1;
+    if (classification.canonicalState === 'blocked_retryable' || classification.canonicalState === 'blocked_hard') {
       summary.blocked += 1;
-      summary.blockedByCode[blockCode] = (summary.blockedByCode[blockCode] || 0) + 1;
+      const blockCode = String(row['Block code'] || classification.reasonCode || '').trim();
+      if (blockCode) summary.blockedByCode[blockCode] = (summary.blockedByCode[blockCode] || 0) + 1;
     }
+    if (classification.canonicalState === 'stale_needs_reapproval') summary.staleNeedsReapproval += 1;
   }
   return summary;
 }
