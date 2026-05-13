@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-12T22:07:37.366Z",
+  "generatedAt": "2026-05-13T13:20:15.788Z",
   "portfolioCount": 2,
   "totalValueChf": 5083.34,
   "portfolios": [
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 8,
+      "pendingActions": 7,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -38,15 +38,15 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
       "status": "warning",
-      "strategyStatus": "blocked",
+      "strategyStatus": "rebalance_needed",
       "totalValueChf": 5083.34,
       "cashChf": 4048.26,
       "investedChf": 1035.08,
@@ -55,11 +55,18 @@
       "pendingApprovals": 1,
       "blockers": 0,
       "pendingActions": 4,
-      "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-      "openRunnerQueue": 1,
-      "openRunnerRetry": 0,
-      "blockedTradeCount": 0,
-      "topBrokerBlock": null,
+      "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
+      "openRunnerQueue": 0,
+      "openRunnerRetry": 1,
+      "blockedTradeCount": 1,
+      "topBrokerBlock": {
+        "tickerOrIsin": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "blockCode": "quote_unavailable",
+        "blockReason": "No broker quote was available during market-open execution.",
+        "nextAction": "Restore broker pricing and rerun the market-open submission path.",
+        "brokerOrderId": ""
+      },
       "driftStatuses": [
         {
           "assetClass": "Global equities",
@@ -77,27 +84,27 @@
           "driftPct": -20
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "needs_operator_attention",
-      "dataFreshness": "current"
+      "dataFreshness": "stale"
     }
   ],
   "queueSummary": {
-    "total": 12,
-    "blocking": 7,
+    "total": 11,
+    "blocking": 5,
     "approvals": 1,
     "execution": 0,
-    "openRunnerQueue": 1,
-    "openRunnerRetry": 0,
-    "recovery": 2,
-    "delivery": 1,
+    "openRunnerQueue": 0,
+    "openRunnerRetry": 1,
+    "recovery": 0,
+    "delivery": 2,
     "data": 0,
     "warnings": 5,
     "workflow": 2,
     "bySeverity": {
-      "high": 7,
-      "medium": 5,
+      "high": 5,
+      "medium": 6,
       "low": 0
     }
   }

@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-12T22:07:37.593Z",
+  "generatedAt": "2026-05-13T13:20:15.787Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
-    "strategy": "blocked",
-    "brokerHealth": "degraded",
-    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-    "executionPosture": "degraded_dry_run_only",
+    "strategy": "rebalance_needed",
+    "brokerHealth": "healthy",
+    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
+    "executionPosture": "ready_for_review",
     "deliveryPosture": "needs_operator_attention",
-    "dataFreshness": "current"
+    "dataFreshness": "stale"
   },
   "readiness": null,
   "holdings": {
@@ -32,37 +32,25 @@
   "operatorQueue": {
     "summary": {
       "total": 4,
-      "blocking": 1,
+      "blocking": 0,
       "approvals": 1,
       "execution": 0,
-      "openRunnerQueue": 1,
-      "openRunnerRetry": 0,
-      "recovery": 1,
-      "delivery": 0,
+      "openRunnerQueue": 0,
+      "openRunnerRetry": 1,
+      "recovery": 0,
+      "delivery": 1,
       "data": 0,
       "warnings": 0,
       "workflow": 1,
       "bySeverity": {
-        "high": 1,
-        "medium": 3,
+        "high": 0,
+        "medium": 4,
         "low": 0
       }
     },
     "items": [
       {
         "rank": 1,
-        "queueType": "recovery",
-        "portfolio": "etf",
-        "kind": "broker",
-        "severity": "high",
-        "status": "degraded",
-        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-        "blocking": true,
-        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-        "source": "broker_readiness"
-      },
-      {
-        "rank": 2,
         "queueType": "backfill_review",
         "portfolio": "etf",
         "kind": "delivery",
@@ -74,7 +62,7 @@
         "source": "fill_notification_state"
       },
       {
-        "rank": 3,
+        "rank": 2,
         "queueType": "approval",
         "portfolio": "etf",
         "kind": "approval",
@@ -86,16 +74,28 @@
         "source": "trade_lifecycle"
       },
       {
-        "rank": 4,
-        "queueType": "open_runner_queue",
+        "rank": 3,
+        "queueType": "open_runner_retry",
         "portfolio": "etf",
         "kind": "execution",
         "severity": "medium",
         "status": "ready_for_review",
-        "summary": "1 trade row(s) are queued for a first market-open handoff.",
+        "summary": "1 trade row(s) were requeued for market-open retry after operator recovery.",
         "blocking": false,
-        "recommendedOperatorAction": "Confirm the queued rows are still intended before the next market-open run.",
+        "recommendedOperatorAction": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
         "source": "trade_state"
+      },
+      {
+        "rank": 4,
+        "queueType": "delivery",
+        "portfolio": "etf",
+        "kind": "delivery",
+        "severity": "medium",
+        "status": "pending",
+        "summary": "Dashboard/report freshness is stale relative to source state.",
+        "blocking": false,
+        "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
+        "source": "delivery_policy"
       }
     ]
   },
@@ -120,14 +120,38 @@
       "withBrokerOrderId": 2
     },
     "tradeState": {
-      "queuedForOpenRunner": 1,
-      "blocked": 0,
-      "blockedByCode": {}
+      "queuedForOpenRunner": 0,
+      "blocked": 5,
+      "blockedByCode": {
+        "status_not_executable": 4,
+        "hold_action": 1
+      },
+      "staleNeedsReapproval": 1,
+      "canonicalStates": {
+        "blocked_hard": 5,
+        "cancelled": 1,
+        "filled": 1,
+        "stale_needs_reapproval": 1
+      }
     },
-    "blockedRows": [],
+    "blockedRows": [
+      {
+        "dateTime": "2026-05-11 06:33:50",
+        "tickerOrIsin": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "action": "buy",
+        "status": "approved",
+        "approval": "queued_for_open_runner",
+        "brokerOrderId": "",
+        "blockCode": "quote_unavailable",
+        "blockReason": "No broker quote was available during market-open execution.",
+        "blockedAt": "2026-05-12 22:42:22",
+        "nextAction": "Restore broker pricing and rerun the market-open submission path."
+      }
+    ],
     "openRunnerRetryState": {
-      "queuedInitial": 1,
-      "queuedRetry": 0
+      "queuedInitial": 0,
+      "queuedRetry": 1
     },
     "inFlightCount": 0,
     "failedCount": 0,
@@ -147,7 +171,7 @@
           "executablePct": 18.54,
           "executionGapChf": 0,
           "approval": "queued_for_open_runner",
-          "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction."
+          "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.; No broker quote was available during market-open execution."
         },
         {
           "tickerOrIsin": "CASH-CHF",
@@ -244,7 +268,7 @@
         "action": "buy",
         "estimatedChf": 942.48,
         "approval": "queued_for_open_runner",
-        "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction."
+        "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.; No broker quote was available during market-open execution."
       }
     },
     {
@@ -266,19 +290,26 @@
     }
   ],
   "pendingActions": [
-    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
     "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
     "1 approved trade row(s) are ready for staging or review.",
-    "1 trade row(s) are queued for a first market-open handoff."
+    "1 trade row(s) were requeued for market-open retry after operator recovery.",
+    "Dashboard/report freshness is stale relative to source state."
   ],
-  "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+  "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
   "explanations": {
     "biggestDrift": "Global equities is 40% over target and outside the allowed band around the 60% target.",
-    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-    "approvalBacklog": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly."
+    "noTradePosture": "Execution should stay blocked because the supporting dashboard/holdings inputs are stale.",
+    "executionBlock": "Execution is blocked because the underlying portfolio state is stale and should be refreshed first.",
+    "approvalBacklog": "1 approval-gated trade row(s), 5 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
+    {
+      "time": "2026-05-12 22:42:22.204 UTC",
+      "eventType": "submission_blocked",
+      "severity": "warn",
+      "summary": "UBSSLI blocked before submission: No broker quote was available during market-open execution.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
     {
       "time": "2026-05-11 21:46:56.727 UTC",
       "eventType": "submission_blocked",
@@ -306,30 +337,23 @@
       "severity": "warn",
       "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
       "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-11 21:23:23.526 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Holdings contain unmatched instruments: review instrument mapping",
-      "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
   "observability": {
     "eventsPresent": true,
     "recentSummary": {
-      "total": 96,
+      "total": 97,
       "byLevel": {
-        "warn": 90,
+        "warn": 91,
         "info": 6
       },
       "byCategory": {
         "execution_policy": 65,
-        "market_open_execution": 14,
+        "market_open_execution": 15,
         "execution": 6,
         "risk": 11
       },
-      "blockedTrades": 90,
+      "blockedTrades": 91,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
       "openRunnerQueueEvents": 0,
@@ -341,6 +365,7 @@
     "mode": "local_only",
     "failureAlertMode": "local_operator_review",
     "pendingActions": [
+      "Dashboard/report freshness is stale relative to source state.",
       "1 reconciled fill(s) still need notification backfill review."
     ]
   },
@@ -377,7 +402,7 @@
       "estimatedChf": "942.48",
       "amount": "942.48",
       "actualChf": "0",
-      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.",
+      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.; No broker quote was available during market-open execution.",
       "approval": "queued_for_open_runner",
       "brokerOrderId": ""
     },

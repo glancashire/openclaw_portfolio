@@ -12,6 +12,7 @@ Use `node scripts/trade.js ...` as the primary operator command family.
 - `trade authority` — canonical effective-config / execution-authority truth surface
 - `trade config` — canonical effective-config diagnostic surface with redacted broker configuration and execution authority context
 - `trade delivery` — canonical delivery-posture diagnostic surface
+- `trade reconcile-live` — canonical broker/live-state reconciliation surface that refreshes open-order truth, completed/fill evidence, and derived operator artifacts
 - `trade arm-open` — explicitly arm the next market-open execution window
 - `trade disarm-open` — clear any armed market-open execution window
 - `trade submit` — submit/stage approved orders via the market-open path

@@ -1,14 +1,41 @@
 'use strict';
 
-function calculateSmartLimit(quote, action) {
+function tickSizeFor({ currency, referencePrice }) {
+  const ccy = String(currency || '').toUpperCase();
+  const px = Number(referencePrice || 0);
+  if (ccy === 'CHF') {
+    if (px >= 100) return 0.05;
+    if (px >= 1) return 0.01;
+    return 0.001;
+  }
+  if (ccy === 'EUR' || ccy === 'USD' || ccy === 'GBP') {
+    if (px >= 1) return 0.01;
+    return 0.001;
+  }
+  return 0.01;
+}
+
+function snapToTick(price, tickSize, action) {
+  const value = Number(price || 0);
+  const tick = Number(tickSize || 0);
+  if (!Number.isFinite(value) || value <= 0 || !Number.isFinite(tick) || tick <= 0) return null;
+  const units = value / tick;
+  const snappedUnits = String(action || '').toUpperCase() === 'SELL' ? Math.floor(units + 1e-9) : Math.ceil(units - 1e-9);
+  return Number((snappedUnits * tick).toFixed(6));
+}
+
+function calculateSmartLimit(quote, action, options = {}) {
   if (quote?.bid && quote?.ask && quote.bid > 0 && quote.ask > 0) {
-    if (action === 'BUY') return Math.round(quote.ask * 10000) / 10000;
-    return Math.round(quote.bid * 10000) / 10000;
+    const raw = action === 'BUY' ? Number(quote.ask) : Number(quote.bid);
+    const tick = tickSizeFor({ currency: options.currency || quote.currency, referencePrice: raw });
+    return snapToTick(raw, tick, action);
   }
   const ref = quote?.last || quote?.close;
   if (!ref) return null;
   const buffer = action === 'BUY' ? 1.003 : 0.997;
-  return Math.round(ref * buffer * 10000) / 10000;
+  const raw = Number(ref) * buffer;
+  const tick = tickSizeFor({ currency: options.currency || quote.currency, referencePrice: raw });
+  return snapToTick(raw, tick, action);
 }
 
 function analyzeQuoteTrend(quote) {
@@ -74,7 +101,7 @@ function evaluateMarketOpenBlock({ trade, quote, marketEntryPolicy }) {
     };
   }
 
-  const limitPrice = calculateSmartLimit(quote, trade?.action);
+  const limitPrice = calculateSmartLimit(quote, trade?.action, { currency: trade?.currency });
   if (!limitPrice) {
     const hasAnyClose = Number.isFinite(Number(quote?.close)) && Number(quote?.close) > 0;
     const hasAnyReference = Number.isFinite(Number(quote?.last)) && Number(quote?.last) > 0

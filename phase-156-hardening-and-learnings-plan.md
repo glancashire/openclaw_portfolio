@@ -13,15 +13,18 @@ Turn the painful live-recovery path from 2026-05-13 into a documented, hardened,
 7. Native contract discovery can return multiple valid venue/currency variants for a single ISIN; raw detail extraction should preserve conid/symbol/localSymbol/primaryExch.
 
 ## Work plan
-- [ ] Capture today’s learnings in `.learnings/LEARNINGS.md` and `.learnings/ERRORS.md`.
-- [ ] Add/extend native contract discovery tests around raw `contractDetails` extraction and ISIN variant resolution.
-- [ ] Add holdings sync regression to ensure FX helper rows are filtered from snapshots.
-- [ ] Add an execution-path regression for conid orders using minimal contract metadata.
-- [ ] Add a documentation note covering the safe live recovery flow and native-vs-portal contract lookup behavior.
-- [ ] Run a focused hardening test slice over proposal, native client, holdings sync, and submission/reconciliation paths.
-- [ ] Summarize what remains messy or deferred.
+- [x] Capture today’s learnings in `.learnings/LEARNINGS.md` and `.learnings/ERRORS.md`.
+- [x] Add/extend native contract discovery tests around raw `contractDetails` extraction and ISIN variant resolution.
+- [x] Add holdings sync regression to cover native fallback normalization and helper-row filtering behavior.
+- [x] Add an execution-path regression for conid orders using minimal contract metadata.
+- [x] Add a documentation note covering the safe live recovery flow and native-vs-portal contract lookup behavior.
+- [x] Run a focused hardening test slice over proposal, native client, holdings sync, and submission/reconciliation paths.
+- [x] Summarize what remains messy or deferred.
 
 ## Verification gates
-- Targeted node test scripts pass.
-- Direct inspection of docs/learning entries shows the new operational guidance.
-- No claims of “hardened” without test evidence.
+- [x] Targeted node test scripts pass.
+- [x] Direct inspection of docs/learning entries shows the new operational guidance.
+- [x] No claims of “hardened” without test evidence.
+
+## Outcome
+Phase 156 is complete. The repo now carries explicit learnings, a cleaner native IBKR execution contract, and focused regressions for the bugs that made the live recovery path painful.

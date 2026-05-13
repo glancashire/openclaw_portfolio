@@ -64,9 +64,19 @@ function matchesTradeSelector(row, selector = {}) {
 
 function updateTradeRows(tradesPath, selector, mutateRow) {
   const table = readTradesTable(tradesPath);
-  let updated = 0;
+  let candidateIndexes = [];
   table.rows.forEach((row, idx) => {
     if (!matchesTradeSelector(row, selector)) return;
+    candidateIndexes.push(idx);
+  });
+
+  if (candidateIndexes.length > 1 && selector.dateTime) {
+    candidateIndexes = candidateIndexes.filter((idx) => String(table.rows[idx]['Date/time'] || '') === String(selector.dateTime));
+  }
+
+  let updated = 0;
+  candidateIndexes.forEach((idx) => {
+    const row = table.rows[idx];
     const next = mutateRow({ ...row }, idx);
     if (!next) return;
     table.lines[table.rowIndexes[idx]] = formatTradeLine(next);

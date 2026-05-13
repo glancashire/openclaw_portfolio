@@ -13,6 +13,7 @@ const assert = require('assert');
     '`trade authority`',
     '`trade config`',
     '`trade delivery`',
+    '`trade reconcile-live`',
     '`trade arm-open`',
     '`trade disarm-open`',
     '`trade submit`',

@@ -1,7 +1,7 @@
 # Portfolio Manager Progress Report
 
-Last updated: 2026-05-13 10:57 UTC  
-Repo HEAD: `736ebff`
+Last updated: 2026-05-13 16:40 UTC  
+Repo HEAD: `471dbc6`
 
 This report maps the current implementation against `SPECIFICATION.md` and highlights the single highest-priority remaining implementation path.
 
@@ -18,7 +18,7 @@ The repository now has a notably stronger MVP foundation than earlier in the day
 - local-only report delivery policy/readiness surfacing now exists for production reporting posture checks
 - bundled execution verification exists and is passing
 
-The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is complete through Phase 42, the later reporting/overview hardening sequence is complete through Phase 100, and the post-acceptance hardening sequence now extends through Phase 154. That later work includes: canonical live preflight, execution-authority, effective-config, and delivery-posture diagnostics; execution/readiness/reporting truth alignment across dashboard/summary/overview surfaces; transmitted-live acceptance coverage; operator incident/runbook verification; doc-contract alignment across the execution command surface, operator runbooks, observability guide, trading workflow, and transmitted-live operations guide; and the later broker-block context propagation across portfolio summary, delivery diagnostics, delivery-status artifacts, cockpit rendering, and generated overview regression coverage. True live transmitted execution remains intentionally guarded and explicit rather than broadly enabled by default, and the real ETF environment is still operationally blocked unless readiness, execution mode, approval state, broker health, and explicit arming all align.
+The original MVP acceptance scope was already closed in read-only + dry-run terms. The expanded follow-on roadmap is complete through Phase 42, the later reporting/overview hardening sequence is complete through Phase 100, the post-acceptance hardening sequence extends through Phase 154, and the current live-recovery / execution-truth / hardening sequence is now materially closed through Phase 156. That later work includes: canonical live preflight, execution-authority, effective-config, and delivery-posture diagnostics; execution/readiness/reporting truth alignment across dashboard/summary/overview surfaces; transmitted-live acceptance coverage; operator incident/runbook verification; doc-contract alignment across the execution command surface, operator runbooks, observability guide, trading workflow, and transmitted-live operations guide; broker-block context propagation across portfolio summary, delivery diagnostics, delivery-status artifacts, cockpit rendering, and generated overview regression coverage; live reconciliation, stale-approval truth, planner cash/allocation fixes, native IBKR order-id/handshake/contract/tick-size hardening, truthful post-fill holdings resync, and replacement of SPYL with a validated UBS Core S&P 500 alternative (`IE00BD4TXW66`, IBKR conid `808613958`). The ETF portfolio is now balanced within current policy constraints, with only sub-minimum residual CHF cash left intentionally untraded.
 
 ## Validation snapshot
 
@@ -54,15 +54,15 @@ Legend:
 | 5. Portfolio Folder Contract | done | Required files exist in both `portfolio/_template/` and `portfolio/etf/`. |
 | 6. `portfolio.md` | done | Required structure is implemented and validated. |
 | 7. `holdings.md` | done | File exists in valid structure and is supported by live holdings sync/update workflows. |
-| 8. `trades.md` | partial | Proposal logging, approval transitions, lifecycle reconciliation, and broker-order-id linkage now exist. The remaining gap is true live writable submit behavior. |
+| 8. `trades.md` | done | Proposal logging, approval transitions, lifecycle reconciliation, broker-order-id linkage, stale-approval truth, and truthful live submit/fill recording now exist. |
 | 9. `history.md` | done | History snapshot writing exists and now supports typed execution snapshots (`execution_filled`, `execution_cancelled`, etc.). |
 | 10. `dashboard.md` | done | Dashboard generation/regeneration exists and now includes execution lifecycle visibility and smarter execution-state warnings/actions. |
-| 11. Broker Adapter Interface | partial | Most interface elements are represented, including auth, accounts, holdings, search, pricing, quote preview, dry-run preview, status lookup, execution/fill fallback, completed-order lookup, and cancel scaffolding. Durable writable live execution remains incomplete. |
-| 12. Interactive Brokers Adapter — MVP Requirements | partial | Read-only native TWS / IB Gateway connectivity, holdings sync, search, pricing, dry-run scaffolding, status reconciliation, and completed-order inspection are present. The remaining key gap is live-quality writable submit/cancel enablement. |
+| 11. Broker Adapter Interface | done | Auth, accounts, holdings, search, pricing, quote preview, dry-run preview, status lookup, execution/fill fallback, completed-order lookup, cancel scaffolding, and live-quality native submission/reconciliation hardening are now represented. |
+| 12. Interactive Brokers Adapter — MVP Requirements | done | Native TWS / IB Gateway connectivity, holdings sync, search, pricing, live-priced proposal support, truthful live submission, status reconciliation, completed-order inspection, and native recovery hardening are present for the active ETF path. |
 | 13. Portfolio Creation Workflow | partial | Portfolio creation, bootstrap, apply-answers, and next-question flows exist, but the onboarding workflow could still be smoother as a single guided path. |
 | 14. Strategy and ETF Selection Workflow | partial | Strategy parsing, shortlist generation, rationale, and approval-gated application support exist. The shortlist approval/write-back workflow is still lighter than the specification implies. |
-| 15. Market Entry Workflow | partial | Staged-entry policy, portfolio-aware execution gating, approval transitions, status reconciliation, cancellation scaffolding, and demo flow are now present. Live writable execution after approval remains incomplete. |
-| 16. Rebalancing Workflow | partial | Holdings sync, drift analysis, trade proposal generation, dashboard refresh, and execution reconciliation exist. The final enabled execution leg still needs hardening. |
+| 15. Market Entry Workflow | done | Staged-entry policy, portfolio-aware execution gating, approval transitions, truthful live submission, status reconciliation, cancellation scaffolding, and demo/live flow coverage are now present. |
+| 16. Rebalancing Workflow | done | Holdings sync, drift analysis, live-priced proposal generation, dashboard refresh, execution reconciliation, and post-fill regeneration from current holdings/cash now exist. |
 | 17. Reporting | done | Weekly/monthly/quarterly report generation exists, with Markdown and PDF outputs. Reporting now also surfaces delivery mode, readiness, pending operator actions, freshness, and generation/render state, with a dedicated local-only readiness check. |
 | 18. Scheduling | partial | Schedule docs and report-job docs exist, and cron wiring is in place. Report-cycle automation now emits workflow, failure, delivery-mode, readiness, and pending-action metadata, though broader observability/alerting remains light. |
 | 19. Safety / Operational Rules | partial | Key safeguards are implemented: no secrets in Markdown, read-only/dry-run posture, activation/safety checks, approval gating, broker error pause state, and execution verification bundle. |
@@ -124,7 +124,7 @@ Legend:
 
 ## Highest-priority remaining implementation path
 
-## Decide whether to harden explicit live broker execution beyond the accepted dry-run/read-only posture
+## Decide whether to extend beyond the now-balanced ETF deployment into health/self-healing automation and broader multi-portfolio operational polish
 
 This is now the clearest remaining path only if the goal is to go beyond the already accepted reporting/overview/operator UX closure and deliberately expand into opt-in live execution hardening.
 

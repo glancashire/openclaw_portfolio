@@ -10,7 +10,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-11T09:51:05.291Z"
+      "lastAt": "2026-05-12T22:42:10.849Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -31,16 +31,16 @@
       "lastAt": "2026-05-10T22:14:55.568Z"
     },
     "etf": {
-      "consecutive": 1,
-      "lastReason": "status_error",
-      "lastMessage": "Unable to reach Interactive Brokers API at 127.0.0.1:4001. TWS or IB Gateway does not appear to be running or API access is disabled. If you do not have access to TWS/IB Gateway on this machine, you will need a reachable IBKR API host/port. You can override defaults with --host/--port or IBKR_HOST/IBKR_PORT. Original error:",
-      "lastAt": "2026-05-11T21:15:28.890Z"
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-13T14:29:30.583Z"
     }
   },
   "liveExecutionArms": {
     "etf": {
-      "armedAt": "2026-05-11T08:18:56.984Z",
-      "expiresAt": "2026-05-11T11:18:56.983Z",
+      "armedAt": "2026-05-13T13:30:35.037Z",
+      "expiresAt": "2026-05-14T07:30:35.037Z",
       "note": "Armed from canonical trade CLI."
     }
   }

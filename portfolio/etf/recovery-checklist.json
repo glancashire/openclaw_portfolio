@@ -1,38 +1,45 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-12T22:07:37.593Z",
+  "generatedAt": "2026-05-13T13:20:15.787Z",
   "portfolio": "etf",
-  "incidentStatus": "action_required",
+  "incidentStatus": "monitor_only",
   "summary": {
     "health": "warning",
-    "brokerHealth": "degraded",
-    "executionPosture": "degraded_dry_run_only",
+    "brokerHealth": "healthy",
+    "executionPosture": "ready_for_review",
     "deliveryPosture": "needs_operator_attention",
-    "dataFreshness": "current",
+    "dataFreshness": "stale",
     "blockerCount": 0,
     "queueItemCount": 4,
     "pendingApprovals": 1,
-    "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-    "approvalWhy": "1 approval-gated trade row(s), 1 queued-for-open-runner row(s) still need explicit operator review before the workflow can advance cleanly."
+    "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
+    "executionWhy": "Execution is blocked because the underlying portfolio state is stale and should be refreshed first.",
+    "approvalWhy": "1 approval-gated trade row(s), 5 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
-    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
+    "Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.",
     "1 approval-gated trade rows are still waiting for operator review."
   ],
   "activeBlockers": [],
-  "activeBrokerBlocks": [],
+  "activeBrokerBlocks": [
+    {
+      "rank": 1,
+      "dateTime": "2026-05-11 06:33:50",
+      "tickerOrIsin": "CH0032912732",
+      "name": "UBS SLI ETF (SMI gleichgewichtet)",
+      "action": "buy",
+      "status": "approved",
+      "approval": "queued_for_open_runner",
+      "brokerOrderId": "",
+      "blockCode": "quote_unavailable",
+      "blockReason": "No broker quote was available during market-open execution.",
+      "blockedAt": "2026-05-12 22:42:22",
+      "nextAction": "Restore broker pricing and rerun the market-open submission path."
+    }
+  ],
   "actionChecklist": [
     {
       "step": 1,
-      "priority": "high",
-      "title": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
-      "source": "broker_readiness"
-    },
-    {
-      "step": 2,
       "priority": "medium",
       "title": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
       "action": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
@@ -40,7 +47,7 @@
       "source": "fill_notification_state"
     },
     {
-      "step": 3,
+      "step": 2,
       "priority": "medium",
       "title": "1 approved trade row(s) are ready for staging or review.",
       "action": "Stage or review the approved trades when readiness gates are satisfied.",
@@ -48,30 +55,38 @@
       "source": "trade_lifecycle"
     },
     {
-      "step": 4,
+      "step": 3,
       "priority": "medium",
-      "title": "1 trade row(s) are queued for a first market-open handoff.",
-      "action": "Confirm the queued rows are still intended before the next market-open run.",
+      "title": "1 trade row(s) were requeued for market-open retry after operator recovery.",
+      "action": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
       "source": "trade_state"
+    },
+    {
+      "step": 4,
+      "priority": "medium",
+      "title": "Dashboard/report freshness is stale relative to source state.",
+      "action": "Review report delivery readiness and clear the pending action.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "delivery_policy"
     }
   ],
   "verificationChecks": [
-    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
-    "Freshness posture remains current.",
+    "Broker health remains healthy or intentionally degraded with operator awareness.",
+    "Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.",
     "All approval-gated rows are explicitly approved, rejected, or intentionally left pending.",
     "No active blockers remain."
   ],
   "completionCriteria": [
-    "Blocking recovery items no longer appear in the operator queue.",
-    "Portfolio health no longer depends on unresolved blocker conditions.",
-    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
+    "Portfolio remains in a healthy or intentionally monitored posture.",
+    "No blocker-class recovery work is outstanding.",
+    "The next operating step is clear from the summary surface."
   ],
   "recentSignals": [
     {
       "rank": 1,
       "severity": "warn",
-      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
+      "summary": "UBSSLI blocked before submission: No broker quote was available during market-open execution.",
       "timestamp": null
     },
     {
@@ -95,7 +110,7 @@
     {
       "rank": 5,
       "severity": "warn",
-      "summary": "Holdings contain unmatched instruments: review instrument mapping",
+      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
       "timestamp": null
     }
   ]

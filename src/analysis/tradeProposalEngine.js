@@ -27,7 +27,25 @@ function parseTotalValueChf(holdingsPath) {
 
 function parseCashChf(holdingsPath) {
   const text = readText(holdingsPath);
+  const summaryMatch = text.match(/- Cash CHF:\s*(.+)/);
+  if (summaryMatch) {
+    return parseNumber(summaryMatch[1]);
+  }
+
   const lines = text.split(/\r?\n/);
+  const cashTableStart = lines.findIndex((line) => line.trim() === '## Cash');
+  if (cashTableStart !== -1) {
+    for (let i = cashTableStart + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.startsWith('## ')) break;
+      if (!line.startsWith('|')) continue;
+      const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
+      if ((cells[0] || '').toUpperCase() === 'CHF') {
+        return parseNumber(cells[3] || cells[1] || '0');
+      }
+    }
+  }
+
   const cashRow = lines.find((line) => /^\|\s*CHF\s*\|/.test(line) && /\|\s*cash\s*\|?\s*$/i.test(line));
   if (!cashRow) return 0;
   const cells = cashRow.split('|').slice(1, -1).map((cell) => cell.trim());

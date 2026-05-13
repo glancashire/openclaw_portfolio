@@ -1,22 +1,22 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-12T22:07:37.366Z",
-  "itemCount": 12,
+  "generatedAt": "2026-05-13T13:20:15.788Z",
+  "itemCount": 11,
   "queueSummary": {
-    "total": 12,
-    "blocking": 7,
+    "total": 11,
+    "blocking": 5,
     "approvals": 1,
     "execution": 0,
-    "openRunnerQueue": 1,
-    "openRunnerRetry": 0,
-    "recovery": 2,
-    "delivery": 1,
+    "openRunnerQueue": 0,
+    "openRunnerRetry": 1,
+    "recovery": 0,
+    "delivery": 2,
     "data": 0,
     "warnings": 5,
     "workflow": 2,
     "bySeverity": {
-      "high": 7,
-      "medium": 5,
+      "high": 5,
+      "medium": 6,
       "low": 0
     }
   },
@@ -83,30 +83,6 @@
     },
     {
       "rank": 6,
-      "queueType": "recovery",
-      "portfolio": "acceptance-closure",
-      "kind": "broker",
-      "severity": "high",
-      "status": "degraded",
-      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-      "blocking": true,
-      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "source": "broker_readiness"
-    },
-    {
-      "rank": 7,
-      "queueType": "recovery",
-      "portfolio": "etf",
-      "kind": "broker",
-      "severity": "high",
-      "status": "degraded",
-      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
-      "blocking": true,
-      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "source": "broker_readiness"
-    },
-    {
-      "rank": 8,
       "queueType": "approval",
       "portfolio": "etf",
       "kind": "approval",
@@ -118,19 +94,19 @@
       "source": "trade_lifecycle"
     },
     {
-      "rank": 9,
-      "queueType": "open_runner_queue",
+      "rank": 7,
+      "queueType": "open_runner_retry",
       "portfolio": "etf",
       "kind": "execution",
       "severity": "medium",
       "status": "ready_for_review",
-      "summary": "1 trade row(s) are queued for a first market-open handoff.",
+      "summary": "1 trade row(s) were requeued for market-open retry after operator recovery.",
       "blocking": false,
-      "recommendedOperatorAction": "Confirm the queued rows are still intended before the next market-open run.",
+      "recommendedOperatorAction": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
       "source": "trade_state"
     },
     {
-      "rank": 10,
+      "rank": 8,
       "queueType": "delivery",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
@@ -142,7 +118,19 @@
       "source": "delivery_policy"
     },
     {
-      "rank": 11,
+      "rank": 9,
+      "queueType": "delivery",
+      "portfolio": "etf",
+      "kind": "delivery",
+      "severity": "medium",
+      "status": "pending",
+      "summary": "Dashboard/report freshness is stale relative to source state.",
+      "blocking": false,
+      "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
+      "source": "delivery_policy"
+    },
+    {
+      "rank": 10,
       "queueType": "backfill_review",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
@@ -154,7 +142,7 @@
       "source": "fill_notification_state"
     },
     {
-      "rank": 12,
+      "rank": 11,
       "queueType": "backfill_review",
       "portfolio": "etf",
       "kind": "delivery",

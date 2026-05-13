@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-12T22:07:37.366Z",
+  "generatedAt": "2026-05-13T13:20:15.789Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 4048.26,
@@ -18,21 +18,27 @@
     "status": "out_of_bounds",
     "absDrift": 50
   },
-  "brokerHealth": "degraded",
+  "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
   "pendingApprovals": 1,
-  "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+  "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
   "biggestDriftWhy": "Global equities is 40% over target and outside the allowed band around the 60% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",
     "cashChf": 4048.26,
-    "brokerHealth": "degraded",
+    "brokerHealth": "healthy",
     "deliveryPosture": "needs_operator_attention",
     "pendingApprovals": 1,
-    "blockedTradeCount": 0,
-    "topBrokerBlock": null,
-    "recommendedNextStep": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-    "whyNow": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    "blockedTradeCount": 1,
+    "topBrokerBlock": {
+      "tickerOrIsin": "CH0032912732",
+      "name": "UBS SLI ETF (SMI gleichgewichtet)",
+      "blockCode": "quote_unavailable",
+      "blockReason": "No broker quote was available during market-open execution.",
+      "nextAction": "Restore broker pricing and rerun the market-open submission path."
+    },
+    "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
+    "whyNow": "No broker quote was available during market-open execution."
   }
 }

@@ -41,14 +41,24 @@ function loadCurrentAllocations(holdingsPath) {
   const text = fs.readFileSync(holdingsPath, 'utf8');
   const rows = parseTableRows(extractTableSection(text, 'Current Holdings'));
   const byAsset = new Map();
-  let total = 0;
+  let investedTotal = 0;
   for (const row of rows) {
     const assetClass = row[2];
     const valueChf = parseNumber(row[7]);
-    total += valueChf;
+    investedTotal += valueChf;
     byAsset.set(assetClass, (byAsset.get(assetClass) || 0) + valueChf);
   }
 
+  const cashSection = extractTableSection(text, 'Cash');
+  const cashRows = parseTableRows(cashSection);
+  const cashChf = cashRows
+    .filter((row) => String(row[0] || '').trim().toUpperCase() === 'CHF')
+    .reduce((sum, row) => sum + parseNumber(row[3] || row[1] || '0'), 0);
+  if (cashChf > 0) {
+    byAsset.set('Bonds / cash-like', (byAsset.get('Bonds / cash-like') || 0) + cashChf);
+  }
+
+  const total = investedTotal + cashChf;
   const result = new Map();
   for (const [assetClass, value] of byAsset.entries()) {
     result.set(assetClass, total > 0 ? (value / total) * 100 : 0);

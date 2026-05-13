@@ -19,6 +19,7 @@ assert(help.includes('preflight'), 'Expected help to mention preflight');
 assert(help.includes('authority'), 'Expected help to mention authority');
 assert(help.includes('arm-open'), 'Expected help to mention arm-open');
 assert(help.includes('disarm-open'), 'Expected help to mention disarm-open');
+assert(help.includes('reconcile-live'), 'Expected help to mention reconcile-live');
 
 const preflight = runAllowFailure(['preflight', '--json']);
 assert([0, 2].includes(preflight.status), `Expected preflight exit 0 or 2, got ${preflight.status}`);

@@ -16,7 +16,10 @@ function buildReason(proposal) {
 }
 
 function proposalRow(proposal, timestamp) {
-  const approval = proposal.approval || (proposal.blocked ? 'blocked_by_min_trade_size' : 'pending_user_approval');
+  const minTradeBlocked = Number(proposal.estimatedOrderChf || proposal.estimatedChf || 0) > 0
+    && Number(proposal.minTradeSize || 0) > 0
+    && Number(proposal.estimatedOrderChf || proposal.estimatedChf || 0) < Number(proposal.minTradeSize || 0);
+  const approval = proposal.approval || (minTradeBlocked ? 'blocked_by_min_trade_size' : 'pending_user_approval');
   const brokerOrderId = proposal.brokerOrderId || '';
   const tickerOrIsin = proposal.instrument || proposal.assetClass;
   const name = proposal.instrumentName || `${proposal.assetClass} basket`;

@@ -5,9 +5,9 @@
 - Portfolios tracked: 2
 - Cash waiting to deploy CHF: 4048.26
 - Pending approvals: 1
-- Broker health: degraded
+- Broker health: healthy
 - Reporting health: attention_needed
-- Recommended next step: 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
+- Recommended next step: 1 approved trade row(s) are ready for staging or review.
 
 ## Biggest Drift Today
 - acceptance-closure: Global equities drift -50% (out_of_bounds)
@@ -17,10 +17,10 @@
 - Portfolio: etf
 - Health: warning
 - Cash CHF: 4048.26
-- Broker health: degraded
+- Broker health: healthy
 - Delivery posture: needs_operator_attention
 - Pending approvals: 1
-- Broker-blocked rows: 0
-- Top broker block: none
-- Recommended next step: 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
-- Why now: Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Broker-blocked rows: 1
+- Top broker block: quote_unavailable (CH0032912732)
+- Recommended next step: 1 approved trade row(s) are ready for staging or review.
+- Why now: No broker quote was available during market-open execution.

@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { validateTradeList } = require('../lib/etfQualityFilter');
 const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
-const { listExecutableTradeRows, updateTradeRows } = require('../src/execution/tradeState');
+const { listExecutableTradeRows, updateTradeRows, reconcileOrderStatus } = require('../src/execution/tradeState');
 const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
 const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing');
 const { calculateSmartLimit, analyzeQuoteTrend, shouldBlockForTrend, evaluateMarketOpenBlock } = require('../src/execution/marketOpenPolicy');
@@ -260,14 +260,25 @@ async function main() {
       }, { dryRun: false, revocableOnly: true, transmitLive: true });
       if (!result.ok) throw new Error(result.error || result.message || result.reason || 'Broker placeOrder failed');
       const orderId = result.order?.orderId ? String(result.order.orderId) : '';
-      updateTradeRows(tradesPath, { dateTime: order.row.dateTime, tickerOrIsin: order.row.tickerOrIsin, action: order.row.action }, (row) => ({
-        ...row,
-        Status: 'submitted',
-        Approval: 'submitted_to_broker',
-        'Broker order id': orderId,
-        'Limit price': String(order.limit),
-        Reason: `${row.Reason}; Market-open live submission attempted.`,
-      }));
+      const immediateStatus = String(result.order?.status || 'submitted');
+      const normalizedImmediate = immediateStatus.trim().toLowerCase();
+      if (normalizedImmediate === 'inactive') {
+        reconcileOrderStatus(
+          tradesPath,
+          { dateTime: order.row.dateTime, tickerOrIsin: order.row.tickerOrIsin, action: order.row.action },
+          result.order,
+          { reasonNote: `Broker order acknowledged but marked Inactive. ${result.order?.brokerErrorMessage || ''}`.trim() }
+        );
+      } else {
+        updateTradeRows(tradesPath, { dateTime: order.row.dateTime, tickerOrIsin: order.row.tickerOrIsin, action: order.row.action }, (row) => ({
+          ...row,
+          Status: 'submitted',
+          Approval: 'submitted_to_broker',
+          'Broker order id': orderId,
+          'Limit price': String(order.limit),
+          Reason: `${row.Reason}; Market-open live submission attempted.`,
+        }));
+      }
       console.log(`  → orderId=${result.order?.orderId} status=${result.order?.status}`);
       results.push({ ...order, orderId: result.order?.orderId, status: result.order?.status, errors: result.brokerErrors });
     } catch (e) {

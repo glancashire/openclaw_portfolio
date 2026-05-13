@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-12T22:07:37.371Z",
+  "generatedAt": "2026-05-13T13:20:15.794Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -54,19 +54,27 @@
       "overrideLoaded": true,
       "ready": false,
       "pendingActions": [
+        "Dashboard/report freshness is stale relative to source state.",
         "1 reconciled fill(s) still need notification backfill review."
       ],
       "deliveryPosture": {
         "ready": false,
-        "pendingActionCount": 1,
+        "pendingActionCount": 2,
         "latestHistoryDate": "2026-05-11",
-        "freshnessStale": false,
+        "freshnessStale": true,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 0,
-          "topBrokerBlock": null
+          "blockedTradeCount": 1,
+          "topBrokerBlock": {
+            "tickerOrIsin": "CH0032912732",
+            "name": "UBS SLI ETF (SMI gleichgewichtet)",
+            "blockCode": "quote_unavailable",
+            "blockReason": "No broker quote was available during market-open execution.",
+            "nextAction": "Restore broker pricing and rerun the market-open submission path.",
+            "brokerOrderId": ""
+          }
         },
         "recommendedNextAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome."
       }
