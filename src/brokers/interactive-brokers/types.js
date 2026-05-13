@@ -15,8 +15,15 @@ function normaliseHolding(raw = {}) {
   const symbol = raw.symbol || contract.symbol || contract.localSymbol || null;
   const conid = raw.conid || contract.conId || null;
   const quantity = Number(raw.position ?? raw.quantity ?? 0);
-  const price = Number(raw.mktPrice ?? raw.price ?? raw.marketPrice ?? 0);
-  const marketValue = Number(raw.mktValue ?? raw.marketValue ?? (Number.isFinite(price) ? price * quantity : 0));
+  const avgCost = Number(raw.avgCost ?? raw.averageCost ?? 0);
+  const explicitPrice = Number(raw.mktPrice ?? raw.price ?? raw.marketPrice ?? 0);
+  const price = Number.isFinite(explicitPrice) && explicitPrice > 0
+    ? explicitPrice
+    : (Number.isFinite(avgCost) && avgCost > 0 ? avgCost : 0);
+  const explicitMarketValue = Number(raw.mktValue ?? raw.marketValue);
+  const marketValue = Number.isFinite(explicitMarketValue) && explicitMarketValue > 0
+    ? explicitMarketValue
+    : (Number.isFinite(price) ? price * quantity : 0);
 
   return {
     broker: 'interactive-brokers',
@@ -28,6 +35,7 @@ function normaliseHolding(raw = {}) {
     price,
     currency: raw.currency || contract.currency || 'CHF',
     marketValue,
+    avgCost: Number.isFinite(avgCost) ? avgCost : null,
     raw,
   };
 }

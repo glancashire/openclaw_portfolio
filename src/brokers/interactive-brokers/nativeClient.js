@@ -92,16 +92,24 @@ class InteractiveBrokersNativeClient {
     return this.withApi(async ({ api, connected }) => {
       await connected;
       return placeNativeOrder(api, order);
+    }, {
+      handshake: {
+        timeoutMs: 15000,
+        label: 'native order handshake',
+        requireConnectedAck: false,
+        requireNextValidId: true,
+      },
     });
   }
 
-  async withApi(fn) {
+  async withApi(fn, overrides = {}) {
     const { IBApi } = loadIbModule();
     const api = new IBApi({ host: this.config.host, port: this.config.port });
     const connected = waitForNativeHandshake(api, {
       timeoutMs: 15000,
       label: 'native handshake',
       ...this.options.handshake,
+      ...(overrides.handshake || {}),
     });
     try {
       api.connect(this.config.clientId);
@@ -229,7 +237,7 @@ function waitForPositions(api) {
 
 function waitForAccountSummary(api, accountGroup) {
   return new Promise((resolve, reject) => {
-    const reqId = nextReqId();
+    const reqId = nextRequestId();
     const rows = [];
     const tags = 'AccountType,NetLiquidation,TotalCashValue,SettledCash,BuyingPower,AvailableFunds,CashBalance';
     const onSummary = (incomingReqId, account, tag, value, currency) => {
@@ -286,7 +294,7 @@ async function searchContractsViaDetails(api, query) {
 
 function waitForContractDetails(api, contract) {
   return new Promise((resolve, reject) => {
-    const reqId = nextReqId();
+    const reqId = nextRequestId();
     const rows = [];
     const onDetails = (incomingReqId, details) => {
       if (incomingReqId !== reqId) return;
@@ -324,7 +332,7 @@ function waitForContractDetails(api, contract) {
 
 function waitForMarketSnapshot(api, contract) {
   return new Promise((resolve, reject) => {
-    const reqId = nextReqId();
+    const reqId = nextRequestId();
     const state = { conid: String(contract.conId), currency: contract.currency || null };
     const onTickPrice = (incomingReqId, tickType, price) => {
       if (incomingReqId !== reqId) return;
@@ -385,6 +393,7 @@ function waitForNativeHandshake(api, {
   label = 'native handshake',
   settleDelayMs = 250,
   requireConnectedAck = false,
+  requireNextValidId = false,
 } = {}) {
   return new Promise((resolve, reject) => {
     let settled = false;
@@ -421,6 +430,7 @@ function waitForNativeHandshake(api, {
     const scheduleResolve = () => {
       if (!hasHandshakeSignal()) return;
       if (requireConnectedAck && !sawConnectionAck) return;
+      if (requireNextValidId && !sawValidId) return;
       clearSettleTimer();
       if (hasStrongReadinessSignal()) {
         finish(buildSuccess());
@@ -431,8 +441,9 @@ function waitForNativeHandshake(api, {
       }, settleDelayMs);
     };
 
-    const onNextValidId = () => {
+    const onNextValidId = (validOrderId) => {
       sawValidId = true;
+      seedNextValidOrderId(validOrderId);
       scheduleResolve();
     };
     const onManagedAccounts = () => {
@@ -507,15 +518,12 @@ function buildConidContract(conid, overrides = {}) {
 function placeNativeOrder(api, order) {
   return new Promise((resolve, reject) => {
     const { EventName } = loadIbModule();
-    const orderId = nextReqId();
+    const orderId = nextOrderId();
     const contract = buildConidContract(order?.conid, {
       exchange: order?.exchange || 'SMART',
       secType: order?.secType || 'STK',
-      currency: order?.currency || undefined,
       primaryExch: order?.primaryExchange || order?.primaryExch || undefined,
       includePrimaryExch: Boolean(order?.primaryExchange || order?.primaryExch),
-      symbol: order?.symbol || undefined,
-      includeSymbol: Boolean(order?.symbol),
     });
     const nativeOrder = {
       action: String(order?.action || '').toUpperCase(),
@@ -663,10 +671,23 @@ function isIgnorableCode(code) {
   return [2104, 2106, 2158].includes(Number(code));
 }
 
-let reqCounter = 9100;
-function nextReqId() {
-  reqCounter += 1;
-  return reqCounter;
+let requestCounter = 1;
+let orderCounter = null;
+function seedNextValidOrderId(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return;
+  if (orderCounter == null || numeric > orderCounter) orderCounter = numeric;
+}
+function nextRequestId() {
+  const next = requestCounter;
+  requestCounter += 1;
+  return next;
+}
+function nextOrderId() {
+  if (orderCounter == null) throw new Error('IB native nextValidId was not received before placing order');
+  const next = orderCounter;
+  orderCounter += 1;
+  return next;
 }
 
 function normalizeError(err, code, reqId) {
@@ -678,6 +699,7 @@ module.exports = {
   InteractiveBrokersNativeClient,
   buildConidContract,
   waitForNativeHandshake,
+  normalizeContractDetails,
   __setTestLoadIbModule(fn) { testLoadIbModule = fn; },
   __resetTestLoadIbModule() { testLoadIbModule = null; },
 };

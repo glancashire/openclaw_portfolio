@@ -18,7 +18,17 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
 
   const ledger = await client.fetchLedger(resolvedAccountId);
   const positions = await client.fetchPositions(resolvedAccountId);
-  const holdings = Array.isArray(positions) ? positions.map(normaliseHolding) : [];
+  const holdings = Array.isArray(positions)
+    ? positions
+        .map(normaliseHolding)
+        .filter((holding) => {
+          const quantity = Number(holding?.quantity || 0);
+          const ticker = String(holding?.ticker || '').trim().toUpperCase();
+          const name = String(holding?.name || '').trim().toUpperCase();
+          const looksLikeFxHelper = ticker.includes('.') || name.includes('.') || ticker.includes('CASH') || name.includes('CASH');
+          return !(quantity === 0 && looksLikeFxHelper);
+        })
+    : [];
   const cashChf = extractCashChf(ledger);
   const result = writeHoldingsSnapshot({
     portfolioDir,

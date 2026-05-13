@@ -124,3 +124,32 @@ Investigate native client handshake timing/race conditions around `nextValidId`,
 - See Also: ERR-20260511-003
 
 ---
+## [ERR-20260513-001] ibkr_gateway_portal_session_logged_out
+
+**Logged**: 2026-05-13T16:35:00Z
+**Priority**: medium
+**Status**: pending
+**Area**: infra
+
+### Summary
+IBKR portal/gateway session was logged out even while native socket trading remained healthy.
+
+### Error
+```
+IBKR login state remained at Client Portal login page, preventing secdef/portal-backed contract lookup.
+```
+
+### Context
+- Command/operation attempted: native recovery followed by gateway-backed conid lookup for `IE00BD4TXW66`
+- Native socket path was connected and usable for quotes/orders/fills
+- Browser/session portal path was not authenticated and could not answer secdef search requests
+
+### Suggested Fix
+Document that native socket and portal session health can diverge. Prefer native raw contract details when possible; use portal session only as a secondary lookup path.
+
+### Metadata
+- Reproducible: yes
+- Related Files: scripts/ibkr-login-state.js,src/brokers/interactive-brokers/client.js
+- See Also: LRN-20260513-004
+
+---

@@ -31,6 +31,12 @@ Things like:
 - Default speaker: Kitchen HomePod
 ```
 
+## IBKR Gotchas
+
+- Native IBKR socket connectivity and Client Portal/browser-session login can diverge. Native quotes/orders/fills may still work while portal/secdef lookup is logged out.
+- For IBKR conid discovery on UCITS ETFs, raw native `contractDetails` can be more trustworthy than simplified search wrappers. Preserve `contract.conId`, `symbol`, `localSymbol`, `primaryExch`, and `currency`.
+- For conid-based native orders, prefer minimal contract metadata; forcing repo-side symbol/currency hints can cause IBKR contract conflicts.
+
 ## Why Separate?
 
 Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
