@@ -6,6 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "test": "node scripts/verify-repo.js",
+    "test:all": "node scripts/test-all.js",
+    "test:full": "npm run test:all && npm run verify",
     "verify": "node scripts/verify-repo.js",
     "test:repo": "node scripts/verify-repo.js",
     "validate:portfolio": "node scripts/validate-portfolio.js portfolio/etf/portfolio.md",

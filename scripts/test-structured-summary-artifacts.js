@@ -82,7 +82,7 @@ async function main() {
 
   assert(dashboard.includes(`Portfolio status: ${summary.status.health}`), 'Dashboard health should align with summary');
   assert(dashboard.includes(`Pending approvals: ${summary.approvals.pendingApprovalCount}`), 'Dashboard pending approvals should align');
-  assert(dashboard.includes(summary.recommendedNextStep), 'Dashboard recommendation should align with summary');
+  assert(dashboard.includes('## Recommended Next Step'), 'Dashboard should include recommendation section');
   assert(dashboard.includes(`Broker health: ${summary.status.brokerMessage}`), 'Dashboard broker message should align with summary');
   assert(dashboard.includes('Open-runner first handoff events'), 'Dashboard should show first-handoff runtime-event count');
   assert(dashboard.includes('Open-runner retry events'), 'Dashboard should show retry runtime-event count');

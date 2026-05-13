@@ -34,7 +34,13 @@ Module._load = function patched(request, parent, isMain) {
     return { InteractiveBrokersNativeClient: class {} };
   }
   if (request.endsWith('/skillClient') || request === './skillClient') {
-    return { InteractiveBrokersSkillClient: class {} };
+    return {
+      InteractiveBrokersSkillClient: class {
+        async authenticate() {
+          return { ok: false, error: 'skill unavailable' };
+        }
+      },
+    };
   }
   return originalLoad(request, parent, isMain);
 };
@@ -49,7 +55,7 @@ async function main() {
   assert(blocked.ok === false, 'Expected blocked live order');
   assert(blocked.reason === 'policy_blocked', 'Expected policy_blocked reason');
   assert(blocked.diagnostics?.operation === 'place_order', 'Expected operation diagnostics');
-  assert(blocked.diagnostics?.mode === 'http', 'Expected HTTP mode diagnostics');
+  assert(blocked.diagnostics?.mode === 'skill', 'Expected skill-mode diagnostics when skill surface is present');
 
   const unavailableStatus = await client.getOrderStatus('abc');
   assert(unavailableStatus.ok === false, 'Expected unavailable status lookup');
@@ -58,8 +64,9 @@ async function main() {
   assert(unavailableStatus.log?.status === 'not_available', 'Expected status lookup log');
 
   const auth = await client.authenticate();
-  assert(auth.ok === false, 'Expected failed HTTP auth');
-  assert(auth.diagnostics?.reason === 'http_error', 'Expected auth diagnostics');
+  assert(auth.ok === false, 'Expected failed skill auth');
+  assert(auth.diagnostics?.mode === 'skill', 'Expected skill-mode auth diagnostics');
+  assert(auth.diagnostics?.reason === 'skill_error', 'Expected auth diagnostics');
 
   const fills = aggregateExecutionFills([
     { orderId: '11', shares: 2, price: 100, symbol: 'VT', currency: 'USD', time: '2026-05-06T08:00:00Z', execId: 'a' },

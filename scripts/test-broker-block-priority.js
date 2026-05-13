@@ -46,7 +46,7 @@ const { buildPendingOperatorActions, bestNextStep } = require('../src/reporting/
     brokerReadiness: { fallbackRequired: false },
     lifecycleSummary: { approved: 1 },
   });
-  assert(withBackfill && withBackfill.queueType === 'delivery', `expected delivery backfill to outrank execution block, got ${JSON.stringify(withBackfill)}`);
+  assert(withBackfill && withBackfill.queueType === 'execution_block', `expected execution block to outrank delivery backfill, got ${JSON.stringify(withBackfill)}`);
 
   console.log(JSON.stringify({ ok: true, blocked, best, withBackfill }, null, 2));
 })();

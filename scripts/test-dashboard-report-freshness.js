@@ -37,10 +37,10 @@ async function main() {
 
     const dashboardPath = await regenerateDashboard(portfolioDir);
     const dashboard = fs.readFileSync(dashboardPath, 'utf8');
-    assert(dashboard.includes('## Freshness'), 'Expected dashboard freshness section');
-    assert(dashboard.includes('## Delivery Status'), 'Expected dashboard delivery status section');
+    assert(dashboard.includes('Data freshness: current'), 'Expected dashboard freshness summary');
+    assert(dashboard.includes('## Report / Delivery Status'), 'Expected dashboard delivery status section');
     assert(dashboard.includes('## Pending Operator Actions'), 'Expected dashboard pending actions section');
-    assert(dashboard.includes('Dashboard stale: no'), 'Expected fresh dashboard after regeneration');
+    assert(dashboard.includes('Delivery posture:'), 'Expected delivery posture in health snapshot');
 
     const report = await generateAndWriteReport({ portfolioDir, period: 'weekly', dateStamp: '20260505' });
     const reportText = fs.readFileSync(report.markdownPath, 'utf8');

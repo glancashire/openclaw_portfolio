@@ -57,7 +57,8 @@ function loadModule(readiness) {
   });
 
   assert(result.ok === false, 'Expected broker error pause to block live execution');
-  assert(result.blockers.some((entry) => /paused after 3 consecutive broker errors/i.test(entry)), 'Expected broker pause blocker');
+  assert(result.blockers.some((entry) => /paused after 3 consecutive broker errors/i.test(entry.message || '')), 'Expected broker pause blocker');
+  assert(result.primaryBlocker?.code === 'broker_automation_paused', 'Expected broker_automation_paused primary blocker');
   clearBrokerErrors(portfolioName);
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {

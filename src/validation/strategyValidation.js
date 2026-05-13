@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const VALID_STATUSES = new Set(['draft', 'active', 'paused', 'archived']);
-const VALID_EXECUTION_MODES = new Set(['propose_only', 'require_confirmation', 'auto_trade_limited', 'auto_trade_full']);
+const VALID_EXECUTION_MODES = new Set(['propose_only', 'require_confirmation', 'auto_trade_limited', 'auto_trade_full', 'transmitted_live']);
 const VALID_RISK_LEVELS = new Set(['low', 'medium', 'high']);
 
 function read(filePath) {
