@@ -22,6 +22,8 @@ function summarizeOperatorQueue(items = []) {
     blocking: 0,
     approvals: 0,
     execution: 0,
+    freshApprovals: 0,
+    staleApprovals: 0,
     openRunnerQueue: 0,
     openRunnerRetry: 0,
     recovery: 0,
@@ -36,7 +38,11 @@ function summarizeOperatorQueue(items = []) {
     if (item.blocking) summary.blocking += 1;
     if (summary.bySeverity[item.severity] != null) summary.bySeverity[item.severity] += 1;
     const type = item.queueType || queueTypeForItem(item);
-    if (type === 'approval') summary.approvals += 1;
+    if (type === 'approval') {
+      summary.approvals += 1;
+      if (item.status === 'stale_needs_reapproval') summary.staleApprovals += 1;
+      else if (item.status === 'ready_for_review') summary.freshApprovals += 1;
+    }
     else if (type === 'execution') summary.execution += 1;
     else if (type === 'open_runner_queue') summary.openRunnerQueue += 1;
     else if (type === 'open_runner_retry') summary.openRunnerRetry += 1;

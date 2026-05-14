@@ -129,6 +129,36 @@ function latestPendingProposalDate(rows, row) {
   return latest;
 }
 
+
+function staleApprovalInventory(tradesPath, options = {}) {
+  if (!tradesPath || !fs.existsSync(tradesPath)) return [];
+  const table = readTradesTable(tradesPath);
+  const items = [];
+  table.rows.forEach((row, idx) => {
+    const classification = classifyTradeRowExecution(row, options);
+    if (classification.canonicalState !== 'stale_needs_reapproval') return;
+    items.push({
+      rowIndex: idx,
+      dateTime: String(row['Date/time'] || '').trim(),
+      tickerOrIsin: String(row['Ticker / ISIN'] || '').trim(),
+      name: String(row.Name || '').trim(),
+      action: String(row.Action || '').trim().toLowerCase(),
+      status: String(row.Status || '').trim().toLowerCase(),
+      approval: String(row.Approval || '').trim(),
+      brokerOrderId: String(row['Broker order id'] || '').trim(),
+      blockCode: String(row['Block code'] || '').trim(),
+      blockReason: String(row['Block reason'] || '').trim(),
+      nextAction: String(row['Next action'] || '').trim(),
+      approvalAgeHours: classification.approvalAgeHours,
+      reasonCode: classification.reasonCode,
+      reason: classification.reason,
+      refreshCommand: `node scripts/trade.js propose ${path.dirname(tradesPath)}`,
+      reapproveGuidance: 'Approve only the latest regenerated row for this instrument/action after reviewing the refreshed proposal.',
+    });
+  });
+  return items;
+}
+
 function markTradeApproved(tradesPath, selector, approval = 'user_approved', options = {}) {
   const table = readTradesTable(tradesPath);
   let updated = 0;
@@ -439,6 +469,7 @@ module.exports = {
   listOpenBrokerOrderRows,
   listExecutableTradeRows,
   markTradeApproved,
+  staleApprovalInventory,
   rejectTradeProposal,
   reconcileOrderStatus,
   mapBrokerOrderStatus,

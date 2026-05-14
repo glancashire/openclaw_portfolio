@@ -1,8 +1,7 @@
 const path = require('path');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 const { brokerErrorStatus } = require('./runtimeState');
-const { summarizeOpenRunnerRetryState, readTradesTable } = require('./tradeState');
-const { classifyTradeRowExecution } = require('./executionClassification');
+const { summarizeOpenRunnerRetryState, staleApprovalInventory } = require('./tradeState');
 const { reportDeliveryStatus } = require('../reporting/deliveryPolicy');
 
 function loadFillNotificationState(repoRoot = process.cwd()) {
@@ -79,17 +78,15 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd() }) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const brokerReadiness = await getInteractiveBrokersReadiness();
   const errorState = brokerErrorStatus(portfolio);
-  const table = readTradesTable(tradesPath);
-  const staleApprovedRows = table.rows
-    .map((row) => ({ row, classification: classifyTradeRowExecution(row) }))
-    .filter((entry) => entry.classification.staleApproval)
-    .map((entry) => ({
-      tickerOrIsin: entry.row['Ticker / ISIN'],
-      action: entry.row.Action,
-      canonicalState: entry.classification.canonicalState,
-      approvalAgeHours: entry.classification.approvalAgeHours,
-      staleApproval: true,
-    }));
+  const staleApprovedRows = staleApprovalInventory(tradesPath).map((entry) => ({
+    tickerOrIsin: entry.tickerOrIsin,
+    action: entry.action,
+    canonicalState: 'stale_needs_reapproval',
+    approvalAgeHours: entry.approvalAgeHours,
+    staleApproval: true,
+    reason: entry.reason,
+    refreshCommand: entry.refreshCommand,
+  }));
   const retryState = summarizeOpenRunnerRetryState(tradesPath);
   const deliveryStatus = reportDeliveryStatus({ portfolioDir });
   const fillNotificationState = loadFillNotificationState(repoRoot);

@@ -36,8 +36,11 @@ async function main() {
   assert(Array.isArray(summary.allocation) && summary.allocation.length >= 3, 'Expected allocation rows');
   assert(Array.isArray(summary.instruments) && summary.instruments.length >= 4, 'Expected approved instruments in summary');
   assert(Array.isArray(summary.pendingActions), 'Expected pending actions array');
+  assert(Array.isArray(summary.approvals.staleApprovals), 'Expected stale approval inventory');
   assert(summary.operatorQueue && Array.isArray(summary.operatorQueue.items), 'Expected operator queue items');
   assert(summary.operatorQueue.summary && typeof summary.operatorQueue.summary.total === 'number', 'Expected operator queue summary');
+  assert(typeof summary.operatorQueue.summary.freshApprovals === 'number', 'Expected fresh-approval queue summary');
+  assert(typeof summary.operatorQueue.summary.staleApprovals === 'number', 'Expected stale-approval queue summary');
   assert(typeof summary.operatorQueue.summary.openRunnerQueue === 'number', 'Expected open-runner first-handoff queue summary');
   assert(typeof summary.operatorQueue.summary.openRunnerRetry === 'number', 'Expected open-runner retry queue summary');
   assert(Array.isArray(summary.recentMaterialEvents), 'Expected material events array');
@@ -56,6 +59,8 @@ async function main() {
   assert(generated.recoveryHtmlPath.endsWith('recovery-checklist.html'), 'Expected recovery checklist html path');
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
+  assert(html.includes('Fresh actionable approvals'), 'Expected fresh-approval queue summary in html');
+  assert(html.includes('Stale approvals needing reapproval'), 'Expected stale-approval queue summary in html');
   assert(html.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in html');
   assert(html.includes('Open-runner retries'), 'Expected retry queue summary in html');
   assert(html.includes('Queued for open runner'), 'Expected queued-for-open-runner execution posture in html');
@@ -82,6 +87,8 @@ async function main() {
 
   assert(dashboard.includes(`Portfolio status: ${summary.status.health}`), 'Dashboard health should align with summary');
   assert(dashboard.includes(`Pending approvals: ${summary.approvals.pendingApprovalCount}`), 'Dashboard pending approvals should align');
+  assert(dashboard.includes('Fresh actionable approvals'), 'Dashboard should show fresh approval split');
+  assert(dashboard.includes('Stale approvals needing reapproval'), 'Dashboard should show stale approval split');
   assert(dashboard.includes('## Recommended Next Step'), 'Dashboard should include recommendation section');
   assert(dashboard.includes(`Broker health: ${summary.status.brokerMessage}`), 'Dashboard broker message should align with summary');
   assert(dashboard.includes('Open-runner first handoff events'), 'Dashboard should show first-handoff runtime-event count');

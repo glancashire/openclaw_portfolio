@@ -261,6 +261,8 @@ function formatQueueSummary(summary = {}) {
     `- Total queue items: ${summary.total || 0}`,
     `- Blocking items: ${summary.blocking || 0}`,
     `- Approval items: ${summary.approvals || 0}`,
+    `- Fresh actionable approvals: ${summary.freshApprovals || 0}`,
+    `- Stale approvals needing reapproval: ${summary.staleApprovals || 0}`,
     `- Execution items: ${summary.execution || 0}`,
     `- Open-runner first handoffs: ${summary.openRunnerQueue || 0}`,
     `- Open-runner retries: ${summary.openRunnerRetry || 0}`,
