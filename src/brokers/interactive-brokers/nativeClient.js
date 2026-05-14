@@ -1,3 +1,5 @@
+const { normalizeContractIntelligence } = require('./contractIntelligence');
+
 let ibModule = null;
 let testLoadIbModule = null;
 
@@ -654,15 +656,20 @@ function shouldResolveNow(status) {
 }
 
 function normalizeContractDetails(details) {
-  const summary = details?.summary || details?.contract || {};
+  const normalized = normalizeContractIntelligence(details);
   return {
-    conid: summary.conId || null,
-    symbol: summary.symbol || null,
-    name: details?.longName || summary.description || summary.localSymbol || summary.symbol || null,
-    description: summary.localSymbol || details?.marketName || null,
-    exchange: summary.primaryExch || summary.exchange || null,
-    currency: summary.currency || null,
-    secType: summary.secType || null,
+    conid: normalized.conid,
+    symbol: normalized.symbol,
+    localSymbol: normalized.localSymbol,
+    primaryExch: normalized.primaryExch,
+    name: normalized.name,
+    description: normalized.description,
+    exchange: normalized.exchange,
+    currency: normalized.currency,
+    secType: normalized.secType,
+    isin: normalized.isin,
+    venue: normalized.venue,
+    venueKey: normalized.venueKey,
     raw: details,
   };
 }

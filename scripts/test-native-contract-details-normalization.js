@@ -17,8 +17,10 @@ const result = normalizeContractDetails({
 
 assert.strictEqual(result.conid, 808613958);
 assert.strictEqual(result.symbol, 'UBSPX');
-assert.strictEqual(result.exchange, 'IBIS');
+assert.strictEqual(result.primaryExch, 'IBIS');
+assert.strictEqual(result.exchange, 'SMART');
 assert.strictEqual(result.currency, 'EUR');
-assert.strictEqual(result.description, 'BCFT');
+assert.strictEqual(result.description, 'ETF');
+assert.strictEqual(result.localSymbol, 'BCFT');
 assert.strictEqual(result.name, 'UBS ETF S&P 500A');
 console.log(JSON.stringify({ ok: true, result }, null, 2));

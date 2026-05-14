@@ -1,5 +1,6 @@
 const { InteractiveBrokersClient } = require('./client');
 const { logBrokerEvent } = require('../shared/safeLogger');
+const { normalizeContractIntelligence } = require('./contractIntelligence');
 
 async function searchEtfInstruments({ query, portfolio = 'etf' }) {
   const client = new InteractiveBrokersClient({ portfolio });
@@ -58,17 +59,7 @@ async function searchEtfInstruments({ query, portfolio = 'etf' }) {
 
 function normalizeSearchResults(raw) {
   const list = Array.isArray(raw) ? raw : [];
-  return list.map((item) => ({
-    conid: item.conid || item.conidEx || null,
-    symbol: item.symbol || item.companyHeader || item.name || null,
-    name: item.companyName || item.name || item.description || item.companyHeader || null,
-    description: item.description || null,
-    exchange: item.exchange || item.listingExchange || item.exchangeName || null,
-    currency: item.currency || null,
-    isin: item.isin || null,
-    secType: item.secType || item.assetClass || null,
-    raw: item,
-  }));
+  return list.map((item) => normalizeContractIntelligence(item));
 }
 
 function isLikelyEtf(row) {

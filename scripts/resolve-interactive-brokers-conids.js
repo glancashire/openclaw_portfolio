@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
 const { searchEtfInstruments } = require('../src/brokers/interactive-brokers/instruments');
+const { pickBestContractIntelligence } = require('../src/brokers/interactive-brokers/contractIntelligence');
 
 async function main() {
   const portfolioPath = process.argv[2];
@@ -13,7 +14,7 @@ async function main() {
 
   for (const instrument of instruments) {
     const found = await searchEtfInstruments({ query: instrument.ibkrSymbol, portfolio: 'etf' });
-    const best = found.ok ? pickBest(found.instruments, instrument) : null;
+    const best = found.ok ? pickBestContractIntelligence(found.instruments, instrument) : null;
     results.push({
       tickerOrIsin: instrument.tickerOrIsin,
       name: instrument.name,
@@ -24,22 +25,16 @@ async function main() {
         conid: best.conid,
         symbol: best.symbol,
         name: best.name,
+        localSymbol: best.localSymbol,
+        primaryExch: best.primaryExch,
         exchange: best.exchange,
         currency: best.currency,
+        venueKey: best.venueKey,
       } : null,
     });
   }
 
   console.log(JSON.stringify({ count: results.length, results }, null, 2));
-}
-
-function pickBest(candidates, instrument) {
-  if (!Array.isArray(candidates) || !candidates.length) return null;
-  const exactSymbol = candidates.find((row) => String(row.symbol || '').toUpperCase() === String(instrument.ibkrSymbol || '').toUpperCase());
-  if (exactSymbol) return exactSymbol;
-  const exactCurrency = candidates.find((row) => row.currency === instrument.currency);
-  if (exactCurrency) return exactCurrency;
-  return candidates[0];
 }
 
 main().catch((err) => {
