@@ -11,6 +11,7 @@ const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { summarizeOperatorQueue } = require('./operatorQueue');
+const { summarizeContractIntelligence } = require('./contractIntelligenceStatus');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 
 function readFillNotificationState(rootDir = path.resolve(__dirname, '..', '..')) {
@@ -191,7 +192,7 @@ function readBlockedTradeQueueItems(tradesPath) {
   }));
 }
 
-function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, recommended = [] }) {
+function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, contractIntelligence = null, recommended = [] }) {
   const actions = [];
   const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   for (const item of deliveryStatus?.pendingActions || []) {
@@ -232,6 +233,7 @@ function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null,
   if (safetyDiagnostics?.holdingsHealth?.stalePricing) {
     actions.push({ queueType: 'data', severity: 'high', status: 'stale', summary: 'Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.' });
   }
+  actions.push(...buildContractIntelligenceQueueItems(contractIntelligence));
   if (unnotifiedFillCount > 0) {
     actions.push({ queueType: 'delivery', severity: 'medium', status: 'backfill_review', summary: `${unnotifiedFillCount} reconciled fill(s) were detected after the live window and still need notification backfill review.` });
   }
@@ -272,6 +274,39 @@ function formatQueueSummary(summary = {}) {
     `- Warning items: ${summary.warnings || 0}`,
     `- Workflow items: ${summary.workflow || 0}`,
   ].join('\n');
+}
+
+function buildContractIntelligenceQueueItems(contractIntelligence = {}) {
+  const actions = [];
+  const examples = contractIntelligence.examples || {};
+  if ((contractIntelligence.missingConidCount || 0) > 0) {
+    actions.push({
+      queueType: 'data',
+      severity: 'medium',
+      status: 'contract_identity_gap',
+      summary: `${contractIntelligence.missingConidCount} approved instrument(s) are missing IBKR conids.${examples.missingConid?.[0] ? ` Example: ${examples.missingConid[0].tickerOrIsin}.` : ''}`,
+      recommendedOperatorAction: 'Resolve missing conids before relying on the full approved set for execution readiness.',
+    });
+  }
+  if ((contractIntelligence.missingSymbolCount || 0) > 0) {
+    actions.push({
+      queueType: 'data',
+      severity: 'medium',
+      status: 'contract_identity_gap',
+      summary: `${contractIntelligence.missingSymbolCount} approved instrument(s) are missing IBKR symbols.${examples.missingSymbol?.[0] ? ` Example: ${examples.missingSymbol[0].tickerOrIsin}.` : ''}`,
+      recommendedOperatorAction: 'Fill missing IBKR symbols so native contract resolution stays deterministic.',
+    });
+  }
+  if ((contractIntelligence.missingVenueCount || 0) > 0) {
+    actions.push({
+      queueType: 'data',
+      severity: 'low',
+      status: 'contract_identity_gap',
+      summary: `${contractIntelligence.missingVenueCount} approved instrument(s) are missing venue identity.${examples.missingVenue?.[0] ? ` Example: ${examples.missingVenue[0].tickerOrIsin}.` : ''}`,
+      recommendedOperatorAction: 'Add exchange / venue identity so operators can verify the intended execution venue.',
+    });
+  }
+  return actions;
 }
 
 function buildMaterialEvents(events = []) {
@@ -384,7 +419,7 @@ function formatBlockerLines(blockers = []) {
   return blockers.map((item) => `- ${item.severity || 'info'}: ${item.message || item}`).join('\n');
 }
 
-function generateDashboard({ portfolioName, tradesPath = '', holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [] }) {
+function generateDashboard({ portfolioName, tradesPath = '', holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [], contractIntelligence = null }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -413,6 +448,7 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
 
   const strategy = strategyStatus(allocations, brokerReadiness, blockers);
   const recommended = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
+  const contractIdentity = contractIntelligence || summarizeContractIntelligence(approvedInstruments);
   const pendingActions = buildPendingOperatorActions({
     tradesPath,
     deliveryStatus,
@@ -422,6 +458,7 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
     openRunnerRetryState,
     safetyDiagnostics: safetyDiagnostics?.diagnostics || safetyDiagnostics,
     fillNotificationState,
+    contractIntelligence: contractIdentity,
     recommended,
   });
   const materialEvents = buildMaterialEvents(recentEvents);
@@ -455,7 +492,7 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
   ].join('\n');
   const pendingActionRows = formatPendingQueueRows(pendingActions);
 
-  return `# Dashboard: ${portfolioName}\n\n## Health Snapshot\n- Portfolio status: ${portfolioHealth}\n- Strategy status: ${strategy}\n- Broker health: ${brokerReadiness?.message || 'unknown'}\n- Last successful sync: ${summary.syncTime}\n- Data freshness: ${freshness?.stale ? 'stale' : 'current'}\n- Execution posture: ${brokerErrorState?.stopAutomation ? 'paused' : (brokerReadiness?.fallbackRequired ? 'degraded_dry_run_only' : 'ready_for_review')}\n- Delivery posture: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}\n- Pending approvals: ${pendingApprovalCount}\n- Active blockers: ${blockers.length}\n\n## Portfolio Value Snapshot\n- Total value CHF: ${summary.totalValue}\n- Cash CHF: ${summary.cash}\n- Invested CHF: ${summary.invested}\n- Daily move CHF: ${latestSnapshot?.dailyChange || '0'}\n- Daily move %: ${latestSnapshot?.dailyChangePct || '0'}\n- Since last report CHF: ${latestSnapshot?.dailyChange || '0'}\n- Since last report %: ${latestSnapshot?.dailyChangePct || '0'}\n- Number of holdings: ${holdingCount}\n- Latest snapshot date: ${latestDate}\n\n## Allocation Health\n| Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |\n|---|---:|---:|---:|---|---|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Actions Queue\n| Instrument | Current % | Target % | Suggested action | Reason | Approval needed |\n|---|---:|---:|---|---|---|\n${formatInstrumentActionRows(approvedInstruments, latestProposals, totalValue)}\n\n## Safety / Risk Diagnostics\n- Safety status: ${blockers.length ? 'blocked_or_warning' : 'clear'}\n- Risk-limit warnings: ${blockers.filter((item) => item.severity === 'warning').length}\n- Broker/API warnings: ${brokerReadiness?.fallbackRequired ? 1 : 0}\n- Stale data warnings: ${(freshness?.stale || (safetyDiagnostics?.diagnostics?.holdingsHealth?.stalePricing || safetyDiagnostics?.holdingsHealth?.stalePricing)) ? 1 : 0}\n- Execution pause state: ${brokerErrorState?.stopAutomation ? 'paused' : 'active'}\n- Active blocker detail:\n${formatBlockerLines(blockers)}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Operator Queue Summary\n${formatQueueSummary(operatorQueueSummary)}\n\n## Recent Material Events\n| Time | Event type | Severity | Summary | Next step |\n|---|---|---|---|---|\n${formatMaterialEventRows(materialEvents)}\n\n## Report / Delivery Status\n${deliveryLines}\n\n## Recommended Next Step\n${recommendation}\n\n## Status Labels\n- Pending approvals queue count: ${pendingApprovalCount}\n- In-flight execution rows: ${inFlightCount}\n- Latest action recommendations:\n  - ${recommended[0]}\n  - ${recommended[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Observability Status\n${formatObservabilityStatus(observability)}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
+  return `# Dashboard: ${portfolioName}\n\n## Health Snapshot\n- Portfolio status: ${portfolioHealth}\n- Strategy status: ${strategy}\n- Broker health: ${brokerReadiness?.message || 'unknown'}\n- Last successful sync: ${summary.syncTime}\n- Data freshness: ${freshness?.stale ? 'stale' : 'current'}\n- Execution posture: ${brokerErrorState?.stopAutomation ? 'paused' : (brokerReadiness?.fallbackRequired ? 'degraded_dry_run_only' : 'ready_for_review')}\n- Delivery posture: ${deliveryStatus?.ready ? 'ready' : 'needs_operator_attention'}\n- Pending approvals: ${pendingApprovalCount}\n- Active blockers: ${blockers.length}\n\n## Portfolio Value Snapshot\n- Total value CHF: ${summary.totalValue}\n- Cash CHF: ${summary.cash}\n- Invested CHF: ${summary.invested}\n- Daily move CHF: ${latestSnapshot?.dailyChange || '0'}\n- Daily move %: ${latestSnapshot?.dailyChangePct || '0'}\n- Since last report CHF: ${latestSnapshot?.dailyChange || '0'}\n- Since last report %: ${latestSnapshot?.dailyChangePct || '0'}\n- Number of holdings: ${holdingCount}\n- Latest snapshot date: ${latestDate}\n\n## Allocation Health\n| Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |\n|---|---:|---:|---:|---|---|---|\n${formatAllocationRows(allocations)}\n\n## Instrument Actions Queue\n| Instrument | Current % | Target % | Suggested action | Reason | Approval needed |\n|---|---:|---:|---|---|---|\n${formatInstrumentActionRows(approvedInstruments, latestProposals, totalValue)}\n\n## Safety / Risk Diagnostics\n- Safety status: ${blockers.length ? 'blocked_or_warning' : 'clear'}\n- Risk-limit warnings: ${blockers.filter((item) => item.severity === 'warning').length}\n- Broker/API warnings: ${brokerReadiness?.fallbackRequired ? 1 : 0}\n- Stale data warnings: ${(freshness?.stale || (safetyDiagnostics?.diagnostics?.holdingsHealth?.stalePricing || safetyDiagnostics?.holdingsHealth?.stalePricing)) ? 1 : 0}\n- Execution pause state: ${brokerErrorState?.stopAutomation ? 'paused' : 'active'}\n- Active blocker detail:\n${formatBlockerLines(blockers)}\n\n## Contract Intelligence Readiness\n- ${contractIdentity.summaryLine}\n- Recommended contract-intelligence action: ${contractIdentity.nextAction}\n\n## Pending Operator Actions\n${pendingActionRows}\n\n## Operator Queue Summary\n${formatQueueSummary(operatorQueueSummary)}\n\n## Recent Material Events\n| Time | Event type | Severity | Summary | Next step |\n|---|---|---|---|---|\n${formatMaterialEventRows(materialEvents)}\n\n## Report / Delivery Status\n${deliveryLines}\n\n## Recommended Next Step\n${recommendation}\n\n## Status Labels\n- Pending approvals queue count: ${pendingApprovalCount}\n- In-flight execution rows: ${inFlightCount}\n- Latest action recommendations:\n  - ${recommended[0]}\n  - ${recommended[1]}\n\n## Risk Warnings\n${warnings.join('\n')}\n\n## Observability Status\n${formatObservabilityStatus(observability)}\n\n## Execution Lifecycle\n${formatExecutionLifecycle(lifecycleSummary)}\n\n## Execution Plan\n${formatExecutionPlan(executionPlan)}\n\n## Recent Trades\n| Date | Action | Instrument | Amount CHF | Status |\n|---|---|---|---:|---|\n${tradeRows}\n`;
 }
 
 async function regenerateDashboard(portfolioDir) {
@@ -468,6 +505,7 @@ async function regenerateDashboard(portfolioDir) {
   const holdingsText = fs.readFileSync(holdingsPath, 'utf8');
   const allocations = analyzeAllocation({ portfolioPath, holdingsPath });
   const approvedInstruments = readApprovedInstruments(portfolioPath);
+  const contractIntelligence = summarizeContractIntelligence(approvedInstruments);
   const latestProposals = latestTradeProposals(tradesPath);
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const sourcePaths = [portfolioPath, holdingsPath, tradesPath, historyPath];
@@ -489,6 +527,7 @@ async function regenerateDashboard(portfolioDir) {
     allocations,
     approvedInstruments,
     existingTrades: recentTrades(tradesPath),
+    contractIntelligence,
     latestProposals,
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
@@ -513,6 +552,7 @@ async function regenerateDashboard(portfolioDir) {
     allocations,
     approvedInstruments,
     existingTrades: recentTrades(tradesPath),
+    contractIntelligence,
     latestProposals,
     executionPlan: buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(parseHoldingsSummary(holdingsText).totalValue || 0) }),
     latestSnapshot: latestHistory(historyPath),
@@ -531,4 +571,4 @@ async function regenerateDashboard(portfolioDir) {
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, readFillNotificationState };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, readFillNotificationState, buildContractIntelligenceQueueItems };

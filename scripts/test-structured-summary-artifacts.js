@@ -37,6 +37,8 @@ async function main() {
   assert(Array.isArray(summary.instruments) && summary.instruments.length >= 4, 'Expected approved instruments in summary');
   assert(Array.isArray(summary.pendingActions), 'Expected pending actions array');
   assert(Array.isArray(summary.approvals.staleApprovals), 'Expected stale approval inventory');
+  assert(summary.contractIntelligence && typeof summary.contractIntelligence.summaryLine === 'string', 'Expected contract-intelligence summary');
+  assert(typeof summary.contractIntelligence.nextAction === 'string', 'Expected contract-intelligence next action');
   assert(summary.operatorQueue && Array.isArray(summary.operatorQueue.items), 'Expected operator queue items');
   assert(summary.operatorQueue.summary && typeof summary.operatorQueue.summary.total === 'number', 'Expected operator queue summary');
   assert(typeof summary.operatorQueue.summary.freshApprovals === 'number', 'Expected fresh-approval queue summary');
@@ -59,6 +61,7 @@ async function main() {
   assert(generated.recoveryHtmlPath.endsWith('recovery-checklist.html'), 'Expected recovery checklist html path');
   assert(html.includes('Portfolio Summary Page: etf'), 'Expected portfolio summary html title content');
   assert(html.includes('Operator Queue Summary'), 'Expected queue summary section in html');
+  assert(html.includes('Contract Intelligence Readiness'), 'Expected contract-intelligence section in html');
   assert(html.includes('Fresh actionable approvals'), 'Expected fresh-approval queue summary in html');
   assert(html.includes('Stale approvals needing reapproval'), 'Expected stale-approval queue summary in html');
   assert(html.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in html');
@@ -87,6 +90,7 @@ async function main() {
 
   assert(dashboard.includes(`Portfolio status: ${summary.status.health}`), 'Dashboard health should align with summary');
   assert(dashboard.includes(`Pending approvals: ${summary.approvals.pendingApprovalCount}`), 'Dashboard pending approvals should align');
+  assert(dashboard.includes('Contract Intelligence Readiness'), 'Dashboard should show contract-intelligence section');
   assert(dashboard.includes('Fresh actionable approvals'), 'Dashboard should show fresh approval split');
   assert(dashboard.includes('Stale approvals needing reapproval'), 'Dashboard should show stale approval split');
   assert(dashboard.includes('## Recommended Next Step'), 'Dashboard should include recommendation section');
