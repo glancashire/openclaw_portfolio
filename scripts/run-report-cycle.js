@@ -2,6 +2,7 @@ const { generateAndWriteReport } = require('../src/reporting/reportGenerator');
 const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
 const { appendHistorySnapshot } = require('../src/analysis/historyWriter');
 const { reportDeliveryStatus } = require('../src/reporting/deliveryPolicy');
+const { deliverPortfolioSummaryEmail } = require('../src/reporting/deliveryExecutor');
 const path = require('path');
 
 function stepOk(name, extra = {}) {
@@ -56,6 +57,13 @@ async function runReportCycle({ portfolioDir, period, dateStamp }) {
     throw Object.assign(error, { workflow, failedStep: 'generate_report', mode: 'read_only_reporting' });
   }
 
+  const emailDelivery = await deliverPortfolioSummaryEmail({
+    portfolioDir,
+    period,
+    summaryPath: report.markdownPath,
+    summaryHtmlPath: report.htmlPath,
+  });
+
   return {
     ok: true,
     mode: 'read_only_reporting',
@@ -63,6 +71,7 @@ async function runReportCycle({ portfolioDir, period, dateStamp }) {
     dashboardPath,
     workflow,
     deliveryStatus: reportDeliveryStatus({ portfolioDir, generationMeta: report.generationMeta, workflow }),
+    emailDelivery,
     ...report,
   };
 }

@@ -1,4 +1,5 @@
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+const { deliverPortfolioSummaryEmail } = require('../src/reporting/deliveryExecutor');
 
 async function main() {
   const target = process.argv[2];
@@ -9,7 +10,13 @@ async function main() {
 
   const result = await generatePortfolioSummaryArtifacts({ portfolioDir: target, writeFiles: true });
   const overview = await generateOverviewArtifacts({ writeFiles: true });
-  console.log(JSON.stringify({ summary: result.outPath, summaryHtml: result.htmlPath, recoveryChecklist: result.recoveryPath, recoveryChecklistHtml: result.recoveryHtmlPath, portfolioIndex: overview.portfolioIndexPath, pendingActions: overview.pendingActionsPath }, null, 2));
+  const emailDelivery = await deliverPortfolioSummaryEmail({
+    portfolioDir: target,
+    period: 'summary',
+    summaryPath: result.outPath,
+    summaryHtmlPath: result.htmlPath,
+  });
+  console.log(JSON.stringify({ summary: result.outPath, summaryHtml: result.htmlPath, recoveryChecklist: result.recoveryPath, recoveryChecklistHtml: result.recoveryHtmlPath, portfolioIndex: overview.portfolioIndexPath, pendingActions: overview.pendingActionsPath, emailDelivery }, null, 2));
 }
 
 main().catch((error) => {
