@@ -52,9 +52,24 @@ Email delivery is still treated as an explicit external side effect and is not c
 - provider config is present,
 - and delivery pending-actions are clear.
 
+## Enabling live email safely
+1. Confirm delivery state is clear:
+   - `node scripts/check-report-delivery-readiness.js portfolio/etf`
+   - `node scripts/check-email-delivery-readiness.js portfolio/etf`
+2. Set policy mode in `config/report_delivery_policy.json` to either:
+   - `email_only` for outbound email only, or
+   - `email_and_repo` for email plus repo artifacts
+3. Set `externalDeliveryEnabled: true`.
+4. Set `emailRecipients` to the intended recipients, for example `[
+  "lancashire@swift.ch"
+]`.
+5. Verify Mailgun secrets are present through `.env` or `secrets/mailgun.json`.
+6. Send one verification email:
+   - `node scripts/send-email-verification.js portfolio/etf`
+
 ## Policy override file
 Machine-readable policy lives at:
 
 - `config/report_delivery_policy.json`
 
-It is still expected to remain side-effect-free by default. Do not treat a policy override as authorization to add real outbound delivery inside this repo.
+It is still expected to remain side-effect-free by default unless the operator explicitly changes the delivery mode/config above.

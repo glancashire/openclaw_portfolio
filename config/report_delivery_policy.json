@@ -1,9 +1,9 @@
 {
-  "deliveryMode": "local_only",
-  "intendedChannels": ["repo_artifacts"],
-  "externalDeliveryEnabled": false,
+  "deliveryMode": "email_and_repo",
+  "intendedChannels": ["repo_artifacts", "email"],
+  "externalDeliveryEnabled": true,
   "emailProvider": "mailgun",
-  "emailRecipients": [],
+  "emailRecipients": ["lancashire@swift.ch"],
   "failureAlertMode": "local_operator_review",
   "failureAlertTargets": ["dashboard", "markdown_report", "report_cycle_json"],
   "pendingActionThresholds": {
