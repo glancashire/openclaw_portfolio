@@ -1,14 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+const {
+  escapeHtml,
+  page,
+  card,
+  badge,
+  bulletList,
+} = require('./emailHtml');
 
 function buildReportEmailSubject({ portfolioName, period, generatedAt = null }) {
   const stamp = generatedAt ? String(generatedAt).slice(0, 10) : new Date().toISOString().slice(0, 10);
@@ -30,28 +28,32 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, delivery
 
 function buildReportEmailHtml({ portfolioName, period, summaryHtml, deliveryStatus = null }) {
   const pending = Array.isArray(deliveryStatus?.pendingActions) ? deliveryStatus.pendingActions : [];
-  const pendingHtml = pending.length
-    ? `<ul>${pending.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
-    : '<p>No delivery-side pending actions are currently surfaced.</p>';
+  const postureTone = pending.length ? 'warn' : 'success';
+  const postureLabel = pending.length ? `${pending.length} pending item(s)` : 'Posture clear';
 
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f3f4f6;margin:0;padding:24px;">
-  <div style="max-width:820px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-    <div style="padding:20px 24px;background:#111827;color:#fff;">
-      <h1 style="margin:0;font-size:20px;">${escapeHtml(portfolioName)} ${escapeHtml(period)} overview</h1>
-    </div>
-    <div style="padding:20px 24px;">
-      <h2 style="font-size:16px;color:#374151;">Delivery posture</h2>
-      ${pendingHtml}
-    </div>
-    <div style="padding:0 24px 24px;">
-      ${summaryHtml}
-    </div>
-  </div>
-</body>
-</html>`;
+  const introCard = card({
+    title: 'Delivery posture',
+    contentHtml: `
+      <div style="margin-bottom:14px;">${badge({ label: postureLabel, tone: postureTone })}</div>
+      ${pending.length
+        ? bulletList(pending)
+        : '<p style="margin:0;color:#6b7280;line-height:1.6;">No delivery-side pending actions are currently surfaced.</p>'}
+    `,
+  });
+
+  const summaryCard = card({
+    title: 'Portfolio summary',
+    contentHtml: `<div class="report-email-summary" style="line-height:1.7;color:#111827;">${summaryHtml}</div>`,
+  });
+
+  return page({
+    eyebrow: 'OpenClaw Portfolio Report',
+    title: `${portfolioName} ${period} overview`,
+    subtitle: 'Structured portfolio summary and delivery posture for operator review.',
+    accent: '#111827',
+    bodyHtml: `${introCard}${summaryCard}`,
+    footer: 'OpenClaw Portfolio Manager • Email delivery remains policy-gated and auditable',
+  });
 }
 
 function loadSummaryEmailSource({ summaryPath = null, summaryHtmlPath = null }) {
