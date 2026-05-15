@@ -12,20 +12,8 @@ const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { summarizeOperatorQueue } = require('./operatorQueue');
 const { summarizeContractIntelligence } = require('./contractIntelligenceStatus');
+const { loadFillNotificationState } = require('./fillNotificationState');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
-
-function readFillNotificationState(rootDir = path.resolve(__dirname, '..', '..')) {
-  const statePath = path.join(rootDir, 'runtime', 'fill-notifications-state.json');
-  try {
-    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    return {
-      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-    };
-  } catch {
-    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
-  }
-}
 
 function parseHoldingsSummary(text) {
   const get = (label) => {
@@ -277,32 +265,33 @@ function formatQueueSummary(summary = {}) {
 }
 
 function buildContractIntelligenceQueueItems(contractIntelligence = {}) {
+  const normalized = contractIntelligence && typeof contractIntelligence === 'object' ? contractIntelligence : {};
   const actions = [];
-  const examples = contractIntelligence.examples || {};
-  if ((contractIntelligence.missingConidCount || 0) > 0) {
+  const examples = normalized.examples || {};
+  if ((normalized.missingConidCount || 0) > 0) {
     actions.push({
       queueType: 'data',
       severity: 'medium',
       status: 'contract_identity_gap',
-      summary: `${contractIntelligence.missingConidCount} approved instrument(s) are missing IBKR conids.${examples.missingConid?.[0] ? ` Example: ${examples.missingConid[0].tickerOrIsin}.` : ''}`,
+      summary: `${normalized.missingConidCount} approved instrument(s) are missing IBKR conids.${examples.missingConid?.[0] ? ` Example: ${examples.missingConid[0].tickerOrIsin}.` : ''}`,
       recommendedOperatorAction: 'Resolve missing conids before relying on the full approved set for execution readiness.',
     });
   }
-  if ((contractIntelligence.missingSymbolCount || 0) > 0) {
+  if ((normalized.missingSymbolCount || 0) > 0) {
     actions.push({
       queueType: 'data',
       severity: 'medium',
       status: 'contract_identity_gap',
-      summary: `${contractIntelligence.missingSymbolCount} approved instrument(s) are missing IBKR symbols.${examples.missingSymbol?.[0] ? ` Example: ${examples.missingSymbol[0].tickerOrIsin}.` : ''}`,
+      summary: `${normalized.missingSymbolCount} approved instrument(s) are missing IBKR symbols.${examples.missingSymbol?.[0] ? ` Example: ${examples.missingSymbol[0].tickerOrIsin}.` : ''}`,
       recommendedOperatorAction: 'Fill missing IBKR symbols so native contract resolution stays deterministic.',
     });
   }
-  if ((contractIntelligence.missingVenueCount || 0) > 0) {
+  if ((normalized.missingVenueCount || 0) > 0) {
     actions.push({
       queueType: 'data',
       severity: 'low',
       status: 'contract_identity_gap',
-      summary: `${contractIntelligence.missingVenueCount} approved instrument(s) are missing venue identity.${examples.missingVenue?.[0] ? ` Example: ${examples.missingVenue[0].tickerOrIsin}.` : ''}`,
+      summary: `${normalized.missingVenueCount} approved instrument(s) are missing venue identity.${examples.missingVenue?.[0] ? ` Example: ${examples.missingVenue[0].tickerOrIsin}.` : ''}`,
       recommendedOperatorAction: 'Add exchange / venue identity so operators can verify the intended execution venue.',
     });
   }
@@ -489,6 +478,7 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
     `- Failure alert readiness: ${deliveryStatus?.failureAlertMode || 'unknown'}`,
     `- Notified fills: ${fillNotificationState?.notifiedFills?.length || 0}`,
     `- Reconciled fills pending notification backfill: ${fillNotificationState?.reconciledUnnotifiedFills?.length || 0}`,
+    `- Acknowledged backfilled fills: ${fillNotificationState?.acknowledgedBackfilledFills?.length || 0}`,
   ].join('\n');
   const pendingActionRows = formatPendingQueueRows(pendingActions);
 
@@ -516,7 +506,7 @@ async function regenerateDashboard(portfolioDir) {
     eventsPathPresent: recentEvents.length > 0,
     recentSummary: summarizeRuntimeEvents(recentEvents),
   };
-  const fillNotificationState = readFillNotificationState();
+  const fillNotificationState = loadFillNotificationState(path.resolve(__dirname, '..', '..'));
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   let freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   let deliveryStatus = reportDeliveryStatus({ portfolioDir });
@@ -571,4 +561,4 @@ async function regenerateDashboard(portfolioDir) {
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, readFillNotificationState, buildContractIntelligenceQueueItems };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, buildContractIntelligenceQueueItems };

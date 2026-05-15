@@ -3,20 +3,7 @@ const path = require('path');
 const { fileFreshnessSummary } = require('./freshness');
 const { latestHistory, executionLifecycleSummary } = require('./portfolioData');
 const { brokerErrorStatus } = require('../execution/runtimeState');
-
-function readFillNotificationState(repoRoot) {
-  try {
-    const statePath = path.join(repoRoot, 'runtime', 'fill-notifications-state.json');
-    if (!fs.existsSync(statePath)) return { notifiedFills: [], reconciledUnnotifiedFills: [] };
-    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    return {
-      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-    };
-  } catch {
-    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
-  }
-}
+const { loadFillNotificationState } = require('./fillNotificationState');
 
 function repoRootFromPortfolioDir(portfolioDir) {
   return path.resolve(portfolioDir, '..', '..');
@@ -123,7 +110,7 @@ function reportDeliveryStatus({ portfolioDir, generationMeta = null, workflow = 
   const lifecycleSummary = fs.existsSync(tradesPath) ? executionLifecycleSummary(tradesPath, { actionableOnly: true }) : {};
   const brokerErrorState = brokerErrorStatus(portfolioName);
   const latestSnapshot = fs.existsSync(historyPath) ? latestHistory(historyPath) : null;
-  const fillNotificationState = readFillNotificationState(repoRoot);
+  const fillNotificationState = loadFillNotificationState(repoRoot);
   const pendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta, workflow, policy, fillNotificationState });
   return {
     portfolio: portfolioName,
