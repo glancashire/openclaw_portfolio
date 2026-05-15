@@ -32,6 +32,8 @@ function main() {
 
   assert(status.deliveryMode === 'local_only', 'Expected local-only delivery mode');
   assert(status.externalDeliveryEnabled === false, 'Expected external delivery to stay disabled');
+  assert(status.emailProvider === 'mailgun', 'Expected default email provider metadata');
+  assert(Array.isArray(status.emailRecipients), 'Expected email recipient metadata array');
   assert(Array.isArray(status.pendingActions) && status.pendingActions.length >= 4, 'Expected pending actions to be surfaced');
   assert(status.ready === false, 'Expected readiness false with pending actions');
   assert(status.pendingActions.some((item) => /stale/i.test(item)), 'Expected stale warning');

@@ -28,6 +28,8 @@ function defaultDeliveryPolicy(portfolioName = 'unknown') {
     deliveryMode: 'local_only',
     intendedChannels: ['repo_artifacts'],
     externalDeliveryEnabled: false,
+    emailProvider: 'mailgun',
+    emailRecipients: [],
     failureAlertMode: 'local_operator_review',
     failureAlertTargets: ['dashboard', 'markdown_report', 'report_cycle_json'],
     pendingActionThresholds: {
@@ -63,6 +65,8 @@ function effectiveDeliveryPolicy(portfolioDir) {
     portfolio: portfolioName,
     intendedChannels: Array.isArray(override?.intendedChannels) ? override.intendedChannels : base.intendedChannels,
     failureAlertTargets: Array.isArray(override?.failureAlertTargets) ? override.failureAlertTargets : base.failureAlertTargets,
+    emailProvider: typeof override?.emailProvider === 'string' && override.emailProvider.trim() ? override.emailProvider : base.emailProvider,
+    emailRecipients: Array.isArray(override?.emailRecipients) ? override.emailRecipients : base.emailRecipients,
     pendingActionThresholds: {
       ...base.pendingActionThresholds,
       ...(override?.pendingActionThresholds || {}),
@@ -126,6 +130,8 @@ function reportDeliveryStatus({ portfolioDir, generationMeta = null, workflow = 
     deliveryMode: policy.deliveryMode,
     intendedChannels: policy.intendedChannels,
     externalDeliveryEnabled: policy.externalDeliveryEnabled,
+    emailProvider: policy.emailProvider,
+    emailRecipients: policy.emailRecipients,
     failureAlertMode: policy.failureAlertMode,
     failureAlertTargets: policy.failureAlertTargets,
     policyPath: policy.policyPath,

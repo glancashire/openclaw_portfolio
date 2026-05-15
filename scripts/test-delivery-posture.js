@@ -19,6 +19,8 @@ const { evaluateDeliveryPosture } = require('../src/reporting/deliveryDiagnostic
   assert(result.deliveryPosture.pendingActionCount === result.status.pendingActions.length, 'Expected pending action count to match');
   assert(result.policy.deliveryMode === result.status.deliveryMode, 'Expected policy/status delivery mode alignment');
   assert(result.policy.failureAlertMode === result.status.failureAlertMode, 'Expected failure alert mode alignment');
+  assert(result.emailDelivery && typeof result.emailDelivery === 'object', 'Expected emailDelivery block');
+  assert(typeof result.emailDelivery.enabled === 'boolean', 'Expected emailDelivery enabled flag');
   assert(typeof result.deliveryPosture.recommendedNextAction === 'string' && result.deliveryPosture.recommendedNextAction.length > 0, 'Expected recommended next action');
 
   console.log(JSON.stringify({

@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { effectiveDeliveryPolicy, reportDeliveryStatus } = require('./deliveryPolicy');
+const { emailDeliveryReadiness } = require('./emailDelivery');
 const { listBlockedTradeRows } = require('./summaryArtifacts');
 
 function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow = null } = {}) {
@@ -10,6 +11,7 @@ function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow
 
   const status = reportDeliveryStatus({ portfolioDir, generationMeta, workflow });
   const policy = effectiveDeliveryPolicy(portfolioDir);
+  const emailReadiness = emailDeliveryReadiness(policy, status);
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const brokerBlockRows = fs.existsSync(tradesPath) ? listBlockedTradeRows(tradesPath) : [];
 
@@ -21,6 +23,8 @@ function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow
       deliveryMode: policy.deliveryMode,
       intendedChannels: policy.intendedChannels,
       externalDeliveryEnabled: policy.externalDeliveryEnabled,
+      emailProvider: policy.emailProvider,
+      emailRecipients: policy.emailRecipients,
       failureAlertMode: policy.failureAlertMode,
       failureAlertTargets: policy.failureAlertTargets,
       pendingActionThresholds: policy.pendingActionThresholds,
@@ -29,6 +33,7 @@ function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow
       overrideLoaded: policy.overrideLoaded,
     },
     status,
+    emailDelivery: emailReadiness,
     deliveryPosture: {
       ready: Boolean(status.ready),
       pendingActionCount: Array.isArray(status.pendingActions) ? status.pendingActions.length : 0,
@@ -52,10 +57,12 @@ function evaluateDeliveryPosture({ portfolioDir, generationMeta = null, workflow
         } : null,
       },
       recommendedNextAction: status.ready
-        ? 'No delivery-side operator action is currently required.'
+        ? (emailReadiness.enabled && !emailReadiness.ready ? emailReadiness.reason : 'No delivery-side operator action is currently required.')
         : (Array.isArray(status.pendingActions) && status.pendingActions.some((item) => /notification backfill review/i.test(String(item))))
           ? 'Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.'
-          : 'Review pending delivery actions and clear the underlying reporting or runtime blocker.',
+          : (emailReadiness.enabled && !emailReadiness.ready)
+            ? emailReadiness.reason
+            : 'Review pending delivery actions and clear the underlying reporting or runtime blocker.',
     },
   };
 }

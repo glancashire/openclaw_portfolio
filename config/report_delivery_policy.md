@@ -6,6 +6,8 @@ This repo now defines a local-only production reporting policy so operators can 
 - Delivery mode: `local_only`
 - Intended channels: repo artifacts only (`dashboard.md`, Markdown report, JSON workflow output)
 - External delivery enabled: no
+- Email provider metadata: `mailgun` (capability modeled, still disabled by policy by default)
+- Email recipients: empty by default
 - Failure alert mode: `local_operator_review`
 - Failure alert targets: dashboard, Markdown report, report-cycle JSON output
 
@@ -37,6 +39,18 @@ This returns JSON describing:
 - broker automation pause state
 - pending operator actions
 - whether the current delivery posture is considered `ready`
+
+## Future email-capable modes
+The policy model can now distinguish between:
+- `local_only`
+- `email_only`
+- `email_and_repo`
+
+Email delivery is still treated as an explicit external side effect and is not considered ready unless:
+- email mode is enabled,
+- one or more `emailRecipients` are configured,
+- provider config is present,
+- and delivery pending-actions are clear.
 
 ## Policy override file
 Machine-readable policy lives at:

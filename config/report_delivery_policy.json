@@ -2,6 +2,8 @@
   "deliveryMode": "local_only",
   "intendedChannels": ["repo_artifacts"],
   "externalDeliveryEnabled": false,
+  "emailProvider": "mailgun",
+  "emailRecipients": [],
   "failureAlertMode": "local_operator_review",
   "failureAlertTargets": ["dashboard", "markdown_report", "report_cycle_json"],
   "pendingActionThresholds": {
