@@ -56,10 +56,24 @@ function acknowledgeBackfilledFills(state, orderIds = []) {
   return next;
 }
 
+function markFillsNotified(state, orderIds = []) {
+  const next = {
+    notifiedFills: normalizeIds(state?.notifiedFills),
+    reconciledUnnotifiedFills: normalizeIds(state?.reconciledUnnotifiedFills),
+    acknowledgedBackfilledFills: normalizeIds(state?.acknowledgedBackfilledFills),
+  };
+  const notifiedSet = new Set(normalizeIds(orderIds));
+  next.notifiedFills = normalizeIds(next.notifiedFills.concat(Array.from(notifiedSet)));
+  next.reconciledUnnotifiedFills = next.reconciledUnnotifiedFills.filter((id) => !notifiedSet.has(id));
+  next.acknowledgedBackfilledFills = next.acknowledgedBackfilledFills.filter((id) => !notifiedSet.has(id));
+  return next;
+}
+
 module.exports = {
   defaultFillNotificationState,
   fillNotificationStatePath,
   loadFillNotificationState,
   saveFillNotificationState,
   acknowledgeBackfilledFills,
+  markFillsNotified,
 };

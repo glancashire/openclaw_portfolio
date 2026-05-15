@@ -11,10 +11,11 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
 const { readTradesTable } = require('../src/execution/tradeState');
+const { loadFillNotificationState, saveFillNotificationState, markFillsNotified } = require('../src/reporting/fillNotificationState');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
-const STATE_FILE = path.join(__dirname, '..', 'runtime', 'fill-notifications-state.json');
-const DEFAULT_PORTFOLIO_DIR = path.join(__dirname, '..', 'portfolio', 'etf');
+const ROOT = path.join(__dirname, '..');
+const DEFAULT_PORTFOLIO_DIR = path.join(ROOT, 'portfolio', 'etf');
 
 function ibkrJson(args) {
   const cmd = `python3 ${IBKR_CLI} ${args} --json`;
@@ -27,22 +28,6 @@ function ibkrJson(args) {
   }
 }
 
-function loadState() {
-  try {
-    const parsed = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-    return {
-      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-    };
-  } catch {
-    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
-  }
-}
-
-function saveState(state) {
-  fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
-}
 
 function loadKnownOrders(portfolioDir = DEFAULT_PORTFOLIO_DIR) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
@@ -71,7 +56,7 @@ async function main() {
   const openOrders = ibkrJson('open-orders') || [];
   const executions = ibkrJson('executions') || [];
 
-  const state = loadState();
+  let state = loadFillNotificationState(ROOT);
   const openOrderIds = new Set(openOrders.map(o => Number(o.orderId)));
 
   let newFills = 0;
@@ -129,7 +114,7 @@ async function main() {
     const fillQty = fill ? (fill.shares || fill.cumQty || order.qty) : order.qty;
 
     console.log(`[monitor] Sending fill notification for ${order.symbol}`);
-    await notifyTradeFill({
+    const notification = await notifyTradeFill({
       trade: {
         symbol: order.symbol,
         action: order.action,
@@ -147,11 +132,15 @@ async function main() {
       openOrders: remainingOpen,
     });
 
-    state.notifiedFills.push(order.orderId);
-    newFills++;
+    if (notification && notification.sent) {
+      state = markFillsNotified(state, [order.orderId]);
+      newFills++;
+    } else {
+      console.log(`[monitor] Notification not recorded for ${order.symbol} (${order.orderId}): ${notification?.reason || notification?.error || 'send_not_confirmed'}`);
+    }
   }
 
-  saveState(state);
+  saveFillNotificationState(ROOT, state);
 
   if (newFills === 0) {
     console.log(`[monitor] No new fills. Open orders: ${openOrders.length}`);
