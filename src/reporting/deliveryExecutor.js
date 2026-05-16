@@ -54,11 +54,11 @@ async function deliverPortfolioSummaryEmail({ portfolioDir, period = 'summary', 
   }
 
   const portfolioName = path.basename(portfolioDir);
-  const { summaryMarkdown, summaryHtml } = loadSummaryEmailSource({ summaryPath, summaryHtmlPath });
+  const { summaryMarkdown, summaryHtml, summary } = loadSummaryEmailSource({ summaryPath, summaryHtmlPath });
   const { topBlocker, nextAction } = extractHealthHighlights(summaryMarkdown);
   const resolvedSubject = subject || buildReportEmailSubject({ portfolioName, period });
-  const text = buildReportEmailText({ portfolioName, period, summaryMarkdown, deliveryStatus, topBlocker, nextAction });
-  const html = buildReportEmailHtml({ portfolioName, period, summaryHtml, deliveryStatus, topBlocker, nextAction });
+  const text = buildReportEmailText({ portfolioName, period, summaryMarkdown, summary, deliveryStatus, topBlocker, nextAction });
+  const html = buildReportEmailHtml({ portfolioName, period, summaryHtml, summary, deliveryStatus, topBlocker, nextAction });
   const result = await sendEmailImpl({ policy, subject: resolvedSubject, text, html });
 
   return {

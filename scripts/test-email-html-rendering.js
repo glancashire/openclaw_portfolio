@@ -3,9 +3,30 @@ const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting
 const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
 
 (function main() {
+  const summary = {
+    holdings: {
+      totalValueChf: 5327.03,
+      investedChf: 5210.39,
+      cashChf: 116.64,
+      holdingCount: 2,
+      latestSnapshotDate: '2026-05-15',
+      lastSyncAt: '2026-05-13 14:29:30',
+      baseCurrency: 'CHF',
+      dailyChangeChf: 0,
+      dailyChangePct: 0,
+    },
+    status: {
+      health: 'attention_needed',
+      executionPosture: 'ready_for_review',
+      brokerHealth: 'healthy',
+      brokerMessage: 'Interactive Brokers read-only connectivity and live/realtime market data are available.',
+    },
+  };
+
   const reportHtml = buildReportEmailHtml({
     portfolioName: 'etf',
     period: 'weekly',
+    summary,
     summaryHtml: '<h1>Demo summary</h1><p>Everything looks good.</p>',
     deliveryStatus: { pendingActions: ['1 delivery item needs review'] },
     topBlocker: '[broker_unready] Broker connectivity is degraded.',
@@ -14,6 +35,7 @@ const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
   const reportText = buildReportEmailText({
     portfolioName: 'etf',
     period: 'weekly',
+    summary,
     summaryMarkdown: '# Demo summary\n\nEverything looks good.',
     deliveryStatus: { pendingActions: ['1 delivery item needs review'] },
     topBlocker: '[broker_unready] Broker connectivity is degraded.',
@@ -21,17 +43,28 @@ const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
   });
 
   assert(reportHtml.includes('OpenClaw Portfolio Report'));
-  assert(reportHtml.includes('Immediate status'));
-  assert(reportHtml.includes('Next action'));
-  assert(reportHtml.includes('Top blocker'));
-  assert(reportHtml.includes('Delivery posture'));
-  assert(reportHtml.includes('Portfolio summary'));
+  assert(reportHtml.includes('Management summary'));
+  assert(reportHtml.includes('Investor take'));
+  assert(reportHtml.includes('Portfolio value'));
+  assert(reportHtml.includes('Gain since purchase'));
+  assert(reportHtml.includes('CHF 5&#39;327.03') || reportHtml.includes('CHF 5,327.03'));
+  assert(reportHtml.includes('+CHF 116.64'));
+  assert(reportHtml.includes('+2.2%'));
+  assert(reportHtml.includes('Immediate priorities'));
+  assert(reportHtml.includes('Portfolio status'));
+  assert(reportHtml.includes('Pending workflow items'));
+  assert(reportHtml.includes('Supporting detail'));
   assert(reportHtml.includes('report-email-summary'));
   assert(reportHtml.includes('Restore broker connectivity first.'));
   assert(reportHtml.includes('[broker_unready] Broker connectivity is degraded.'));
   assert(reportHtml.includes('1 delivery item needs review'));
-  assert(reportHtml.indexOf('Immediate status') < reportHtml.indexOf('Portfolio summary'));
+  assert(reportHtml.indexOf('Management summary') < reportHtml.indexOf('Supporting detail'));
 
+  assert(reportText.includes('Management summary'));
+  assert(reportText.includes('Headline metrics'));
+  assert(reportText.includes('Portfolio value (CHF): CHF'));
+  assert(reportText.includes('Gain since purchase (CHF): +CHF 116.64'));
+  assert(reportText.includes('Gain since purchase (%): +2.2%'));
   assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
   assert(reportText.includes('Next action: Restore broker connectivity first.'));
 
