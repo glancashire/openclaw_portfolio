@@ -1,46 +1,15 @@
 # TOOLS.md - Local Notes
 
-Skills define _how_ tools work. This file is for _your_ specifics — the stuff that's unique to your setup.
+Things that matter in this setup:
 
-## What Goes Here
-
-Things like:
-
-- Camera names and locations
-- SSH hosts and aliases
-- Preferred voices for TTS
-- Speaker/room names
-- Device nicknames
-- Anything environment-specific
-
-## Examples
-
-```markdown
-### Cameras
-
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
-
-### SSH
-
-- home-server → 192.168.1.100, user: admin
-
-### TTS
-
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
-```
-
-## IBKR Gotchas
-
-- Native IBKR socket connectivity and Client Portal/browser-session login can diverge. Native quotes/orders/fills may still work while portal/secdef lookup is logged out.
-- For IBKR conid discovery on UCITS ETFs, raw native `contractDetails` can be more trustworthy than simplified search wrappers. Preserve `contract.conId`, `symbol`, `localSymbol`, `primaryExch`, and `currency`.
-- For conid-based native orders, prefer minimal contract metadata; forcing repo-side symbol/currency hints can cause IBKR contract conflicts.
-
-## Why Separate?
-
-Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
-
----
-
-Add whatever helps you do your job. This is your cheat sheet.
+### IBKR native gateway recovery
+- Known-good native path: `/home/ubuntu/ibgateway-native/start-ibc.sh`
+- That wrapper must use the pinned install4j runtime:
+  - `/home/ubuntu/.local/share/i4j_jres/Oda-jK0QgTEmVssfllLP/17.0.16.0.101-zulu_64/bin/java`
+- Do not let IB Gateway fall back to system Java (it broke the launcher and produced `NoClassDefFoundError: javafx/scene/Parent` / headless splash failures).
+- Known-good gateway config expects the API socket on `127.0.0.1:4001`.
+- `jts.ini` is at `/home/ubuntu/Jts/jts.ini`.
+- The launcher may expose only the IBC command port (`7462`) until the GUI login / 2FA step is completed.
+- If readiness says `connect ECONNREFUSED 127.0.0.1:4001`, the wrapper started but the gateway has not completed login and exposed the API port yet.
+- Last verified launch display: `:99` via Xvfb.
+- The practical finish step is completing the IB Gateway login / second-factor approval on that display, then rerunning `node scripts/check-interactive-brokers-readiness.js`.
