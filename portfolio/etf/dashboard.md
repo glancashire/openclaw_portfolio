@@ -1,13 +1,13 @@
 # Dashboard: etf
 
 ## Health Snapshot
-- Portfolio status: attention_needed
-- Strategy status: rebalance_needed
-- Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
+- Portfolio status: warning
+- Strategy status: blocked
+- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
 - Last successful sync: 2026-05-13 14:29:30
 - Data freshness: current
-- Execution posture: ready_for_review
-- Delivery posture: needs_operator_attention
+- Execution posture: degraded_dry_run_only
+- Delivery posture: ready
 - Pending approvals: 1
 - Active blockers: 0
 
@@ -20,7 +20,7 @@
 - Since last report CHF: 0
 - Since last report %: 0
 - Number of holdings: 2
-- Latest snapshot date: 2026-05-13
+- Latest snapshot date: 2026-05-15
 
 ## Allocation Health
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
@@ -32,34 +32,43 @@
 ## Instrument Actions Queue
 | Instrument | Current % | Target % | Suggested action | Reason | Approval needed |
 |---|---:|---:|---|---|---|
-| LU0950668870 | 0 | 60 | watch | No active proposal | watch |
+| IE00BD4TXW66 | 0 | 40 | watch | No active proposal | watch |
+| LU0950668870 | 0 | 20 | watch | No active proposal | watch |
 | CH0032912732 | 0 | 20 | watch | No active proposal | watch |
-| CASH-CHF | 38 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| CASH-CHF | 2.19 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | pending_user_approval |
 
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
-- Broker/API warnings: 0
+- Broker/API warnings: 1
 - Stale data warnings: 0
 - Execution pause state: active
 - Active blocker detail:
 - none
 
+## Contract Intelligence Readiness
+- 3/4 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.
+- Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.
+
 ## Pending Operator Actions
 1. [execution_block/blocked/high] CH0032912732: No broker quote was available during market-open execution.
-2. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
-3. [delivery/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
+2. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+3. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
+4. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
+5. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Operator Queue Summary
-- Total queue items: 3
+- Total queue items: 5
 - Blocking items: 0
 - Approval items: 1
+- Fresh actionable approvals: 0
+- Stale approvals needing reapproval: 0
 - Execution items: 0
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
-- Recovery items: 0
-- Delivery items: 1
-- Data items: 0
+- Recovery items: 1
+- Delivery items: 0
+- Data items: 2
 - Warning items: 0
 - Workflow items: 1
 
@@ -73,13 +82,14 @@
 | 2026-05-11 21:39:57.415 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
-- Weekly report: latest history 2026-05-13
-- Monthly report: local_only
+- Weekly report: latest history 2026-05-15
+- Monthly report: email_and_repo
 - Quarterly report: local_operator_review
-- Delivery readiness: needs_operator_attention
+- Delivery readiness: ready
 - Failure alert readiness: local_operator_review
 - Notified fills: 0
-- Reconciled fills pending notification backfill: 1
+- Reconciled fills pending notification backfill: 0
+- Acknowledged backfilled fills: 1
 
 ## Recommended Next Step
 CH0032912732: No broker quote was available during market-open execution.
@@ -88,14 +98,14 @@ CH0032912732: No broker quote was available during market-open execution.
 - Pending approvals queue count: 1
 - In-flight execution rows: 0
 - Latest action recommendations:
-  - Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
-  - Refresh history snapshots after holdings updates and trade execution.
+  - Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
+  - Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 1509.11 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: Broker order 9115 status sync: Filled
-- 1 reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.
+- Whole-share draft sizing leaves CHF 3416.6 unallocated beyond the intentional CHF cash sleeve.
+- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Latest history note: weekly report cycle snapshot
 - Observability shows 91 recent blocked execution-policy event(s).
 
 ## Observability Status
@@ -122,14 +132,14 @@ CH0032912732: No broker quote was available during market-open execution.
 
 ## Execution Plan
 - IE000XZSV718: target 0% | intended CHF 1793.79 | executable CHF 1793.79 | gap CHF 0
-- CASH-CHF: target 20% | intended CHF 2024.13 | executable CHF 2024.13 | gap CHF 0
-- Totals: intended CHF 3817.92 | executable CHF 3817.92 | gap CHF 0
+- CASH-CHF: target 20% | intended CHF 116.64 | executable CHF 116.64 | gap CHF 0
+- Totals: intended CHF 1910.43 | executable CHF 1910.43 | gap CHF 0
 
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
 |---|---|---|---:|---|
+| 2026-05-13 16:31:40 | hold | CHF cash balance | 116.64 | planned |
 | 2026-05-13 14:27:32 | buy | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 1899.6 | filled |
 | 2026-05-13 13:57:43 | buy | UBS SLI ETF (SMI gleichgewichtet) | 1273.44 | filled |
 | 2026-05-13 13:57:43 | buy | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 909.65 | filled |
 | 2026-05-13 13:57:43 | buy | State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc) | 1793.79 | proposed |
-| 2026-05-13 13:42:25 | buy | UBS SLI ETF (SMI gleichgewichtet) | 1270.72 | inactive |

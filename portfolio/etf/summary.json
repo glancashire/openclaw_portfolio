@@ -1,65 +1,70 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-13T13:20:15.787Z",
+  "generatedAt": "2026-05-16T09:04:21.776Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
-    "strategy": "rebalance_needed",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
-    "deliveryPosture": "needs_operator_attention",
-    "dataFreshness": "stale"
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionPosture": "degraded_dry_run_only",
+    "deliveryPosture": "ready",
+    "dataFreshness": "current"
   },
   "readiness": null,
   "holdings": {
-    "totalValueChf": 5083.34,
-    "cashChf": 4048.26,
-    "investedChf": 1035.08,
+    "totalValueChf": 5327.0300003,
+    "cashChf": 116.64,
+    "investedChf": 5210.3900003,
     "holdingCount": 2,
     "baseCurrency": "CHF",
-    "lastSyncAt": "2026-05-11 21:27:45",
+    "lastSyncAt": "2026-05-13 14:29:30",
     "source": "broker_api",
-    "latestSnapshotDate": "2026-05-11",
+    "latestSnapshotDate": "2026-05-15",
     "dailyChangeChf": 0,
     "dailyChangePct": 0
   },
   "approvals": {
-    "proposedCount": 0,
-    "approvedCount": 1,
-    "pendingApprovalCount": 1
+    "proposedCount": 1,
+    "approvedCount": 0,
+    "staleApprovalCount": 0,
+    "freshApprovedCount": 0,
+    "pendingApprovalCount": 1,
+    "staleApprovals": []
   },
   "operatorQueue": {
     "summary": {
-      "total": 4,
-      "blocking": 0,
+      "total": 2,
+      "blocking": 1,
       "approvals": 1,
       "execution": 0,
+      "freshApprovals": 0,
+      "staleApprovals": 0,
       "openRunnerQueue": 0,
-      "openRunnerRetry": 1,
-      "recovery": 0,
-      "delivery": 1,
+      "openRunnerRetry": 0,
+      "recovery": 1,
+      "delivery": 0,
       "data": 0,
       "warnings": 0,
-      "workflow": 1,
+      "workflow": 0,
       "bySeverity": {
-        "high": 0,
-        "medium": 4,
+        "high": 1,
+        "medium": 1,
         "low": 0
       }
     },
     "items": [
       {
         "rank": 1,
-        "queueType": "backfill_review",
+        "queueType": "recovery",
         "portfolio": "etf",
-        "kind": "delivery",
-        "severity": "medium",
-        "status": "backfill_review",
-        "summary": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
-        "source": "fill_notification_state"
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
       },
       {
         "rank": 2,
@@ -67,37 +72,140 @@
         "portfolio": "etf",
         "kind": "approval",
         "severity": "medium",
-        "status": "ready_for_review",
-        "summary": "1 approved trade row(s) are ready for staging or review.",
+        "status": "pending_user_approval",
+        "summary": "1 proposed trade row(s) still need user approval.",
         "blocking": false,
-        "recommendedOperatorAction": "Stage or review the approved trades when readiness gates are satisfied.",
+        "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",
         "source": "trade_lifecycle"
-      },
-      {
-        "rank": 3,
-        "queueType": "open_runner_retry",
-        "portfolio": "etf",
-        "kind": "execution",
-        "severity": "medium",
-        "status": "ready_for_review",
-        "summary": "1 trade row(s) were requeued for market-open retry after operator recovery.",
-        "blocking": false,
-        "recommendedOperatorAction": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
-        "source": "trade_state"
-      },
-      {
-        "rank": 4,
-        "queueType": "delivery",
-        "portfolio": "etf",
-        "kind": "delivery",
-        "severity": "medium",
-        "status": "pending",
-        "summary": "Dashboard/report freshness is stale relative to source state.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
-        "source": "delivery_policy"
       }
     ]
+  },
+  "contractIntelligence": {
+    "total": 4,
+    "readyCount": 3,
+    "missingConidCount": 1,
+    "missingSymbolCount": 1,
+    "missingVenueCount": 0,
+    "items": [
+      {
+        "tickerOrIsin": "IE00BD4TXW66",
+        "name": "UBS Core S&P 500 UCITS ETF USD acc",
+        "currency": "EUR",
+        "exchange": "IBIS / SMART",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": 808613958,
+          "symbol": "UBSPX",
+          "localSymbol": "BCFT",
+          "venue": "IBIS / SMART",
+          "venueKey": "unknown::EUR::IBIS / SMART",
+          "isin": "IE00BD4TXW66"
+        }
+      },
+      {
+        "tickerOrIsin": "LU0950668870",
+        "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+        "currency": "EUR",
+        "exchange": "Xetra / IBKR-supported venue",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": 243939970,
+          "symbol": "EMUAA",
+          "localSymbol": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+          "venue": "Xetra / IBKR-supported venue",
+          "venueKey": "unknown::EUR::Xetra / IBKR-supported venue",
+          "isin": "LU0950668870"
+        }
+      },
+      {
+        "tickerOrIsin": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "currency": "CHF",
+        "exchange": "SIX",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": 150029461,
+          "symbol": "UBSSLI",
+          "localSymbol": "UBS SLI ETF (SMI gleichgewichtet)",
+          "venue": "SIX",
+          "venueKey": "unknown::CHF::SIX",
+          "isin": "CH0032912732"
+        }
+      },
+      {
+        "tickerOrIsin": "CASH-CHF",
+        "name": "CHF cash balance",
+        "currency": "CHF",
+        "exchange": "IBKR cash balance",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": true,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": null,
+          "localSymbol": "CHF cash balance",
+          "venue": "IBKR cash balance",
+          "venueKey": "unknown::CHF::IBKR cash balance",
+          "isin": "CASH-CHF"
+        }
+      }
+    ],
+    "examples": {
+      "missingConid": [
+        {
+          "tickerOrIsin": "CASH-CHF",
+          "symbol": "missing_symbol",
+          "venue": "IBKR cash balance",
+          "conid": null,
+          "venueKey": "unknown::CHF::IBKR cash balance"
+        }
+      ],
+      "missingSymbol": [
+        {
+          "tickerOrIsin": "CASH-CHF",
+          "symbol": "missing_symbol",
+          "venue": "IBKR cash balance",
+          "conid": null,
+          "venueKey": "unknown::CHF::IBKR cash balance"
+        }
+      ],
+      "missingVenue": [],
+      "ready": [
+        {
+          "tickerOrIsin": "IE00BD4TXW66",
+          "symbol": "UBSPX",
+          "venue": "IBIS / SMART",
+          "conid": 808613958,
+          "venueKey": "unknown::EUR::IBIS / SMART"
+        },
+        {
+          "tickerOrIsin": "LU0950668870",
+          "symbol": "EMUAA",
+          "venue": "Xetra / IBKR-supported venue",
+          "conid": 243939970,
+          "venueKey": "unknown::EUR::Xetra / IBKR-supported venue"
+        },
+        {
+          "tickerOrIsin": "CH0032912732",
+          "symbol": "UBSSLI",
+          "venue": "SIX",
+          "conid": 150029461,
+          "venueKey": "unknown::CHF::SIX"
+        }
+      ]
+    },
+    "summaryLine": "3/4 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.",
+    "nextAction": "Resolve missing IBKR conids before treating the full approved instrument list as execution-ready."
   },
   "blockers": {
     "count": 0,
@@ -105,14 +213,14 @@
   },
   "execution": {
     "lifecycle": {
-      "proposed": 0,
-      "approved": 1,
+      "proposed": 1,
+      "approved": 0,
       "rejected": 0,
       "staged": 0,
       "submitted": 0,
       "partiallyFilled": 0,
-      "filled": 1,
-      "cancelled": 1,
+      "filled": 2,
+      "cancelled": 0,
       "failed": 0,
       "inactive": 0,
       "simulated": 0,
@@ -121,17 +229,18 @@
     },
     "tradeState": {
       "queuedForOpenRunner": 0,
-      "blocked": 5,
+      "blocked": 15,
       "blockedByCode": {
         "status_not_executable": 4,
-        "hold_action": 1
+        "already_submitted": 8,
+        "quote_unavailable": 1,
+        "hold_action": 2
       },
-      "staleNeedsReapproval": 1,
+      "staleNeedsReapproval": 0,
       "canonicalStates": {
-        "blocked_hard": 5,
-        "cancelled": 1,
-        "filled": 1,
-        "stale_needs_reapproval": 1
+        "blocked_hard": 15,
+        "proposal": 5,
+        "filled": 3
       }
     },
     "blockedRows": [
@@ -140,8 +249,8 @@
         "tickerOrIsin": "CH0032912732",
         "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "action": "buy",
-        "status": "approved",
-        "approval": "queued_for_open_runner",
+        "status": "rejected",
+        "approval": "user_rejected",
         "brokerOrderId": "",
         "blockCode": "quote_unavailable",
         "blockReason": "No broker quote was available during market-open execution.",
@@ -151,27 +260,27 @@
     ],
     "openRunnerRetryState": {
       "queuedInitial": 0,
-      "queuedRetry": 1
+      "queuedRetry": 0
     },
     "inFlightCount": 0,
     "failedCount": 0,
     "plan": {
       "rows": [
         {
-          "tickerOrIsin": "CH0032912732",
-          "name": "UBS SLI ETF (SMI gleichgewichtet)",
+          "tickerOrIsin": "IE000XZSV718",
+          "name": "State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc)",
           "action": "buy",
-          "status": "approved",
-          "quantity": 6,
-          "limitPrice": 157.08,
-          "targetPct": 20,
-          "intendedChf": 942.48,
-          "intendedPct": 18.54,
-          "executableChf": 942.48,
-          "executablePct": 18.54,
+          "status": "proposed",
+          "quantity": 0,
+          "limitPrice": 0,
+          "targetPct": 0,
+          "intendedChf": 1793.79,
+          "intendedPct": 33.67,
+          "executableChf": 1793.79,
+          "executablePct": 33.67,
           "executionGapChf": 0,
-          "approval": "queued_for_open_runner",
-          "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.; No broker quote was available during market-open execution."
+          "approval": "pending_user_approval",
+          "reason": "Deploy available cash toward underweight Global equities using State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc).; allocation before 20.36%; target 40%; allocation after 55.65%; drift before -39.64%; drift after 15.65%; drift corrected 23.99%; expected cost CHF 1793.79; funding source cash; Dry-run instrument proposal only; No draft price available yet."
         },
         {
           "tickerOrIsin": "CASH-CHF",
@@ -181,51 +290,51 @@
           "quantity": 0,
           "limitPrice": 0,
           "targetPct": 20,
-          "intendedChf": 1000,
-          "intendedPct": 19.67,
-          "executableChf": 1000,
-          "executablePct": 19.67,
+          "intendedChf": 116.64,
+          "intendedPct": 2.19,
+          "executableChf": 116.64,
+          "executablePct": 2.19,
           "executionGapChf": 0,
           "approval": "pending_user_approval",
-          "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 20%; drift before -20%; drift after 0%; drift corrected 20%; expected cost CHF 1000; funding source cash; Planning entry only; no broker order required for the cash sleeve."
+          "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 2.19%; target 20%; allocation after 4.38%; drift before -17.81%; drift after -15.62%; drift corrected 2.19%; expected cost CHF 116.64; funding source cash; Planning entry only; no broker order required for the cash sleeve."
         }
       ],
       "totals": {
-        "intendedChf": 1942.48,
-        "executableChf": 1942.48,
+        "intendedChf": 1910.43,
+        "executableChf": 1910.43,
         "executionGapChf": 0
       }
     },
     "proposalTotals": {
-      "plannedCashSleeve": 1000,
-      "executableBuys": 942.48,
-      "residualTradableCash": 3140.86
+      "plannedCashSleeve": 116.64,
+      "executableBuys": 1793.79,
+      "residualTradableCash": 3416.6
     }
   },
   "allocation": [
     {
       "assetClass": "Global equities",
-      "currentPct": 100,
+      "currentPct": 73.81,
       "targetPct": 60,
-      "driftPct": 40,
+      "driftPct": 13.81,
       "minPct": 50,
       "maxPct": 70,
       "status": "out_of_bounds"
     },
     {
       "assetClass": "Swiss equities",
-      "currentPct": 0,
+      "currentPct": 24,
       "targetPct": 20,
-      "driftPct": -20,
+      "driftPct": 4,
       "minPct": 10,
       "maxPct": 30,
-      "status": "out_of_bounds"
+      "status": "on_track"
     },
     {
       "assetClass": "Bonds / cash-like",
-      "currentPct": 0,
+      "currentPct": 2.19,
       "targetPct": 20,
-      "driftPct": -20,
+      "driftPct": -17.81,
       "minPct": 10,
       "maxPct": 30,
       "status": "out_of_bounds"
@@ -233,13 +342,13 @@
   ],
   "instruments": [
     {
-      "tickerOrIsin": "IE000XZSV718",
-      "name": "State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc)",
+      "tickerOrIsin": "IE00BD4TXW66",
+      "name": "UBS Core S&P 500 UCITS ETF USD acc",
       "assetClass": "Global equities",
       "targetPct": 40,
       "minPct": 30,
       "maxPct": 50,
-      "exchange": "Xetra / IBKR-supported venue",
+      "exchange": "IBIS / SMART",
       "currency": "EUR",
       "latestProposal": null
     },
@@ -263,13 +372,7 @@
       "maxPct": 30,
       "exchange": "SIX",
       "currency": "CHF",
-      "latestProposal": {
-        "status": "approved",
-        "action": "buy",
-        "estimatedChf": 942.48,
-        "approval": "queued_for_open_runner",
-        "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.; No broker quote was available during market-open execution."
-      }
+      "latestProposal": null
     },
     {
       "tickerOrIsin": "CASH-CHF",
@@ -283,24 +386,49 @@
       "latestProposal": {
         "status": "planned",
         "action": "hold",
-        "estimatedChf": 1000,
+        "estimatedChf": 116.64,
         "approval": "pending_user_approval",
-        "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 20%; drift before -20%; drift after 0%; drift corrected 20%; expected cost CHF 1000; funding source cash; Planning entry only; no broker order required for the cash sleeve."
+        "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 2.19%; target 20%; allocation after 4.38%; drift before -17.81%; drift after -15.62%; drift corrected 2.19%; expected cost CHF 116.64; funding source cash; Planning entry only; no broker order required for the cash sleeve."
       }
     }
   ],
   "pendingActions": [
-    "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-    "1 approved trade row(s) are ready for staging or review.",
-    "1 trade row(s) were requeued for market-open retry after operator recovery.",
-    "Dashboard/report freshness is stale relative to source state."
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "1 proposed trade row(s) still need user approval."
   ],
-  "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
+  "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
+  "selfHealPlan": {
+    "ok": true,
+    "dryRun": true,
+    "portfolio": "etf",
+    "health": {
+      "health": "blocked",
+      "severity": "high",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    },
+    "actions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ]
+  },
   "explanations": {
-    "biggestDrift": "Global equities is 40% over target and outside the allowed band around the 60% target.",
-    "noTradePosture": "Execution should stay blocked because the supporting dashboard/holdings inputs are stale.",
-    "executionBlock": "Execution is blocked because the underlying portfolio state is stale and should be refreshed first.",
-    "approvalBacklog": "1 approval-gated trade row(s), 5 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "biggestDrift": "Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.",
+    "approvalBacklog": "1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
     {
@@ -361,94 +489,91 @@
     }
   },
   "delivery": {
-    "ready": false,
-    "mode": "local_only",
+    "ready": true,
+    "mode": "email_and_repo",
     "failureAlertMode": "local_operator_review",
-    "pendingActions": [
-      "Dashboard/report freshness is stale relative to source state.",
-      "1 reconciled fill(s) still need notification backfill review."
-    ]
+    "pendingActions": []
   },
   "runtimeState": {
     "brokerAutomationPaused": false,
-    "consecutiveBrokerErrors": 1,
-    "lastBrokerErrorReason": "status_error",
-    "lastBrokerErrorAt": "2026-05-11T21:15:28.890Z"
+    "consecutiveBrokerErrors": 0,
+    "lastBrokerErrorReason": null,
+    "lastBrokerErrorAt": "2026-05-13T14:29:30.583Z"
   },
   "recentTrades": [
     {
-      "date": "2026-05-02 10:25:27",
+      "date": "2026-05-13 16:31:40",
       "status": "planned",
       "action": "hold",
       "tickerOrIsin": "CASH-CHF",
       "instrument": "CHF cash balance",
       "quantity": "0",
       "limitPrice": "0",
-      "estimatedChf": "1000",
-      "amount": "1000",
+      "estimatedChf": "116.64",
+      "amount": "116.64",
       "actualChf": "0",
-      "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 20%; drift before -20%; drift after 0%; drift corrected 20%; expected cost CHF 1000; funding source cash; Planning entry only; no broker order required for the cash sleeve.",
+      "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 2.19%; target 20%; allocation after 4.38%; drift before -17.81%; drift after -15.62%; drift corrected 2.19%; expected cost CHF 116.64; funding source cash; Planning entry only; no broker order required for the cash sleeve.",
       "approval": "pending_user_approval",
       "brokerOrderId": ""
     },
     {
-      "date": "2026-05-11 06:33:50",
-      "status": "approved",
-      "action": "buy",
-      "tickerOrIsin": "CH0032912732",
-      "instrument": "UBS SLI ETF (SMI gleichgewichtet)",
-      "quantity": "6",
-      "limitPrice": "157.08",
-      "estimatedChf": "942.48",
-      "amount": "942.48",
-      "actualChf": "0",
-      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; Could not determine a smart limit price from broker quote data.; Row requeued for market-open runner after operator review.; Broker returned quote data, but no usable live or delayed reference price fields were available for safe smart-limit construction.; No broker quote was available during market-open execution.",
-      "approval": "queued_for_open_runner",
-      "brokerOrderId": ""
-    },
-    {
-      "date": "2026-05-11 06:33:50",
+      "date": "2026-05-13 14:27:32",
       "status": "filled",
       "action": "buy",
       "tickerOrIsin": "LU0950668870",
       "instrument": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
-      "quantity": "26",
-      "limitPrice": "39.905",
-      "estimatedChf": "970.82",
-      "amount": "970.82",
-      "actualChf": "1035.08",
-      "reason": "Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc.; Broker order status lookup returned not_found.; Execution reconciliation: broker status Filled, order id 9107, filled 26, remaining 0, avg fill 39.8108, last fill 39.8108, exec id 00015269.6a018757.01.01, executed at 2026-05-11T09:42:36+00:00",
+      "quantity": "50",
+      "limitPrice": "39.58",
+      "estimatedChf": "1899.6",
+      "amount": "1899.6",
+      "actualChf": "1978.75",
+      "reason": "Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc. Whole-share sizing leaves CHF 34.20 unallocated for this leg.; Market-open live submission attempted.; Execution reconciliation: broker status Filled, order id 9115, filled 50, remaining 0, avg fill 39.575, last fill 39.575, exec id 00020f63.6a048cf3.01.01, executed at 2026-05-13T14:29:17+00:00",
       "approval": "broker_filled",
-      "brokerOrderId": "9107"
+      "brokerOrderId": "9115"
     },
     {
-      "date": "2026-05-11 06:33:50",
-      "status": "cancelled",
-      "action": "buy",
-      "tickerOrIsin": "IE000XZSV718",
-      "instrument": "State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc)",
-      "quantity": "105",
-      "limitPrice": "15.5",
-      "estimatedChf": "1560.83",
-      "amount": "1560.83",
-      "actualChf": "0",
-      "reason": "Deploy available cash toward underweight Global equities using State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc).; Phase 138 reconciliation pass for probable broker-cancelled outcome.; Broker order id match was unavailable, but completed-order evidence suggests cancellation (symbol SPYL, quantity 105, permId 617503611).",
-      "approval": "broker_cancelled",
-      "brokerOrderId": "9105"
-    },
-    {
-      "date": "2026-05-02 10:05:00",
-      "status": "rejected",
+      "date": "2026-05-13 13:57:43",
+      "status": "filled",
       "action": "buy",
       "tickerOrIsin": "CH0032912732",
       "instrument": "UBS SLI ETF (SMI gleichgewichtet)",
       "quantity": "8",
-      "limitPrice": "120",
-      "estimatedChf": "960",
-      "amount": "960",
+      "limitPrice": "159.2",
+      "estimatedChf": "1273.44",
+      "amount": "1273.44",
+      "actualChf": "1273.6",
+      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet). Live broker-priced order for 8 shares at ask-derived limit 159.2 CHF. Broker acknowledged live submitted order permId 1431009902.; Execution reconciliation: broker status Filled, order id 9113, filled 8, remaining 0, avg fill 159.2, last fill 159.2, exec id 00028f0a.6a040521.01.01, executed at 2026-05-13T14:07:17+00:00",
+      "approval": "broker_filled",
+      "brokerOrderId": "9113"
+    },
+    {
+      "date": "2026-05-13 13:57:43",
+      "status": "filled",
+      "action": "buy",
+      "tickerOrIsin": "LU0950668870",
+      "instrument": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+      "quantity": "23",
+      "limitPrice": "39.52",
+      "estimatedChf": "909.65",
+      "amount": "909.65",
+      "actualChf": "908.96",
+      "reason": "Deploy available cash toward underweight Global equities using UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc. Live broker-priced order for 23 shares at ask-derived limit 39.52 EUR. Broker acknowledged live submitted order permId 1431009903.; Execution reconciliation: broker status Submitted, order id 9114, filled 0, remaining 23; Execution reconciliation: broker status Filled, order id 9114, filled 23, remaining 0, avg fill 39.52, last fill 39.52, exec id 00028f0a.6a04052d.01.01, executed at 2026-05-13T14:12:10+00:00",
+      "approval": "broker_filled",
+      "brokerOrderId": "9114"
+    },
+    {
+      "date": "2026-05-13 13:57:43",
+      "status": "proposed",
+      "action": "buy",
+      "tickerOrIsin": "IE000XZSV718",
+      "instrument": "State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc)",
+      "quantity": "0",
+      "limitPrice": "0",
+      "estimatedChf": "1793.79",
+      "amount": "1793.79",
       "actualChf": "0",
-      "reason": "Deploy available cash toward underweight Swiss equities using UBS SLI ETF (SMI gleichgewichtet).; allocation before 0%; target 20%; allocation after 19.2%; drift before -20%; drift after -0.8%; drift corrected 19.2%; expected cost CHF 960; funding source cash; Dry-run instrument proposal only; Sized with draft price assumptions (120 CHF, FX 1 to CHF).; Superseded by newer live-priced proposal.",
-      "approval": "superseded_duplicate",
+      "reason": "Deploy available cash toward underweight Global equities using State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc).; allocation before 20.36%; target 40%; allocation after 55.65%; drift before -39.64%; drift after 15.65%; drift corrected 23.99%; expected cost CHF 1793.79; funding source cash; Dry-run instrument proposal only; No draft price available yet.",
+      "approval": "pending_user_approval",
       "brokerOrderId": ""
     }
   ]

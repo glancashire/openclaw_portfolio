@@ -9,6 +9,7 @@
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { loadFillNotificationState } = require('../src/reporting/fillNotificationState');
 
 const IBKR_CLI = path.join(__dirname, '..', 'skills', 'ibkr', 'scripts', 'ibkr_cli.py');
 const ROOT = path.join(__dirname, '..');
@@ -412,47 +413,44 @@ function cmdStatus() {
   const portfolioDir = portfolioArg ? path.resolve(portfolioArg) : path.join(ROOT, 'portfolio', 'etf');
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
+  const state = loadFillNotificationState(ROOT);
   let openOrders = [];
   const statusStderrPath = '/tmp/openclaw-trade-status-ibkr-stderr.log';
   try {
     openOrders = JSON.parse(ibkr('open-orders --json', { stderrPath: statusStderrPath }));
   } catch (error) {
     if (JSON_OUT) {
-      printJson({ error: 'IB Gateway not connected', openOrders: [], notifiedFills: [], reconciledUnnotifiedFills: [], openRunnerRetryState });
+      printJson({
+        error: 'IB Gateway not connected',
+        openOrders: [],
+        notifiedFills: state.notifiedFills,
+        reconciledUnnotifiedFills: state.reconciledUnnotifiedFills,
+        acknowledgedBackfilledFills: state.acknowledgedBackfilledFills,
+        openRunnerRetryState,
+      });
       return;
     }
     console.log('Open Orders\n');
     console.log('  ⚠️ IB Gateway not connected. Cannot fetch open orders.');
     console.log(`  Error: ${error.message.split('\n')[0]}`);
-    const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
-    let state = { notifiedFills: [], reconciledUnnotifiedFills: [] };
-    try {
-      const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-      state = {
-        notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-        reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-      };
-    } catch {}
     console.log(`\nOpen-runner queue: ${openRunnerRetryState.queuedInitial} first handoff, ${openRunnerRetryState.queuedRetry} retry`);
     console.log(`\nNotified fills: ${state.notifiedFills.length}`);
     if (state.notifiedFills.length > 0) console.log(`  Order IDs: ${state.notifiedFills.join(', ')}`);
     console.log(`Reconciled fills pending notification backfill: ${state.reconciledUnnotifiedFills.length}`);
     if (state.reconciledUnnotifiedFills.length > 0) console.log(`  Order IDs: ${state.reconciledUnnotifiedFills.join(', ')}`);
+    console.log(`Acknowledged backfilled fills: ${state.acknowledgedBackfilledFills.length}`);
+    if (state.acknowledgedBackfilledFills.length > 0) console.log(`  Order IDs: ${state.acknowledgedBackfilledFills.join(', ')}`);
     return;
   }
 
-  const stateFile = path.join(ROOT, 'runtime', 'fill-notifications-state.json');
-  let state = { notifiedFills: [], reconciledUnnotifiedFills: [] };
-  try {
-    const parsed = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-    state = {
-      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-    };
-  } catch {}
-
   if (JSON_OUT) {
-    printJson({ openOrders, notifiedFills: state.notifiedFills, reconciledUnnotifiedFills: state.reconciledUnnotifiedFills, openRunnerRetryState });
+    printJson({
+      openOrders,
+      notifiedFills: state.notifiedFills,
+      reconciledUnnotifiedFills: state.reconciledUnnotifiedFills,
+      acknowledgedBackfilledFills: state.acknowledgedBackfilledFills,
+      openRunnerRetryState,
+    });
     return;
   }
 
@@ -472,6 +470,10 @@ function cmdStatus() {
   console.log(`Reconciled fills pending notification backfill: ${state.reconciledUnnotifiedFills.length}`);
   if (state.reconciledUnnotifiedFills.length > 0) {
     console.log(`  Order IDs: ${state.reconciledUnnotifiedFills.join(', ')}`);
+  }
+  console.log(`Acknowledged backfilled fills: ${state.acknowledgedBackfilledFills.length}`);
+  if (state.acknowledgedBackfilledFills.length > 0) {
+    console.log(`  Order IDs: ${state.acknowledgedBackfilledFills.join(', ')}`);
   }
 }
 

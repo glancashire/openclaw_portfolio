@@ -6,11 +6,12 @@ function main() {
   const expr = process.argv.includes('--expr') ? process.argv[process.argv.indexOf('--expr') + 1] : '0 8,14,20 * * *';
   const tz = process.argv.includes('--tz') ? process.argv[process.argv.indexOf('--tz') + 1] : 'UTC';
   if (!portfolioDirArg) {
-    console.error('Usage: node scripts/check-health-monitor-cron.js <portfolio-dir> [--expr "0 8,14,20 * * *"] [--tz UTC]');
+    console.error('Usage: node scripts/check-health-monitor-cron.js <portfolio-dir> [--expr "0 8,14,20 * * *"] [--tz UTC] [--delivery none|announce]');
     process.exit(1);
   }
   const portfolioDir = path.resolve(portfolioDirArg);
-  const job = buildHealthMonitorJob({ portfolioDir, scheduleExpr: expr, tz });
+  const deliveryMode = process.argv.includes('--delivery') ? process.argv[process.argv.indexOf('--delivery') + 1] : 'none';
+  const job = buildHealthMonitorJob({ portfolioDir, scheduleExpr: expr, tz, deliveryMode });
   console.log(JSON.stringify({
     portfolio: path.basename(portfolioDir),
     expectedJobName: job.name,

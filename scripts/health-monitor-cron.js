@@ -1,6 +1,6 @@
 const path = require('path');
 
-function buildHealthMonitorJob({ portfolioDir, scheduleExpr = '0 8,14,20 * * *', tz = 'UTC' }) {
+function buildHealthMonitorJob({ portfolioDir, scheduleExpr = '0 8,14,20 * * *', tz = 'UTC', deliveryMode = 'none' }) {
   const resolvedPortfolioDir = path.resolve(portfolioDir);
   const portfolio = path.basename(resolvedPortfolioDir);
   return {
@@ -18,16 +18,16 @@ function buildHealthMonitorJob({ portfolioDir, scheduleExpr = '0 8,14,20 * * *',
       toolsAllow: ['exec', 'read'],
       lightContext: true,
     },
-    sessionTarget: 'isolated',
+    sessionTarget: 'current',
     delivery: {
-      mode: 'announce',
+      mode: deliveryMode,
     },
     enabled: true,
   };
 }
 
 function parseArgs(argv) {
-  const args = { action: 'show', portfolioDir: null, scheduleExpr: '0 8,14,20 * * *', tz: 'UTC', jobId: null };
+  const args = { action: 'show', portfolioDir: null, scheduleExpr: '0 8,14,20 * * *', tz: 'UTC', jobId: null, deliveryMode: 'none' };
   const parts = [...argv];
   if (parts[0] && !parts[0].startsWith('-')) args.action = parts.shift();
   while (parts.length) {
@@ -35,6 +35,7 @@ function parseArgs(argv) {
     if (part === '--tz') args.tz = parts.shift();
     else if (part === '--expr') args.scheduleExpr = parts.shift();
     else if (part === '--job-id') args.jobId = parts.shift();
+    else if (part === '--delivery') args.deliveryMode = parts.shift();
     else if (!args.portfolioDir) args.portfolioDir = part;
   }
   return args;
@@ -43,7 +44,7 @@ function parseArgs(argv) {
 if (require.main === module) {
   const args = parseArgs(process.argv.slice(2));
   if (!args.portfolioDir) {
-    console.error('Usage: node scripts/health-monitor-cron.js <show|payload> <portfolio-dir> [--expr "0 8,14,20 * * *"] [--tz UTC]');
+    console.error('Usage: node scripts/health-monitor-cron.js <show|payload> <portfolio-dir> [--expr "0 8,14,20 * * *"] [--tz UTC] [--delivery none|announce]');
     process.exit(1);
   }
   const job = buildHealthMonitorJob(args);

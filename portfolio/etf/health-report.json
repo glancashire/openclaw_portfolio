@@ -1,0 +1,537 @@
+{
+  "schemaVersion": "1.0",
+  "portfolio": "etf",
+  "generatedAt": "2026-05-16T09:04:21.787Z",
+  "before": {
+    "portfolio": "etf",
+    "generatedAt": "2026-05-16T09:04:21.695Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first.",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    },
+    "errorState": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-13T14:29:30.583Z",
+      "stopAutomation": false,
+      "threshold": 3
+    },
+    "staleApprovedRows": [],
+    "retryState": {
+      "queuedInitial": 0,
+      "queuedRetry": 0
+    },
+    "deliveryStatus": {
+      "portfolio": "etf",
+      "deliveryMode": "email_and_repo",
+      "intendedChannels": [
+        "repo_artifacts",
+        "email"
+      ],
+      "externalDeliveryEnabled": true,
+      "emailProvider": "mailgun",
+      "emailRecipients": [
+        "lancashire@swift.ch"
+      ],
+      "failureAlertMode": "local_operator_review",
+      "failureAlertTargets": [
+        "dashboard",
+        "markdown_report",
+        "report_cycle_json"
+      ],
+      "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
+      "overrideLoaded": true,
+      "latestHistoryDate": "2026-05-15",
+      "freshness": {
+        "stale": false,
+        "dashboardExists": true,
+        "dashboardMtimeMs": 1778856255911.944,
+        "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
+        "newestSourceMtimeMs": 1778842973840.5232
+      },
+      "lifecycleSummary": {
+        "proposed": 1,
+        "approved": 0,
+        "rejected": 0,
+        "staged": 0,
+        "submitted": 0,
+        "partiallyFilled": 0,
+        "filled": 2,
+        "cancelled": 0,
+        "failed": 0,
+        "inactive": 0,
+        "simulated": 0,
+        "planned": 1,
+        "withBrokerOrderId": 2
+      },
+      "brokerErrorState": {
+        "consecutive": 0,
+        "lastReason": null,
+        "lastMessage": null,
+        "lastAt": "2026-05-13T14:29:30.583Z",
+        "stopAutomation": false,
+        "threshold": 3
+      },
+      "fillNotificationState": {
+        "notifiedFills": [],
+        "reconciledUnnotifiedFills": [],
+        "acknowledgedBackfilledFills": [
+          9107
+        ]
+      },
+      "pendingActions": [],
+      "ready": true
+    },
+    "deliveryPosture": {
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-05-16T09:04:21.694Z",
+      "portfolio": "etf",
+      "policy": {
+        "deliveryMode": "email_and_repo",
+        "intendedChannels": [
+          "repo_artifacts",
+          "email"
+        ],
+        "externalDeliveryEnabled": true,
+        "emailProvider": "mailgun",
+        "emailRecipients": [
+          "lancashire@swift.ch"
+        ],
+        "failureAlertMode": "local_operator_review",
+        "failureAlertTargets": [
+          "dashboard",
+          "markdown_report",
+          "report_cycle_json"
+        ],
+        "pendingActionThresholds": {
+          "staleDashboard": true,
+          "failedTrades": 1,
+          "inFlightOrders": 1,
+          "brokerAutomationPaused": true
+        },
+        "notes": [
+          "This repository only validates reporting delivery posture locally by default.",
+          "Do not add real outbound delivery here without explicit operator approval and a separate side-effect review."
+        ],
+        "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
+        "overrideLoaded": true
+      },
+      "status": {
+        "portfolio": "etf",
+        "deliveryMode": "email_and_repo",
+        "intendedChannels": [
+          "repo_artifacts",
+          "email"
+        ],
+        "externalDeliveryEnabled": true,
+        "emailProvider": "mailgun",
+        "emailRecipients": [
+          "lancashire@swift.ch"
+        ],
+        "failureAlertMode": "local_operator_review",
+        "failureAlertTargets": [
+          "dashboard",
+          "markdown_report",
+          "report_cycle_json"
+        ],
+        "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
+        "overrideLoaded": true,
+        "latestHistoryDate": "2026-05-15",
+        "freshness": {
+          "stale": false,
+          "dashboardExists": true,
+          "dashboardMtimeMs": 1778856255911.944,
+          "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
+          "newestSourceMtimeMs": 1778842973840.5232
+        },
+        "lifecycleSummary": {
+          "proposed": 1,
+          "approved": 0,
+          "rejected": 0,
+          "staged": 0,
+          "submitted": 0,
+          "partiallyFilled": 0,
+          "filled": 2,
+          "cancelled": 0,
+          "failed": 0,
+          "inactive": 0,
+          "simulated": 0,
+          "planned": 1,
+          "withBrokerOrderId": 2
+        },
+        "brokerErrorState": {
+          "consecutive": 0,
+          "lastReason": null,
+          "lastMessage": null,
+          "lastAt": "2026-05-13T14:29:30.583Z",
+          "stopAutomation": false,
+          "threshold": 3
+        },
+        "fillNotificationState": {
+          "notifiedFills": [],
+          "reconciledUnnotifiedFills": [],
+          "acknowledgedBackfilledFills": [
+            9107
+          ]
+        },
+        "pendingActions": [],
+        "ready": true
+      },
+      "emailDelivery": {
+        "enabled": true,
+        "ready": true,
+        "mode": "email_and_repo",
+        "recipient": "lancashire@swift.ch",
+        "recipients": [
+          "lancashire@swift.ch"
+        ],
+        "provider": "mailgun",
+        "providerConfigured": true,
+        "providerError": null,
+        "classification": "email_ready",
+        "missing": [],
+        "reason": "Email delivery is configured and ready."
+      },
+      "deliveryPosture": {
+        "ready": true,
+        "pendingActionCount": 0,
+        "latestHistoryDate": "2026-05-15",
+        "freshnessStale": false,
+        "failedTrades": 0,
+        "inFlightOrders": 0,
+        "brokerAutomationPaused": false,
+        "brokerBlockContext": {
+          "blockedTradeCount": 1,
+          "topBrokerBlock": {
+            "tickerOrIsin": "CH0032912732",
+            "name": "UBS SLI ETF (SMI gleichgewichtet)",
+            "blockCode": "quote_unavailable",
+            "blockReason": "No broker quote was available during market-open execution.",
+            "nextAction": "Restore broker pricing and rerun the market-open submission path.",
+            "brokerOrderId": ""
+          }
+        },
+        "recommendedNextAction": "No delivery-side operator action is currently required."
+      }
+    },
+    "fillNotificationState": {
+      "notifiedFills": [],
+      "reconciledUnnotifiedFills": [],
+      "acknowledgedBackfilledFills": [
+        9107
+      ]
+    },
+    "generatedStateIssues": [],
+    "health": {
+      "health": "blocked",
+      "severity": "high",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    }
+  },
+  "after": {
+    "portfolio": "etf",
+    "generatedAt": "2026-05-16T09:04:21.787Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first.",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+    },
+    "errorState": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-13T14:29:30.583Z",
+      "stopAutomation": false,
+      "threshold": 3
+    },
+    "staleApprovedRows": [],
+    "retryState": {
+      "queuedInitial": 0,
+      "queuedRetry": 0
+    },
+    "deliveryStatus": {
+      "portfolio": "etf",
+      "deliveryMode": "email_and_repo",
+      "intendedChannels": [
+        "repo_artifacts",
+        "email"
+      ],
+      "externalDeliveryEnabled": true,
+      "emailProvider": "mailgun",
+      "emailRecipients": [
+        "lancashire@swift.ch"
+      ],
+      "failureAlertMode": "local_operator_review",
+      "failureAlertTargets": [
+        "dashboard",
+        "markdown_report",
+        "report_cycle_json"
+      ],
+      "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
+      "overrideLoaded": true,
+      "latestHistoryDate": "2026-05-15",
+      "freshness": {
+        "stale": false,
+        "dashboardExists": true,
+        "dashboardMtimeMs": 1778922261731.953,
+        "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
+        "newestSourceMtimeMs": 1778842973840.5232
+      },
+      "lifecycleSummary": {
+        "proposed": 1,
+        "approved": 0,
+        "rejected": 0,
+        "staged": 0,
+        "submitted": 0,
+        "partiallyFilled": 0,
+        "filled": 2,
+        "cancelled": 0,
+        "failed": 0,
+        "inactive": 0,
+        "simulated": 0,
+        "planned": 1,
+        "withBrokerOrderId": 2
+      },
+      "brokerErrorState": {
+        "consecutive": 0,
+        "lastReason": null,
+        "lastMessage": null,
+        "lastAt": "2026-05-13T14:29:30.583Z",
+        "stopAutomation": false,
+        "threshold": 3
+      },
+      "fillNotificationState": {
+        "notifiedFills": [],
+        "reconciledUnnotifiedFills": [],
+        "acknowledgedBackfilledFills": [
+          9107
+        ]
+      },
+      "pendingActions": [],
+      "ready": true
+    },
+    "deliveryPosture": {
+      "schemaVersion": "1.0",
+      "generatedAt": "2026-05-16T09:04:21.786Z",
+      "portfolio": "etf",
+      "policy": {
+        "deliveryMode": "email_and_repo",
+        "intendedChannels": [
+          "repo_artifacts",
+          "email"
+        ],
+        "externalDeliveryEnabled": true,
+        "emailProvider": "mailgun",
+        "emailRecipients": [
+          "lancashire@swift.ch"
+        ],
+        "failureAlertMode": "local_operator_review",
+        "failureAlertTargets": [
+          "dashboard",
+          "markdown_report",
+          "report_cycle_json"
+        ],
+        "pendingActionThresholds": {
+          "staleDashboard": true,
+          "failedTrades": 1,
+          "inFlightOrders": 1,
+          "brokerAutomationPaused": true
+        },
+        "notes": [
+          "This repository only validates reporting delivery posture locally by default.",
+          "Do not add real outbound delivery here without explicit operator approval and a separate side-effect review."
+        ],
+        "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
+        "overrideLoaded": true
+      },
+      "status": {
+        "portfolio": "etf",
+        "deliveryMode": "email_and_repo",
+        "intendedChannels": [
+          "repo_artifacts",
+          "email"
+        ],
+        "externalDeliveryEnabled": true,
+        "emailProvider": "mailgun",
+        "emailRecipients": [
+          "lancashire@swift.ch"
+        ],
+        "failureAlertMode": "local_operator_review",
+        "failureAlertTargets": [
+          "dashboard",
+          "markdown_report",
+          "report_cycle_json"
+        ],
+        "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
+        "overrideLoaded": true,
+        "latestHistoryDate": "2026-05-15",
+        "freshness": {
+          "stale": false,
+          "dashboardExists": true,
+          "dashboardMtimeMs": 1778922261731.953,
+          "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
+          "newestSourceMtimeMs": 1778842973840.5232
+        },
+        "lifecycleSummary": {
+          "proposed": 1,
+          "approved": 0,
+          "rejected": 0,
+          "staged": 0,
+          "submitted": 0,
+          "partiallyFilled": 0,
+          "filled": 2,
+          "cancelled": 0,
+          "failed": 0,
+          "inactive": 0,
+          "simulated": 0,
+          "planned": 1,
+          "withBrokerOrderId": 2
+        },
+        "brokerErrorState": {
+          "consecutive": 0,
+          "lastReason": null,
+          "lastMessage": null,
+          "lastAt": "2026-05-13T14:29:30.583Z",
+          "stopAutomation": false,
+          "threshold": 3
+        },
+        "fillNotificationState": {
+          "notifiedFills": [],
+          "reconciledUnnotifiedFills": [],
+          "acknowledgedBackfilledFills": [
+            9107
+          ]
+        },
+        "pendingActions": [],
+        "ready": true
+      },
+      "emailDelivery": {
+        "enabled": true,
+        "ready": true,
+        "mode": "email_and_repo",
+        "recipient": "lancashire@swift.ch",
+        "recipients": [
+          "lancashire@swift.ch"
+        ],
+        "provider": "mailgun",
+        "providerConfigured": true,
+        "providerError": null,
+        "classification": "email_ready",
+        "missing": [],
+        "reason": "Email delivery is configured and ready."
+      },
+      "deliveryPosture": {
+        "ready": true,
+        "pendingActionCount": 0,
+        "latestHistoryDate": "2026-05-15",
+        "freshnessStale": false,
+        "failedTrades": 0,
+        "inFlightOrders": 0,
+        "brokerAutomationPaused": false,
+        "brokerBlockContext": {
+          "blockedTradeCount": 1,
+          "topBrokerBlock": {
+            "tickerOrIsin": "CH0032912732",
+            "name": "UBS SLI ETF (SMI gleichgewichtet)",
+            "blockCode": "quote_unavailable",
+            "blockReason": "No broker quote was available during market-open execution.",
+            "nextAction": "Restore broker pricing and rerun the market-open submission path.",
+            "brokerOrderId": ""
+          }
+        },
+        "recommendedNextAction": "No delivery-side operator action is currently required."
+      }
+    },
+    "fillNotificationState": {
+      "notifiedFills": [],
+      "reconciledUnnotifiedFills": [],
+      "acknowledgedBackfilledFills": [
+        9107
+      ]
+    },
+    "generatedStateIssues": [],
+    "health": {
+      "health": "blocked",
+      "severity": "high",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    }
+  },
+  "health": {
+    "health": "blocked",
+    "severity": "high",
+    "blockerCount": 1,
+    "blockers": [
+      {
+        "code": "broker_unready",
+        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+      }
+    ],
+    "recommendedActions": [
+      "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    ],
+    "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+  },
+  "selfHeal": {
+    "dryRun": false,
+    "plannedActions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ],
+    "actions": [
+      {
+        "kind": "regenerate_dashboard",
+        "ok": true,
+        "dashboardPath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/dashboard.md"
+      },
+      {
+        "kind": "regenerate_reporting_artifacts",
+        "ok": true,
+        "summaryPath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/summary.json",
+        "overviewIndexPath": "/home/ubuntu/.openclaw/workspace/runtime/overview/portfolio-index.json"
+      }
+    ]
+  }
+}

@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-13T13:20:15.788Z",
+  "generatedAt": "2026-05-16T09:04:21.777Z",
   "portfolioCount": 2,
-  "totalValueChf": 5083.34,
+  "totalValueChf": 5327.03,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -38,26 +38,26 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "healthy",
-      "executionPosture": "ready_for_review",
+      "brokerHealth": "degraded",
+      "executionPosture": "degraded_dry_run_only",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
       "status": "warning",
-      "strategyStatus": "rebalance_needed",
-      "totalValueChf": 5083.34,
-      "cashChf": 4048.26,
-      "investedChf": 1035.08,
-      "lastSyncAt": "2026-05-11 21:27:45",
-      "latestSnapshotDate": "2026-05-11",
+      "strategyStatus": "blocked",
+      "totalValueChf": 5327.0300003,
+      "cashChf": 116.64,
+      "investedChf": 5210.3900003,
+      "lastSyncAt": "2026-05-13 14:29:30",
+      "latestSnapshotDate": "2026-05-15",
       "pendingApprovals": 1,
       "blockers": 0,
-      "pendingActions": 4,
-      "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
+      "pendingActions": 2,
+      "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
       "openRunnerQueue": 0,
-      "openRunnerRetry": 1,
+      "openRunnerRetry": 0,
       "blockedTradeCount": 1,
       "topBrokerBlock": {
         "tickerOrIsin": "CH0032912732",
@@ -71,40 +71,42 @@
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 40
+          "driftPct": 13.81
         },
         {
           "assetClass": "Swiss equities",
-          "status": "out_of_bounds",
-          "driftPct": -20
+          "status": "on_track",
+          "driftPct": 4
         },
         {
           "assetClass": "Bonds / cash-like",
           "status": "out_of_bounds",
-          "driftPct": -20
+          "driftPct": -17.81
         }
       ],
-      "brokerHealth": "healthy",
-      "executionPosture": "ready_for_review",
-      "deliveryPosture": "needs_operator_attention",
-      "dataFreshness": "stale"
+      "brokerHealth": "degraded",
+      "executionPosture": "degraded_dry_run_only",
+      "deliveryPosture": "ready",
+      "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 11,
-    "blocking": 5,
+    "total": 9,
+    "blocking": 7,
     "approvals": 1,
     "execution": 0,
+    "freshApprovals": 0,
+    "staleApprovals": 0,
     "openRunnerQueue": 0,
-    "openRunnerRetry": 1,
-    "recovery": 0,
-    "delivery": 2,
+    "openRunnerRetry": 0,
+    "recovery": 2,
+    "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 2,
+    "workflow": 0,
     "bySeverity": {
-      "high": 5,
-      "medium": 6,
+      "high": 7,
+      "medium": 2,
       "low": 0
     }
   }
