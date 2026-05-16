@@ -3,19 +3,7 @@ const { getInteractiveBrokersReadiness } = require('../brokers/interactive-broke
 const { brokerErrorStatus } = require('./runtimeState');
 const { summarizeOpenRunnerRetryState, staleApprovalInventory } = require('./tradeState');
 const { reportDeliveryStatus } = require('../reporting/deliveryPolicy');
-
-function loadFillNotificationState(repoRoot = process.cwd()) {
-  const statePath = path.join(repoRoot, 'runtime', 'fill-notifications-state.json');
-  try {
-    const parsed = JSON.parse(require('fs').readFileSync(statePath, 'utf8'));
-    return {
-      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-    };
-  } catch {
-    return { notifiedFills: [], reconciledUnnotifiedFills: [] };
-  }
-}
+const { loadFillNotificationState } = require('../reporting/fillNotificationState');
 
 function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRows, retryState, deliveryStatus, fillNotificationState }) {
   const blockers = [];
@@ -102,4 +90,4 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd() }) {
   return { ok: true, dryRun: true, portfolio, health, actions };
 }
 
-module.exports = { classifyPortfolioHealth, buildSelfHealPlan, loadFillNotificationState };
+module.exports = { classifyPortfolioHealth, buildSelfHealPlan };

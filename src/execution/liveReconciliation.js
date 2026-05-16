@@ -5,44 +5,18 @@ const { resyncPortfolioOrders } = require('./portfolioExecution');
 const { readTradesTable, listOpenBrokerOrderRows } = require('./tradeState');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('../reporting/summaryArtifacts');
-
-function fillNotificationStatePath(repoRoot = process.cwd()) {
-  return path.join(repoRoot, 'runtime', 'fill-notifications-state.json');
-}
-
-function loadFillNotificationState(repoRoot = process.cwd()) {
-  const statePath = fillNotificationStatePath(repoRoot);
-  try {
-    const parsed = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    return {
-      path: statePath,
-      notifiedFills: Array.isArray(parsed?.notifiedFills) ? parsed.notifiedFills : [],
-      reconciledUnnotifiedFills: Array.isArray(parsed?.reconciledUnnotifiedFills) ? parsed.reconciledUnnotifiedFills : [],
-    };
-  } catch {
-    return {
-      path: statePath,
-      notifiedFills: [],
-      reconciledUnnotifiedFills: [],
-    };
-  }
-}
-
-function saveFillNotificationState(state, repoRoot = process.cwd()) {
-  const statePath = fillNotificationStatePath(repoRoot);
-  fs.mkdirSync(path.dirname(statePath), { recursive: true });
-  fs.writeFileSync(statePath, JSON.stringify({
-    notifiedFills: Array.from(new Set((state.notifiedFills || []).map(Number))).sort((a, b) => a - b),
-    reconciledUnnotifiedFills: Array.from(new Set((state.reconciledUnnotifiedFills || []).map(Number))).sort((a, b) => a - b),
-  }, null, 2) + '\n');
-  return statePath;
-}
+const {
+  loadFillNotificationState,
+  saveFillNotificationState,
+  fillNotificationStatePath,
+} = require('../reporting/fillNotificationState');
 
 function reconcileFillNotificationBacklog({ portfolioDir, repoRoot = process.cwd() }) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const state = loadFillNotificationState(repoRoot);
   const notified = new Set((state.notifiedFills || []).map(Number));
   const reconciled = new Set((state.reconciledUnnotifiedFills || []).map(Number));
+  const acknowledged = new Set((state.acknowledgedBackfilledFills || []).map(Number));
   const { rows } = readTradesTable(tradesPath);
 
   const added = [];
@@ -50,7 +24,7 @@ function reconcileFillNotificationBacklog({ portfolioDir, repoRoot = process.cwd
     if (String(row.Status || '').trim().toLowerCase() !== 'filled') continue;
     const orderId = Number(row['Broker order id'] || 0);
     if (!Number.isFinite(orderId) || orderId <= 0) continue;
-    if (notified.has(orderId) || reconciled.has(orderId)) continue;
+    if (notified.has(orderId) || reconciled.has(orderId) || acknowledged.has(orderId)) continue;
     reconciled.add(orderId);
     added.push(orderId);
   }
@@ -58,8 +32,10 @@ function reconcileFillNotificationBacklog({ portfolioDir, repoRoot = process.cwd
   const next = {
     notifiedFills: Array.from(notified).sort((a, b) => a - b),
     reconciledUnnotifiedFills: Array.from(reconciled).sort((a, b) => a - b),
+    acknowledgedBackfilledFills: Array.from(acknowledged).sort((a, b) => a - b),
   };
-  const statePath = saveFillNotificationState(next, repoRoot);
+  saveFillNotificationState(repoRoot, next);
+  const statePath = fillNotificationStatePath(repoRoot);
   return { added, state: next, statePath };
 }
 
