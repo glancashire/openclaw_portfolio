@@ -86,24 +86,45 @@ function buildHealthReportMarkdown(report) {
   const blockers = Array.isArray(report.health?.blockers) ? report.health.blockers : [];
   const healed = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((item) => item.ok) : [];
   const failedFixes = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((item) => !item.ok) : [];
+  const nextActions = (report.health.recommendedActions || []).length
+    ? report.health.recommendedActions
+    : ['No immediate operator action is required.'];
+  const generatedIssues = Array.isArray(report.after?.generatedStateIssues) ? report.after.generatedStateIssues : [];
+  const deliveryPending = Array.isArray(report.after?.deliveryStatus?.pendingActions) ? report.after.deliveryStatus.pendingActions : [];
+  const fillBackfillCount = Number(report.after?.fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
+  const acknowledgedBackfillCount = Number(report.after?.fillNotificationState?.acknowledgedBackfilledFills?.length || 0);
+
   return [
     `# Health Report: ${report.portfolio}`,
     '',
+    '## Immediate status',
     `- Generated at: ${report.generatedAt}`,
     `- Health: ${report.health.health}`,
     `- Severity: ${report.health.severity}`,
-    `- Blockers: ${blockers.length}`,
-    `- Successful self-heals: ${healed.length}`,
-    `- Failed self-heals: ${failedFixes.length}`,
+    `- Next action: ${report.health.nextAction || nextActions[0]}`,
+    `- Unresolved exceptions: ${blockers.length}`,
+    `- Remediated items: ${healed.length}`,
+    `- Failed remediations: ${failedFixes.length}`,
     '',
-    '## Outstanding issues',
+    '## Unresolved exceptions',
     ...(blockers.length ? blockers.map((item) => `- [${item.code}] ${item.message}`) : ['- None.']),
     '',
-    '## Recommended actions',
-    ...((report.health.recommendedActions || []).length ? report.health.recommendedActions.map((item) => `- ${item}`) : ['- No immediate operator action is required.']),
+    '## Recommended next actions',
+    ...nextActions.map((item) => `- ${item}`),
     '',
-    '## Self-heal results',
-    ...((report.selfHeal?.actions || []).length ? report.selfHeal.actions.map((item) => `- ${item.kind}: ${item.ok ? 'ok' : `failed (${item.error})`}`) : ['- No self-heal actions were attempted.']),
+    '## Remediated during this run',
+    ...(healed.length ? healed.map((item) => `- ${item.kind}: fixed`) : ['- None.']),
+    '',
+    '## Remediation attempts that still need attention',
+    ...(failedFixes.length ? failedFixes.map((item) => `- ${item.kind}: failed (${item.error || 'unknown error'})`) : ['- None.']),
+    '',
+    '## Remaining status and reference details',
+    `- Generated-state issues: ${generatedIssues.length}`,
+    ...(generatedIssues.length ? generatedIssues.map((item) => `  - [${item.severity}] ${item.message}`) : []),
+    `- Delivery pending actions: ${deliveryPending.length}`,
+    ...(deliveryPending.length ? deliveryPending.map((item) => `  - ${item}`) : []),
+    `- Fill backfill review still open: ${fillBackfillCount}`,
+    `- Acknowledged backfilled fills: ${acknowledgedBackfillCount}`,
   ].join('\n');
 }
 
@@ -111,44 +132,81 @@ function buildHealthReportHtml(report) {
   const blockers = Array.isArray(report.health?.blockers) ? report.health.blockers : [];
   const healed = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((item) => item.ok) : [];
   const failedFixes = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((item) => !item.ok) : [];
+  const nextActions = (report.health.recommendedActions || []).length
+    ? report.health.recommendedActions
+    : ['No immediate operator action is required.'];
+  const generatedIssues = Array.isArray(report.after?.generatedStateIssues) ? report.after.generatedStateIssues : [];
+  const deliveryPending = Array.isArray(report.after?.deliveryStatus?.pendingActions) ? report.after.deliveryStatus.pendingActions : [];
+  const fillBackfillCount = Number(report.after?.fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
+  const acknowledgedBackfillCount = Number(report.after?.fillNotificationState?.acknowledgedBackfilledFills?.length || 0);
   const statusBadge = badge({ label: `${report.health.health} / ${report.health.severity}`, tone: severityTone(report.health.severity) });
+  const nextActionBadge = badge({ label: blockers.length ? 'Action required' : 'No urgent exception', tone: blockers.length ? 'danger' : 'success' });
 
   const summaryCard = card({
-    title: 'System health summary',
+    title: 'Immediate status',
     contentHtml: `
-      <div style="margin-bottom:14px;">${statusBadge}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">${statusBadge}${nextActionBadge}</div>
+      <div style="margin:0 0 16px;padding:14px 16px;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;">
+        <div style="font-size:12px;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:6px;">Next action</div>
+        <div style="font-size:16px;font-weight:700;color:#7c2d12;line-height:1.5;">${report.health.nextAction || nextActions[0]}</div>
+      </div>
       ${kvTable([
         { label: 'Generated at', value: report.generatedAt },
-        { label: 'Outstanding blockers', value: String(blockers.length) },
-        { label: 'Successful self-heals', value: String(healed.length) },
-        { label: 'Failed self-heals', value: String(failedFixes.length) },
+        { label: 'Unresolved exceptions', value: String(blockers.length) },
+        { label: 'Remediated items', value: String(healed.length) },
+        { label: 'Failed remediations', value: String(failedFixes.length) },
       ])}
     `,
   });
 
   const issuesCard = card({
-    title: 'Outstanding issues',
-    contentHtml: blockers.length ? bulletList(blockers.map((item) => `[${item.code}] ${item.message}`)) : '<p style="margin:0;color:#6b7280;">No outstanding health blockers are currently surfaced.</p>',
-  });
-
-  const selfHealCard = card({
-    title: 'Self-heal results',
-    contentHtml: (report.selfHeal?.actions || []).length
-      ? bulletList(report.selfHeal.actions.map((item) => `${item.kind}: ${item.ok ? 'fixed' : `not fixed (${item.error || 'unknown error'})`}`))
-      : '<p style="margin:0;color:#6b7280;">No self-heal actions were attempted.</p>',
+    title: 'Unresolved exceptions',
+    contentHtml: blockers.length
+      ? bulletList(blockers.map((item) => `[${item.code}] ${item.message}`))
+      : '<p style="margin:0;color:#166534;font-weight:600;">No unresolved exceptions are currently surfaced.</p>',
   });
 
   const nextActionsCard = card({
     title: 'Recommended next actions',
-    contentHtml: bulletList((report.health.recommendedActions || []).length ? report.health.recommendedActions : ['No immediate operator action is required.']),
+    contentHtml: bulletList(nextActions),
+  });
+
+  const remediatedCard = card({
+    title: 'Remediated during this run',
+    contentHtml: healed.length
+      ? bulletList(healed.map((item) => `${item.kind}: fixed`))
+      : '<p style="margin:0;color:#6b7280;">No issues were remediated during this run.</p>',
+  });
+
+  const failedFixesCard = card({
+    title: 'Remediation attempts that still need attention',
+    contentHtml: failedFixes.length
+      ? bulletList(failedFixes.map((item) => `${item.kind}: not fixed (${item.error || 'unknown error'})`))
+      : '<p style="margin:0;color:#6b7280;">No failed remediation attempts were recorded.</p>',
+  });
+
+  const referenceCard = card({
+    title: 'Remaining status and reference details',
+    contentHtml: `
+      ${kvTable([
+        { label: 'Generated-state issues', value: String(generatedIssues.length) },
+        { label: 'Delivery pending actions', value: String(deliveryPending.length) },
+        { label: 'Fill backfill review still open', value: String(fillBackfillCount) },
+        { label: 'Acknowledged backfilled fills', value: String(acknowledgedBackfillCount) },
+      ])}
+      <div style="height:12px"></div>
+      ${generatedIssues.length ? `<div style="margin-bottom:12px;"><div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:8px;">Generated-state issues</div>${bulletList(generatedIssues.map((item) => `[${item.severity}] ${item.message}`))}</div>` : ''}
+      ${deliveryPending.length ? `<div><div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:8px;">Delivery pending actions</div>${bulletList(deliveryPending)}</div>` : ''}
+      ${!generatedIssues.length && !deliveryPending.length ? '<p style="margin:0;color:#6b7280;">No additional low-priority status details require review.</p>' : ''}
+    `,
   });
 
   return page({
     eyebrow: 'OpenClaw Health Monitor',
     title: `${report.portfolio} system health report`,
-    subtitle: 'Key portfolio automation, delivery, and reporting signals with safe self-heal results highlighted.',
+    subtitle: 'Exceptions and next actions first, followed by remediated items and lower-priority reference details.',
     accent: '#7c2d12',
-    bodyHtml: `${summaryCard}${issuesCard}${selfHealCard}${nextActionsCard}`,
+    bodyHtml: `${summaryCard}${issuesCard}${nextActionsCard}${remediatedCard}${failedFixesCard}${referenceCard}`,
     footer: 'OpenClaw Portfolio Manager • Health monitoring report',
   });
 }

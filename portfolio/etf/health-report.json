@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0",
   "portfolio": "etf",
-  "generatedAt": "2026-05-16T09:04:21.787Z",
+  "generatedAt": "2026-05-16T09:24:15.573Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T09:04:21.695Z",
+    "generatedAt": "2026-05-16T09:24:15.498Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": false,
@@ -56,7 +56,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778856255911.944,
+        "dashboardMtimeMs": 1778922261731.953,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1778842973840.5232
       },
@@ -95,7 +95,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T09:04:21.694Z",
+      "generatedAt": "2026-05-16T09:24:15.497Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -151,7 +151,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778856255911.944,
+          "dashboardMtimeMs": 1778922261731.953,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1778842973840.5232
         },
@@ -251,7 +251,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T09:04:21.787Z",
+    "generatedAt": "2026-05-16T09:24:15.573Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": false,
@@ -303,7 +303,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778922261731.953,
+        "dashboardMtimeMs": 1778923455524.5479,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1778842973840.5232
       },
@@ -342,7 +342,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T09:04:21.786Z",
+      "generatedAt": "2026-05-16T09:24:15.573Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -398,7 +398,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778922261731.953,
+          "dashboardMtimeMs": 1778923455524.5479,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1778842973840.5232
         },
