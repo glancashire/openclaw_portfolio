@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { buildReportEmailHtml } = require('../src/reporting/reportEmail');
+const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting/reportEmail');
 const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
 
 (function main() {
@@ -8,12 +8,32 @@ const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
     period: 'weekly',
     summaryHtml: '<h1>Demo summary</h1><p>Everything looks good.</p>',
     deliveryStatus: { pendingActions: ['1 delivery item needs review'] },
+    topBlocker: '[broker_unready] Broker connectivity is degraded.',
+    nextAction: 'Restore broker connectivity first.',
   });
+  const reportText = buildReportEmailText({
+    portfolioName: 'etf',
+    period: 'weekly',
+    summaryMarkdown: '# Demo summary\n\nEverything looks good.',
+    deliveryStatus: { pendingActions: ['1 delivery item needs review'] },
+    topBlocker: '[broker_unready] Broker connectivity is degraded.',
+    nextAction: 'Restore broker connectivity first.',
+  });
+
   assert(reportHtml.includes('OpenClaw Portfolio Report'));
+  assert(reportHtml.includes('Immediate status'));
+  assert(reportHtml.includes('Next action'));
+  assert(reportHtml.includes('Top blocker'));
   assert(reportHtml.includes('Delivery posture'));
   assert(reportHtml.includes('Portfolio summary'));
   assert(reportHtml.includes('report-email-summary'));
+  assert(reportHtml.includes('Restore broker connectivity first.'));
+  assert(reportHtml.includes('[broker_unready] Broker connectivity is degraded.'));
   assert(reportHtml.includes('1 delivery item needs review'));
+  assert(reportHtml.indexOf('Immediate status') < reportHtml.indexOf('Portfolio summary'));
+
+  assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
+  assert(reportText.includes('Next action: Restore broker connectivity first.'));
 
   const tradeHtml = buildTradeEmailHtml({
     symbol: 'SLICHA',

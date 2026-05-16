@@ -1,15 +1,28 @@
 # Dashboard: etf
 
-## Health Snapshot
+## Immediate Status
 - Portfolio status: warning
-- Strategy status: blocked
+- Top blocker: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Next action: CH0032912732: No broker quote was available during market-open execution.
 - Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-- Last successful sync: 2026-05-13 14:29:30
-- Data freshness: current
 - Execution posture: degraded_dry_run_only
 - Delivery posture: ready
-- Pending approvals: 1
 - Active blockers: 0
+- Pending operator queue items: 5
+
+## Health Snapshot
+- Strategy status: blocked
+- Last successful sync: 2026-05-13 14:29:30
+- Data freshness: current
+- Pending approvals: 1
+- In-flight execution rows: 0
+
+## Pending Operator Actions
+1. [execution_block/blocked/high] CH0032912732: No broker quote was available during market-open execution.
+2. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+3. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
+4. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
+5. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Portfolio Value Snapshot
 - Total value CHF: 5327.0300003
@@ -49,13 +62,6 @@
 ## Contract Intelligence Readiness
 - 3/4 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.
 - Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.
-
-## Pending Operator Actions
-1. [execution_block/blocked/high] CH0032912732: No broker quote was available during market-open execution.
-2. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-3. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
-4. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
-5. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Operator Queue Summary
 - Total queue items: 5

@@ -65,12 +65,13 @@ function main() {
   });
 
   const requiredSections = [
+    '## Immediate Status',
     '## Health Snapshot',
+    '## Pending Operator Actions',
     '## Portfolio Value Snapshot',
     '## Allocation Health',
     '## Instrument Actions Queue',
     '## Safety / Risk Diagnostics',
-    '## Pending Operator Actions',
     '## Recent Material Events',
     '## Report / Delivery Status',
     '## Recommended Next Step',
@@ -80,9 +81,11 @@ function main() {
     assert(dashboard.includes(section), `Expected section ${section}`);
   }
 
+  assert(dashboard.indexOf('## Immediate Status') < dashboard.indexOf('## Portfolio Value Snapshot'), 'Expected immediate status before value snapshot');
   assert(/Portfolio status: warning/i.test(dashboard), 'Expected health label');
+  assert(/Top blocker: Portfolio still has open questions; trade execution must remain blocked\./i.test(dashboard), 'Expected top blocker near top');
+  assert(/Next action: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked\./i.test(dashboard), 'Expected blocker-driven next action near top');
   assert(/Broker health: gateway unavailable/i.test(dashboard), 'Expected broker health line');
-  assert(/Resolve the active blocker:/i.test(dashboard), 'Expected blocker-driven recommendation');
   assert(/draft_execution_blocked/i.test(dashboard), 'Expected recent material event row');
   assert(/Open-runner first handoffs: 1/i.test(dashboard), 'Expected first-handoff queue summary in dashboard');
   assert(/Open-runner retries: 1/i.test(dashboard), 'Expected retry queue summary in dashboard');

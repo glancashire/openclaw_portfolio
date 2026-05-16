@@ -1,7 +1,7 @@
 # Health Report: etf
 
 ## Immediate status
-- Generated at: 2026-05-16T09:24:15.573Z
+- Generated at: 2026-05-16T10:23:36.240Z
 - Health: blocked
 - Severity: high
 - Next action: Restore native IBKR connectivity before relying on executable live-state surfaces.

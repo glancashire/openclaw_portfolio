@@ -13,11 +13,13 @@ function buildReportEmailSubject({ portfolioName, period, generatedAt = null }) 
   return `[Portfolio] ${portfolioName} ${period} overview (${stamp})`;
 }
 
-function buildReportEmailText({ portfolioName, period, summaryMarkdown, deliveryStatus = null }) {
+function buildReportEmailText({ portfolioName, period, summaryMarkdown, deliveryStatus = null, topBlocker = null, nextAction = null }) {
   const pending = Array.isArray(deliveryStatus?.pendingActions) ? deliveryStatus.pendingActions : [];
   return [
     `${portfolioName} ${period} overview`,
     '',
+    topBlocker ? `Top blocker: ${topBlocker}` : 'Top blocker: none currently surfaced.',
+    nextAction ? `Next action: ${nextAction}` : 'Next action: continue normal monitoring.',
     pending.length
       ? `Delivery posture still has ${pending.length} pending item(s).`
       : 'Delivery posture is clear of pending items.',
@@ -26,19 +28,33 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, delivery
   ].join('\n');
 }
 
-function buildReportEmailHtml({ portfolioName, period, summaryHtml, deliveryStatus = null }) {
+function buildReportEmailHtml({ portfolioName, period, summaryHtml, deliveryStatus = null, topBlocker = null, nextAction = null }) {
   const pending = Array.isArray(deliveryStatus?.pendingActions) ? deliveryStatus.pendingActions : [];
   const postureTone = pending.length ? 'warn' : 'success';
   const postureLabel = pending.length ? `${pending.length} pending item(s)` : 'Posture clear';
+  const blockerTone = topBlocker ? 'danger' : 'success';
+  const blockerLabel = topBlocker ? 'Action required' : 'No active blocker';
 
-  const introCard = card({
-    title: 'Delivery posture',
+  const immediateCard = card({
+    title: 'Immediate status',
     contentHtml: `
-      <div style="margin-bottom:14px;">${badge({ label: postureLabel, tone: postureTone })}</div>
-      ${pending.length
-        ? bulletList(pending)
-        : '<p style="margin:0;color:#6b7280;line-height:1.6;">No delivery-side pending actions are currently surfaced.</p>'}
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">${badge({ label: blockerLabel, tone: blockerTone })}${badge({ label: postureLabel, tone: postureTone })}</div>
+      <div style="margin:0 0 12px;padding:14px 16px;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;">
+        <div style="font-size:12px;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:6px;">Next action</div>
+        <div style="font-size:16px;font-weight:700;color:#7c2d12;line-height:1.5;">${escapeHtml(nextAction || 'Continue normal monitoring.')}</div>
+      </div>
+      <div style="margin:0;padding:14px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;line-height:1.6;">
+        <div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:6px;">Top blocker</div>
+        <div style="font-size:15px;color:#111827;">${escapeHtml(topBlocker || 'No active blocker is currently surfaced.')}</div>
+      </div>
     `,
+  });
+
+  const postureCard = card({
+    title: 'Delivery posture',
+    contentHtml: pending.length
+      ? bulletList(pending)
+      : '<p style="margin:0;color:#6b7280;line-height:1.6;">No delivery-side pending actions are currently surfaced.</p>',
   });
 
   const summaryCard = card({
@@ -49,9 +65,9 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, deliveryStat
   return page({
     eyebrow: 'OpenClaw Portfolio Report',
     title: `${portfolioName} ${period} overview`,
-    subtitle: 'Structured portfolio summary and delivery posture for operator review.',
+    subtitle: 'Top blocker and next action first, followed by delivery posture and the full portfolio summary.',
     accent: '#111827',
-    bodyHtml: `${introCard}${summaryCard}`,
+    bodyHtml: `${immediateCard}${postureCard}${summaryCard}`,
     footer: 'OpenClaw Portfolio Manager • Email delivery remains policy-gated and auditable',
   });
 }
