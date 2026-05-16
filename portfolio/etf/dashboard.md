@@ -2,9 +2,9 @@
 
 ## Immediate Status
 - Portfolio status: warning
-- Top blocker: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
-- Next action: CH0032912732: No broker quote was available during market-open execution.
-- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Top blocker: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Next action: Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 - Execution posture: degraded_dry_run_only
 - Delivery posture: ready
 - Active blockers: 0
@@ -19,7 +19,7 @@
 
 ## Pending Operator Actions
 1. [execution_block/blocked/high] CH0032912732: No broker quote was available during market-open execution.
-2. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+2. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 3. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
 4. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
 5. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
@@ -110,7 +110,7 @@ CH0032912732: No broker quote was available during market-open execution.
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 3416.6 unallocated beyond the intentional CHF cash sleeve.
-- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 - Latest history note: weekly report cycle snapshot
 - Observability shows 91 recent blocked execution-policy event(s).
 

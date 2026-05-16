@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0",
   "portfolio": "etf",
-  "generatedAt": "2026-05-16T10:23:36.240Z",
+  "generatedAt": "2026-05-16T10:42:04.908Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T10:23:36.129Z",
+    "generatedAt": "2026-05-16T10:42:04.804Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": false,
@@ -16,8 +16,8 @@
       "marketDataProbe": null,
       "reason": "native_error",
       "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first.",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "errorState": {
       "consecutive": 0,
@@ -56,7 +56,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778923455524.5479,
+        "dashboardMtimeMs": 1778927858306.867,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1778842973840.5232
       },
@@ -95,7 +95,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T10:23:36.128Z",
+      "generatedAt": "2026-05-16T10:42:04.802Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -151,7 +151,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778923455524.5479,
+          "dashboardMtimeMs": 1778927858306.867,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1778842973840.5232
         },
@@ -240,7 +240,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
         }
       ],
       "recommendedActions": [
@@ -251,7 +251,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T10:23:36.240Z",
+    "generatedAt": "2026-05-16T10:42:04.908Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": false,
@@ -263,8 +263,8 @@
       "marketDataProbe": null,
       "reason": "native_error",
       "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first.",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "errorState": {
       "consecutive": 0,
@@ -303,7 +303,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778927016156.5493,
+        "dashboardMtimeMs": 1778928124839.613,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1778842973840.5232
       },
@@ -342,7 +342,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T10:23:36.239Z",
+      "generatedAt": "2026-05-16T10:42:04.907Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -398,7 +398,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778927016156.5493,
+          "dashboardMtimeMs": 1778928124839.613,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1778842973840.5232
         },
@@ -487,7 +487,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
         }
       ],
       "recommendedActions": [
@@ -503,7 +503,7 @@
     "blockers": [
       {
         "code": "broker_unready",
-        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions."
+        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
       }
     ],
     "recommendedActions": [

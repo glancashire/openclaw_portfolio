@@ -51,7 +51,7 @@ function main() {
     ],
     executionPlan: { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } },
     latestSnapshot: { date: '2026-05-03', dailyChange: '0', dailyChangePct: '0', notes: 'demo snapshot' },
-    brokerReadiness: { fallbackRequired: true, message: 'gateway unavailable' },
+    brokerReadiness: { fallbackRequired: true, message: 'gateway unavailable', guidance: 'Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001' },
     lifecycleSummary: { proposed: 1, approved: 1, rejected: 0, staged: 0, submitted: 1, partiallyFilled: 0, filled: 0, cancelled: 0, failed: 1, planned: 0, withBrokerOrderId: 1 },
     openRunnerRetryState: { queuedInitial: 1, queuedRetry: 1 },
     freshness: { stale: false, dashboardExists: true, newestSourcePath: 'holdings.md' },
@@ -83,8 +83,8 @@ function main() {
 
   assert(dashboard.indexOf('## Immediate Status') < dashboard.indexOf('## Portfolio Value Snapshot'), 'Expected immediate status before value snapshot');
   assert(/Portfolio status: warning/i.test(dashboard), 'Expected health label');
-  assert(/Top blocker: Portfolio still has open questions; trade execution must remain blocked\./i.test(dashboard), 'Expected top blocker near top');
-  assert(/Next action: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked\./i.test(dashboard), 'Expected blocker-driven next action near top');
+  assert(/Top blocker: gateway unavailable/i.test(dashboard), 'Expected broker fallback top blocker near top');
+  assert(/Next action: Restore native connectivity first\. Detail: connect ECONNREFUSED 127\.0\.0\.1:4001/i.test(dashboard), 'Expected broker-driven next action near top');
   assert(/Broker health: gateway unavailable/i.test(dashboard), 'Expected broker health line');
   assert(/draft_execution_blocked/i.test(dashboard), 'Expected recent material event row');
   assert(/Open-runner first handoffs: 1/i.test(dashboard), 'Expected first-handoff queue summary in dashboard');

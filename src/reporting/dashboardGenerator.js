@@ -467,8 +467,10 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
     brokerReadiness,
     lifecycleSummary,
   }));
-  const topBlocker = blockers[0]?.message || (brokerReadiness?.fallbackRequired ? brokerReadiness?.message : null);
-  const topOperatorAction = recommendation || recommended[0] || 'Continue normal monitoring and wait for the next material state change.';
+  const topBlocker = (brokerReadiness?.fallbackRequired ? brokerReadiness?.message : null) || blockers[0]?.message || null;
+  const topOperatorAction = brokerReadiness?.fallbackRequired
+    ? (brokerReadiness?.guidance || brokerReadiness?.message || recommendation)
+    : (recommendation || recommended[0] || 'Continue normal monitoring and wait for the next material state change.');
   const pendingApprovalCount = (lifecycleSummary?.proposed || 0) + (lifecycleSummary?.approved || 0);
   const inFlightCount = (lifecycleSummary?.staged || 0) + (lifecycleSummary?.submitted || 0) + (lifecycleSummary?.partiallyFilled || 0);
   const latestDate = latestSnapshot?.date || summary.syncTime || 'unknown';

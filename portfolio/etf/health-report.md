@@ -1,7 +1,7 @@
 # Health Report: etf
 
 ## Immediate status
-- Generated at: 2026-05-16T10:23:36.240Z
+- Generated at: 2026-05-16T10:42:04.908Z
 - Health: blocked
 - Severity: high
 - Next action: Restore native IBKR connectivity before relying on executable live-state surfaces.
@@ -10,7 +10,7 @@
 - Failed remediations: 0
 
 ## Unresolved exceptions
-- [broker_unready] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.
+- [broker_unready] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 
 ## Recommended next actions
 - Restore native IBKR connectivity before relying on executable live-state surfaces.

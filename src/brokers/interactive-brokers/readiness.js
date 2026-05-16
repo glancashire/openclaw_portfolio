@@ -150,8 +150,10 @@ function summarizeReadiness({ config, auth, marketData }) {
       ? 'live_or_realtime'
       : (authReadyButUnpriced ? (marketData?.posture || 'unpriced') : 'unavailable');
   const portalLikelyDiverged = mode === 'native-socket' && (liveReady || delayedOnly || authReadyButUnpriced);
+  const authFailureDetail = String(auth?.error || auth?.diagnostics?.detail || '').trim();
+  const authFailureSuffix = authFailureDetail ? ` Detail: ${authFailureDetail}` : '';
   const guidance = !auth?.ok
-    ? 'Restore native connectivity first.'
+    ? `Restore native connectivity first.${authFailureSuffix}`
     : delayedOnly
       ? 'Keep live submission blocked or explicitly accept delayed-only pricing policy.'
       : authReadyButUnpriced
@@ -182,8 +184,8 @@ function summarizeReadiness({ config, auth, marketData }) {
         : authReadyButUnpriced
           ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.'
           : auth?.reason === 'http_error'
-            ? 'Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.'
-            : 'Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.',
+            ? `Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`
+            : `Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`,
   };
 }
 
