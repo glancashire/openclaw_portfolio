@@ -1,23 +1,23 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-13T13:20:15.787Z",
+  "generatedAt": "2026-05-16T20:19:08.961Z",
   "portfolio": "etf",
-  "incidentStatus": "monitor_only",
+  "incidentStatus": "action_required",
   "summary": {
     "health": "warning",
-    "brokerHealth": "healthy",
-    "executionPosture": "ready_for_review",
-    "deliveryPosture": "needs_operator_attention",
-    "dataFreshness": "stale",
+    "brokerHealth": "degraded",
+    "executionPosture": "degraded_dry_run_only",
+    "deliveryPosture": "ready",
+    "dataFreshness": "current",
     "blockerCount": 0,
-    "queueItemCount": 4,
+    "queueItemCount": 2,
     "pendingApprovals": 1,
-    "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
-    "executionWhy": "Execution is blocked because the underlying portfolio state is stale and should be refreshed first.",
-    "approvalWhy": "1 approval-gated trade row(s), 5 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
+    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+    "approvalWhy": "1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
-    "Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.",
+    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
     "1 approval-gated trade rows are still waiting for operator review."
   ],
   "activeBlockers": [],
@@ -28,8 +28,8 @@
       "tickerOrIsin": "CH0032912732",
       "name": "UBS SLI ETF (SMI gleichgewichtet)",
       "action": "buy",
-      "status": "approved",
-      "approval": "queued_for_open_runner",
+      "status": "rejected",
+      "approval": "user_rejected",
       "brokerOrderId": "",
       "blockCode": "quote_unavailable",
       "blockReason": "No broker quote was available during market-open execution.",
@@ -40,47 +40,31 @@
   "actionChecklist": [
     {
       "step": 1,
-      "priority": "medium",
-      "title": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-      "action": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
-      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
-      "source": "fill_notification_state"
+      "priority": "high",
+      "title": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
+      "source": "broker_readiness"
     },
     {
       "step": 2,
       "priority": "medium",
-      "title": "1 approved trade row(s) are ready for staging or review.",
-      "action": "Stage or review the approved trades when readiness gates are satisfied.",
+      "title": "1 proposed trade row(s) still need user approval.",
+      "action": "Review the proposed trades and approve or reject them explicitly.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
       "source": "trade_lifecycle"
-    },
-    {
-      "step": 3,
-      "priority": "medium",
-      "title": "1 trade row(s) were requeued for market-open retry after operator recovery.",
-      "action": "Re-check the prior blocker cause before allowing the retry handoff to proceed.",
-      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
-      "source": "trade_state"
-    },
-    {
-      "step": 4,
-      "priority": "medium",
-      "title": "Dashboard/report freshness is stale relative to source state.",
-      "action": "Review report delivery readiness and clear the pending action.",
-      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
-      "source": "delivery_policy"
     }
   ],
   "verificationChecks": [
-    "Broker health remains healthy or intentionally degraded with operator awareness.",
-    "Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.",
+    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
+    "Freshness posture remains current.",
     "All approval-gated rows are explicitly approved, rejected, or intentionally left pending.",
     "No active blockers remain."
   ],
   "completionCriteria": [
-    "Portfolio remains in a healthy or intentionally monitored posture.",
-    "No blocker-class recovery work is outstanding.",
-    "The next operating step is clear from the summary surface."
+    "Blocking recovery items no longer appear in the operator queue.",
+    "Portfolio health no longer depends on unresolved blocker conditions.",
+    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
   ],
   "recentSignals": [
     {

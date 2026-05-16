@@ -18,6 +18,15 @@ const { readTradesTable, summarizeOpenRunnerRetryState, staleApprovalInventory }
 const { classifyTradeRowExecution } = require('../execution/executionClassification');
 const { buildSelfHealPlan } = require('../execution/portfolioHealth');
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function explainAllocationRow(row = {}) {
   const assetClass = row.assetClass || 'This sleeve';
   const driftPct = Number(row.driftPct ?? row.drift ?? 0);
@@ -768,6 +777,157 @@ function renderRecoveryChecklistMarkdown(checklist = {}) {
   return `# Recovery Checklist: ${checklist.portfolio || 'unknown'}\n\n## Incident Status\n- Status: ${checklist.incidentStatus || 'unknown'}\n- Health: ${checklist.summary?.health || 'unknown'}\n- Broker health: ${checklist.summary?.brokerHealth || 'unknown'}\n- Execution posture: ${checklist.summary?.executionPosture || 'unknown'}\n- Delivery posture: ${checklist.summary?.deliveryPosture || 'unknown'}\n- Data freshness: ${checklist.summary?.dataFreshness || 'unknown'}\n- Pending approvals: ${checklist.summary?.pendingApprovals || 0}\n- Recommended next step: ${checklist.summary?.recommendedNextStep || 'No recommendation available.'}\n\n## Why This Incident Exists\n- ${checklist.summary?.executionWhy || 'No execution explanation available.'}\n- ${checklist.summary?.approvalWhy || 'No approval explanation available.'}\n\n## Incident Drivers\n${drivers}\n\n## Active Blockers\n${blockers}\n\n## Active Broker Blocks\n${brokerBlocks}\n\n## Action Checklist\n${actions}\n\n## Verification Checks\n${verification}\n\n## Completion Criteria\n${completion}\n\n## Recent Signals\n${recentSignals}\n`;
 }
 
+function renderPortfolioSummaryHtml(summary = {}) {
+  const totalValue = Number(summary.holdings?.totalValueChf || 0);
+  const invested = Number(summary.holdings?.investedChf || 0);
+  const cash = Number(summary.holdings?.cashChf || 0);
+  const gain = Number((totalValue - invested).toFixed(2));
+  const gainPct = invested > 0 ? Number(((gain / invested) * 100).toFixed(1)) : 0;
+  const pendingCount = Number(summary.operatorQueue?.summary?.total || 0);
+  const topBlocker = summary.blockers?.items?.[0]?.message || 'No active blocker currently surfaced.';
+  const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
+  const recentEvents = Array.isArray(summary.recentMaterialEvents) ? summary.recentMaterialEvents : [];
+  const allocationRows = Array.isArray(summary.allocation) ? summary.allocation : [];
+  const instrumentRows = Array.isArray(summary.instruments) ? summary.instruments : [];
+  const statusTone = String(summary.status?.health || 'warning');
+  const toneClass = statusTone === 'healthy' ? 'tone-positive' : statusTone === 'blocked' ? 'tone-negative' : 'tone-warning';
+
+  const allocationBars = allocationRows.length
+    ? allocationRows.map((row) => {
+        const current = Number(row.currentPct ?? row.current ?? 0);
+        const target = Number(row.targetPct ?? row.target ?? 0);
+        const drift = Number(row.driftPct ?? row.drift ?? 0);
+        const width = Math.max(4, Math.min(100, current));
+        const barClass = String(row.status || '').includes('out_of_bounds') ? 'bar-negative' : String(row.status || '').includes('drifted') ? 'bar-warning' : 'bar-positive';
+        return `<div class="allocation-bar-card"><div class="allocation-bar-head"><span>${escapeHtml(row.assetClass || 'Asset')}</span><span>${current.toFixed(1)}% / ${target.toFixed(1)}%</span></div><div class="allocation-track"><div class="allocation-fill ${barClass}" style="width:${width}%;"></div></div><div class="allocation-caption ${drift >= 0 ? 'tone-positive' : 'tone-negative'}">${drift >= 0 ? '+' : ''}${drift.toFixed(2)}% drift</div></div>`;
+      }).join('')
+    : '<div class="empty-state">No allocation data available.</div>';
+
+  const allocationTable = allocationRows.length
+    ? allocationRows.map((row) => {
+        const drift = Number(row.driftPct ?? row.drift ?? 0);
+        return `<tr><td>${escapeHtml(row.assetClass || '—')}</td><td class="num">${Number(row.currentPct ?? row.current ?? 0).toFixed(2)}%</td><td class="num">${Number(row.targetPct ?? row.target ?? 0).toFixed(2)}%</td><td class="num ${drift >= 0 ? 'tone-positive' : 'tone-negative'}">${drift >= 0 ? '+' : ''}${drift.toFixed(2)}%</td><td>${escapeHtml(row.status || 'unknown')}</td></tr>`;
+      }).join('')
+    : '<tr><td colspan="5">No allocation rows available.</td></tr>';
+
+  const instrumentTable = instrumentRows.length
+    ? instrumentRows.map((row) => `<tr><td>${escapeHtml(row.tickerOrIsin || '—')}</td><td>${escapeHtml(row.name || '—')}</td><td>${escapeHtml(row.assetClass || '—')}</td><td class="num">${Number(row.targetPct || 0).toFixed(2)}%</td><td>${escapeHtml(row.latestProposal?.status || 'none')}</td><td>${escapeHtml(row.latestProposal?.approval || 'n/a')}</td></tr>`).join('')
+    : '<tr><td colspan="6">No instrument rows available.</td></tr>';
+
+  const queueList = queueItems.length
+    ? queueItems.slice(0, 8).map((item) => `<li><span class="queue-pill">${escapeHtml(item.queueType || item.kind || 'workflow')}</span><strong>${escapeHtml(item.summary || 'Pending action')}</strong><div class="list-subtle">${escapeHtml(item.recommendedOperatorAction || 'Review and resolve as appropriate.')}</div></li>`).join('')
+    : '<li>No pending operator queue items.</li>';
+
+  const eventList = recentEvents.length
+    ? recentEvents.slice(0, 5).map((item) => `<li><strong>${escapeHtml(item.severity || 'info')}</strong> - ${escapeHtml(item.summary || item.message || 'event')}</li>`).join('')
+    : '<li>No recent material events.</li>';
+
+  const whyList = [
+    `Drift: ${summary.explanations?.biggestDrift || 'No drift explanation available.'}`,
+    `Execution: ${summary.explanations?.executionBlock || 'No execution explanation available.'}`,
+    `Approvals: ${summary.explanations?.approvalBacklog || 'No approval explanation available.'}`,
+    `Trade posture: ${summary.explanations?.noTradePosture || 'No trade-posture explanation available.'}`,
+  ].map((line) => `<li>${escapeHtml(line)}</li>`).join('');
+
+  return `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portfolio Summary Page: ${escapeHtml(summary.portfolio || 'unknown')}</title>
+<style>
+:root {
+  --bg: #06121f;
+  --bg-accent: #10263f;
+  --surface: rgba(10, 20, 35, 0.88);
+  --line: rgba(148, 163, 184, 0.16);
+  --text: #e5eef8;
+  --muted: #97a6ba;
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #f87171;
+  --color-healthy: #22c55e;
+  --color-warning: #f59e0b;
+  --color-blocked: #f87171;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%), radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 24%), linear-gradient(180deg, var(--bg-accent) 0%, var(--bg) 56%, #040914 100%); }
+.report-container { max-width: 1180px; margin: 0 auto; }
+.hero { padding: 30px; border-radius: 28px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9) 42%, rgba(34, 197, 94, 0.12)); border: 1px solid var(--line); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28); }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.18em; color: #c7d8ea; }
+.hero h1 { margin: 10px 0 8px; font-size: 2.25rem; line-height: 1.05; letter-spacing: -0.04em; }
+.hero p { margin: 0; max-width: 72ch; color: var(--muted); line-height: 1.6; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border-radius: 999px; border: 1px solid var(--line); background: rgba(7, 18, 31, 0.62); color: var(--text); font-size: 12px; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 22px; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18); }
+.card h2 { margin: 0 0 14px; font-size: 1rem; letter-spacing: -0.02em; }
+.panel-12 { grid-column: span 12; } .panel-8 { grid-column: span 8; } .panel-6 { grid-column: span 6; } .panel-4 { grid-column: span 4; }
+.kpi-grid { grid-column: span 12; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.kpi { padding: 18px; border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)); border: 1px solid var(--line); }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.kpi-value { margin-top: 10px; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; }
+.kpi-detail { margin-top: 6px; color: var(--muted); font-size: 12px; }
+.management-callout { padding: 18px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.22); background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(59, 130, 246, 0.06)); line-height: 1.7; }
+.allocation-bars { display: grid; gap: 12px; }
+.allocation-bar-card { padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.02); border: 1px solid rgba(148, 163, 184, 0.12); }
+.allocation-bar-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+.allocation-track { height: 12px; border-radius: 999px; background: rgba(148, 163, 184, 0.15); overflow: hidden; }
+.allocation-fill { height: 12px; border-radius: 999px; }
+.bar-positive { background: linear-gradient(90deg, #22c55e, #4ade80); } .bar-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); } .bar-negative { background: linear-gradient(90deg, #ef4444, #f87171); }
+.table-wrap { overflow-x: auto; border-radius: 18px; }
+.table-wrap table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.table-wrap th, .table-wrap td { padding: 11px 12px; border-bottom: 1px solid rgba(148, 163, 184, 0.12); font-size: 14px; vertical-align: top; }
+.table-wrap th { color: var(--muted); text-align: left; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+.table-wrap tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.table-wrap tbody tr:hover { background: rgba(56, 189, 248, 0.06); }
+.num { text-align: right; }
+.list-panel { margin: 0; padding-left: 20px; } .list-panel li { margin-bottom: 10px; }
+.list-subtle { margin-top: 4px; color: var(--muted); font-size: 13px; }
+.queue-pill { display: inline-block; margin-right: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(56, 189, 248, 0.12); color: #bfe8ff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+.tone-positive { color: var(--good); } .tone-warning { color: var(--warn); } .tone-negative { color: var(--bad); } .empty-state { color: var(--muted); }
+@media (max-width: 960px) { .panel-8, .panel-6, .panel-4 { grid-column: span 12; } .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { body { padding: 16px; } .hero { padding: 22px; } .hero h1 { font-size: 1.7rem; } .kpi-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="report-container">
+  <section class="hero">
+    <div class="eyebrow">Investor dashboard</div>
+    <h1>Portfolio Summary Page: ${escapeHtml(summary.portfolio || 'unknown')}</h1>
+    <p class="${toneClass}">Current health is ${escapeHtml(summary.status?.health || 'unknown')}. ${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</p>
+    <div class="badge-row">
+      <span class="badge">Total value CHF ${totalValue.toFixed(2)}</span>
+      <span class="badge">Invested CHF ${invested.toFixed(2)}</span>
+      <span class="badge">Gain since purchase CHF ${gain.toFixed(2)} (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)</span>
+      <span class="badge">Cash CHF ${cash.toFixed(2)}</span>
+      <span class="badge">Pending actions ${pendingCount}</span>
+    </div>
+  </section>
+  <div class="grid">
+    <section class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Portfolio value</div><div class="kpi-value">CHF ${totalValue.toFixed(2)}</div><div class="kpi-detail">Latest snapshot ${escapeHtml(summary.holdings?.latestSnapshotDate || 'unknown')}</div></div>
+      <div class="kpi"><div class="kpi-label">Gain since purchase</div><div class="kpi-value ${gain >= 0 ? 'tone-positive' : 'tone-negative'}">CHF ${gain.toFixed(2)}</div><div class="kpi-detail">${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%</div></div>
+      <div class="kpi"><div class="kpi-label">Cash balance</div><div class="kpi-value">CHF ${cash.toFixed(2)}</div><div class="kpi-detail">Holdings ${Number(summary.holdings?.holdingCount || 0)}</div></div>
+      <div class="kpi"><div class="kpi-label">Top blocker</div><div class="kpi-value" style="font-size:1.05rem;line-height:1.35;">${escapeHtml(topBlocker)}</div><div class="kpi-detail">Broker health ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</div></div>
+    </section>
+    <section class="card panel-8"><h2>Management summary</h2><div class="management-callout">${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</div><div style="margin-top:16px;" class="allocation-bars">${allocationBars}</div></section>
+    <section class="card panel-4"><h2>Immediate status</h2><ul><li>Health: ${escapeHtml(summary.status?.health || 'unknown')}</li><li>Strategy status: ${escapeHtml(summary.status?.strategy || 'unknown')}</li><li>Broker health: ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</li><li>Execution posture: ${escapeHtml(summary.status?.executionPosture || 'unknown')}</li><li>Delivery posture: ${escapeHtml(summary.status?.deliveryPosture || 'unknown')}</li><li>Data freshness: ${escapeHtml(summary.status?.dataFreshness || 'unknown')}</li></ul></section>
+    <section class="card panel-12"><h2>Allocation health</h2><div class="table-wrap"><table><thead><tr><th>Asset class</th><th class="num">Current %</th><th class="num">Target %</th><th class="num">Drift %</th><th>Status</th></tr></thead><tbody>${allocationTable}</tbody></table></div></section>
+    <section class="card panel-12"><h2>Instrument actions</h2><div class="table-wrap"><table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th class="num">Target %</th><th>Latest proposal status</th><th>Approval</th></tr></thead><tbody>${instrumentTable}</tbody></table></div></section>
+    <section class="card panel-6"><h2>Why This Portfolio Looks This Way</h2><ol>${whyList}</ol></section>
+    <section class="card panel-6"><h2>Recent material events</h2><ul>${eventList}</ul></section>
+    <section class="card panel-12"><h2>Operator Queue Summary</h2><div class="badge-row" style="margin-top:0;margin-bottom:14px;"><span class="badge">Total ${Number(summary.operatorQueue?.summary?.total || 0)}</span><span class="badge">Blocking ${Number(summary.operatorQueue?.summary?.blocking || 0)}</span><span class="badge">Approval ${Number(summary.operatorQueue?.summary?.approvals || 0)}</span><span class="badge">Fresh actionable approvals ${Number(summary.operatorQueue?.summary?.freshApprovals || 0)}</span><span class="badge">Stale approvals needing reapproval ${Number(summary.operatorQueue?.summary?.staleApprovals || 0)}</span><span class="badge">Open-runner first handoffs ${Number(summary.operatorQueue?.summary?.openRunnerQueue || 0)}</span><span class="badge">Open-runner retries ${Number(summary.operatorQueue?.summary?.openRunnerRetry || 0)}</span></div><ol>${queueList}</ol></section>
+    <section class="card panel-6"><h2>Execution Posture</h2><ul><li>Proposed trades: ${summary.approvals?.proposedCount || 0}</li><li>Approved trades: ${summary.approvals?.approvedCount || 0}</li><li>Fresh actionable approvals: ${summary.approvals?.freshApprovedCount || 0}</li><li>Stale approvals needing reapproval: ${summary.approvals?.staleApprovalCount || 0}</li><li>Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}</li><li>Queued for open runner: ${summary.execution?.tradeState?.queuedForOpenRunner || 0}</li><li>Queued retries: ${summary.execution?.openRunnerRetryState?.queuedRetry || 0}</li><li>Blocked rows: ${summary.execution?.tradeState?.blocked || 0}</li><li>In-flight rows: ${summary.execution?.inFlightCount || 0}</li><li>Failed rows: ${summary.execution?.failedCount || 0}</li></ul></section>
+    <section class="card panel-6"><h2>Observability Status</h2><ul><li>Runtime event file present: ${summary.observability?.eventsPresent ? 'yes' : 'no'}</li><li>Recent runtime events scanned: ${summary.observability?.recentSummary?.total || 0}</li><li>Blocked execution-policy events: ${summary.observability?.recentSummary?.blockedTrades || 0}</li><li>Open-runner first handoff events: ${summary.observability?.recentSummary?.openRunnerQueueEvents || 0}</li><li>Open-runner retry events: ${summary.observability?.recentSummary?.openRunnerRetryEvents || 0}</li><li>Degraded broker events: ${summary.observability?.recentSummary?.degradedBrokerEvents || 0}</li><li>Stale-data events: ${summary.observability?.recentSummary?.staleDataEvents || 0}</li></ul></section>
+    <section class="card panel-12"><h2>Recommended Next Step</h2><p>${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</p></section>
+    <section class="card panel-12"><h2>Contract Intelligence Readiness</h2><p>${escapeHtml(summary.contractIntelligence?.summaryLine || 'No contract-intelligence summary available.')}</p><p class="list-subtle">Recommended contract-intelligence action: ${escapeHtml(summary.contractIntelligence?.nextAction || 'No contract-intelligence remediation suggested.')}</p></section>
+  </div>
+</div>
+</body>
+</html>`;
+}
+
 function renderPortfolioSummaryMarkdown(summary = {}) {
   const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
   const blockers = Array.isArray(summary.blockers?.items) ? summary.blockers.items : [];
@@ -819,7 +979,7 @@ async function generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles = tr
   const recoveryMarkdown = renderRecoveryChecklistMarkdown(checklist);
   if (writeFiles) {
     fs.writeFileSync(outPath, JSON.stringify(summary, null, 2) + '\n');
-    fs.writeFileSync(htmlPath, markdownToBasicHtml(markdown));
+    fs.writeFileSync(htmlPath, renderPortfolioSummaryHtml(summary));
     fs.writeFileSync(recoveryPath, JSON.stringify(checklist, null, 2) + '\n');
     fs.writeFileSync(recoveryMarkdownPath, recoveryMarkdown);
     fs.writeFileSync(recoveryHtmlPath, markdownToBasicHtml(recoveryMarkdown));

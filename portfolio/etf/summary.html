@@ -2,72 +2,96 @@
 <html>
 <head>
 <meta charset="utf-8" />
-<title>Portfolio Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portfolio Summary Page: etf</title>
 <style>
 :root {
-  --color-healthy: #16a34a;
-  --color-warning: #d97706;
-  --color-blocked: #dc2626;
-  --color-info: #2563eb;
-  --color-muted: #6b7280;
-  --color-bg: #fafafa;
-  --color-surface: #ffffff;
-  --color-border: #e5e7eb;
-  --color-text: #1f2937;
-  --color-text-secondary: #4b5563;
+  --bg: #06121f;
+  --bg-accent: #10263f;
+  --surface: rgba(10, 20, 35, 0.88);
+  --line: rgba(148, 163, 184, 0.16);
+  --text: #e5eef8;
+  --muted: #97a6ba;
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #f87171;
+  --color-healthy: #22c55e;
+  --color-warning: #f59e0b;
+  --color-blocked: #f87171;
 }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 32px 40px; color: var(--color-text); background: var(--color-bg); line-height: 1.6; }
-.report-container { max-width: 900px; margin: 0 auto; background: var(--color-surface); border-radius: 8px; padding: 32px 40px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 8px 0; padding-bottom: 12px; border-bottom: 2px solid var(--color-border); }
-h2 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 12px 0; color: var(--color-text); }
-h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px 0; color: var(--color-text-secondary); }
-p { margin: 8px 0; color: var(--color-text-secondary); }
-ul, ol { margin: 8px 0; padding-left: 24px; }
-li { margin: 4px 0; line-height: 1.5; }
-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.85rem; }
-th { background: #f3f4f6; font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--color-border); }
-td { padding: 8px 12px; border-bottom: 1px solid var(--color-border); }
-tbody tr:nth-child(even) { background: #f9fafb; }
-tbody tr:hover { background: #f0f4ff; }
-code { font-family: 'SF Mono', Monaco, monospace; font-size: 0.85em; background: #f3f4f6; padding: 2px 5px; border-radius: 3px; }
-pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 6px; font-size: 0.85rem; }
-.badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.03em; }
-.badge-healthy { background: #dcfce7; color: var(--color-healthy); }
-.badge-warning { background: #fef3c7; color: var(--color-warning); }
-.badge-blocked { background: #fee2e2; color: var(--color-blocked); }
-.badge-info { background: #dbeafe; color: var(--color-info); }
-.meta-bar { font-size: 0.8rem; color: var(--color-muted); margin-bottom: 16px; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%), radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 24%), linear-gradient(180deg, var(--bg-accent) 0%, var(--bg) 56%, #040914 100%); }
+.report-container { max-width: 1180px; margin: 0 auto; }
+.hero { padding: 30px; border-radius: 28px; background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9) 42%, rgba(34, 197, 94, 0.12)); border: 1px solid var(--line); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28); }
+.eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 0.18em; color: #c7d8ea; }
+.hero h1 { margin: 10px 0 8px; font-size: 2.25rem; line-height: 1.05; letter-spacing: -0.04em; }
+.hero p { margin: 0; max-width: 72ch; color: var(--muted); line-height: 1.6; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border-radius: 999px; border: 1px solid var(--line); background: rgba(7, 18, 31, 0.62); color: var(--text); font-size: 12px; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 22px; box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18); }
+.card h2 { margin: 0 0 14px; font-size: 1rem; letter-spacing: -0.02em; }
+.panel-12 { grid-column: span 12; } .panel-8 { grid-column: span 8; } .panel-6 { grid-column: span 6; } .panel-4 { grid-column: span 4; }
+.kpi-grid { grid-column: span 12; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.kpi { padding: 18px; border-radius: 20px; background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)); border: 1px solid var(--line); }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.kpi-value { margin-top: 10px; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; }
+.kpi-detail { margin-top: 6px; color: var(--muted); font-size: 12px; }
+.management-callout { padding: 18px; border-radius: 20px; border: 1px solid rgba(56, 189, 248, 0.22); background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(59, 130, 246, 0.06)); line-height: 1.7; }
+.allocation-bars { display: grid; gap: 12px; }
+.allocation-bar-card { padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.02); border: 1px solid rgba(148, 163, 184, 0.12); }
+.allocation-bar-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+.allocation-track { height: 12px; border-radius: 999px; background: rgba(148, 163, 184, 0.15); overflow: hidden; }
+.allocation-fill { height: 12px; border-radius: 999px; }
+.bar-positive { background: linear-gradient(90deg, #22c55e, #4ade80); } .bar-warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); } .bar-negative { background: linear-gradient(90deg, #ef4444, #f87171); }
+.table-wrap { overflow-x: auto; border-radius: 18px; }
+.table-wrap table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.table-wrap th, .table-wrap td { padding: 11px 12px; border-bottom: 1px solid rgba(148, 163, 184, 0.12); font-size: 14px; vertical-align: top; }
+.table-wrap th { color: var(--muted); text-align: left; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+.table-wrap tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+.table-wrap tbody tr:hover { background: rgba(56, 189, 248, 0.06); }
+.num { text-align: right; }
+.list-panel { margin: 0; padding-left: 20px; } .list-panel li { margin-bottom: 10px; }
+.list-subtle { margin-top: 4px; color: var(--muted); font-size: 13px; }
+.queue-pill { display: inline-block; margin-right: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(56, 189, 248, 0.12); color: #bfe8ff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+.tone-positive { color: var(--good); } .tone-warning { color: var(--warn); } .tone-negative { color: var(--bad); } .empty-state { color: var(--muted); }
+@media (max-width: 960px) { .panel-8, .panel-6, .panel-4 { grid-column: span 12; } .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { body { padding: 16px; } .hero { padding: 22px; } .hero h1 { font-size: 1.7rem; } .kpi-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="report-container">
-<h1>Portfolio Summary Page: etf</h1>
-<h2>Status Snapshot</h2>
-<ul><li>Generated at: 2026-05-13T13:20:15.787Z</li><li>Health: warning</li><li>Strategy status: rebalance_needed</li><li>Broker health: healthy</li><li>Execution posture: ready_for_review</li><li>Delivery posture: needs_operator_attention</li><li>Data freshness: stale</li><li>Live readiness: not-evaluated</li><li>Live arm state: not-evaluated</li><li>Live readiness next step: n/a</li></ul>
-<h2>Why This Portfolio Looks This Way</h2>
-<ul><li>Drift: Global equities is 40% over target and outside the allowed band around the 60% target.</li><li>Execution: Execution is blocked because the underlying portfolio state is stale and should be refreshed first.</li><li>Approvals: 1 approval-gated trade row(s), 5 blocked row(s) still need explicit operator review before the workflow can advance cleanly.</li><li>Trade posture: Execution should stay blocked because the supporting dashboard/holdings inputs are stale.</li></ul>
-<h2>Holdings Snapshot</h2>
-<ul><li>Total value CHF: 5083.34</li><li>Cash CHF: 4048.26</li><li>Invested CHF: 1035.08</li><li>Holding count: 2</li><li>Last sync: 2026-05-11 21:27:45</li><li>Latest snapshot date: 2026-05-11</li></ul>
-<h2>Recommended Next Step</h2>
-<ul><li>1 approved trade row(s) are ready for staging or review.</li></ul>
-<h2>Operator Queue Summary</h2>
-<ul><li>Total queue items: 4</li><li>Blocking items: 0</li><li>Approval items: 1</li><li>Open-runner first handoffs: 0</li><li>Open-runner retries: 1</li><li>Recovery items: 0</li><li>Warning items: 0</li></ul>
-<h2>Operator Queue Items</h2>
-<ol><li>[backfill_review/backfill_review/medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review. — Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.</li><li>[approval/ready_for_review/medium] 1 approved trade row(s) are ready for staging or review. — Stage or review the approved trades when readiness gates are satisfied.</li><li>[open_runner_retry/ready_for_review/medium] 1 trade row(s) were requeued for market-open retry after operator recovery. — Re-check the prior blocker cause before allowing the retry handoff to proceed.</li><li>[delivery/pending/medium] Dashboard/report freshness is stale relative to source state. — Review report delivery readiness and clear the pending action.</li></ol>
-<h2>Blockers</h2>
-<ol><li>No active blockers.</li></ol>
-<h2>Execution Posture</h2>
-<ul><li>Proposed trades: 0</li><li>Approved trades: 1</li><li>Pending approvals: 1</li><li>Queued for open runner: 0</li><li>Queued retries: 1</li><li>Blocked rows: 5</li><li>In-flight rows: 0</li><li>Failed rows: 0</li></ul>
-<h2>Broker Block Details</h2>
-<ol><li>[quote_unavailable] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)</li></ol>
-<h2>Observability Status</h2>
-<ul><li>Runtime event file present: yes</li><li>Recent runtime events scanned: 97</li><li>Blocked execution-policy events: 91</li><li>Open-runner first handoff events: 0</li><li>Open-runner retry events: 6</li><li>Degraded broker events: 0</li><li>Stale-data events: 0</li></ul>
-<h2>Allocation</h2>
-<table><thead><tr><th>Asset class</th><th>Current %</th><th>Target %</th><th>Drift %</th><th>Status</th></tr></thead><tbody><tr><td>Global equities</td><td>100</td><td>60</td><td>40</td><td>out_of_bounds</td></tr><tr><td>Swiss equities</td><td>0</td><td>20</td><td>-20</td><td>out_of_bounds</td></tr><tr><td>Bonds / cash-like</td><td>0</td><td>20</td><td>-20</td><td>out_of_bounds</td></tr></tbody></table>
-<h2>Instruments</h2>
-<table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th>Target %</th><th>Latest proposal status</th><th>Approval</th></tr></thead><tbody><tr><td>IE000XZSV718</td><td>State Street SPDR S&amp;P 500 UCITS ETF USD Unhedged (Acc)</td><td>Global equities</td><td>40</td><td>none</td><td>n/a</td></tr><tr><td>LU0950668870</td><td>UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc</td><td>Global equities</td><td>20</td><td>none</td><td>n/a</td></tr><tr><td>CH0032912732</td><td>UBS SLI ETF (SMI gleichgewichtet)</td><td>Swiss equities</td><td>20</td><td>approved</td><td>queued_for_open_runner</td></tr><tr><td>CASH-CHF</td><td>CHF cash balance</td><td>Bonds / cash-like</td><td>20</td><td>planned</td><td>pending_user_approval</td></tr></tbody></table>
-<h2>Recent Material Events</h2>
-<ol><li>[warn] UBSSLI blocked before submission: No broker quote was available during market-open execution.</li><li>[warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li><li>[warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li><li>[warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li><li>[warn] CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li></ol>
+  <section class="hero">
+    <div class="eyebrow">Investor dashboard</div>
+    <h1>Portfolio Summary Page: etf</h1>
+    <p class="tone-warning">Current health is warning. 1 proposed trade row(s) still need user approval.</p>
+    <div class="badge-row">
+      <span class="badge">Total value CHF 5327.03</span>
+      <span class="badge">Invested CHF 5210.39</span>
+      <span class="badge">Gain since purchase CHF 116.64 (+2.2%)</span>
+      <span class="badge">Cash CHF 116.64</span>
+      <span class="badge">Pending actions 2</span>
+    </div>
+  </section>
+  <div class="grid">
+    <section class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Portfolio value</div><div class="kpi-value">CHF 5327.03</div><div class="kpi-detail">Latest snapshot 2026-05-15</div></div>
+      <div class="kpi"><div class="kpi-label">Gain since purchase</div><div class="kpi-value tone-positive">CHF 116.64</div><div class="kpi-detail">+2.2%</div></div>
+      <div class="kpi"><div class="kpi-label">Cash balance</div><div class="kpi-value">CHF 116.64</div><div class="kpi-detail">Holdings 2</div></div>
+      <div class="kpi"><div class="kpi-label">Top blocker</div><div class="kpi-value" style="font-size:1.05rem;line-height:1.35;">No active blocker currently surfaced.</div><div class="kpi-detail">Broker health degraded</div></div>
+    </section>
+    <section class="card panel-8"><h2>Management summary</h2><div class="management-callout">1 proposed trade row(s) still need user approval.</div><div style="margin-top:16px;" class="allocation-bars"><div class="allocation-bar-card"><div class="allocation-bar-head"><span>Global equities</span><span>73.8% / 60.0%</span></div><div class="allocation-track"><div class="allocation-fill bar-negative" style="width:73.81%;"></div></div><div class="allocation-caption tone-positive">+13.81% drift</div></div><div class="allocation-bar-card"><div class="allocation-bar-head"><span>Swiss equities</span><span>24.0% / 20.0%</span></div><div class="allocation-track"><div class="allocation-fill bar-positive" style="width:24%;"></div></div><div class="allocation-caption tone-positive">+4.00% drift</div></div><div class="allocation-bar-card"><div class="allocation-bar-head"><span>Bonds / cash-like</span><span>2.2% / 20.0%</span></div><div class="allocation-track"><div class="allocation-fill bar-negative" style="width:4%;"></div></div><div class="allocation-caption tone-negative">-17.81% drift</div></div></div></section>
+    <section class="card panel-4"><h2>Immediate status</h2><ul><li>Health: warning</li><li>Strategy status: blocked</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: ready</li><li>Data freshness: current</li></ul></section>
+    <section class="card panel-12"><h2>Allocation health</h2><div class="table-wrap"><table><thead><tr><th>Asset class</th><th class="num">Current %</th><th class="num">Target %</th><th class="num">Drift %</th><th>Status</th></tr></thead><tbody><tr><td>Global equities</td><td class="num">73.81%</td><td class="num">60.00%</td><td class="num tone-positive">+13.81%</td><td>out_of_bounds</td></tr><tr><td>Swiss equities</td><td class="num">24.00%</td><td class="num">20.00%</td><td class="num tone-positive">+4.00%</td><td>on_track</td></tr><tr><td>Bonds / cash-like</td><td class="num">2.19%</td><td class="num">20.00%</td><td class="num tone-negative">-17.81%</td><td>out_of_bounds</td></tr></tbody></table></div></section>
+    <section class="card panel-12"><h2>Instrument actions</h2><div class="table-wrap"><table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th class="num">Target %</th><th>Latest proposal status</th><th>Approval</th></tr></thead><tbody><tr><td>IE00BD4TXW66</td><td>UBS Core S&amp;P 500 UCITS ETF USD acc</td><td>Global equities</td><td class="num">40.00%</td><td>none</td><td>n/a</td></tr><tr><td>LU0950668870</td><td>UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc</td><td>Global equities</td><td class="num">20.00%</td><td>none</td><td>n/a</td></tr><tr><td>CH0032912732</td><td>UBS SLI ETF (SMI gleichgewichtet)</td><td>Swiss equities</td><td class="num">20.00%</td><td>none</td><td>n/a</td></tr><tr><td>CASH-CHF</td><td>CHF cash balance</td><td>Bonds / cash-like</td><td class="num">20.00%</td><td>planned</td><td>pending_user_approval</td></tr></tbody></table></div></section>
+    <section class="card panel-6"><h2>Why This Portfolio Looks This Way</h2><ol><li>Drift: Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.</li><li>Execution: Execution is blocked because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.</li><li>Approvals: 1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly.</li><li>Trade posture: No live-ready trade path is available because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.</li></ol></section>
+    <section class="card panel-6"><h2>Recent material events</h2><ul><li><strong>warn</strong> - UBSSLI blocked before submission: No broker quote was available during market-open execution.</li><li><strong>warn</strong> - CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li><li><strong>warn</strong> - CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li><li><strong>warn</strong> - CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li><li><strong>warn</strong> - CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.</li></ul></section>
+    <section class="card panel-12"><h2>Operator Queue Summary</h2><div class="badge-row" style="margin-top:0;margin-bottom:14px;"><span class="badge">Total 2</span><span class="badge">Blocking 1</span><span class="badge">Approval 1</span><span class="badge">Fresh actionable approvals 0</span><span class="badge">Stale approvals needing reapproval 0</span><span class="badge">Open-runner first handoffs 0</span><span class="badge">Open-runner retries 0</span></div><ol><li><span class="queue-pill">recovery</span><strong>Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.</strong><div class="list-subtle">Restore broker connectivity before relying on broker-backed pricing or live execution paths.</div></li><li><span class="queue-pill">approval</span><strong>1 proposed trade row(s) still need user approval.</strong><div class="list-subtle">Review the proposed trades and approve or reject them explicitly.</div></li></ol></section>
+    <section class="card panel-6"><h2>Execution Posture</h2><ul><li>Proposed trades: 1</li><li>Approved trades: 0</li><li>Fresh actionable approvals: 0</li><li>Stale approvals needing reapproval: 0</li><li>Pending approvals: 1</li><li>Queued for open runner: 0</li><li>Queued retries: 0</li><li>Blocked rows: 15</li><li>In-flight rows: 0</li><li>Failed rows: 0</li></ul></section>
+    <section class="card panel-6"><h2>Observability Status</h2><ul><li>Runtime event file present: yes</li><li>Recent runtime events scanned: 97</li><li>Blocked execution-policy events: 91</li><li>Open-runner first handoff events: 0</li><li>Open-runner retry events: 6</li><li>Degraded broker events: 0</li><li>Stale-data events: 0</li></ul></section>
+    <section class="card panel-12"><h2>Recommended Next Step</h2><p>1 proposed trade row(s) still need user approval.</p></section>
+    <section class="card panel-12"><h2>Contract Intelligence Readiness</h2><p>3/4 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.</p><p class="list-subtle">Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.</p></section>
+  </div>
 </div>
 </body>
 </html>

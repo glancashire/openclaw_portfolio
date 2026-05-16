@@ -1,21 +1,21 @@
 # Recovery Checklist: etf
 
 ## Incident Status
-- Status: monitor_only
+- Status: action_required
 - Health: warning
-- Broker health: healthy
-- Execution posture: ready_for_review
-- Delivery posture: needs_operator_attention
-- Data freshness: stale
+- Broker health: degraded
+- Execution posture: degraded_dry_run_only
+- Delivery posture: ready
+- Data freshness: current
 - Pending approvals: 1
-- Recommended next step: 1 approved trade row(s) are ready for staging or review.
+- Recommended next step: 1 proposed trade row(s) still need user approval.
 
 ## Why This Incident Exists
-- Execution is blocked because the underlying portfolio state is stale and should be refreshed first.
-- 1 approval-gated trade row(s), 5 blocked row(s) still need explicit operator review before the workflow can advance cleanly.
+- Execution is blocked because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.
+- 1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly.
 
 ## Incident Drivers
-- Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.
+- Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
 - 1 approval-gated trade rows are still waiting for operator review.
 
 ## Active Blockers
@@ -28,33 +28,25 @@
    - Broker order id: n/a
 
 ## Action Checklist
-1. [medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
-   - Action: Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: fill_notification_state
-2. [medium] 1 approved trade row(s) are ready for staging or review.
-   - Action: Stage or review the approved trades when readiness gates are satisfied.
+1. [high] Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.
+   - Action: Restore broker connectivity before relying on broker-backed pricing or live execution paths.
+   - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
+   - Source: broker_readiness
+2. [medium] 1 proposed trade row(s) still need user approval.
+   - Action: Review the proposed trades and approve or reject them explicitly.
    - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
    - Source: trade_lifecycle
-3. [medium] 1 trade row(s) were requeued for market-open retry after operator recovery.
-   - Action: Re-check the prior blocker cause before allowing the retry handoff to proceed.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: trade_state
-4. [medium] Dashboard/report freshness is stale relative to source state.
-   - Action: Review report delivery readiness and clear the pending action.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: delivery_policy
 
 ## Verification Checks
-- Broker health remains healthy or intentionally degraded with operator awareness.
-- Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.
+- Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.
+- Freshness posture remains current.
 - All approval-gated rows are explicitly approved, rejected, or intentionally left pending.
 - No active blockers remain.
 
 ## Completion Criteria
-- Portfolio remains in a healthy or intentionally monitored posture.
-- No blocker-class recovery work is outstanding.
-- The next operating step is clear from the summary surface.
+- Blocking recovery items no longer appear in the operator queue.
+- Portfolio health no longer depends on unresolved blocker conditions.
+- The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.
 
 ## Recent Signals
 1. [warn] UBSSLI blocked before submission: No broker quote was available during market-open execution.
