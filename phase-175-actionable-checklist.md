@@ -11,5 +11,5 @@
 - [x] Re-run relevant report/email verification gates until green.
 - [x] Run one live email flow for evidence.
 - [x] Commit Phase 175 plan.
-- [ ] Commit Phase 175 implementation.
-- [ ] Push Phase 175.
+- [x] Commit Phase 175 implementation.
+- [x] Push Phase 175.
