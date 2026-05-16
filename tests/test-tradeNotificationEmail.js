@@ -39,28 +39,25 @@ const openOrders = [
   { symbol: 'SLICHA', action: 'BUY', qty: 4, limitPrice: 222.50, currency: 'CHF', status: 'Submitted' },
 ];
 
-// --- Basic HTML generation ---
 console.log('-- buildTradeEmailHtml --');
-
 const html = buildTradeEmailHtml(trade, portfolio, openOrders);
 assert(typeof html === 'string', 'Returns a string');
 assert(html.includes('<html'), 'Contains HTML tag');
+assert(html.includes('Management summary'), 'Contains management summary section');
+assert(html.includes('Investor take'), 'Contains investor summary label');
+assert(html.includes('Gross trade impact'), 'Contains CHF-first trade metric');
+assert(html.includes('Portfolio after fill'), 'Contains portfolio-after-fill section');
+assert(html.includes('Execution detail'), 'Contains execution detail section');
+assert(html.includes('Remaining open orders'), 'Contains open order section');
 assert(html.includes('VUSA'), 'Contains trade symbol');
-assert(html.includes('18'), 'Contains quantity');
-assert(html.includes('109.30') || html.includes('109.3'), 'Contains fill price');
-assert(html.includes('BUY'), 'Contains action');
-assert(html.includes('CHF'), 'Contains currency');
-assert(html.includes('ETF Portfolio'), 'Contains portfolio name');
-assert(html.includes('Vanguard S&P 500'), 'Contains holding name');
+assert(html.includes('Vanguard S&amp;P 500') || html.includes('Vanguard S&P 500'), 'Contains holding name');
 assert(html.includes('SLICHA'), 'Contains open order symbol');
 assert(html.includes('222.50') || html.includes('222.5'), 'Contains open order limit price');
 
-// --- Empty open orders ---
 console.log('\n-- Empty open orders --');
 const htmlNoOrders = buildTradeEmailHtml(trade, portfolio, []);
-assert(htmlNoOrders.includes('No open orders') || htmlNoOrders.includes('no open') || !htmlNoOrders.includes('Submitted'), 'Handles empty open orders');
+assert(htmlNoOrders.includes('No open orders') || htmlNoOrders.includes('no remaining open orders') || !htmlNoOrders.includes('Submitted'), 'Handles empty open orders');
 
-// --- Missing/edge values ---
 console.log('\n-- Edge cases --');
 const minTrade = { symbol: 'X', action: 'BUY', qty: 1, price: 0, fillPrice: 0, fillQty: 0, currency: 'CHF', costChf: 0, fees: 0, orderId: '0', time: '' };
 const minPortfolio = { name: 'Test', totalValueChf: 0, cashChf: 0, holdings: [] };

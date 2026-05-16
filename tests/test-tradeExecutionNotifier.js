@@ -1,10 +1,5 @@
 'use strict';
 
-/**
- * Test tradeExecutionNotifier with a mocked mailgun.
- * We monkey-patch the sendEmail function to capture calls.
- */
-
 let passed = 0, failed = 0;
 function assert(cond, msg) {
   if (cond) { passed++; console.log(`  ✓ ${msg}`); }
@@ -12,15 +7,6 @@ function assert(cond, msg) {
 }
 
 console.log('=== lib/tradeExecutionNotifier.js ===\n');
-
-// Mock mailgun
-const mailgunModule = require('../lib/mailgun');
-let emailCalls = [];
-const originalSendEmail = mailgunModule.sendEmail;
-mailgunModule.sendEmail = async (opts) => {
-  emailCalls.push(opts);
-  return { id: '<mock-id>', message: 'Queued.' };
-};
 
 const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
 
@@ -33,39 +19,57 @@ const portfolio = { name: 'ETF Portfolio', totalValueChf: 5000, cashChf: 2000, h
 const openOrders = [{ symbol: 'VUSA', action: 'BUY', qty: 18, limitPrice: 109.50, currency: 'CHF', status: 'Submitted' }];
 
 async function run() {
-  // Test 1: successful send
   console.log('-- notifyTradeFill success --');
-  emailCalls = [];
-  const result = await notifyTradeFill({ trade, portfolio, openOrders });
+  const emailCalls = [];
+  const result = await notifyTradeFill({
+    trade,
+    portfolio,
+    openOrders,
+    to: 'lancashire@swift.ch',
+    sendEmailImpl: async (opts) => {
+      emailCalls.push(opts);
+      return { id: '<mock-id>', message: 'Queued.' };
+    },
+  });
   assert(emailCalls.length === 1, 'sendEmail called once');
   assert(emailCalls[0].subject.includes('EMUAA'), 'Subject contains symbol');
   assert(emailCalls[0].subject.includes('40.25'), 'Subject contains fill price');
   assert(emailCalls[0].subject.includes('BUY'), 'Subject contains action');
-  assert(emailCalls[0].to === 'lancashire@swift.ch', 'Default recipient used');
+  assert(emailCalls[0].to === 'lancashire@swift.ch', 'Recipient used');
   assert(emailCalls[0].html.includes('<html'), 'HTML body present');
-  assert(result.id === '<mock-id>', 'Returns mailgun response');
+  assert(emailCalls[0].text.includes('Portfolio value: CHF 5000.00'), 'Text fallback includes CHF portfolio value');
+  assert(result.result && result.result.id === '<mock-id>', 'Returns wrapped mail provider response');
 
-  // Test 2: custom recipient
   console.log('\n-- custom recipient --');
-  emailCalls = [];
-  await notifyTradeFill({ trade, portfolio, openOrders, to: 'test@example.com' });
-  assert(emailCalls[0].to === 'test@example.com', 'Custom recipient used');
+  const customCalls = [];
+  await notifyTradeFill({
+    trade,
+    portfolio,
+    openOrders,
+    to: 'test@example.com',
+    sendEmailImpl: async (opts) => {
+      customCalls.push(opts);
+      return { id: '<mock-id>', message: 'Queued.' };
+    },
+  });
+  assert(customCalls[0].to === 'test@example.com', 'Custom recipient used');
 
-  // Test 3: sendEmail failure is non-blocking
   console.log('\n-- sendEmail failure handling --');
-  mailgunModule.sendEmail = async () => { throw new Error('Network error'); };
   let threw = false;
+  let failureResult = null;
   try {
-    await notifyTradeFill({ trade, portfolio, openOrders });
+    failureResult = await notifyTradeFill({
+      trade,
+      portfolio,
+      openOrders,
+      to: 'lancashire@swift.ch',
+      sendEmailImpl: async () => { throw new Error('Network error'); },
+    });
   } catch (e) {
     threw = true;
   }
-  // The function should catch internally and not throw
-  // Let's check the source to see if it catches
   assert(!threw, 'notifyTradeFill does not throw on sendEmail failure');
-
-  // Restore
-  mailgunModule.sendEmail = originalSendEmail;
+  assert(failureResult && failureResult.sent === false && /Network error/.test(failureResult.error || ''), 'Failure result is non-blocking and preserves the error');
 
   console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);
   process.exit(failed > 0 ? 1 : 0);

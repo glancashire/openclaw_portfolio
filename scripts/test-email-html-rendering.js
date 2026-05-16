@@ -90,8 +90,8 @@ const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
   }, [
     { symbol: 'EMUAA', action: 'BUY', qty: 27, limitPrice: 40.3, currency: 'EUR', status: 'Submitted' },
   ]);
-  assert(tradeHtml.includes('Execution summary'));
-  assert(tradeHtml.includes('Portfolio after trade'));
+  assert(tradeHtml.includes('Management summary'));
+  assert(tradeHtml.includes('Portfolio after fill'));
   assert(tradeHtml.includes('Remaining open orders'));
   assert(tradeHtml.includes('BUY filled'));
   assert(tradeHtml.includes('SLICHA fill confirmed'));
