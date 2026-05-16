@@ -153,3 +153,35 @@ Document that native socket and portal session health can diverge. Prefer native
 - See Also: LRN-20260513-004
 
 ---
+## [ERR-20260516-001] ibkr-native-keepalive-phase-gate
+
+**Logged**: 2026-05-16T14:05:00Z
+**Priority**: high
+**Status**: pending
+**Area**: tests
+
+### Summary
+Claimed phase progress before the new keepalive script had a passing focused test or stable live readiness.
+
+### Error
+```
+node scripts/test-ibkr-native-keepalive.js
+AssertionError [ERR_ASSERTION]: Expected a 2FA escalation mail
+
+node scripts/check-interactive-brokers-readiness.js
+connect ECONNREFUSED 127.0.0.1:4001
+```
+
+### Context
+- A new native IBKR keepalive script and cron were added.
+- The phase should not be considered complete until the focused test passes and live readiness is re-verified.
+- Repeated `edit` tool misuse also slowed iteration because it requires `path`, not `filePath`.
+
+### Suggested Fix
+Refactor the keepalive script for explicit dependency injection and state-path control, make the focused test deterministic, restore the native gateway, then only commit/push after both gates pass.
+
+### Metadata
+- Reproducible: yes
+- Related Files: scripts/ibkr-native-keepalive.js, scripts/test-ibkr-native-keepalive.js
+
+---
