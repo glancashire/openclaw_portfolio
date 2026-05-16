@@ -8,6 +8,6 @@
 - [x] Add focused dashboard/email ordering tests.
 - [x] Re-run targeted regressions until green.
 - [x] Run one live health-check email flow for evidence.
-- [ ] Commit Phase 172 plan.
-- [ ] Commit Phase 172 implementation.
-- [ ] Push Phase 172.
+- [x] Commit Phase 172 plan.
+- [x] Commit Phase 172 implementation.
+- [x] Push Phase 172.
