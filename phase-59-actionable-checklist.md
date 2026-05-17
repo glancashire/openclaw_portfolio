@@ -4,5 +4,5 @@
 - [x] Add buy-side extreme move guard before submission
 - [x] Record skipped trend-guard decisions in trade/runtime evidence
 - [x] Add focused trend-guard test coverage
-- [ ] Re-run targeted command-surface and execution tests
-- [ ] Commit and push
+- [x] Re-run targeted command-surface and execution tests
+- [x] Commit and push
