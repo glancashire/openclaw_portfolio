@@ -9,5 +9,5 @@
 - [x] Inspect regenerated `portfolio/etf/summary.html` for hierarchy and readability.
 - [x] Send a test dashboard HTML preview to `lancashire@swift.ch`.
 - [x] Mark checklist complete and summarize the phase outcome.
-- [ ] Commit Phase 177 implementation.
-- [ ] Push Phase 177.
+- [x] Commit Phase 177 implementation.
+- [x] Push Phase 177.

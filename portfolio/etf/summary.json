@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-16T20:19:08.961Z",
+  "generatedAt": "2026-05-17T08:02:35.648Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
     "strategy": "blocked",
     "brokerHealth": "degraded",
-    "brokerMessage": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "ready",
     "dataFreshness": "current"
@@ -61,7 +61,7 @@
         "kind": "broker",
         "severity": "high",
         "status": "degraded",
-        "summary": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
         "blocking": true,
         "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
         "source": "broker_readiness"
@@ -393,7 +393,7 @@
     }
   ],
   "pendingActions": [
-    "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "1 proposed trade row(s) still need user approval."
   ],
   "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
@@ -408,7 +408,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
         }
       ],
       "recommendedActions": [
@@ -426,8 +426,8 @@
   },
   "explanations": {
     "biggestDrift": "Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.",
-    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
-    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "approvalBacklog": "1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [

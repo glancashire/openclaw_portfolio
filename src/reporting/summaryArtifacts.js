@@ -789,6 +789,23 @@ function renderPortfolioSummaryHtml(summary = {}) {
   const recentEvents = Array.isArray(summary.recentMaterialEvents) ? summary.recentMaterialEvents : [];
   const allocationRows = Array.isArray(summary.allocation) ? summary.allocation : [];
   const instrumentRows = Array.isArray(summary.instruments) ? summary.instruments : [];
+  const holdingsTable = String(summary.holdings?.tableMarkdown || '');
+  const holdingsBody = holdingsTable.split(/\r?\n/).filter((line) => /^\|\s/.test(line) && !line.includes('Ticker / ISIN') && !line.includes('Currency | Amount'));
+  const holdingRows = holdingsBody.map((line) => {
+    const cols = line.split('|').map((part) => part.trim()).filter(Boolean);
+    const [tickerOrIsin, name, assetClass, quantity, price, currency, fxRate, valueChf] = cols;
+    return {
+      tickerOrIsin,
+      name,
+      assetClass,
+      quantity: Number(quantity || 0),
+      price: Number(price || 0),
+      currency,
+      fxRate: Number(fxRate || 1),
+      valueChf: Number(valueChf || 0),
+    };
+  }).filter((row) => row.tickerOrIsin && row.name);
+  const holdingTotalChf = holdingRows.reduce((sum, row) => sum + Number(row.valueChf || 0), 0);
   const statusTone = String(summary.status?.health || 'warning');
   const toneClass = statusTone === 'healthy' ? 'tone-positive' : statusTone === 'blocked' ? 'tone-negative' : 'tone-warning';
 
@@ -818,8 +835,9 @@ function renderPortfolioSummaryHtml(summary = {}) {
     ? queueItems.slice(0, 8).map((item) => `<li><span class="queue-pill">${escapeHtml(item.queueType || item.kind || 'workflow')}</span><strong>${escapeHtml(item.summary || 'Pending action')}</strong><div class="list-subtle">${escapeHtml(item.recommendedOperatorAction || 'Review and resolve as appropriate.')}</div></li>`).join('')
     : '<li>No pending operator queue items.</li>';
 
-  const eventList = recentEvents.length
-    ? recentEvents.slice(0, 5).map((item) => `<li><strong>${escapeHtml(item.severity || 'info')}</strong> - ${escapeHtml(item.summary || item.message || 'event')}</li>`).join('')
+  const filteredRecentEvents = recentEvents.filter((item) => !/CSPX/i.test(String(item.summary || item.message || '')));
+  const eventList = filteredRecentEvents.length
+    ? filteredRecentEvents.slice(0, 5).map((item) => `<li><strong>${escapeHtml(item.severity || 'info')}</strong> - ${escapeHtml(item.summary || item.message || 'event')}</li>`).join('')
     : '<li>No recent material events.</li>';
 
   const whyList = [
@@ -828,6 +846,10 @@ function renderPortfolioSummaryHtml(summary = {}) {
     `Approvals: ${summary.explanations?.approvalBacklog || 'No approval explanation available.'}`,
     `Trade posture: ${summary.explanations?.noTradePosture || 'No trade-posture explanation available.'}`,
   ].map((line) => `<li>${escapeHtml(line)}</li>`).join('');
+
+  const holdingRowsHtml = holdingRows.length
+    ? holdingRows.map((row) => `<tr><td>${escapeHtml(row.tickerOrIsin || '—')}</td><td>${escapeHtml(row.name || '—')}</td><td>${escapeHtml(row.assetClass || '—')}</td><td class="num">${Number(row.quantity || 0).toLocaleString('en-US', { maximumFractionDigits: 6 })}</td><td class="num">CHF ${Number(row.price || 0).toFixed(2)}</td><td class="num">CHF ${Number(row.valueChf || 0).toFixed(2)}</td></tr>`).join('')
+    : '<tr><td colspan="6">No effective holdings rows available.</td></tr>';
 
   return `<!doctype html>
 <html>
@@ -911,9 +933,9 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
       <div class="kpi"><div class="kpi-label">Cash balance</div><div class="kpi-value">CHF ${cash.toFixed(2)}</div><div class="kpi-detail">Holdings ${Number(summary.holdings?.holdingCount || 0)}</div></div>
       <div class="kpi"><div class="kpi-label">Top blocker</div><div class="kpi-value" style="font-size:1.05rem;line-height:1.35;">${escapeHtml(topBlocker)}</div><div class="kpi-detail">Broker health ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</div></div>
     </section>
-    <section class="card panel-8"><h2>Management summary</h2><div class="management-callout">${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</div><div style="margin-top:16px;" class="allocation-bars">${allocationBars}</div></section>
+    <section class="card panel-8"><h2>Management summary</h2><div class="management-callout">${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</div></section>
     <section class="card panel-4"><h2>Immediate status</h2><ul><li>Health: ${escapeHtml(summary.status?.health || 'unknown')}</li><li>Strategy status: ${escapeHtml(summary.status?.strategy || 'unknown')}</li><li>Broker health: ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</li><li>Execution posture: ${escapeHtml(summary.status?.executionPosture || 'unknown')}</li><li>Delivery posture: ${escapeHtml(summary.status?.deliveryPosture || 'unknown')}</li><li>Data freshness: ${escapeHtml(summary.status?.dataFreshness || 'unknown')}</li></ul></section>
-    <section class="card panel-12"><h2>Allocation health</h2><div class="table-wrap"><table><thead><tr><th>Asset class</th><th class="num">Current %</th><th class="num">Target %</th><th class="num">Drift %</th><th>Status</th></tr></thead><tbody>${allocationTable}</tbody></table></div></section>
+    <section class="card panel-12"><h2>Effective holdings</h2><div class="table-wrap"><table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th class="num">Quantity</th><th class="num">Price CHF</th><th class="num">Value CHF</th></tr></thead><tbody>${holdingRowsHtml}</tbody><tfoot><tr><th colspan="5">Total</th><th class="num">CHF ${holdingTotalChf.toFixed(2)}</th></tr></tfoot></table></div></section>
     <section class="card panel-12"><h2>Instrument actions</h2><div class="table-wrap"><table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th class="num">Target %</th><th>Latest proposal status</th><th>Approval</th></tr></thead><tbody>${instrumentTable}</tbody></table></div></section>
     <section class="card panel-6"><h2>Why This Portfolio Looks This Way</h2><ol>${whyList}</ol></section>
     <section class="card panel-6"><h2>Recent material events</h2><ul>${eventList}</ul></section>
@@ -921,6 +943,7 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
     <section class="card panel-6"><h2>Execution Posture</h2><ul><li>Proposed trades: ${summary.approvals?.proposedCount || 0}</li><li>Approved trades: ${summary.approvals?.approvedCount || 0}</li><li>Fresh actionable approvals: ${summary.approvals?.freshApprovedCount || 0}</li><li>Stale approvals needing reapproval: ${summary.approvals?.staleApprovalCount || 0}</li><li>Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}</li><li>Queued for open runner: ${summary.execution?.tradeState?.queuedForOpenRunner || 0}</li><li>Queued retries: ${summary.execution?.openRunnerRetryState?.queuedRetry || 0}</li><li>Blocked rows: ${summary.execution?.tradeState?.blocked || 0}</li><li>In-flight rows: ${summary.execution?.inFlightCount || 0}</li><li>Failed rows: ${summary.execution?.failedCount || 0}</li></ul></section>
     <section class="card panel-6"><h2>Observability Status</h2><ul><li>Runtime event file present: ${summary.observability?.eventsPresent ? 'yes' : 'no'}</li><li>Recent runtime events scanned: ${summary.observability?.recentSummary?.total || 0}</li><li>Blocked execution-policy events: ${summary.observability?.recentSummary?.blockedTrades || 0}</li><li>Open-runner first handoff events: ${summary.observability?.recentSummary?.openRunnerQueueEvents || 0}</li><li>Open-runner retry events: ${summary.observability?.recentSummary?.openRunnerRetryEvents || 0}</li><li>Degraded broker events: ${summary.observability?.recentSummary?.degradedBrokerEvents || 0}</li><li>Stale-data events: ${summary.observability?.recentSummary?.staleDataEvents || 0}</li></ul></section>
     <section class="card panel-12"><h2>Recommended Next Step</h2><p>${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</p></section>
+    <section class="card panel-12"><h2>Allocation health</h2><div class="table-wrap"><table><thead><tr><th>Asset class</th><th class="num">Current %</th><th class="num">Target %</th><th class="num">Drift %</th><th>Status</th></tr></thead><tbody>${allocationTable}</tbody></table></div></section>
     <section class="card panel-12"><h2>Contract Intelligence Readiness</h2><p>${escapeHtml(summary.contractIntelligence?.summaryLine || 'No contract-intelligence summary available.')}</p><p class="list-subtle">Recommended contract-intelligence action: ${escapeHtml(summary.contractIntelligence?.nextAction || 'No contract-intelligence remediation suggested.')}</p></section>
   </div>
 </div>
