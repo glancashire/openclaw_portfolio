@@ -1,49 +1,40 @@
-# Phase 103 — Execution Command Rationalization and Canonical Operator Surface
-
-_Last updated: 2026-05-10 12:01 UTC_
+# Phase 103 — Execution command rationalization
 
 ## Goal
+Consolidate the operator-facing execution command surface into one canonical family so readiness, approval, stage, cancel, resync, and status flows are clear, documented, and machine-readable where it matters.
 
-Reduce operational ambiguity by consolidating the execution-related command surface into a small set of canonical, well-documented operator entrypoints.
+## Current hypothesis
+The repo already has a working command surface, but older wrappers and docs may still be ambiguous. This phase should only add the minimum missing glue or documentation required to make the canonical surface obvious and unambiguous.
 
-## Why this phase matters
+## In scope
+- inventory execution-related scripts and classify them by role
+- choose and document one canonical operator command family
+- ensure help/usage is clear and JSON output exists where operationally useful
+- mark obsolete scripts clearly without breaking compatibility where needed
+- add or tighten focused tests for routing/output and docs alignment
 
-The repo now has strong execution logic, but many overlapping scripts still exist:
-- preflight/readiness checks
-- approval/rejection flows
-- staging/submission flows
-- sync/resync flows
-- cancel flows
-- open-runner / market-open flows
-- debug/diagnostic scripts
+## Out of scope
+- changing live-execution safety gates
+- widening authority or bypassing policy checks
+- removing compatibility if callers still need it and the canonical path is already explicit
 
-That sprawl makes it harder to know which command is authoritative, which one is compatibility-only, and which one should be used in production.
+## Implementation steps
+1. Inventory execution-related scripts and docs.
+2. Compare the surface against the phase checklist.
+3. Add the smallest missing canonical glue/documentation/test coverage.
+4. Re-run focused verification until green.
+5. Commit and push the completed phase.
 
-## Scope
+## Verification gates
+- `node scripts/test-trade-cli-surface.js`
+- `node scripts/test-execution-command-surface-doc.js`
+- `node scripts/test-operator-runbooks-contract.js`
+- `node scripts/test-trading-workflow-doc-contract.js`
+- `node scripts/test-transmitted-live-operations-doc-contract.js`
+- `node scripts/test-system-policy-contract.js`
 
-Create a canonical operator command model for execution workflows that:
-1. identifies canonical vs compatibility vs debug scripts
-2. adds a top-level operator entrypoint for execution actions
-3. documents the expected command families
-4. reduces confusion around which command should be used for live readiness, approval, staging, submit, cancel, and resync
-5. preserves safety gates and explicit approvals
-
-## Non-goals
-
-- do not remove compatibility scripts yet unless the canonical path fully replaces them
-- do not change execution safety policy
-- do not add new live execution power
-
-## Intended outputs
-
-- a small canonical command surface
-- explicit repo docs for command families
-- compatibility/deprecation notes for obsolete scripts
-- tests verifying canonical commands route correctly
-
-## Done criteria
-
-This phase is done when:
-- there is one clearly documented canonical operator command family for execution actions
-- obsolete/compat/debug commands are classified
-- tests or direct inspection prove the canonical surface exists and works
+## Success criteria
+- one canonical execution command family is documented and test-covered
+- operator users can discover the right commands without ambiguity
+- safety gates remain unchanged
+- old wrappers are either clearly compat or clearly obsolete
