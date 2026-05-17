@@ -3,4 +3,4 @@
 - [x] Inspect pending-actions artifact coverage
 - [x] Add generated pending-actions contract checks
 - [x] Re-run targeted overview/reporting checks
-- [ ] Commit and push
+- [x] Commit and push

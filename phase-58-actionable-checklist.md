@@ -7,4 +7,4 @@
 - [x] Add execution-policy delayed-only coverage
 - [x] Update operator-facing docs for delayed fallback visibility
 - [x] Re-run readiness command and targeted safety checks
-- [ ] Commit and push
+- [x] Commit and push

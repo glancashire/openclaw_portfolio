@@ -8,5 +8,5 @@
 - [x] Iterate until the dashboard artifact tests pass.
 - [x] Regenerate and inspect `portfolio/etf/summary.html`.
 - [x] Mark checklist complete and summarize the phase outcome.
-- [ ] Commit Phase 178 implementation.
-- [ ] Push Phase 178.
+- [x] Commit Phase 178 implementation.
+- [x] Push Phase 178.

@@ -5,4 +5,4 @@
 - [x] Add focused queue command tests
 - [x] Update operator docs for queue command
 - [x] Re-run targeted command-surface and trade-state tests
-- [ ] Commit and push
+- [x] Commit and push

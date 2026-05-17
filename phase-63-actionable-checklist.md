@@ -5,4 +5,4 @@
 - [x] Preserve trend guard and audit trail behavior
 - [x] Add/update focused quote-path tests
 - [x] Re-run targeted market-open and readiness checks
-- [ ] Commit and push
+- [x] Commit and push

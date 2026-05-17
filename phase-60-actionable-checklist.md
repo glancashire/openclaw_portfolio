@@ -4,4 +4,4 @@
 - [x] Keep blocked rows excluded from executable selection
 - [x] Add focused queued-row selection coverage
 - [x] Re-run targeted trade-state and market-open selection tests
-- [ ] Commit and push
+- [x] Commit and push

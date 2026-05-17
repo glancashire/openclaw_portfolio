@@ -5,4 +5,4 @@
 - [x] Add/update focused CLI recovery tests
 - [x] Update operator docs
 - [x] Re-run targeted command/trade-state/reporting checks
-- [ ] Commit and push
+- [x] Commit and push
