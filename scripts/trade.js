@@ -57,6 +57,7 @@ Commands:
   reconcile-live Refresh broker/live-state truth and derived operator artifacts
   health        Classify current portfolio execution health
   self-heal     Show a bounded dry-run remediation plan
+  refresh-stale-approvals  Inspect stale approvals and exact safe next steps
   status        Show open orders and fill notification state
   cancel        Cancel open orders (--order-id <id> or --all)
   history       Show recent trade executions
@@ -82,6 +83,7 @@ Examples:
   node scripts/trade.js reconcile-live --json
   node scripts/trade.js health --json
   node scripts/trade.js self-heal --dry-run --json
+  node scripts/trade.js refresh-stale-approvals portfolio/etf --json
   node scripts/trade.js cancel --all
   node scripts/trade.js history --json
 `);
@@ -407,6 +409,51 @@ function cmdSelfHeal() {
   });
 }
 
+
+function cmdRefreshStaleApprovals() {
+  const portfolioDir = resolvePortfolioDir();
+  const { staleApprovalInventory } = require('../src/execution/tradeState');
+  const tradesPath = path.join(portfolioDir, 'trades.md');
+  const items = staleApprovalInventory(tradesPath);
+  const nextSteps = [];
+  if (items.length > 0) {
+    const uniqueRefreshCommands = [...new Set(items.map((item) => item.refreshCommand).filter(Boolean))];
+    nextSteps.push(...uniqueRefreshCommands);
+    nextSteps.push('Review the regenerated proposal rows and approve only the latest refreshed row per instrument/action.');
+  }
+  const payload = {
+    ok: true,
+    portfolio: path.basename(portfolioDir),
+    staleApprovalCount: items.length,
+    items,
+    mutatesTrades: false,
+    recommendedNextSteps: nextSteps,
+  };
+
+  if (JSON_OUT) {
+    printJson(payload);
+    if (items.length > 0) process.exit(2);
+    return;
+  }
+
+  console.log(`Stale approval refresh surface for ${payload.portfolio}`);
+  console.log(`- stale approvals needing reapproval: ${payload.staleApprovalCount}`);
+  console.log('- mutates trades: no');
+  if (items.length === 0) {
+    console.log('- next action: none; no stale approvals currently detected.');
+    return;
+  }
+  console.log('- exact safe next steps:');
+  for (const step of payload.recommendedNextSteps) console.log(`  - ${step}`);
+  console.log('\nStale approval inventory:');
+  for (const item of items) {
+    console.log(`- ${item.tickerOrIsin || 'unknown'} ${item.action || 'trade'} (${item.dateTime || 'unknown time'})`);
+    console.log(`  reason: ${item.reason}`);
+    console.log(`  next row guidance: ${item.reapproveGuidance}`);
+  }
+  process.exit(2);
+}
+
 function cmdStatus() {
   const { summarizeOpenRunnerRetryState } = require('../src/execution/tradeState');
   const portfolioArg = flags.find((flag) => !flag.startsWith('-'));
@@ -638,6 +685,7 @@ switch (command) {
   case 'reconcile-live': cmdReconcileLive(); break;
   case 'health': cmdHealth(); break;
   case 'self-heal': cmdSelfHeal(); break;
+  case 'refresh-stale-approvals': cmdRefreshStaleApprovals(); break;
   case 'status': cmdStatus(); break;
   case 'submit': cmdSubmit(); break;
   case 'queue-open': cmdQueueOpen(); break;
