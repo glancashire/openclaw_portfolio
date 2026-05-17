@@ -1,20 +1,20 @@
 # Phase 103 — Actionable Checklist
 
 ## Canonical execution command surface
-- [ ] Inventory execution-related scripts and classify them as canonical / compat / debug / obsolete.
-- [ ] Define one canonical execution command family.
-- [ ] Add or refine a top-level operator entrypoint for readiness / approve / reject / stage / cancel / resync.
-- [ ] Ensure canonical commands have clear help/usage output.
-- [ ] Ensure canonical commands support machine-readable JSON where operationally useful.
+- [x] Inventory execution-related scripts and classify them as canonical / compat / debug / obsolete.
+- [x] Define one canonical execution command family.
+- [x] Add or refine a top-level operator entrypoint for readiness / approve / reject / stage / cancel / resync.
+- [x] Ensure canonical commands have clear help/usage output.
+- [x] Ensure canonical commands support machine-readable JSON where operationally useful.
 
 ## Documentation and deprecation
-- [ ] Document the canonical command surface in repo docs.
-- [ ] Mark obsolete scripts clearly.
-- [ ] Preserve compatibility where needed without ambiguity.
+- [x] Document the canonical command surface in repo docs.
+- [x] Mark obsolete scripts clearly.
+- [x] Preserve compatibility where needed without ambiguity.
 
 ## Verification
-- [ ] Add focused tests for canonical command routing/output.
-- [ ] Run repo verification after changes.
-- [ ] Confirm no safety gates were widened.
-- [ ] Commit Phase 103 implementation.
-- [ ] Push Phase 103.
+- [x] Add focused tests for canonical command routing/output.
+- [x] Run repo verification after changes.
+- [x] Confirm no safety gates were widened.
+- [x] Commit Phase 103 implementation.
+- [x] Push Phase 103.
