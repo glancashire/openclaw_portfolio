@@ -1,19 +1,19 @@
 # Phase 108 — Actionable Checklist
 
 ## Artifact policy
-- [ ] Create a repo-local artifact policy document.
-- [ ] Classify source files, derived versioned artifacts, and runtime ephemeral artifacts.
-- [ ] Cover portfolio summaries, overview outputs, runtime state, and event logs.
+- [x] Create a repo-local artifact policy document.
+- [x] Classify source files, derived versioned artifacts, and runtime ephemeral artifacts.
+- [x] Cover portfolio summaries, overview outputs, runtime state, and event logs.
 
 ## Alignment
-- [ ] Keep the policy aligned with current repo behavior.
-- [ ] Reference the policy from relevant operational docs if needed.
-- [ ] Avoid pretending the repo is cleaner than it is.
+- [x] Keep the policy aligned with current repo behavior.
+- [x] Reference the policy from relevant operational docs if needed.
+- [x] Avoid pretending the repo is cleaner than it is.
 
 ## Verification
-- [ ] Add a focused artifact-policy verification test.
-- [ ] Add the test to repo verification.
-- [ ] Run focused checks and full repo verification.
-- [ ] Iterate until all checks pass.
-- [ ] Commit Phase 108 implementation.
-- [ ] Push Phase 108.
+- [x] Add a focused artifact-policy verification test.
+- [x] Add the test to repo verification.
+- [x] Run focused checks and full repo verification.
+- [x] Iterate until all checks pass.
+- [x] Commit Phase 108 implementation.
+- [x] Push Phase 108.
