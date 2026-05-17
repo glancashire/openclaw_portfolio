@@ -6,16 +6,16 @@ _Last updated: 2026-05-12 22:14 UTC_
 Stabilize IBKR native auth/readiness handshakes so canonical auth/readiness/authority surfaces stop disagreeing due to narrow `nextValidId` timing behavior.
 
 ## Checklist
-- [ ] Review `src/brokers/interactive-brokers/nativeClient.js` handshake success/failure events.
-- [ ] Review readiness and authority callers for repeated fresh-connection divergence.
-- [ ] Implement a shared native connection wait helper that accepts multiple safe success signals.
-- [ ] Preserve explicit timeout and real-error reporting without masking hard failures.
-- [ ] Reuse the helper across auth/relevant broker operations.
-- [ ] Add or extend regression tests for timeout handling and readiness/auth convergence behavior.
-- [ ] Run focused verification gates.
-- [ ] Iterate until all targeted tests pass.
-- [ ] Commit implementation.
-- [ ] Push.
+- [x] Review `src/brokers/interactive-brokers/nativeClient.js` handshake success/failure events.
+- [x] Review readiness and authority callers for repeated fresh-connection divergence.
+- [x] Implement a shared native connection wait helper that accepts multiple safe success signals.
+- [x] Preserve explicit timeout and real-error reporting without masking hard failures.
+- [x] Reuse the helper across auth/relevant broker operations.
+- [x] Add or extend regression tests for timeout handling and readiness/auth convergence behavior.
+- [x] Run focused verification gates.
+- [x] Iterate until all targeted tests pass.
+- [x] Commit implementation.
+- [x] Push.
 
 ## Verification gates
 - `node tests/test-ibkr-readiness.js`
