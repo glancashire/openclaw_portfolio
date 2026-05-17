@@ -10,5 +10,5 @@
 - [x] Verify readiness stays green when gateway is already healthy.
 - [x] Re-run the focused verification commands until green.
 - [x] Commit Phase 173 plan.
-- [ ] Commit Phase 173 implementation.
-- [ ] Push Phase 173.
+- [x] Commit Phase 173 implementation.
+- [x] Push Phase 173.

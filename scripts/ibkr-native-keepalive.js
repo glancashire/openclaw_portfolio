@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { InteractiveBrokersClient } = require('../src/brokers/interactive-brokers/client');
 const { getInteractiveBrokersReadiness } = require('../src/brokers/interactive-brokers/readiness');
 const { sendEmail } = require('../lib/mailgun');
 
@@ -76,6 +77,23 @@ function startGateway(startScript) {
   execFileSync(startScript, { stdio: 'inherit' });
 }
 
+function hasUsableQuote(readiness) {
+  const probe = readiness?.marketDataProbe;
+  const detail = String(readiness?.marketDataDetail || '');
+  return Boolean(probe) && !/no usable price fields/i.test(detail);
+}
+
+async function probeNativeData({ portfolio, getReadiness }) {
+  const readiness = await getReadiness({ portfolio });
+  if (!readiness?.authenticated || !readiness?.reachable) {
+    return { ok: false, readiness, gatewayState: 'down', status: 'down' };
+  }
+  if (readiness.fallbackRequired === false || hasUsableQuote(readiness)) {
+    return { ok: true, readiness, gatewayState: 'api_ready', status: 'ready' };
+  }
+  return { ok: true, readiness, gatewayState: 'api_ready', status: 'up_but_unpriced' };
+}
+
 async function maybeSend2faMail(readiness, state, { recipient, paths, sendEmailImpl }) {
   if (state.awaiting2faMailSentAt) return { mailed: false, reason: 'already_sent' };
   const subject = 'IBKR native gateway is waiting for 2FA approval';
@@ -103,8 +121,9 @@ async function main(options = {}) {
   const sendEmailImpl = settings.sendEmail || sendEmail;
   const detectGatewayState = settings.detectGatewayState || defaultDetectGatewayState;
 
-  const firstReadiness = await getReadiness({ portfolio: settings.portfolio });
-  const firstGatewayState = detectGatewayState();
+  const firstProbe = await probeNativeData({ portfolio: settings.portfolio, getReadiness });
+  const firstGatewayState = firstProbe.gatewayState || detectGatewayState();
+  const firstReadiness = firstProbe.readiness;
   const firstStatus = classify(firstReadiness, firstGatewayState);
 
   if (firstStatus === 'ready') {
@@ -113,15 +132,17 @@ async function main(options = {}) {
     state.awaiting2faMailSentAt = null;
     state.lastError = null;
     writeState(paths, state);
-    console.log(JSON.stringify({ ok: true, status: 'ready', gatewayState: firstGatewayState, restarted: false, mailed: false, readiness: firstReadiness }, null, 2));
-    return;
+    const result = { ok: true, status: 'ready', gatewayState: firstGatewayState, restarted: false, mailed: false, readiness: firstReadiness };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
   }
 
   if (!isDaytimeUTC()) {
     state.lastError = 'gateway_not_ready_outside_daytime_window';
     writeState(paths, state);
-    console.log(JSON.stringify({ ok: false, status: firstStatus, gatewayState: firstGatewayState, restarted: false, mailed: false, skipped: 'outside_daytime_window', readiness: firstReadiness }, null, 2));
-    return;
+    const result = { ok: false, status: firstStatus, gatewayState: firstGatewayState, restarted: false, mailed: false, skipped: 'outside_daytime_window', readiness: firstReadiness };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
   }
 
   if (firstStatus === 'awaiting_login_or_2fa') {
@@ -129,8 +150,9 @@ async function main(options = {}) {
     const mail = await maybeSend2faMail(firstReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
     state.lastError = 'awaiting_login_or_2fa';
     writeState(paths, state);
-    console.log(JSON.stringify({ ok: false, status: 'awaiting_login_or_2fa', gatewayState: firstGatewayState, restarted: false, mailed: mail.mailed, readiness: firstReadiness }, null, 2));
-    return;
+    const result = { ok: false, status: 'awaiting_login_or_2fa', gatewayState: firstGatewayState, restarted: false, mailed: mail.mailed, readiness: firstReadiness };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
   }
 
   startGateway(settings.startScript);
@@ -138,8 +160,9 @@ async function main(options = {}) {
   writeState(paths, state);
 
   await new Promise((resolve) => setTimeout(resolve, settings.restartWaitMs));
-  const secondReadiness = await getReadiness({ portfolio: settings.portfolio });
-  const secondGatewayState = detectGatewayState();
+  const secondProbe = await probeNativeData({ portfolio: settings.portfolio, getReadiness });
+  const secondGatewayState = secondProbe.gatewayState || detectGatewayState();
+  const secondReadiness = secondProbe.readiness;
   const secondStatus = classify(secondReadiness, secondGatewayState);
 
   if (secondStatus === 'ready') {
@@ -148,8 +171,9 @@ async function main(options = {}) {
     state.awaiting2faMailSentAt = null;
     state.lastError = null;
     writeState(paths, state);
-    console.log(JSON.stringify({ ok: true, status: 'ready', gatewayState: secondGatewayState, restarted: true, mailed: false, readiness: secondReadiness }, null, 2));
-    return;
+    const result = { ok: true, status: 'ready', gatewayState: secondGatewayState, restarted: true, mailed: false, readiness: secondReadiness };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
   }
 
   if (secondStatus === 'awaiting_login_or_2fa') {
@@ -157,13 +181,16 @@ async function main(options = {}) {
     const mail = await maybeSend2faMail(secondReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
     state.lastError = 'awaiting_login_or_2fa';
     writeState(paths, state);
-    console.log(JSON.stringify({ ok: false, status: 'awaiting_login_or_2fa', gatewayState: secondGatewayState, restarted: true, mailed: mail.mailed, readiness: secondReadiness }, null, 2));
-    return;
+    const result = { ok: false, status: 'awaiting_login_or_2fa', gatewayState: secondGatewayState, restarted: true, mailed: mail.mailed, readiness: secondReadiness };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
   }
 
   state.lastError = secondReadiness?.message || 'gateway_not_ready_after_restart';
   writeState(paths, state);
-  console.log(JSON.stringify({ ok: false, status: secondStatus, gatewayState: secondGatewayState, restarted: true, mailed: false, readiness: secondReadiness }, null, 2));
+  const result = { ok: false, status: secondStatus, gatewayState: secondGatewayState, restarted: true, mailed: false, readiness: secondReadiness };
+  console.log(JSON.stringify(result, null, 2));
+  return result;
 }
 
 if (require.main === module) {
@@ -173,4 +200,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main, classify, isDaytimeUTC, buildPaths, defaultDetectGatewayState };
+module.exports = { main, classify, isDaytimeUTC, buildPaths, defaultDetectGatewayState, probeNativeData };
