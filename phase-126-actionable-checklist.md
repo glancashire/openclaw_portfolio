@@ -6,16 +6,16 @@ _Last updated: 2026-05-12 22:39 UTC_
 Make approved-but-non-executable trade rows explicit and consistently explained across preflight, authority-adjacent operator surfaces, and market-open dry-run behavior.
 
 ## Checklist
-- [ ] Inspect executable-row derivation and current blocked/non-executable trade-state semantics.
-- [ ] Inspect preflight and market-open dry-run outputs for missing operator-facing reason detail.
-- [ ] Define one normalized reason contract for approved-but-non-executable rows.
-- [ ] Surface that reason in canonical preflight outputs.
-- [ ] Keep market-open dry-run reasoning aligned with the same truth.
-- [ ] Add/extend focused regression tests.
-- [ ] Run verification gates.
-- [ ] Iterate until all targeted tests pass.
-- [ ] Commit implementation.
-- [ ] Push.
+- [x] Inspect executable-row derivation and current blocked/non-executable trade-state semantics.
+- [x] Inspect preflight and market-open dry-run outputs for missing operator-facing reason detail.
+- [x] Define one normalized reason contract for approved-but-non-executable rows.
+- [x] Surface that reason in canonical preflight outputs.
+- [x] Keep market-open dry-run reasoning aligned with the same truth.
+- [x] Add/extend focused regression tests.
+- [x] Run verification gates.
+- [x] Iterate until all targeted tests pass.
+- [x] Commit implementation.
+- [x] Push.
 
 ## Verification gates
 - `node tests/test-ibkr-readiness.js`
