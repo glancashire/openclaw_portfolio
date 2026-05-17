@@ -13,7 +13,7 @@
 - [x] 155B — live reconciliation command + broker evidence persistence
 - [x] 155C — rebalance/regenerate from current holdings and cash
 - [x] 155D — dashboard priority overhaul + path-to-balanced-portfolio
-- [ ] 155E — health model + bounded self-healing
+- [x] 155E — health model + bounded self-healing
 
 ## Outcome
 - Portfolio state was reconciled against live IBKR evidence.
