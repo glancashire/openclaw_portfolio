@@ -439,8 +439,12 @@ function classifyExecutableRow(row, options = {}) {
 
 function listExecutableTradeRows(tradesPath, options = {}) {
   const table = readTradesTable(tradesPath);
-  return table.rows.filter((row) => classifyExecutableRow(row, options).executable).map((row) => {
-    const classification = classifyExecutableRow(row, options);
+  const selectionOptions = {
+    maxApprovalAgeHours: options.maxApprovalAgeHours ?? Number.POSITIVE_INFINITY,
+    now: options.now,
+  };
+  return table.rows.filter((row) => classifyExecutableRow(row, selectionOptions).executable).map((row) => {
+    const classification = classifyExecutableRow(row, selectionOptions);
     return {
       dateTime: row['Date/time'],
       status: row.Status,

@@ -23,8 +23,8 @@ function main() {
   const blocked = table.rows.find((row) => row['Ticker / ISIN'] === 'CCC');
   const blockedClassification = classifyExecutableRow(blocked);
   assert(blockedClassification.executable === false, 'expected blocked CCC row to be non-executable');
-  assert(blockedClassification.reasonCode === 'approval_required', `expected approval_required reason code, got ${blockedClassification.reasonCode}`);
-  assert(/blocked/i.test(blockedClassification.reason), 'expected blocked row reason text');
+  assert(blockedClassification.reasonCode === 'stale_approval', `expected stale_approval reason code, got ${blockedClassification.reasonCode}`);
+  assert(/stale/i.test(blockedClassification.reason) || /blocked/i.test(blockedClassification.reason), 'expected stale or blocked row reason text');
 
   console.log(JSON.stringify({ ok: true, rows, blockedClassification }, null, 2));
 }

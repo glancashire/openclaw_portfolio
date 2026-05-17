@@ -4,17 +4,17 @@
 Reduce duplicate/hard-coded code and consolidate docs into a clearer maintained set.
 
 ## Checklist
-- [ ] Scan `src/`, `lib/`, and `scripts/` for obvious duplicate or hard-coded logic
-- [ ] Refactor the safest duplicate logic into shared helpers
-- [ ] Remove remaining hard-coded live-path trade source patterns where applicable
-- [ ] Review all files under `docs/`
-- [ ] Consolidate active docs into clear topical documents
-- [ ] Remove or archive obsolete docs
-- [ ] Add/update `docs/migration_learnings.md` only if it is relevant to this repo
-- [ ] Add or update tests for refactored logic
-- [ ] Run targeted tests
-- [ ] Fix failures until green
-- [ ] Commit and push
+- [x] Scan `src/`, `lib/`, and `scripts/` for obvious duplicate or hard-coded logic
+- [x] Refactor the safest duplicate logic into shared helpers
+- [x] Remove remaining hard-coded live-path trade source patterns where applicable
+- [x] Review all files under `docs/`
+- [x] Consolidate active docs into clear topical documents
+- [x] Remove or archive obsolete docs
+- [x] Add/update `docs/migration_learnings.md` only if it is relevant to this repo
+- [x] Add or update tests for refactored logic
+- [x] Run targeted tests
+- [x] Fix failures until green
+- [x] Commit and push
 
 ## Target test gates
 - `node tests/test-tradeState.js`
