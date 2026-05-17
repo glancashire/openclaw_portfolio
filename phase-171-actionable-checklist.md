@@ -8,5 +8,5 @@
 - [x] Add focused ordering/rendering tests for exception-first output.
 - [x] Re-run health/report/email regressions until green.
 - [x] Run one real health-report email flow under live policy.
-- [ ] Commit Phase 171 implementation.
-- [ ] Push Phase 171.
+- [x] Commit Phase 171 implementation.
+- [x] Push Phase 171.
