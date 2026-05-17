@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-16T20:19:08.963Z",
+  "generatedAt": "2026-05-17T08:13:30.105Z",
   "itemCount": 9,
   "queueSummary": {
     "total": 9,
@@ -90,7 +90,7 @@
       "kind": "broker",
       "severity": "high",
       "status": "degraded",
-      "summary": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "blocking": true,
       "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
       "source": "broker_readiness"
@@ -102,7 +102,7 @@
       "kind": "broker",
       "severity": "high",
       "status": "degraded",
-      "summary": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "blocking": true,
       "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
       "source": "broker_readiness"

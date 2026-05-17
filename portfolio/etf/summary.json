@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-17T08:02:35.648Z",
+  "generatedAt": "2026-05-17T08:13:30.103Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
@@ -11,7 +11,80 @@
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": null,
+  "readiness": {
+    "ok": false,
+    "portfolio": "etf",
+    "generatedAt": "2026-05-17T08:13:29.904Z",
+    "executionMode": "transmitted_live",
+    "armedForMarketOpen": false,
+    "armExpiresAt": "2026-05-14T07:30:35.037Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+    },
+    "marketWindow": {
+      "exchange": "EBS",
+      "openNow": false,
+      "reason": "Weekend (day 0)",
+      "nextOpen": "2026-05-18T09:00:00.000Z"
+    },
+    "approvalState": {
+      "proposedCount": 5,
+      "approvedCount": 0,
+      "executableCount": 0,
+      "latestApprovedAt": null,
+      "approvalAgeHours": null,
+      "staleApproval": false,
+      "staleApprovedRows": [],
+      "maxApprovalAgeHours": 24,
+      "ambiguousQueuedCount": 0,
+      "hasAnyApprovedRows": false,
+      "hasExecutableApprovedRows": false,
+      "executableRows": [],
+      "excludedApprovedRows": []
+    },
+    "rows": [],
+    "excludedRows": [],
+    "blockers": [
+      {
+        "code": "not_armed_for_market_open",
+        "message": "Live execution is not armed for the next market-open window."
+      },
+      {
+        "code": "broker_unready",
+        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      },
+      {
+        "code": "no_approved_rows",
+        "message": "No approved trade rows exist in trades.md for live execution."
+      },
+      {
+        "code": "no_executable_rows",
+        "message": "No executable approved trade rows are currently eligible for submission."
+      },
+      {
+        "code": "approval_state_mismatch",
+        "message": "Trades remain proposed with no approved rows recorded, so approval intent is not reflected in the active trade log."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "market_closed",
+        "message": "Market is currently closed (Weekend (day 0)). Next open: 2026-05-18T09:00:00.000Z"
+      }
+    ],
+    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight."
+  },
   "holdings": {
     "totalValueChf": 5327.0300003,
     "cashChf": 116.64,

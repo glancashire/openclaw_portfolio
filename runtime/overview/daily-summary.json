@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-13T13:20:15.789Z",
+  "generatedAt": "2026-05-17T08:13:30.105Z",
   "totals": {
     "portfolioCount": 2,
-    "totalCashChf": 4048.26,
+    "totalCashChf": 116.64,
     "approvalCount": 1,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
   },
   "healthHeadline": "warning",
-  "cashWaitingToDeployChf": 4048.26,
+  "cashWaitingToDeployChf": 116.64,
   "biggestDrift": {
     "portfolio": "acceptance-closure",
     "assetClass": "Global equities",
@@ -18,17 +18,17 @@
     "status": "out_of_bounds",
     "absDrift": 50
   },
-  "brokerHealth": "healthy",
+  "brokerHealth": "degraded",
   "reportingHealth": "attention_needed",
   "pendingApprovals": 1,
-  "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
-  "biggestDriftWhy": "Global equities is 40% over target and outside the allowed band around the 60% target.",
+  "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
+  "biggestDriftWhy": "Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",
-    "cashChf": 4048.26,
-    "brokerHealth": "healthy",
-    "deliveryPosture": "needs_operator_attention",
+    "cashChf": 116.64,
+    "brokerHealth": "degraded",
+    "deliveryPosture": "ready",
     "pendingApprovals": 1,
     "blockedTradeCount": 1,
     "topBrokerBlock": {
@@ -38,7 +38,7 @@
       "blockReason": "No broker quote was available during market-open execution.",
       "nextAction": "Restore broker pricing and rerun the market-open submission path."
     },
-    "recommendedNextStep": "1 approved trade row(s) are ready for staging or review.",
+    "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
     "whyNow": "No broker quote was available during market-open execution."
   }
 }

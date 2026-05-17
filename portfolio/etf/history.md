@@ -34,3 +34,4 @@
 | 2026-05-13 | execution_rejected | 5162.4400003 | 3228.6400003 | 1933.8 | 0 | 0 | Trade rejected and blocked from execution. |
 | 2026-05-13 | execution_approved | 5162.4400003 | 3228.6400003 | 1933.8 | 0 | 0 | Trade approved for broker execution. |
 | 2026-05-13 | execution_filled | 5327.0300003 | 5210.3900003 | 116.64 | 0 | 0 | Broker order 9115 status sync: Filled |
+| 2026-05-15 | end_of_day | 5327.0300003 | 5210.3900003 | 116.64 | 0 | 0 | weekly report cycle snapshot |

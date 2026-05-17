@@ -785,6 +785,11 @@ function renderPortfolioSummaryHtml(summary = {}) {
   const gainPct = invested > 0 ? Number(((gain / invested) * 100).toFixed(1)) : 0;
   const pendingCount = Number(summary.operatorQueue?.summary?.total || 0);
   const topBlocker = summary.blockers?.items?.[0]?.message || 'No active blocker currently surfaced.';
+  const liveReadinessLabel = summary.readiness ? (summary.readiness.ok ? 'ready' : 'blocked') : 'not-evaluated';
+  const liveArmLabel = summary.readiness
+    ? (summary.readiness.armedForMarketOpen ? `armed until ${summary.readiness.armExpiresAt || 'unknown'}` : 'not armed')
+    : 'not-evaluated';
+  const liveReadinessNextStep = summary.readiness?.recommendedNextAction || 'n/a';
   const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
   const recentEvents = Array.isArray(summary.recentMaterialEvents) ? summary.recentMaterialEvents : [];
   const allocationRows = Array.isArray(summary.allocation) ? summary.allocation : [];
@@ -933,7 +938,7 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
       <div class="kpi"><div class="kpi-label">Cash balance</div><div class="kpi-value">CHF ${cash.toFixed(2)}</div><div class="kpi-detail">Holdings ${Number(summary.holdings?.holdingCount || 0)}</div></div>
       <div class="kpi"><div class="kpi-label">Top blocker</div><div class="kpi-value" style="font-size:1.05rem;line-height:1.35;">${escapeHtml(topBlocker)}</div><div class="kpi-detail">Broker health ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</div></div>
     </section>
-    <section class="card panel-8"><h2>Management summary</h2><div class="management-callout">${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</div></section>
+    <section class="card panel-8"><h2>Management summary</h2><div class="management-callout">${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}<div style="margin-top:14px;color:var(--muted);font-size:13px;line-height:1.7;"><div>Live readiness: ${escapeHtml(liveReadinessLabel)}</div><div>Live arm state: ${escapeHtml(liveArmLabel)}</div><div>Live readiness next step: ${escapeHtml(liveReadinessNextStep)}</div></div></div></section>
     <section class="card panel-4"><h2>Immediate status</h2><ul><li>Health: ${escapeHtml(summary.status?.health || 'unknown')}</li><li>Strategy status: ${escapeHtml(summary.status?.strategy || 'unknown')}</li><li>Broker health: ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</li><li>Execution posture: ${escapeHtml(summary.status?.executionPosture || 'unknown')}</li><li>Delivery posture: ${escapeHtml(summary.status?.deliveryPosture || 'unknown')}</li><li>Data freshness: ${escapeHtml(summary.status?.dataFreshness || 'unknown')}</li></ul></section>
     <section class="card panel-12"><h2>Effective holdings</h2><div class="table-wrap"><table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th class="num">Quantity</th><th class="num">Price CHF</th><th class="num">Value CHF</th></tr></thead><tbody>${holdingRowsHtml}</tbody><tfoot><tr><th colspan="5">Total</th><th class="num">CHF ${holdingTotalChf.toFixed(2)}</th></tr></tfoot></table></div></section>
     <section class="card panel-12"><h2>Instrument actions</h2><div class="table-wrap"><table><thead><tr><th>Ticker / ISIN</th><th>Name</th><th>Asset class</th><th class="num">Target %</th><th>Latest proposal status</th><th>Approval</th></tr></thead><tbody>${instrumentTable}</tbody></table></div></section>

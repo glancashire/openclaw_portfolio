@@ -3,24 +3,24 @@
 ## Headline
 - Overall health: warning
 - Portfolios tracked: 2
-- Cash waiting to deploy CHF: 4048.26
+- Cash waiting to deploy CHF: 116.64
 - Pending approvals: 1
-- Broker health: healthy
+- Broker health: degraded
 - Reporting health: attention_needed
-- Recommended next step: 1 approved trade row(s) are ready for staging or review.
+- Recommended next step: 1 proposed trade row(s) still need user approval.
 
 ## Biggest Drift Today
 - acceptance-closure: Global equities drift -50% (out_of_bounds)
-- Why it matters: Global equities is 40% over target and outside the allowed band around the 60% target.
+- Why it matters: Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.
 
 ## Highlighted Portfolio
 - Portfolio: etf
 - Health: warning
-- Cash CHF: 4048.26
-- Broker health: healthy
-- Delivery posture: needs_operator_attention
+- Cash CHF: 116.64
+- Broker health: degraded
+- Delivery posture: ready
 - Pending approvals: 1
 - Broker-blocked rows: 1
 - Top broker block: quote_unavailable (CH0032912732)
-- Recommended next step: 1 approved trade row(s) are ready for staging or review.
+- Recommended next step: 1 proposed trade row(s) still need user approval.
 - Why now: No broker quote was available during market-open execution.

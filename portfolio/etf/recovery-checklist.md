@@ -11,7 +11,7 @@
 - Recommended next step: 1 proposed trade row(s) still need user approval.
 
 ## Why This Incident Exists
-- Execution is blocked because broker readiness is degraded: Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.
+- Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 - 1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly.
 
 ## Incident Drivers
@@ -28,7 +28,7 @@
    - Broker order id: n/a
 
 ## Action Checklist
-1. [high] Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.
+1. [high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
    - Action: Restore broker connectivity before relying on broker-backed pricing or live execution paths.
    - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
    - Source: broker_readiness

@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-13T13:20:15.421Z",
+  "generatedAt": "2026-05-17T08:13:30.086Z",
   "portfolio": "acceptance-closure",
   "status": {
     "health": "warning",
     "strategy": "blocked",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "stale"
   },
@@ -27,24 +27,29 @@
   "approvals": {
     "proposedCount": 0,
     "approvedCount": 0,
-    "pendingApprovalCount": 0
+    "staleApprovalCount": 0,
+    "freshApprovedCount": 0,
+    "pendingApprovalCount": 0,
+    "staleApprovals": []
   },
   "operatorQueue": {
     "summary": {
       "total": 7,
-      "blocking": 5,
+      "blocking": 6,
       "approvals": 0,
       "execution": 0,
+      "freshApprovals": 0,
+      "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 0,
+      "recovery": 1,
       "delivery": 1,
       "data": 0,
       "warnings": 5,
-      "workflow": 1,
+      "workflow": 0,
       "bySeverity": {
-        "high": 5,
-        "medium": 2,
+        "high": 6,
+        "medium": 1,
         "low": 0
       }
     },
@@ -111,15 +116,15 @@
       },
       {
         "rank": 6,
-        "queueType": "backfill_review",
+        "queueType": "recovery",
         "portfolio": "acceptance-closure",
-        "kind": "delivery",
-        "severity": "medium",
-        "status": "backfill_review",
-        "summary": "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
-        "source": "fill_notification_state"
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
       },
       {
         "rank": 7,
@@ -134,6 +139,121 @@
         "source": "delivery_policy"
       }
     ]
+  },
+  "contractIntelligence": {
+    "total": 3,
+    "readyCount": 0,
+    "missingConidCount": 3,
+    "missingSymbolCount": 3,
+    "missingVenueCount": 0,
+    "items": [
+      {
+        "tickerOrIsin": "<ticker / isin>",
+        "name": "<name>",
+        "currency": "CHF",
+        "exchange": "<exchange>",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": true,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": null,
+          "localSymbol": "<name>",
+          "venue": "<exchange>",
+          "venueKey": "unknown::CHF::<exchange>",
+          "isin": "<ticker / isin>"
+        }
+      },
+      {
+        "tickerOrIsin": "<ticker / isin>",
+        "name": "<name>",
+        "currency": "CHF",
+        "exchange": "<exchange>",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": true,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": null,
+          "localSymbol": "<name>",
+          "venue": "<exchange>",
+          "venueKey": "unknown::CHF::<exchange>",
+          "isin": "<ticker / isin>"
+        }
+      },
+      {
+        "tickerOrIsin": "<ticker / isin>",
+        "name": "<name>",
+        "currency": "CHF",
+        "exchange": "<exchange>",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": true,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": null,
+          "localSymbol": "<name>",
+          "venue": "<exchange>",
+          "venueKey": "unknown::CHF::<exchange>",
+          "isin": "<ticker / isin>"
+        }
+      }
+    ],
+    "examples": {
+      "missingConid": [
+        {
+          "tickerOrIsin": "<ticker / isin>",
+          "symbol": "missing_symbol",
+          "venue": "<exchange>",
+          "conid": null,
+          "venueKey": "unknown::CHF::<exchange>"
+        },
+        {
+          "tickerOrIsin": "<ticker / isin>",
+          "symbol": "missing_symbol",
+          "venue": "<exchange>",
+          "conid": null,
+          "venueKey": "unknown::CHF::<exchange>"
+        },
+        {
+          "tickerOrIsin": "<ticker / isin>",
+          "symbol": "missing_symbol",
+          "venue": "<exchange>",
+          "conid": null,
+          "venueKey": "unknown::CHF::<exchange>"
+        }
+      ],
+      "missingSymbol": [
+        {
+          "tickerOrIsin": "<ticker / isin>",
+          "symbol": "missing_symbol",
+          "venue": "<exchange>",
+          "conid": null,
+          "venueKey": "unknown::CHF::<exchange>"
+        },
+        {
+          "tickerOrIsin": "<ticker / isin>",
+          "symbol": "missing_symbol",
+          "venue": "<exchange>",
+          "conid": null,
+          "venueKey": "unknown::CHF::<exchange>"
+        },
+        {
+          "tickerOrIsin": "<ticker / isin>",
+          "symbol": "missing_symbol",
+          "venue": "<exchange>",
+          "conid": null,
+          "venueKey": "unknown::CHF::<exchange>"
+        }
+      ],
+      "missingVenue": [],
+      "ready": []
+    },
+    "summaryLine": "0/3 approved instrument(s) have complete IBKR contract identity; missing conid: 3, missing symbol: 3, missing venue: 0.",
+    "nextAction": "Resolve missing IBKR conids before treating the full approved instrument list as execution-ready."
   },
   "blockers": {
     "count": 5,
@@ -274,47 +394,78 @@
     "Missing concrete risk limit: Max single ETF allocation.",
     "Missing concrete risk limit: Max single issuer allocation.",
     "Portfolio still has open questions; trade execution must remain blocked.",
-    "1 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "Dashboard/report freshness is stale relative to source state."
   ],
   "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
+  "selfHealPlan": {
+    "ok": true,
+    "dryRun": true,
+    "portfolio": "acceptance-closure",
+    "health": {
+      "health": "blocked",
+      "severity": "high",
+      "blockerCount": 2,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        },
+        {
+          "code": "delivery_attention",
+          "message": "Dashboard/report freshness is stale relative to source state."
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    },
+    "actions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ]
+  },
   "explanations": {
     "biggestDrift": "Global equities is 50% under target and outside the allowed band around the 50% target.",
-    "noTradePosture": "Execution should stay blocked because the supporting dashboard/holdings inputs are stale.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "executionBlock": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
     "approvalBacklog": "There is no active approval backlog."
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-13 13:20:15.411 UTC",
+      "time": "2026-05-17 08:13:30.073 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-13 10:59:53.158 UTC",
+      "time": "2026-05-17 08:12:53.784 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-13 10:59:53.111 UTC",
+      "time": "2026-05-16 22:04:39.779 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-13 07:26:22.108 UTC",
+      "time": "2026-05-16 21:57:15.707 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-13 07:26:22.035 UTC",
+      "time": "2026-05-16 20:17:29.142 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
@@ -340,11 +491,10 @@
   },
   "delivery": {
     "ready": false,
-    "mode": "local_only",
+    "mode": "email_and_repo",
     "failureAlertMode": "local_operator_review",
     "pendingActions": [
-      "Dashboard/report freshness is stale relative to source state.",
-      "1 reconciled fill(s) still need notification backfill review."
+      "Dashboard/report freshness is stale relative to source state."
     ]
   },
   "runtimeState": {

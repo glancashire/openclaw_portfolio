@@ -1,23 +1,23 @@
 {
   "schemaVersion": "1.0",
   "portfolio": "etf",
-  "generatedAt": "2026-05-16T10:42:04.908Z",
+  "generatedAt": "2026-05-16T22:06:53.959Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T10:42:04.804Z",
+    "generatedAt": "2026-05-16T22:02:04.534Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": false,
-      "reachable": false,
-      "mode": "unknown",
+      "authenticated": true,
+      "reachable": true,
+      "mode": "native-socket",
       "fallbackRequired": true,
-      "marketDataMode": "unavailable",
-      "marketDataDetail": null,
+      "marketDataMode": "unknown",
+      "marketDataDetail": "approved instrument IE00BD4TXW66: market data request returned no usable price fields | approved instrument LU0950668870: market data request returned no usable price fields | approved instrument CH0032912732: market data request returned no usable price fields",
       "marketDataProbe": null,
-      "reason": "native_error",
-      "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      "reason": "unknown",
+      "portalSessionState": "unknown_or_separate",
+      "guidance": "Prefer native raw contract details / market-data probes before assuming the portal session is required.",
+      "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
     },
     "errorState": {
       "consecutive": 0,
@@ -56,7 +56,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778927858306.867,
+        "dashboardMtimeMs": 1778968740519.0828,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1778842973840.5232
       },
@@ -95,7 +95,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T10:42:04.802Z",
+      "generatedAt": "2026-05-16T22:02:04.532Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -151,7 +151,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778927858306.867,
+          "dashboardMtimeMs": 1778968740519.0828,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1778842973840.5232
         },
@@ -240,7 +240,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+          "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
         }
       ],
       "recommendedActions": [
@@ -251,20 +251,20 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T10:42:04.908Z",
+    "generatedAt": "2026-05-16T22:06:53.959Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": false,
-      "reachable": false,
-      "mode": "unknown",
+      "authenticated": true,
+      "reachable": true,
+      "mode": "native-socket",
       "fallbackRequired": true,
-      "marketDataMode": "unavailable",
-      "marketDataDetail": null,
+      "marketDataMode": "unknown",
+      "marketDataDetail": "approved instrument IE00BD4TXW66: market data request returned no usable price fields | approved instrument LU0950668870: market data request returned no usable price fields | approved instrument CH0032912732: market data request returned no usable price fields",
       "marketDataProbe": null,
-      "reason": "native_error",
-      "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      "reason": "unknown",
+      "portalSessionState": "unknown_or_separate",
+      "guidance": "Prefer native raw contract details / market-data probes before assuming the portal session is required.",
+      "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
     },
     "errorState": {
       "consecutive": 0,
@@ -303,7 +303,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778928124839.613,
+        "dashboardMtimeMs": 1778968991055.2278,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1778842973840.5232
       },
@@ -342,7 +342,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T10:42:04.907Z",
+      "generatedAt": "2026-05-16T22:06:53.958Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -398,7 +398,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778928124839.613,
+          "dashboardMtimeMs": 1778968991055.2278,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1778842973840.5232
         },
@@ -487,7 +487,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+          "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
         }
       ],
       "recommendedActions": [
@@ -503,7 +503,7 @@
     "blockers": [
       {
         "code": "broker_unready",
-        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
       }
     ],
     "recommendedActions": [

@@ -3,8 +3,8 @@
 ## Incident Status
 - Status: action_required
 - Health: warning
-- Broker health: healthy
-- Execution posture: ready_for_review
+- Broker health: degraded
+- Execution posture: degraded_dry_run_only
 - Delivery posture: needs_operator_attention
 - Data freshness: stale
 - Pending approvals: 0
@@ -15,6 +15,7 @@
 - There is no active approval backlog.
 
 ## Incident Drivers
+- Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
 - Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.
 - 5 explicit blocker(s) are preventing a healthy operating posture.
 
@@ -49,17 +50,17 @@
    - Action: Resolve the blocking condition before proceeding.
    - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
    - Source: safety_controls
-6. [medium] 1 reconciled fill(s) were detected after the live window and still need notification backfill review.
-   - Action: Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: fill_notification_state
+6. [high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+   - Action: Restore broker connectivity before relying on broker-backed pricing or live execution paths.
+   - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
+   - Source: broker_readiness
 7. [medium] Dashboard/report freshness is stale relative to source state.
    - Action: Review report delivery readiness and clear the pending action.
    - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
    - Source: delivery_policy
 
 ## Verification Checks
-- Broker health remains healthy or intentionally degraded with operator awareness.
+- Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.
 - Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.
 - No approval backlog remains.
 - Active blockers are cleared or explicitly documented as accepted constraints.
