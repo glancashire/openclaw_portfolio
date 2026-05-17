@@ -4,7 +4,6 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { InteractiveBrokersClient } = require('../src/brokers/interactive-brokers/client');
 const { getInteractiveBrokersReadiness } = require('../src/brokers/interactive-brokers/readiness');
 const { sendEmail } = require('../lib/mailgun');
 
@@ -15,6 +14,7 @@ const DEFAULTS = {
   portfolio: 'etf',
   restartWaitMs: 20000,
   detectGatewayState: defaultDetectGatewayState,
+  allowAutoRestart: false,
 };
 
 function buildPaths(workspace) {
@@ -34,6 +34,7 @@ function readState(statePath) {
       lastReadyAt: null,
       awaiting2faSince: null,
       awaiting2faMailSentAt: null,
+      downMailSentAt: null,
       lastError: null,
     };
   }
@@ -86,7 +87,7 @@ function hasUsableQuote(readiness) {
 async function probeNativeData({ portfolio, getReadiness }) {
   const readiness = await getReadiness({ portfolio });
   if (!readiness?.authenticated || !readiness?.reachable) {
-    return { ok: false, readiness, gatewayState: 'down', status: 'down' };
+    return { ok: false, readiness, status: 'down' };
   }
   if (readiness.fallbackRequired === false || hasUsableQuote(readiness)) {
     return { ok: true, readiness, gatewayState: 'api_ready', status: 'ready' };
@@ -94,21 +95,39 @@ async function probeNativeData({ portfolio, getReadiness }) {
   return { ok: true, readiness, gatewayState: 'api_ready', status: 'up_but_unpriced' };
 }
 
-async function maybeSend2faMail(readiness, state, { recipient, paths, sendEmailImpl }) {
-  if (state.awaiting2faMailSentAt) return { mailed: false, reason: 'already_sent' };
-  const subject = 'IBKR native gateway is waiting for 2FA approval';
-  const text = [
-    'The native IBKR gateway keepalive checked the gateway during daytime,',
-    'and the launcher is up but the API socket is still waiting on login / second-factor approval.',
-    '',
-    `Readiness message: ${readiness.message || 'unknown'}`,
-    `Guidance: ${readiness.guidance || 'unknown'}`,
-    '',
-    'No automatic retry will be attempted after this point.',
-    'Ask me explicitly if you want another retry.',
-  ].join('\n');
+async function maybeSendOperatorMail(kind, readiness, state, { recipient, paths, sendEmailImpl }) {
+  if (kind === 'awaiting_login_or_2fa' && state.awaiting2faMailSentAt) return { mailed: false, reason: 'already_sent' };
+  if (kind === 'down' && state.downMailSentAt) return { mailed: false, reason: 'already_sent' };
+
+  const subject = kind === 'awaiting_login_or_2fa'
+    ? 'IBKR native gateway is waiting for login / 2FA approval'
+    : 'IBKR native gateway is down and needs operator relaunch';
+
+  const text = kind === 'awaiting_login_or_2fa'
+    ? [
+      'The native IBKR gateway keepalive checked the gateway during daytime,',
+      'and the launcher is up but the API socket is still waiting on login / second-factor approval.',
+      '',
+      `Readiness message: ${readiness?.message || 'unknown'}`,
+      `Guidance: ${readiness?.guidance || 'unknown'}`,
+      '',
+      'I did not auto-retry again.',
+      'Please relaunch or approve login/2FA when you are present, then ask me explicitly if you want another retry.',
+    ].join('\n')
+    : [
+      'The native IBKR gateway keepalive checked the gateway during daytime and could not get a usable native quote/readiness path.',
+      'The gateway appears down.',
+      '',
+      `Readiness message: ${readiness?.message || 'unknown'}`,
+      `Guidance: ${readiness?.guidance || 'unknown'}`,
+      '',
+      'I intentionally did not auto-restart it to avoid triggering an unnecessary login / 2FA flow while the operator may be away.',
+      'Please relaunch it when you are present, then trigger the login / 2FA flow intentionally if needed.',
+    ].join('\n');
+
   await sendEmailImpl({ to: recipient, subject, text });
-  state.awaiting2faMailSentAt = nowIso();
+  if (kind === 'awaiting_login_or_2fa') state.awaiting2faMailSentAt = nowIso();
+  if (kind === 'down') state.downMailSentAt = nowIso();
   writeState(paths, state);
   return { mailed: true };
 }
@@ -130,6 +149,7 @@ async function main(options = {}) {
     state.lastReadyAt = nowIso();
     state.awaiting2faSince = null;
     state.awaiting2faMailSentAt = null;
+    state.downMailSentAt = null;
     state.lastError = null;
     writeState(paths, state);
     const result = { ok: true, status: 'ready', gatewayState: firstGatewayState, restarted: false, mailed: false, readiness: firstReadiness };
@@ -145,12 +165,46 @@ async function main(options = {}) {
     return result;
   }
 
-  if (firstStatus === 'awaiting_login_or_2fa') {
+  if (firstGatewayState === 'launcher_waiting') {
     state.awaiting2faSince ||= nowIso();
-    const mail = await maybeSend2faMail(firstReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
+    const mail = await maybeSendOperatorMail('awaiting_login_or_2fa', firstReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
     state.lastError = 'awaiting_login_or_2fa';
     writeState(paths, state);
     const result = { ok: false, status: 'awaiting_login_or_2fa', gatewayState: firstGatewayState, restarted: false, mailed: mail.mailed, readiness: firstReadiness };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
+  }
+
+  if (firstStatus === 'down') {
+    const mail = await maybeSendOperatorMail('down', firstReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
+    state.lastError = firstReadiness?.message || 'gateway_down_operator_action_required';
+    writeState(paths, state);
+    const result = {
+      ok: false,
+      status: firstStatus,
+      gatewayState: firstGatewayState,
+      restarted: false,
+      mailed: mail.mailed,
+      operatorActionRequired: 'relaunch_gateway_when_present',
+      readiness: firstReadiness,
+    };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
+  }
+
+  if (!settings.allowAutoRestart) {
+    const mail = await maybeSendOperatorMail('down', firstReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
+    state.lastError = firstReadiness?.message || 'gateway_down_operator_action_required';
+    writeState(paths, state);
+    const result = {
+      ok: false,
+      status: firstStatus,
+      gatewayState: firstGatewayState,
+      restarted: false,
+      mailed: mail.mailed,
+      operatorActionRequired: 'relaunch_gateway_when_present',
+      readiness: firstReadiness,
+    };
     console.log(JSON.stringify(result, null, 2));
     return result;
   }
@@ -169,6 +223,7 @@ async function main(options = {}) {
     state.lastReadyAt = nowIso();
     state.awaiting2faSince = null;
     state.awaiting2faMailSentAt = null;
+    state.downMailSentAt = null;
     state.lastError = null;
     writeState(paths, state);
     const result = { ok: true, status: 'ready', gatewayState: secondGatewayState, restarted: true, mailed: false, readiness: secondReadiness };
@@ -176,9 +231,9 @@ async function main(options = {}) {
     return result;
   }
 
-  if (secondStatus === 'awaiting_login_or_2fa') {
+  if (secondGatewayState === 'launcher_waiting') {
     state.awaiting2faSince ||= nowIso();
-    const mail = await maybeSend2faMail(secondReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
+    const mail = await maybeSendOperatorMail('awaiting_login_or_2fa', secondReadiness, state, { recipient: settings.recipient, paths, sendEmailImpl });
     state.lastError = 'awaiting_login_or_2fa';
     writeState(paths, state);
     const result = { ok: false, status: 'awaiting_login_or_2fa', gatewayState: secondGatewayState, restarted: true, mailed: mail.mailed, readiness: secondReadiness };
