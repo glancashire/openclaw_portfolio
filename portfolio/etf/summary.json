@@ -1,90 +1,17 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-17T08:13:30.103Z",
+  "generatedAt": "2026-05-17T11:40:36.845Z",
   "portfolio": "etf",
   "status": {
-    "health": "warning",
-    "strategy": "blocked",
-    "brokerHealth": "degraded",
-    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-    "executionPosture": "degraded_dry_run_only",
+    "health": "attention_needed",
+    "strategy": "rebalance_needed",
+    "brokerHealth": "healthy",
+    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
+    "executionPosture": "ready_for_review",
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": {
-    "ok": false,
-    "portfolio": "etf",
-    "generatedAt": "2026-05-17T08:13:29.904Z",
-    "executionMode": "transmitted_live",
-    "armedForMarketOpen": false,
-    "armExpiresAt": "2026-05-14T07:30:35.037Z",
-    "brokerReadiness": {
-      "configured": true,
-      "authenticated": false,
-      "reachable": false,
-      "mode": "unknown",
-      "fallbackRequired": true,
-      "marketDataMode": "unavailable",
-      "marketDataDetail": null,
-      "marketDataProbe": null,
-      "reason": "native_error",
-      "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-    },
-    "marketWindow": {
-      "exchange": "EBS",
-      "openNow": false,
-      "reason": "Weekend (day 0)",
-      "nextOpen": "2026-05-18T09:00:00.000Z"
-    },
-    "approvalState": {
-      "proposedCount": 5,
-      "approvedCount": 0,
-      "executableCount": 0,
-      "latestApprovedAt": null,
-      "approvalAgeHours": null,
-      "staleApproval": false,
-      "staleApprovedRows": [],
-      "maxApprovalAgeHours": 24,
-      "ambiguousQueuedCount": 0,
-      "hasAnyApprovedRows": false,
-      "hasExecutableApprovedRows": false,
-      "executableRows": [],
-      "excludedApprovedRows": []
-    },
-    "rows": [],
-    "excludedRows": [],
-    "blockers": [
-      {
-        "code": "not_armed_for_market_open",
-        "message": "Live execution is not armed for the next market-open window."
-      },
-      {
-        "code": "broker_unready",
-        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-      },
-      {
-        "code": "no_approved_rows",
-        "message": "No approved trade rows exist in trades.md for live execution."
-      },
-      {
-        "code": "no_executable_rows",
-        "message": "No executable approved trade rows are currently eligible for submission."
-      },
-      {
-        "code": "approval_state_mismatch",
-        "message": "Trades remain proposed with no approved rows recorded, so approval intent is not reflected in the active trade log."
-      }
-    ],
-    "warnings": [
-      {
-        "code": "market_closed",
-        "message": "Market is currently closed (Weekend (day 0)). Next open: 2026-05-18T09:00:00.000Z"
-      }
-    ],
-    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight."
-  },
+  "readiness": null,
   "holdings": {
     "totalValueChf": 5327.0300003,
     "cashChf": 116.64,
@@ -107,21 +34,21 @@
   },
   "operatorQueue": {
     "summary": {
-      "total": 2,
-      "blocking": 1,
+      "total": 1,
+      "blocking": 0,
       "approvals": 1,
       "execution": 0,
       "freshApprovals": 0,
       "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 1,
+      "recovery": 0,
       "delivery": 0,
       "data": 0,
       "warnings": 0,
       "workflow": 0,
       "bySeverity": {
-        "high": 1,
+        "high": 0,
         "medium": 1,
         "low": 0
       }
@@ -129,18 +56,6 @@
     "items": [
       {
         "rank": 1,
-        "queueType": "recovery",
-        "portfolio": "etf",
-        "kind": "broker",
-        "severity": "high",
-        "status": "degraded",
-        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-        "blocking": true,
-        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-        "source": "broker_readiness"
-      },
-      {
-        "rank": 2,
         "queueType": "approval",
         "portfolio": "etf",
         "kind": "approval",
@@ -466,7 +381,6 @@
     }
   ],
   "pendingActions": [
-    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "1 proposed trade row(s) still need user approval."
   ],
   "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
@@ -475,35 +389,36 @@
     "dryRun": true,
     "portfolio": "etf",
     "health": {
-      "health": "blocked",
-      "severity": "high",
-      "blockerCount": 1,
-      "blockers": [
-        {
-          "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-        }
-      ],
-      "recommendedActions": [
-        "Restore native IBKR connectivity before relying on executable live-state surfaces."
-      ],
-      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      "health": "healthy",
+      "severity": "low",
+      "blockerCount": 0,
+      "blockers": [],
+      "recommendedActions": [],
+      "nextAction": "No immediate operator action is required."
     },
-    "actions": [
-      {
-        "kind": "command",
-        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
-        "reason": "Rebuild truthful broker evidence once native connectivity is available."
-      }
-    ]
+    "actions": []
   },
   "explanations": {
     "biggestDrift": "Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.",
-    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
+    "executionBlock": "Execution is waiting on explicit operator approval of proposed trade rows.",
     "approvalBacklog": "1 proposed row(s) still need approval, 15 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
+    {
+      "time": "2026-05-17 11:25:02.513 UTC",
+      "eventType": "live_execution_blocked",
+      "severity": "warn",
+      "summary": "Portfolio requires confirmation before first live trade.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-17 11:24:51.418 UTC",
+      "eventType": "draft_execution_blocked",
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
     {
       "time": "2026-05-12 22:42:22.204 UTC",
       "eventType": "submission_blocked",
@@ -524,37 +439,23 @@
       "severity": "warn",
       "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
       "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-11 21:41:08.702 UTC",
-      "eventType": "submission_blocked",
-      "severity": "warn",
-      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-11 21:39:57.415 UTC",
-      "eventType": "submission_blocked",
-      "severity": "warn",
-      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
-      "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
   "observability": {
     "eventsPresent": true,
     "recentSummary": {
-      "total": 97,
+      "total": 99,
       "byLevel": {
-        "warn": 91,
+        "warn": 93,
         "info": 6
       },
       "byCategory": {
-        "execution_policy": 65,
+        "execution_policy": 67,
         "market_open_execution": 15,
         "execution": 6,
         "risk": 11
       },
-      "blockedTrades": 91,
+      "blockedTrades": 93,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
       "openRunnerQueueEvents": 0,

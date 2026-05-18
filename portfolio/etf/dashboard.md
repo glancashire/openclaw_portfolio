@@ -1,17 +1,17 @@
 # Dashboard: etf
 
 ## Immediate Status
-- Portfolio status: warning
-- Top blocker: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
-- Next action: Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001
-- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
-- Execution posture: degraded_dry_run_only
+- Portfolio status: attention_needed
+- Top blocker: none currently surfaced
+- Next action: CH0032912732: No broker quote was available during market-open execution.
+- Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
+- Execution posture: ready_for_review
 - Delivery posture: ready
 - Active blockers: 0
-- Pending operator queue items: 5
+- Pending operator queue items: 4
 
 ## Health Snapshot
-- Strategy status: blocked
+- Strategy status: rebalance_needed
 - Last successful sync: 2026-05-13 14:29:30
 - Data freshness: current
 - Pending approvals: 1
@@ -19,10 +19,9 @@
 
 ## Pending Operator Actions
 1. [execution_block/blocked/high] CH0032912732: No broker quote was available during market-open execution.
-2. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
-3. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
-4. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
-5. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
+2. [approval/pending_user_approval/medium] There are 1 proposed trade row(s) awaiting approval.
+3. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
+4. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Portfolio Value Snapshot
 - Total value CHF: 5327.0300003
@@ -53,7 +52,7 @@
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
-- Broker/API warnings: 1
+- Broker/API warnings: 0
 - Stale data warnings: 0
 - Execution pause state: active
 - Active blocker detail:
@@ -64,7 +63,7 @@
 - Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.
 
 ## Operator Queue Summary
-- Total queue items: 5
+- Total queue items: 4
 - Blocking items: 0
 - Approval items: 1
 - Fresh actionable approvals: 0
@@ -72,7 +71,7 @@
 - Execution items: 0
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
-- Recovery items: 1
+- Recovery items: 0
 - Delivery items: 0
 - Data items: 2
 - Warning items: 0
@@ -81,11 +80,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
+| 2026-05-17 11:25:02.513 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-17 11:24:51.418 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
 | 2026-05-12 22:42:22.204 UTC | submission_blocked | warn | UBSSLI blocked before submission: No broker quote was available during market-open execution. | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:46:56.727 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
 | 2026-05-11 21:45:40.109 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:41:08.702 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
-| 2026-05-11 21:39:57.415 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-15
@@ -104,20 +103,19 @@ CH0032912732: No broker quote was available during market-open execution.
 - Pending approvals queue count: 1
 - In-flight execution rows: 0
 - Latest action recommendations:
-  - Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
-  - Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
+  - Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
+  - Keep the defensive sleeve in CHF cash for now, and leave residual tradable cash of CHF 3416.6 unallocated until live pricing is available.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 3416.6 unallocated beyond the intentional CHF cash sleeve.
-- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 - Latest history note: weekly report cycle snapshot
-- Observability shows 91 recent blocked execution-policy event(s).
+- Observability shows 93 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
-- Recent runtime events scanned: 97
-- Recent blocked trade events: 91
+- Recent runtime events scanned: 99
+- Recent blocked trade events: 93
 - Open-runner first handoff events: 0
 - Open-runner retry events: 6
 - Recent degraded broker events: 0
