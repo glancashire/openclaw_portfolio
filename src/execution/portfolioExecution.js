@@ -11,6 +11,7 @@ const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-broke
 const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows, readTradesTable } = require('./tradeState');
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
 const { recordRuntimeEvent } = require('../observability/runtimeEvents');
+const { applyExecutionTimingPolicy } = require('./orderTimingPolicy');
 
 function parsePortfolioStatus(text) {
   return captureLine(text, 'Status');
@@ -89,18 +90,6 @@ function primaryBlocker(blockers) {
   return first ? { code: codeForBlocker(first), message: first } : null;
 }
 
-
-function applyExecutionTimingPolicy(order = {}, instrument = null) {
-  const next = { ...order };
-  const symbol = String(order?.symbol || instrument?.ibkrSymbol || '').trim().toUpperCase();
-  const primaryExchange = String(order?.primaryExchange || instrument?.ibkrPrimaryExchange || '').trim().toUpperCase();
-  if (!next.tif) next.tif = 'DAY';
-  if (symbol === 'UBSPX' && primaryExchange === 'IBIS') {
-    if (next.outsideRth == null) next.outsideRth = false;
-    if (!next.goodAfterTime) next.goodAfterTime = '20260521 09:00:00 MET';
-  }
-  return next;
-}
 
 function approvedInstrumentForOrder(order, approvedInstruments) {
   const identifier = String(order?.identifier || order?.conid || order?.ibkrConid || order?.symbol || '').trim();

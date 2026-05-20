@@ -73,7 +73,13 @@ async function main() {
   assert(html.includes('Open-runner retry events'), 'Expected retry runtime-event count in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
   assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');
-  assert(html.includes('outside the allowed band') || html.includes('broker readiness is degraded') || html.includes('approval-gated trade row'), 'Expected explanation text in summary html');
+  const explanationNeedles = [
+    summary.explanations?.biggestDrift,
+    summary.explanations?.executionBlock,
+    summary.explanations?.approvalBacklog,
+    summary.explanations?.noTradePosture,
+  ].filter((value) => typeof value === 'string' && value.length > 0);
+  assert(explanationNeedles.some((needle) => html.includes(needle)), 'Expected rendered explanation text from summary model in summary html');
   assert(html.includes('<table>'), 'Expected html table rendering for summary page');
   assert(html.includes('report-container'), 'Expected improved report container class');
   assert(html.includes('--color-healthy'), 'Expected CSS custom properties for status colors');
