@@ -11,7 +11,7 @@ const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-broke
 const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows, readTradesTable } = require('./tradeState');
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
 const { recordRuntimeEvent } = require('../observability/runtimeEvents');
-const { applyExecutionTimingPolicy } = require('./orderTimingPolicy');
+const { prepareOrderForSubmission } = require('./orderPreparation');
 
 function parsePortfolioStatus(text) {
   return captureLine(text, 'Status');
@@ -320,7 +320,7 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
     };
   }
 
-  const preparedOrder = applyExecutionTimingPolicy(order, policy.instrument);
+  const preparedOrder = prepareOrderForSubmission(order, policy.instrument);
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
   const brokerResult = await client.placeOrder(preparedOrder, { dryRun, revocableOnly, transmitLive });
   if (!brokerResult.ok) {
