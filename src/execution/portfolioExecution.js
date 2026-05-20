@@ -113,6 +113,17 @@ function approvedInstrumentForOrder(order, approvedInstruments) {
   }) || null;
 }
 
+
+function approvedInstrumentSymbolAliases(instrument = null) {
+  if (!instrument) return new Set();
+  return new Set([
+    String(instrument.tickerOrIsin || '').trim().toUpperCase(),
+    String(instrument.ibkrSymbol || '').trim().toUpperCase(),
+    String(instrument.ibkrLocalSymbol || '').trim().toUpperCase(),
+    String(instrument.ibkrConid || '').trim().toUpperCase(),
+  ].filter(Boolean));
+}
+
 function buildPolicyContext({ portfolioPath, holdingsPath }) {
   const portfolioText = fs.readFileSync(portfolioPath, 'utf8');
   const holdingsText = fs.readFileSync(holdingsPath, 'utf8');
@@ -430,6 +441,11 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
         return true;
       }) || null;
       const matchedQuantity = matchedRow ? Number(matchedRow.Quantity || 0) : null;
+      const approvedInstruments = readApprovedInstruments(path.join(portfolioDir, 'portfolio.md'));
+      const matchedInstrument = selector.tickerOrIsin
+        ? approvedInstruments.find((instrument) => String(instrument.tickerOrIsin || '').trim().toUpperCase() === String(selector.tickerOrIsin).trim().toUpperCase()) || null
+        : null;
+      const instrumentAliases = approvedInstrumentSymbolAliases(matchedInstrument);
       const hintRows = Array.isArray(statusResult.hints?.completedOrders) ? statusResult.hints.completedOrders : [];
       const probableCancelledHint = hintRows.find((hint) => {
         const status = String(hint.status || '').trim().toLowerCase();
@@ -439,14 +455,13 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
           const selectorText = String(selector.tickerOrIsin).trim().toUpperCase();
           const hintSymbol = String(hint.symbol || '').trim().toUpperCase();
           const matchedName = String(matchedRow?.Name || '').trim().toUpperCase();
-          const matchedReason = String(matchedRow?.Reason || '').trim().toUpperCase();
-          const symbolReferencedByRow = hintSymbol && (
+          const instrumentAligned = hintSymbol && (
             selectorText.includes(hintSymbol)
             || hintSymbol.includes(selectorText)
             || matchedName.includes(hintSymbol)
-            || matchedReason.includes(hintSymbol)
+            || instrumentAliases.has(hintSymbol)
           );
-          if (hintSymbol && selectorText && !symbolReferencedByRow) return false;
+          if (hintSymbol && selectorText && !instrumentAligned) return false;
         }
         return true;
       }) || null;
