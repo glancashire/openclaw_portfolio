@@ -1,9 +1,69 @@
+const fs = require('fs');
 const { proposeTrades } = require('./tradeProposalEngine');
 const { readApprovedInstruments } = require('./approvedInstruments');
 const { estimateOrderSize } = require('./draftPricing');
 const { estimateOrderSizeWithBrokerFallback } = require('./brokerBackedPricing');
 
-function proposalDistribution(assetClassProposals, instruments) {
+
+function parseNumber(value) {
+  const cleaned = String(value || '').replace(/[,% ]/g, '').trim();
+  if (!cleaned) return 0;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function extractSectionRows(text, heading) {
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (start === -1) return [];
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].startsWith('## ')) {
+      end = i;
+      break;
+    }
+  }
+  return lines.slice(start, end).filter((line) => line.startsWith('|')).slice(2)
+    .map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
+}
+
+function loadCurrentInstrumentAllocations(holdingsPath, instruments) {
+  const text = fs.readFileSync(holdingsPath, 'utf8');
+  const rows = extractSectionRows(text, 'Current Holdings');
+  const totalMatch = text.match(/- Total value CHF:\s*(.+)/);
+  const totalValueChf = totalMatch ? parseNumber(totalMatch[1]) : 0;
+  const byInstrument = new Map();
+  const instrumentByConid = new Map();
+  const instrumentBySymbol = new Map();
+  const instrumentByName = new Map();
+
+  for (const instrument of instruments) {
+    if (instrument.ibkrConid) instrumentByConid.set(String(instrument.ibkrConid).trim(), instrument);
+    if (instrument.ibkrSymbol) instrumentBySymbol.set(String(instrument.ibkrSymbol).trim().toUpperCase(), instrument);
+    if (instrument.name) instrumentByName.set(String(instrument.name).trim().toUpperCase(), instrument);
+    byInstrument.set(instrument.tickerOrIsin, 0);
+  }
+
+  for (const row of rows) {
+    const tickerOrIsin = row[0] || '';
+    const name = String(row[1] || '').trim().toUpperCase();
+    const valueChf = parseNumber(row[7]);
+    const matched = instrumentByConid.get(String(tickerOrIsin).trim())
+      || instrumentBySymbol.get(String(tickerOrIsin).trim().toUpperCase())
+      || instrumentByName.get(name)
+      || instruments.find((instrument) => String(instrument.tickerOrIsin || '').trim().toUpperCase() === String(tickerOrIsin).trim().toUpperCase());
+    if (!matched) continue;
+    byInstrument.set(matched.tickerOrIsin, (byInstrument.get(matched.tickerOrIsin) || 0) + valueChf);
+  }
+
+  const allocationByInstrument = new Map();
+  for (const [tickerOrIsin, valueChf] of byInstrument.entries()) {
+    allocationByInstrument.set(tickerOrIsin, totalValueChf > 0 ? Number(((valueChf / totalValueChf) * 100).toFixed(2)) : 0);
+  }
+  return { totalValueChf, allocationByInstrument };
+}
+
+function proposalDistribution(assetClassProposals, instruments, allocationByInstrument = new Map()) {
   const proposals = [];
 
   for (const proposal of assetClassProposals.proposals) {
@@ -18,14 +78,28 @@ function proposalDistribution(assetClassProposals, instruments) {
       continue;
     }
 
-    const weighted = eligible.filter((instrument) => instrument.target != null);
-    const totalTarget = weighted.reduce((sum, instrument) => sum + instrument.target, 0);
+    const withCurrent = eligible.map((instrument) => {
+      const current = Number(allocationByInstrument.get(instrument.tickerOrIsin) || 0);
+      const target = Number(instrument.target || 0);
+      return { instrument, current, target, gap: Number((target - current).toFixed(2)) };
+    });
 
-    if (weighted.length && totalTarget > 0) {
-      for (const instrument of weighted) {
-        const share = instrument.target / totalTarget;
+    const underweight = withCurrent.filter((row) => row.gap > 0.01 && row.instrument.tickerOrIsin !== 'CASH-CHF');
+    const weighted = (underweight.length ? underweight : withCurrent.filter((row) => row.instrument.target != null)).filter((row) => row.instrument.target != null);
+    const totalGap = underweight.reduce((sum, row) => sum + row.gap, 0);
+    const totalTarget = weighted.reduce((sum, row) => sum + Number(row.instrument.target || 0), 0);
+
+    if (underweight.length && totalGap > 0) {
+      for (const row of underweight) {
+        const share = row.gap / totalGap;
         const estimatedChf = Number((proposal.estimatedChf * share).toFixed(2));
-        proposals.push({ proposal, instrument, estimatedChf, share });
+        proposals.push({ proposal, instrument: row.instrument, estimatedChf, share });
+      }
+    } else if (weighted.length && totalTarget > 0) {
+      for (const row of weighted) {
+        const share = Number(row.instrument.target || 0) / totalTarget;
+        const estimatedChf = Number((proposal.estimatedChf * share).toFixed(2));
+        proposals.push({ proposal, instrument: row.instrument, estimatedChf, share });
       }
     } else {
       const share = 1 / eligible.length;
@@ -125,7 +199,8 @@ function summariseInstrumentProposals(proposals) {
 function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
   const assetClassProposals = proposeTrades({ portfolioPath, holdingsPath });
   const instruments = readApprovedInstruments(portfolioPath);
-  const distributed = proposalDistribution(assetClassProposals, instruments);
+  const { allocationByInstrument } = loadCurrentInstrumentAllocations(holdingsPath, instruments);
+  const distributed = proposalDistribution(assetClassProposals, instruments, allocationByInstrument);
 
   const proposals = distributed.map(({ proposal, instrument, estimatedChf }) => {
     const isCashSleeve = instrument.tickerOrIsin === 'CASH-CHF';
@@ -138,7 +213,7 @@ function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
       currency: 'CHF',
       fxToChf: 1,
     } : estimateOrderSize({ tickerOrIsin: instrument.tickerOrIsin, estimatedChf });
-    return buildInstrumentProposal(proposal, instrument, estimatedChf, sizing);
+    return buildInstrumentProposal(proposal, instrument, estimatedChf, sizing, { allocationBeforePct: allocationByInstrument.get(instrument.tickerOrIsin) || 0 });
   });
 
   const summary = summariseInstrumentProposals(proposals);
@@ -154,12 +229,13 @@ function proposeInstrumentTrades({ portfolioPath, holdingsPath }) {
 async function proposeInstrumentTradesLivePriced({ portfolioPath, holdingsPath, portfolio = 'etf' }) {
   const assetClassProposals = proposeTrades({ portfolioPath, holdingsPath });
   const instruments = readApprovedInstruments(portfolioPath);
-  const distributed = proposalDistribution(assetClassProposals, instruments);
+  const { allocationByInstrument } = loadCurrentInstrumentAllocations(holdingsPath, instruments);
+  const distributed = proposalDistribution(assetClassProposals, instruments, allocationByInstrument);
   const proposals = [];
 
   for (const { proposal, instrument, estimatedChf } of distributed) {
     const sizing = await estimateOrderSizeWithBrokerFallback({ instrument, estimatedChf, portfolio });
-    proposals.push(buildInstrumentProposal(proposal, instrument, estimatedChf, sizing));
+    proposals.push(buildInstrumentProposal(proposal, instrument, estimatedChf, sizing, { allocationBeforePct: allocationByInstrument.get(instrument.tickerOrIsin) || 0 }));
   }
 
   const summary = summariseInstrumentProposals(proposals);

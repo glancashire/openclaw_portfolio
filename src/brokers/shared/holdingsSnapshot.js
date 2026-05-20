@@ -29,12 +29,17 @@ function matchApprovedInstrument(holding, approved) {
   const identifier = normalizeRaw(holding?.identifier);
   const identifierUpper = normalizeUpper(holding?.identifier);
   const ticker = normalizeUpper(holding?.ticker);
+  const localSymbol = normalizeUpper(holding?.localSymbol);
+  const primaryExchange = normalizeUpper(holding?.primaryExchange);
+  const exchange = normalizeUpper(holding?.exchange);
   const name = normalizeUpper(holding?.name);
   return approved.find((instrument) => {
     const tickerOrIsin = normalizeUpper(instrument?.tickerOrIsin);
     const ibkrConid = normalizeRaw(instrument?.ibkrConid);
     const ibkrConidUpper = normalizeUpper(instrument?.ibkrConid);
     const ibkrSymbol = normalizeUpper(instrument?.ibkrSymbol);
+    const ibkrLocalSymbol = normalizeUpper(instrument?.ibkrLocalSymbol);
+    const ibkrPrimaryExchange = normalizeUpper(instrument?.ibkrPrimaryExchange);
     const instrumentName = normalizeUpper(instrument?.name);
     return (
       tickerOrIsin === isin ||
@@ -43,7 +48,10 @@ function matchApprovedInstrument(holding, approved) {
       instrumentName === name ||
       (ibkrConid && ibkrConid === identifier) ||
       (ibkrConidUpper && ibkrConidUpper === identifierUpper) ||
-      (ibkrSymbol && ibkrSymbol === ticker)
+      (ibkrSymbol && ibkrSymbol === ticker) ||
+      (ibkrLocalSymbol && ibkrLocalSymbol === localSymbol) ||
+      (ibkrPrimaryExchange && ibkrPrimaryExchange === primaryExchange && ((ibkrSymbol && ibkrSymbol === ticker) || (ibkrLocalSymbol && ibkrLocalSymbol === localSymbol) || tickerOrIsin === isin)) ||
+      (ibkrPrimaryExchange && ibkrPrimaryExchange === exchange && ((ibkrSymbol && ibkrSymbol === ticker) || (ibkrLocalSymbol && ibkrLocalSymbol === localSymbol)))
     );
   });
 }

@@ -64,8 +64,8 @@ function main() {
   fs.writeFileSync(portfolioPath, makePortfolio({ threshold: 'absolute drift > 5 percentage points or relative drift > 20%', maxCashDrag: 10 }));
   fs.writeFileSync(holdingsPath, makeHoldings({ cash: 2000, global: 2000, swiss: 500, bond: 500, total: 5000 }));
   const cashDrag = proposeTrades({ portfolioPath, holdingsPath });
-  assert(cashDrag.proposals.some((proposal) => /Cash drag remains above policy/i.test(proposal.blockedReason || '')), 'Expected explicit cash-drag blocker');
-  assert(cashDrag.notes.some((note) => /cash-drag limit/i.test(note)), 'Expected cash-drag note');
+  assert(!cashDrag.proposals.some((proposal) => /Cash drag remains above policy/i.test(proposal.blockedReason || '')), 'Did not expect per-leg cash-drag blocker when the basket deploys available cash');
+  assert(!cashDrag.notes.some((note) => /cash-drag limit/i.test(note)), 'Did not expect cash-drag note when the basket resolves it');
 
   fs.writeFileSync(portfolioPath, makePortfolio({ threshold: 'absolute drift > 0.1 percentage points or relative drift > 1%', minimumTradeSize: 1, avoid: true, turnoverLimit: 1 }));
   fs.writeFileSync(holdingsPath, makeHoldings({ cash: 500, global: 2990, swiss: 980, bond: 530, total: 5000 }));

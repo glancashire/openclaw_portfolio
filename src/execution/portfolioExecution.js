@@ -89,6 +89,19 @@ function primaryBlocker(blockers) {
   return first ? { code: codeForBlocker(first), message: first } : null;
 }
 
+
+function applyExecutionTimingPolicy(order = {}, instrument = null) {
+  const next = { ...order };
+  const symbol = String(order?.symbol || instrument?.ibkrSymbol || '').trim().toUpperCase();
+  const primaryExchange = String(order?.primaryExchange || instrument?.ibkrPrimaryExchange || '').trim().toUpperCase();
+  if (!next.tif) next.tif = 'DAY';
+  if (symbol === 'UBSPX' && primaryExchange === 'IBIS') {
+    if (next.outsideRth == null) next.outsideRth = false;
+    if (!next.goodAfterTime) next.goodAfterTime = '20260521 09:00:00 MET';
+  }
+  return next;
+}
+
 function approvedInstrumentForOrder(order, approvedInstruments) {
   const identifier = String(order?.identifier || order?.conid || order?.ibkrConid || order?.symbol || '').trim();
   const symbol = String(order?.symbol || '').trim().toUpperCase();
@@ -166,6 +179,12 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
 
   const blockerObjects = blockers.map((message) => ({ code: codeForBlocker(message), message }));
   const primary = primaryBlocker(blockers);
+  if (instrument) {
+    if (!order.primaryExchange && instrument.ibkrPrimaryExchange) order.primaryExchange = instrument.ibkrPrimaryExchange;
+    if (!order.localSymbol && instrument.ibkrLocalSymbol) order.localSymbol = instrument.ibkrLocalSymbol;
+    if (!order.exchange) order.exchange = 'SMART';
+  }
+
   const result = {
     ok: blockers.length === 0,
     submitReady: blockers.length === 0,
@@ -301,8 +320,9 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
     };
   }
 
+  const preparedOrder = applyExecutionTimingPolicy(order, policy.instrument);
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
-  const brokerResult = await client.placeOrder(order, { dryRun, revocableOnly, transmitLive });
+  const brokerResult = await client.placeOrder(preparedOrder, { dryRun, revocableOnly, transmitLive });
   if (!brokerResult.ok) {
     const errorState = recordBrokerError({
       portfolio: path.basename(portfolioDir),
@@ -322,13 +342,26 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
 
   const historyPath = path.join(portfolioDir, 'history.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
+
+  if (dryRun === true) {
+    return {
+      ok: true,
+      dryRun,
+      policy,
+      brokerResult,
+      tradeAppend: { appended: 0, skipped: 'dry_run_no_trade_log_write' },
+      historyAppend: { appended: false, skipped: 'dry_run_no_history_write' },
+      dashboardPath: null,
+    };
+  }
+
   const tradeProposal = toTradeProposalRow(order, policy, brokerResult);
   const tradeAppend = appendTradeProposals(tradesPath, [tradeProposal]);
   const historyAppend = appendHistorySnapshot(
     historyPath,
     holdingsPath,
-    dryRun ? 'end_of_day' : 'execution_staged',
-    dryRun ? 'Dry-run broker order preview generated.' : transmitLive ? 'Transmitted live broker order submitted.' : 'Non-transmitted broker order staged.'
+    transmitLive ? 'execution_staged' : 'execution_staged',
+    transmitLive ? 'Transmitted live broker order submitted.' : 'Non-transmitted broker order staged.'
   );
   const dashboardPath = await regenerateDashboard(portfolioDir);
 

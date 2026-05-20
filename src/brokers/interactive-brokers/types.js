@@ -24,13 +24,20 @@ function normaliseHolding(raw = {}) {
   const marketValue = Number.isFinite(explicitMarketValue) && explicitMarketValue > 0
     ? explicitMarketValue
     : (Number.isFinite(price) ? price * quantity : 0);
+  const isin = raw.isin || contract.isin || null;
+  const localSymbol = raw.localSymbol || contract.localSymbol || null;
+  const primaryExchange = raw.primaryExchange || raw.primaryExch || contract.primaryExchange || contract.primaryExch || null;
+  const exchange = raw.exchange || contract.exchange || null;
 
   return {
     broker: 'interactive-brokers',
-    identifier: conid || raw.isin || symbol || null,
+    identifier: conid || isin || symbol || localSymbol || null,
     ticker: symbol,
-    isin: raw.isin || null,
-    name: raw.description || raw.name || raw.contractDesc || contract.description || contract.localSymbol || symbol || null,
+    isin,
+    localSymbol,
+    primaryExchange,
+    exchange,
+    name: raw.description || raw.name || raw.contractDesc || contract.description || localSymbol || symbol || null,
     quantity,
     price,
     currency: raw.currency || contract.currency || 'CHF',

@@ -62,6 +62,8 @@ function readApprovedInstruments(portfolioPath) {
       metadata,
       ibkrConid: metadata.ibkr_conid || metadata.conid || null,
       ibkrSymbol: metadata.ibkr_symbol || metadata.symbol || null,
+      ibkrLocalSymbol: metadata.ibkr_local_symbol || metadata.local_symbol || null,
+      ibkrPrimaryExchange: metadata.ibkr_primary_exchange || metadata.primary_exchange || null,
       fxToChfHint: metadata.fx_to_chf ? Number(metadata.fx_to_chf) : null,
     };
   });

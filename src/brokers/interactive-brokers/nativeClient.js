@@ -533,6 +533,9 @@ function placeNativeOrder(api, order) {
       totalQuantity: Number(order?.quantity || 0),
       lmtPrice: Number(order?.limitPrice || 0),
       tif: String(order?.tif || 'DAY').toUpperCase(),
+      outsideRth: order?.outsideRth === true,
+      goodAfterTime: order?.goodAfterTime ? String(order.goodAfterTime) : '',
+      goodTillDate: order?.goodTillDate ? String(order.goodTillDate) : '',
       transmit: order?.transmit === true,
     };
 

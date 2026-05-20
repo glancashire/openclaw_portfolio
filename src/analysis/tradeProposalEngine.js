@@ -109,7 +109,8 @@ function materiallyImprovesDrift(row, estimatedChf, totalValueChf, turnoverThres
   const current = Number(row.current || 0);
   const target = Number(row.target || 0);
   const driftBefore = Math.abs(current - target);
-  const allocationAfter = ((current / 100) * totalValueChf + estimatedChf) / totalValueChf * 100;
+  const currentValueChf = (current / 100) * totalValueChf;
+  const allocationAfter = ((currentValueChf + estimatedChf) / totalValueChf) * 100;
   const driftAfter = Math.abs(allocationAfter - target);
   const driftImprovement = driftBefore - driftAfter;
   const deployedPct = (estimatedChf / totalValueChf) * 100;
@@ -120,8 +121,9 @@ function materiallyImprovesDrift(row, estimatedChf, totalValueChf, turnoverThres
 
 function buildProposal({ row, estimatedChf, totalValueChf, minimumTradeSizeChf, preferCashBeforeSelling, forcedByBounds = false, turnoverBlocked = false, cashDragBlocked = false, remainingCashPct = 0 }) {
   const currentValueChf = Number((((row.current || 0) / 100) * totalValueChf).toFixed(2));
+  const deployedChf = Math.min(Math.max(Number(estimatedChf || 0), 0), Math.max(Number(totalValueChf || 0) - currentValueChf, 0));
   const allocationAfter = totalValueChf > 0
-    ? Number((((currentValueChf + estimatedChf) / totalValueChf) * 100).toFixed(2))
+    ? Number((((currentValueChf + deployedChf) / totalValueChf) * 100).toFixed(2))
     : Number(row.current || 0);
   const driftAfter = Number((allocationAfter - Number(row.target || 0)).toFixed(2));
   const belowMinimum = minimumTradeSizeChf > 0 && estimatedChf < minimumTradeSizeChf;
@@ -193,17 +195,30 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
   }
 
   const totalTargetGap = eligible.reduce((sum, row) => sum + Math.abs(Number(row.target || 0) - Number(row.current || 0)), 0);
-  const proposals = eligible
+  const targetGapDeploymentChf = Number(eligible.reduce((sum, row) => {
+    const targetGapPct = Math.max(Number(row.target || 0) - Number(row.current || 0), 0);
+    return sum + ((targetGapPct / 100) * totalValueChf);
+  }, 0).toFixed(2));
+  const deployableCashChf = Math.min(cashChf, targetGapDeploymentChf > 0 ? targetGapDeploymentChf : cashChf);
+  const plannedAllocations = eligible
     .map((row) => {
       const share = totalTargetGap > 0 ? Math.abs(Number(row.target || 0) - Number(row.current || 0)) / totalTargetGap : 0;
-      const estimatedChf = Number((cashChf * share).toFixed(2));
+      const estimatedChf = Number((deployableCashChf * share).toFixed(2));
+      return { row, share, estimatedChf };
+    })
+    .filter(({ estimatedChf }) => estimatedChf > 0);
+
+  const totalPlannedDeploymentChf = Number(plannedAllocations.reduce((sum, item) => sum + Number(item.estimatedChf || 0), 0).toFixed(2));
+  const basketRemainingCashPct = totalValueChf > 0 ? Number((((cashChf - totalPlannedDeploymentChf) / totalValueChf) * 100).toFixed(2)) : 0;
+  const basketCashDragBlocked = policy.maxCashDragAfterDeploymentPct > 0 && basketRemainingCashPct > policy.maxCashDragAfterDeploymentPct + 0.01 && totalPlannedDeploymentChf < cashChf;
+
+  const proposals = plannedAllocations
+    .map(({ row, estimatedChf }) => {
       const forcedByBounds = isOutsideBounds(row) && !exceedsRebalanceThreshold(row, policy.rebalanceThreshold);
       const turnoverBlocked = policy.avoidUnnecessaryTrades && !forcedByBounds && (
         !materiallyImprovesDrift(row, estimatedChf, totalValueChf, policy.avoidTurnoverAbovePct)
         || (policy.avoidTurnoverAbovePct > 0 && (estimatedChf / Math.max(totalValueChf, 1)) * 100 < policy.avoidTurnoverAbovePct && Math.abs(Number(row.drift || 0)) < policy.avoidTurnoverAbovePct)
       );
-      const remainingCashPct = totalValueChf > 0 ? Number((((cashChf - estimatedChf) / totalValueChf) * 100).toFixed(2)) : 0;
-      const cashDragBlocked = policy.maxCashDragAfterDeploymentPct > 0 && remainingCashPct > policy.maxCashDragAfterDeploymentPct + 0.01 && estimatedChf < cashChf;
       return buildProposal({
         row,
         estimatedChf,
@@ -212,11 +227,10 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
         preferCashBeforeSelling: policy.preferCashBeforeSelling,
         forcedByBounds,
         turnoverBlocked,
-        cashDragBlocked,
-        remainingCashPct,
+        cashDragBlocked: basketCashDragBlocked,
+        remainingCashPct: basketRemainingCashPct,
       });
-    })
-    .filter((proposal) => proposal.estimatedChf > 0);
+    });
 
   const blockedCount = proposals.filter((proposal) => proposal.blocked).length;
   const notes = [];
