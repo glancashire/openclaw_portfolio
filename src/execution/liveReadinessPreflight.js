@@ -158,8 +158,8 @@ function inferExcludedApprovedReason(row) {
   return 'Approved row is not currently executable.';
 }
 
-function evaluateMarketWindow(portfolioDir) {
-  const diagnostics = buildExecutableOrderDiagnostics({ portfolioDir });
+function evaluateMarketWindow(portfolioDir, { contractDetailsByTicker = {}, now = new Date() } = {}) {
+  const diagnostics = buildExecutableOrderDiagnostics({ portfolioDir, contractDetailsByTicker, now });
   const primaryExchange = diagnostics[0]?.preparedOrder?.primaryExchange || diagnostics[0]?.approvedInstrument?.ibkrPrimaryExchange || null;
   const exchange = primaryExchange || 'EBS';
   const openNow = isMarketOpen(exchange);
@@ -172,14 +172,22 @@ function evaluateMarketWindow(portfolioDir) {
   };
 }
 
-async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), maxApprovalAgeHours = DEFAULT_APPROVAL_MAX_AGE_HOURS } = {}) {
+function writePreSubmitDiagnosticArtifact({ portfolioDir, portfolio, payload }) {
+  const runtimeDir = path.join(path.dirname(path.dirname(portfolioDir)), 'runtime', 'pre-submit-diagnostics');
+  fs.mkdirSync(runtimeDir, { recursive: true });
+  const outPath = path.join(runtimeDir, `${portfolio}-live-readiness.json`);
+  fs.writeFileSync(outPath, JSON.stringify(payload, null, 2));
+  return outPath;
+}
+
+async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), maxApprovalAgeHours = DEFAULT_APPROVAL_MAX_AGE_HOURS, contractDetailsByTicker = {} } = {}) {
   const basics = readPortfolioBasics(portfolioDir);
   const portfolio = path.basename(portfolioDir);
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio });
   const approvalState = summarizeApprovalState(tradesPath, now, maxApprovalAgeHours);
   const armState = getLiveArmState(portfolioDir);
-  const marketWindow = evaluateMarketWindow(portfolioDir);
+  const marketWindow = evaluateMarketWindow(portfolioDir, { contractDetailsByTicker, now });
   const errorState = brokerErrorStatus(portfolio);
 
   const blockers = [];
@@ -239,7 +247,7 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
             ? 'Arm live execution explicitly for the next intended market-open window, then rerun preflight.'
             : 'Resolve blockers and rerun preflight.';
 
-  return {
+  const result = {
     ok,
     portfolio,
     generatedAt: now.toISOString(),
@@ -255,6 +263,9 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
     warnings,
     recommendedNextAction,
   };
+
+  result.diagnosticArtifactPath = writePreSubmitDiagnosticArtifact({ portfolioDir, portfolio, payload: result });
+  return result;
 }
 
 module.exports = {
