@@ -1,3 +1,5 @@
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 const { InteractiveBrokersClient } = require('../brokers/interactive-brokers/client');
@@ -10,6 +12,9 @@ const {
   saveFillNotificationState,
   fillNotificationStatePath,
 } = require('../reporting/fillNotificationState');
+const { loadApprovalEnvelope } = require('./basketApprovalStore');
+const { executeApprovedBasket } = require('./basketExecutionRunner');
+const { detectBasketPriceDrift } = require('./basketReapprovalStore');
 
 function reconcileFillNotificationBacklog({ portfolioDir, repoRoot = process.cwd() }) {
   const tradesPath = path.join(portfolioDir, 'trades.md');
@@ -84,12 +89,29 @@ async function fetchBrokerLiveEvidence({ portfolio }) {
   return evidence;
 }
 
-async function reconcilePortfolioLiveState({ portfolioDir, repoRoot = process.cwd(), refreshDerivedArtifacts = true }) {
+async function refreshBasketExecutionArtifacts({ portfolioDir, repoRoot = process.cwd(), approvalId = null, refreshDerivedArtifacts = true, detectDrift = true, driftTolerancePct = 0.5, executeBasket = false, submitLeg = null, now = new Date() } = {}) {
   const portfolio = path.basename(portfolioDir);
   const openRowsBefore = listOpenBrokerOrderRows(path.join(portfolioDir, 'trades.md'));
   const brokerEvidence = await fetchBrokerLiveEvidence({ portfolio });
   const orderResync = await resyncPortfolioOrders({ portfolioDir, refreshHoldingsOnFill: true });
   const fillBackfill = reconcileFillNotificationBacklog({ portfolioDir, repoRoot });
+
+  let basketRun = null;
+  let basketDrift = null;
+  if (approvalId) {
+    const approval = loadApprovalEnvelope({ portfolio, approvalId, rootDir: repoRoot, now });
+    if (detectDrift) {
+      basketDrift = detectBasketPriceDrift({
+        approvalEnvelope: approval.envelope,
+        currentLegs: approval.envelope.legs,
+        tolerancePct: driftTolerancePct,
+        now,
+      });
+    }
+    if (executeBasket) {
+      basketRun = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: repoRoot, now, submitLeg });
+    }
+  }
 
   let dashboardPath = null;
   let summaryArtifacts = null;
@@ -109,6 +131,8 @@ async function reconcilePortfolioLiveState({ portfolioDir, repoRoot = process.cw
     openRowsAfter,
     orderResync,
     fillBackfill,
+    basketRun,
+    basketDrift,
     artifacts: refreshDerivedArtifacts ? {
       dashboardPath,
       summaryPath: summaryArtifacts?.outPath || null,
@@ -119,8 +143,13 @@ async function reconcilePortfolioLiveState({ portfolioDir, repoRoot = process.cw
   };
 }
 
+async function reconcilePortfolioLiveState(options = {}) {
+  return refreshBasketExecutionArtifacts(options);
+}
+
 module.exports = {
   reconcilePortfolioLiveState,
+  refreshBasketExecutionArtifacts,
   reconcileFillNotificationBacklog,
   loadFillNotificationState,
   saveFillNotificationState,
