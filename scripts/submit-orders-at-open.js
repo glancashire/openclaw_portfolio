@@ -14,6 +14,7 @@ const { readApprovedInstruments } = require('../src/analysis/approvedInstruments
 const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing');
 const { calculateSmartLimit, analyzeQuoteTrend, shouldBlockForTrend, evaluateMarketOpenBlock } = require('../src/execution/marketOpenPolicy');
 const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
+const { prepareOrderForSubmission } = require('../src/execution/orderPreparation');
 
 const cliArgs = process.argv.slice(2);
 const DRY_RUN = cliArgs.includes('--dry-run');
@@ -122,21 +123,26 @@ function buildExecutableOrders() {
   const instruments = readApprovedInstruments(portfolioPath);
   return rows.map((row) => {
     const instrument = instruments.find((item) => String(item.tickerOrIsin || '').trim() === String(row.tickerOrIsin || '').trim() || String(item.ibkrSymbol || '').trim().toUpperCase() === String(row.tickerOrIsin || '').trim().toUpperCase());
-    const symbol = instrument?.ibkrSymbol || row.tickerOrIsin;
-    const conid = instrument?.ibkrConid || null;
-    const exchange = 'SMART';
-    const primaryExchange = instrument?.exchange?.includes('EBS') ? 'EBS' : undefined;
-    const currency = instrument?.currency || 'CHF';
+    const prepared = prepareOrderForSubmission({
+      action: String(row.action || '').toUpperCase(),
+      quantity: Number(row.quantity || 0),
+      limitPrice: Number(row.limitPrice || 0),
+      symbol: instrument?.ibkrSymbol || row.tickerOrIsin,
+      conid: instrument?.ibkrConid || null,
+      currency: instrument?.currency || 'CHF',
+      exchange: 'SMART',
+    }, instrument);
     return {
       row,
-      symbol,
-      conid,
-      exchange,
-      primaryExchange,
-      currency,
-      action: String(row.action || '').toUpperCase(),
-      qty: Number(row.quantity || 0),
+      symbol: prepared.symbol,
+      conid: prepared.conid,
+      exchange: prepared.exchange,
+      primaryExchange: prepared.primaryExchange,
+      currency: prepared.currency,
+      action: String(prepared.action || '').toUpperCase(),
+      qty: Number(prepared.quantity || 0),
       name: row.name,
+      preparedOrder: prepared,
     };
   });
 }

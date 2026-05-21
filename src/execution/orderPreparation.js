@@ -4,7 +4,7 @@ function normalizedUpper(value) {
   return String(value || '').trim().toUpperCase();
 }
 
-function prepareOrderForSubmission(order = {}, instrument = null) {
+function prepareOrderForSubmission(order = {}, instrument = null, options = {}) {
   const prepared = { ...order };
   if (instrument) {
     if (!prepared.conid && instrument.ibkrConid) prepared.conid = instrument.ibkrConid;
@@ -17,7 +17,7 @@ function prepareOrderForSubmission(order = {}, instrument = null) {
   if (!prepared.exchange) prepared.exchange = 'SMART';
   if (prepared.symbol) prepared.symbol = normalizedUpper(prepared.symbol);
   if (prepared.primaryExchange) prepared.primaryExchange = normalizedUpper(prepared.primaryExchange);
-  return applyExecutionTimingPolicy(prepared, instrument);
+  return applyExecutionTimingPolicy(prepared, instrument, options);
 }
 
 module.exports = { prepareOrderForSubmission };

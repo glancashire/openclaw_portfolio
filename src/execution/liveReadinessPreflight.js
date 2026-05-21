@@ -8,6 +8,7 @@ const { readTradesTable, listExecutableTradeRows, classifyExecutableRow } = requ
 const { brokerErrorStatus, readExecutionState, writeExecutionState } = require('./runtimeState');
 const { parseTradeDate, hoursBetween } = require('./executionClassification');
 const { isMarketOpen, nextOpenTime } = require('../../lib/marketHours');
+const { buildExecutableOrderDiagnostics } = require('./executionDiagnostics');
 
 const DEFAULT_APPROVAL_MAX_AGE_HOURS = 24;
 const DEFAULT_ARM_WINDOW_HOURS = 24;
@@ -157,14 +158,17 @@ function inferExcludedApprovedReason(row) {
   return 'Approved row is not currently executable.';
 }
 
-function evaluateMarketWindow() {
-  const exchange = 'EBS';
+function evaluateMarketWindow(portfolioDir) {
+  const diagnostics = buildExecutableOrderDiagnostics({ portfolioDir });
+  const primaryExchange = diagnostics[0]?.preparedOrder?.primaryExchange || diagnostics[0]?.approvedInstrument?.ibkrPrimaryExchange || null;
+  const exchange = primaryExchange || 'EBS';
   const openNow = isMarketOpen(exchange);
   return {
     exchange,
     openNow: Boolean(openNow.open),
     reason: openNow.reason,
     nextOpen: nextOpenTime(exchange),
+    diagnostics,
   };
 }
 
@@ -175,7 +179,7 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio });
   const approvalState = summarizeApprovalState(tradesPath, now, maxApprovalAgeHours);
   const armState = getLiveArmState(portfolioDir);
-  const marketWindow = evaluateMarketWindow();
+  const marketWindow = evaluateMarketWindow(portfolioDir);
   const errorState = brokerErrorStatus(portfolio);
 
   const blockers = [];

@@ -10,7 +10,11 @@ const instrument = {
   currency: 'EUR',
 };
 
-const prepared = prepareOrderForSubmission({ action: 'BUY', quantity: 8, limitPrice: 122.845 }, instrument);
+const prepared = prepareOrderForSubmission(
+  { action: 'BUY', quantity: 8, limitPrice: 122.845 },
+  instrument,
+  { nowMs: Date.parse('2026-05-21T08:25:00Z') }
+);
 assert.strictEqual(prepared.conid, '808613958');
 assert.strictEqual(prepared.symbol, 'UBSPX');
 assert.strictEqual(prepared.localSymbol, 'BCFT');
@@ -19,7 +23,14 @@ assert.strictEqual(prepared.exchange, 'SMART');
 assert.strictEqual(prepared.currency, 'EUR');
 assert.strictEqual(prepared.tif, 'DAY');
 assert.strictEqual(prepared.outsideRth, false);
-assert.strictEqual(prepared.goodAfterTime, '20260521 09:00:00 MET');
+assert.strictEqual(prepared.goodAfterTime, undefined);
+
+const preparedBeforeOpen = prepareOrderForSubmission(
+  { action: 'BUY', quantity: 8, limitPrice: 122.845 },
+  instrument,
+  { nowMs: Date.parse('2026-05-21T06:59:00Z') }
+);
+assert.strictEqual(preparedBeforeOpen.goodAfterTime, '20260521 09:00:00 MET');
 
 const explicit = prepareOrderForSubmission({ symbol: 'ubspx', exchange: 'IBIS2', primaryExchange: 'IBIS', tif: 'GTC', outsideRth: true, goodAfterTime: 'custom' }, instrument);
 assert.strictEqual(explicit.symbol, 'UBSPX');
