@@ -234,6 +234,18 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
     warnings.push({ code: 'market_closed', message: `Market is currently closed (${marketWindow.reason}). Next open: ${marketWindow.nextOpen}` });
   }
 
+  for (const diag of marketWindow.diagnostics || []) {
+    const liquid = diag?.hours?.liquid || { status: 'unknown', sourceKind: 'unknown' };
+    if (['before_open', 'after_close', 'closed', 'unknown'].includes(liquid.status)) {
+      const venue = diag?.preparedOrder?.primaryExchange || diag?.approvedInstrument?.ibkrPrimaryExchange || marketWindow.exchange;
+      const instrumentLabel = diag?.preparedOrder?.symbol || diag?.tickerOrIsin || 'instrument';
+      warnings.push({
+        code: 'venue_hours_attention',
+        message: `${instrumentLabel} on ${venue} is ${liquid.status.replace(/_/g, ' ')} based on ${liquid.sourceKind === 'ibkr_contract' ? 'IBKR contract hours' : 'local venue reference'}${diag?.tickerOrIsin ? ` (${diag.tickerOrIsin})` : ''}.`,
+      });
+    }
+  }
+
   const ok = blockers.length === 0;
   const recommendedNextAction = ok
     ? 'Preflight passed. Confirm the submission path intentionally and reconcile promptly after transmission.'

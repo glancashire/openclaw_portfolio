@@ -3,6 +3,7 @@ const path = require('path');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { listExecutableTradeRows } = require('./tradeState');
 const { prepareOrderForSubmission } = require('./orderPreparation');
+const { getVenueHoursReference, evaluateVenueReferenceState } = require('./venueHoursReference');
 
 function pad(value) {
   return String(value).padStart(2, '0');
@@ -102,6 +103,11 @@ function buildExecutableOrderDiagnostics({ portfolioDir, contractDetailsByTicker
     const preparedOrder = prepareOrderForSubmission(executableRowToDraftOrder(row, instrument), instrument);
     const ticker = String(row.tickerOrIsin || '').trim().toUpperCase();
     const contract = contractDetailsByTicker[ticker] || null;
+    const venue = preparedOrder.primaryExchange || instrument?.ibkrPrimaryExchange || 'EBS';
+    const venueReference = getVenueHoursReference(venue);
+    const fallbackTrading = evaluateVenueReferenceState(venueReference, now);
+    const fallbackLiquid = evaluateVenueReferenceState(venueReference, now);
+
     return {
       dateTime: row.dateTime,
       tickerOrIsin: row.tickerOrIsin,
@@ -131,12 +137,13 @@ function buildExecutableOrderDiagnostics({ portfolioDir, contractDetailsByTicker
         liquidHoursSegments: parseHoursSegments(contract.liquidHours || ''),
       } : null,
       hours: contract ? {
-        trading: evaluateHoursState(parseHoursSegments(contract.tradingHours || ''), now),
-        liquid: evaluateHoursState(parseHoursSegments(contract.liquidHours || ''), now),
+        trading: { ...evaluateHoursState(parseHoursSegments(contract.tradingHours || ''), now), sourceKind: 'ibkr_contract' },
+        liquid: { ...evaluateHoursState(parseHoursSegments(contract.liquidHours || ''), now), sourceKind: 'ibkr_contract' },
       } : {
-        trading: { status: 'unknown', activeDay: null, activeSegment: null, nextSegment: null },
-        liquid: { status: 'unknown', activeDay: null, activeSegment: null, nextSegment: null },
+        trading: { ...fallbackTrading, sourceKind: fallbackTrading.sourceKind || 'reference' },
+        liquid: { ...fallbackLiquid, sourceKind: fallbackLiquid.sourceKind || 'reference' },
       },
+      venueReference,
     };
   });
 }
