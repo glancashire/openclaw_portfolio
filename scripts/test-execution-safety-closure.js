@@ -111,7 +111,7 @@ async function main() {
     order: { symbol: 'AAA', conid: '1001', action: 'BUY', quantity: 1 },
   });
   assert(unmatchedPolicy.ok === false, 'Expected unmatched holdings to block execution');
-  assert(unmatchedPolicy.blockers.some((item) => /Holdings contain unmatched instruments: ZZZ/i.test(item)), 'Expected explicit unmatched-holdings blocker');
+  assert(unmatchedPolicy.blockers.some((item) => /Holdings contain unmatched instruments: ZZZ/i.test(item.message || item)), 'Expected explicit unmatched-holdings blocker');
 
   writeFile(path.join(dir, 'holdings.md'), makeHoldings({ unmatched: 'none', weightPct: 75 }));
   const riskLimitPolicy = await evaluateExecutionPolicy({
@@ -120,7 +120,7 @@ async function main() {
     order: { symbol: 'AAA', conid: '1001', action: 'BUY', quantity: 1 },
   });
   assert(riskLimitPolicy.ok === false, 'Expected risk-limit breach to block execution');
-  assert(riskLimitPolicy.blockers.some((item) => /Current holdings exceed max single ETF allocation/i.test(item)), 'Expected explicit risk-limit blocker');
+  assert(riskLimitPolicy.blockers.some((item) => /Current holdings exceed max single ETF allocation/i.test(item.message || item)), 'Expected explicit risk-limit blocker');
 
   writeFile(path.join(dir, 'holdings.md'), makeHoldings({ unmatched: 'none', weightPct: 20 }));
   const staged = await stagePortfolioOrder({

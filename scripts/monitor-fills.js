@@ -44,6 +44,8 @@ function loadKnownOrders(portfolioDir = DEFAULT_PORTFOLIO_DIR) {
       estimatedChf: Number(row['Estimated CHF'] || 0),
       actualChf: Number(row['Actual CHF'] || 0),
       status: String(row.Status || '').trim().toLowerCase(),
+      reason: String(row.Reason || '').trim(),
+      dateTime: String(row['Date/time'] || '').trim(),
     }))
     .filter((row) => Number.isFinite(row.orderId) && row.orderId > 0)
     .filter((row) => ['submitted', 'partially_filled', 'filled', 'failed', 'cancelled', 'inactive'].includes(row.status));
@@ -62,11 +64,24 @@ async function main() {
   let newFills = 0;
   for (const order of knownOrders) {
     if (state.notifiedFills.includes(order.orderId)) continue;
-    if (state.reconciledUnnotifiedFills.includes(order.orderId)) continue;
+    const isBackfill = state.reconciledUnnotifiedFills.includes(order.orderId);
     if (openOrderIds.has(order.orderId)) continue;
 
     const fill = executions.find(e => Number(e.orderId) === Number(order.orderId));
-    if (!fill) {
+    const syntheticBackfill = !fill && isBackfill && order.status === 'filled'
+      ? {
+          time: order.dateTime,
+          symbol: order.symbol,
+          side: order.action,
+          shares: order.qty,
+          price: order.actualChf > 0 && order.qty > 0 ? (order.actualChf / order.qty) : order.limit,
+          orderId: order.orderId,
+          execId: `backfill-${order.orderId}`,
+          currency: 'CHF',
+        }
+      : null;
+    const effectiveFill = fill || syntheticBackfill;
+    if (!effectiveFill) {
       console.log(`[monitor] Order ${order.orderId} (${order.symbol}) no longer open but no fill record found — likely cancelled/inactive`);
       continue;
     }
@@ -110,10 +125,10 @@ async function main() {
       status: o.status || 'Submitted',
     }));
 
-    const fillPrice = fill ? (fill.price || fill.avgPrice || order.limit) : order.limit;
-    const fillQty = fill ? (fill.shares || fill.cumQty || order.qty) : order.qty;
+    const fillPrice = effectiveFill ? (effectiveFill.price || effectiveFill.avgPrice || order.limit) : order.limit;
+    const fillQty = effectiveFill ? (effectiveFill.shares || effectiveFill.cumQty || order.qty) : order.qty;
 
-    console.log(`[monitor] Sending fill notification for ${order.symbol}`);
+    console.log(`[monitor] Sending ${isBackfill ? 'backfill ' : ''}fill notification for ${order.symbol}`);
     const notification = await notifyTradeFill({
       trade: {
         symbol: order.symbol,
@@ -122,14 +137,15 @@ async function main() {
         price: order.limit,
         fillPrice,
         fillQty,
-        currency: fill?.currency || 'CHF',
+        currency: effectiveFill?.currency || 'CHF',
         costChf: order.actualChf || (fillPrice * fillQty),
         fees: 1.50,
         orderId: String(order.orderId),
-        time: fill ? fill.time : new Date().toISOString().slice(0, 16),
+        time: effectiveFill ? effectiveFill.time : new Date().toISOString().slice(0, 16),
       },
       portfolio,
       openOrders: remainingOpen,
+      notificationMode: isBackfill ? 'backfill' : 'live_fill',
     });
 
     if (notification && notification.sent) {

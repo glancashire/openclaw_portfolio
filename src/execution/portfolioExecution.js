@@ -357,6 +357,24 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
 
   const tradeProposal = toTradeProposalRow(order, policy, brokerResult);
   const tradeAppend = appendTradeProposals(tradesPath, [tradeProposal]);
+
+  let immediateReconcile = { updated: 0 };
+  const immediateStatus = String(brokerResult?.order?.status || '').trim().toLowerCase();
+  if (transmitLive && immediateStatus === 'inactive') {
+    immediateReconcile = reconcileOrderStatus(
+      tradesPath,
+      {
+        dateTime: tradeProposal.timestamp,
+        tickerOrIsin: tradeProposal.tickerOrIsin,
+        action: tradeProposal.action,
+      },
+      brokerResult.order,
+      {
+        reasonNote: `Broker order acknowledged but marked Inactive. ${brokerResult.order?.brokerErrorMessage || ''}`.trim(),
+      }
+    );
+  }
+
   const historyAppend = appendHistorySnapshot(
     historyPath,
     holdingsPath,
@@ -371,6 +389,7 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
     policy,
     brokerResult,
     tradeAppend,
+    immediateReconcile,
     historyAppend,
     dashboardPath,
   };

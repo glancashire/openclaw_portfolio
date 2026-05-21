@@ -185,3 +185,94 @@ Refactor the keepalive script for explicit dependency injection and state-path c
 - Related Files: scripts/ibkr-native-keepalive.js, scripts/test-ibkr-native-keepalive.js
 
 ---
+## [ERR-20260521-001] stock-analysis-skill-path-stale
+
+**Logged**: 2026-05-21T08:49:30Z
+**Priority**: medium
+**Status**: pending
+**Area**: config
+
+### Summary
+Injected stock-analysis skill path resolved to ENOENT, so skill bootstrap could not be loaded when requested.
+
+### Error
+```
+ENOENT: no such file or directory, access '/home/ubuntu/.openclaw/workspace/skills/stock-analysis-new/SKILL.md'
+```
+
+### Context
+- Operation attempted: read ~/.openclaw/workspace/skills/stock-analysis-new/SKILL.md
+- User requested UBSPX metadata/standards analysis
+- Proceeded with direct repo/web evidence instead
+
+### Suggested Fix
+Refresh available_skills injection so stock-analysis points to an existing SKILL.md path.
+
+### Metadata
+- Reproducible: yes
+- Related Files: workspace skill injection metadata
+
+---
+
+## [ERR-20260521-002] ibkr-cli-client-id-collision
+
+**Logged**: 2026-05-21T08:49:31Z
+**Priority**: high
+**Status**: pending
+**Area**: backend
+
+### Summary
+Parallel IBKR CLI probes can collide on client id 1 and produce misleading API-unreachable errors.
+
+### Error
+```
+Error 326, reqId -1: Unable to connect as the client id is already in use.
+Peer closed connection. clientId 1 already in use?
+API connection failed: TimeoutError()
+ERROR: Unable to reach Interactive Brokers API at 127.0.0.1:4001.
+```
+
+### Context
+- Operation attempted: parallel contract/quote diagnostics against native IBKR API
+- Inputs: multiple ibkr_cli.py calls in parallel
+- Environment: active native gateway, client id 1 already occupied
+
+### Suggested Fix
+Serialize IBKR CLI diagnostics or support unique client ids per probe so client-id collisions do not masquerade as gateway outages.
+
+### Metadata
+- Reproducible: yes
+- Related Files: skills/ibkr/scripts/ibkr_cli.py, src/brokers/interactive-brokers/*
+
+---
+
+## [ERR-20260521-003] ibkr_cli_tzdata_blocks_contract_probe
+
+**Logged**: 2026-05-21T15:36:00Z
+**Priority**: high
+**Status**: pending
+**Area**: infra
+
+### Summary
+IBKR CLI contract and quote probing is polluted by missing Python tzdata when execution-history parsing encounters US/Eastern timestamps.
+
+### Error
+```
+ModuleNotFoundError: No module named 'tzdata'
+zoneinfo._common.ZoneInfoNotFoundError: 'No time zone found with key US/Eastern'
+```
+
+### Context
+- Command/operation attempted: IBKR contract-details and quote lookups during SPI Mid contract resolution
+- Inputs: CH0130595124 / likely SPI Mid symbol variants on SMART and SIX
+- Effect: CLI output becomes noisy/unreliable during otherwise unrelated contract discovery work
+
+### Suggested Fix
+Install Python tzdata in the environment used by the IBKR skill, or harden the CLI to avoid parsing execution history during read-only contract/quote operations.
+
+### Metadata
+- Reproducible: yes
+- Related Files: /home/ubuntu/.openclaw/workspace/skills/ibkr/scripts/ibkr_cli.py
+- See Also: ERR-20260521-002
+
+---

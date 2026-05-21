@@ -17,17 +17,26 @@ function normaliseHolding(raw = {}) {
   const quantity = Number(raw.position ?? raw.quantity ?? 0);
   const avgCost = Number(raw.avgCost ?? raw.averageCost ?? 0);
   const explicitPrice = Number(raw.mktPrice ?? raw.price ?? raw.marketPrice ?? 0);
-  const price = Number.isFinite(explicitPrice) && explicitPrice > 0
+  const hasExplicitPrice = Number.isFinite(explicitPrice) && explicitPrice > 0;
+  const hasAvgCost = Number.isFinite(avgCost) && avgCost > 0;
+  const price = hasExplicitPrice
     ? explicitPrice
-    : (Number.isFinite(avgCost) && avgCost > 0 ? avgCost : 0);
+    : (hasAvgCost ? avgCost : 0);
   const explicitMarketValue = Number(raw.mktValue ?? raw.marketValue);
-  const marketValue = Number.isFinite(explicitMarketValue) && explicitMarketValue > 0
+  const hasExplicitMarketValue = Number.isFinite(explicitMarketValue) && explicitMarketValue > 0;
+  const marketValue = hasExplicitMarketValue
     ? explicitMarketValue
     : (Number.isFinite(price) ? price * quantity : 0);
   const isin = raw.isin || contract.isin || null;
   const localSymbol = raw.localSymbol || contract.localSymbol || null;
   const primaryExchange = raw.primaryExchange || raw.primaryExch || contract.primaryExchange || contract.primaryExch || null;
   const exchange = raw.exchange || contract.exchange || null;
+  const priceBasis = hasExplicitPrice
+    ? 'market_snapshot'
+    : (hasAvgCost ? 'avg_cost_fallback' : 'unknown');
+  const marketValueBasis = hasExplicitMarketValue
+    ? 'broker_market_value'
+    : ((priceBasis === 'market_snapshot' || priceBasis === 'avg_cost_fallback') ? `${priceBasis}_times_quantity` : 'unknown');
 
   return {
     broker: 'interactive-brokers',
@@ -40,9 +49,11 @@ function normaliseHolding(raw = {}) {
     name: raw.description || raw.name || raw.contractDesc || contract.description || localSymbol || symbol || null,
     quantity,
     price,
+    priceBasis,
     currency: raw.currency || contract.currency || 'CHF',
     marketValue,
-    avgCost: Number.isFinite(avgCost) ? avgCost : null,
+    marketValueBasis,
+    avgCost: hasAvgCost ? avgCost : null,
     raw,
   };
 }
@@ -72,6 +83,9 @@ function normaliseOrder(raw = {}) {
     transmit: raw.transmit === false ? false : true,
     executedAt: raw.executedAt || raw.time || null,
     execId: raw.execId || null,
+    brokerReason: raw.brokerReason || null,
+    brokerErrorCode: raw.brokerErrorCode ?? null,
+    brokerErrorMessage: raw.brokerErrorMessage || null,
     raw,
   };
 }

@@ -452,6 +452,9 @@ class InteractiveBrokersClient {
       const orders = await openOrderReader.fetchOpenOrders();
       const openMatch = orders.find((row) => String(row.orderId) === String(orderId));
       if (openMatch) {
+        if (this.native && typeof this.native.clearOrderError === 'function') {
+          this.native.clearOrderError(orderId);
+        }
         return {
           ok: true,
           order: normaliseOrder(openMatch),
@@ -490,9 +493,15 @@ class InteractiveBrokersClient {
         const completedOrders = await this.skill.fetchCompletedOrders();
         const completedMatch = completedOrders.find((row) => String(row.orderId) === String(orderId));
         if (completedMatch) {
+          if (this.native && typeof this.native.clearOrderError === 'function') {
+            this.native.clearOrderError(orderId);
+          }
           return {
             ok: true,
-            order: normaliseOrder(completedMatch),
+            order: normaliseOrder({
+              ...completedMatch,
+              ...(this.native && typeof this.native.recentOrderError === 'function' ? (this.native.recentOrderError(orderId) || {}) : {}),
+            }),
             source: 'completed_orders',
             log: logBrokerEvent({
               broker: 'interactive-brokers',
@@ -529,6 +538,28 @@ class InteractiveBrokersClient {
             },
           };
         }
+      }
+
+      const recentNativeError = this.native && typeof this.native.recentOrderError === 'function'
+        ? this.native.recentOrderError(orderId)
+        : null;
+      if (recentNativeError) {
+        return {
+          ok: true,
+          order: normaliseOrder({
+            orderId,
+            transmit: true,
+            ...recentNativeError,
+          }),
+          source: 'native_recent_error',
+          log: logBrokerEvent({
+            broker: 'interactive-brokers',
+            operation: 'get_order_status',
+            status: 'ok',
+            summary: { orderId, status: recentNativeError.status || 'Inactive', source: 'native_recent_error' },
+            portfolio: this.options.portfolio,
+          }),
+        };
       }
 
       return {

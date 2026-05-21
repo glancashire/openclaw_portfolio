@@ -16,3 +16,9 @@ backups/
 
 # Local skill installs / experiments
 skills/ibkr-trader/
+# Local transient artifacts
+.venv-ibkr-tz/
+runtime/
+*.log
+*.tmp
+tmp_render_summary_html.js.txt

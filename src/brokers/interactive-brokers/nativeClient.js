@@ -22,6 +22,32 @@ class InteractiveBrokersNativeClient {
   constructor(config, options = {}) {
     this.config = config;
     this.options = options || {};
+    this.recentOrderErrors = new Map();
+  }
+
+  rememberOrderError(orderId, detail = {}) {
+    const numericOrderId = Number(orderId);
+    if (!Number.isFinite(numericOrderId) || numericOrderId <= 0) return;
+    this.recentOrderErrors.set(String(numericOrderId), {
+      orderId: numericOrderId,
+      status: detail.status || 'Inactive',
+      brokerReason: detail.brokerReason || 'broker_error',
+      brokerErrorCode: detail.brokerErrorCode ?? null,
+      brokerErrorMessage: detail.brokerErrorMessage || null,
+      at: new Date().toISOString(),
+    });
+  }
+
+  recentOrderError(orderId) {
+    const numericOrderId = Number(orderId);
+    if (!Number.isFinite(numericOrderId) || numericOrderId <= 0) return null;
+    return this.recentOrderErrors.get(String(numericOrderId)) || null;
+  }
+
+  clearOrderError(orderId) {
+    const numericOrderId = Number(orderId);
+    if (!Number.isFinite(numericOrderId) || numericOrderId <= 0) return;
+    this.recentOrderErrors.delete(String(numericOrderId));
   }
 
   async authenticate() {
@@ -93,7 +119,7 @@ class InteractiveBrokersNativeClient {
   async placeOrder(order) {
     return this.withApi(async ({ api, connected }) => {
       await connected;
-      return placeNativeOrder(api, order);
+      return placeNativeOrder(api, order, this);
     }, {
       handshake: {
         timeoutMs: 15000,
@@ -517,7 +543,7 @@ function buildConidContract(conid, overrides = {}) {
   return contract;
 }
 
-function placeNativeOrder(api, order) {
+function placeNativeOrder(api, order, client = null) {
   return new Promise((resolve, reject) => {
     const { EventName } = loadIbModule();
     const orderId = nextOrderId();
@@ -577,7 +603,10 @@ function placeNativeOrder(api, order) {
         limitPrice: Number.isFinite(Number(incomingOrder?.lmtPrice)) ? Number(incomingOrder.lmtPrice) : nativeOrder.lmtPrice,
         transmit: incomingOrder?.transmit === true,
       });
-      if (shouldResolveNow(lastAck.status)) finish(lastAck);
+      if (shouldResolveNow(lastAck.status)) {
+        if (String(lastAck.status || '').trim().toLowerCase() === 'inactive' && !lastAck.brokerErrorMessage) return;
+        finish(lastAck);
+      }
     };
 
     const onOrderStatus = (incomingOrderId, status, filled, remaining, avgFillPrice, permId) => {
@@ -597,7 +626,10 @@ function placeNativeOrder(api, order) {
         limitPrice: nativeOrder.lmtPrice,
         transmit: nativeOrder.transmit === true,
       });
-      if (shouldResolveNow(lastAck.status)) finish(lastAck);
+      if (shouldResolveNow(lastAck.status)) {
+        if (String(lastAck.status || '').trim().toLowerCase() === 'inactive' && !lastAck.brokerErrorMessage) return;
+        finish(lastAck);
+      }
     };
 
     const onError = (err, code, reqId) => {
@@ -610,6 +642,9 @@ function placeNativeOrder(api, order) {
           brokerErrorCode: code ?? null,
           brokerErrorMessage: normalizeError(err, code, reqId).message,
         });
+        if (client && typeof client.rememberOrderError === 'function') {
+          client.rememberOrderError(orderId, lastAck);
+        }
         finish(lastAck);
         return;
       }
@@ -710,6 +745,8 @@ module.exports = {
   buildConidContract,
   waitForNativeHandshake,
   normalizeContractDetails,
-  __setTestLoadIbModule(fn) { testLoadIbModule = fn; },
+  __testPlaceNativeOrder: placeNativeOrder,
+  __setTestNextOrderId(value) { orderCounter = Number(value); },
+  __setTestLoadIbModule(value) { testLoadIbModule = typeof value === 'function' ? value : () => value; },
   __resetTestLoadIbModule() { testLoadIbModule = null; },
 };

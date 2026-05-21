@@ -292,7 +292,7 @@ function buildBrokerReasonNote(brokerOrder, mappedStatus) {
   return `Execution reconciliation: ${parts.join(', ')}`;
 }
 
-function appendReasonNote(existing, note, maxSegments = 3) {
+function appendReasonNote(existing, note, maxSegments = 5) {
   const cleanExisting = String(existing || '').trim();
   const cleanNote = String(note || '').trim();
   if (!cleanNote) return cleanExisting;
