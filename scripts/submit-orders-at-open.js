@@ -13,6 +13,7 @@ const { listExecutableTradeRows, updateTradeRows, reconcileOrderStatus } = requi
 const { readApprovedInstruments } = require('../src/analysis/approvedInstruments');
 const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing');
 const { calculateSmartLimit, analyzeQuoteTrend, shouldBlockForTrend, evaluateMarketOpenBlock } = require('../src/execution/marketOpenPolicy');
+const { buildExecutableOrderDiagnostics } = require('../src/execution/executionDiagnostics');
 const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
 const { prepareOrderForSubmission } = require('../src/execution/orderPreparation');
 const { resolveVenueAwareMarketWindow } = require('../src/execution/venueAwareMarketWindow');
@@ -161,17 +162,18 @@ async function main() {
 
   const marketEntryPolicy = loadMarketEntryPolicy();
   const executable = buildExecutableOrders();
+  const orderDiagnostics = buildExecutableOrderDiagnostics({ portfolioDir });
 
   if (!DRY_RUN && !FORCE) {
     const marketWindow = resolveVenueAwareMarketWindow({ diagnostics: executable.map((row) => ({ preparedOrder: { primaryExchange: row.primaryExchange, symbol: row.symbol }, approvedInstrument: { ibkrPrimaryExchange: row.primaryExchange }, tickerOrIsin: row.row?.tickerOrIsin })) });
     if (!marketWindow.openNow) {
-      console.error(`\n✗ Market is closed for ${marketWindow.exchange}: ${marketWindow.reason}`);
-      console.error(`  Next open: ${marketWindow.nextOpen}`);
-      if (marketWindow.instrumentLabel) console.error(`  Instrument context: ${marketWindow.instrumentLabel}`);
-      console.error(`  Schedule this script to run at market open, or use --force to override.`);
-      process.exit(1);
+      console.log(`! Market is not open for ${marketWindow.exchange}: ${marketWindow.reason}`);
+      console.log(`  Next open: ${marketWindow.nextOpen}`);
+      if (marketWindow.instrumentLabel) console.log(`  Instrument context: ${marketWindow.instrumentLabel}`);
+      console.log('  Closed-venue rows will be parked; open-venue rows may still continue.');
+    } else {
+      console.log(`✓ Market is open for ${marketWindow.exchange}`);
     }
-    console.log(`✓ Market is open for ${marketWindow.exchange}`);
   }
   if (executable.length === 0) {
     const message = 'No approved executable trade rows found for market-open submission.';
@@ -196,6 +198,21 @@ async function main() {
 
   const orders = [];
   for (const trade of executable) {
+    if (!DRY_RUN && !FORCE) {
+      const tradeDiagnostic = orderDiagnostics.find((row) => row.dateTime === trade.row?.dateTime && row.tickerOrIsin === trade.row?.tickerOrIsin && String(row.action || '').toLowerCase() === String(trade.row?.action || '').toLowerCase()) || { preparedOrder: { primaryExchange: trade.primaryExchange, symbol: trade.symbol }, approvedInstrument: { ibkrPrimaryExchange: trade.primaryExchange }, tickerOrIsin: trade.row?.tickerOrIsin };
+      const tradeWindow = resolveVenueAwareMarketWindow({ diagnostics: [tradeDiagnostic] });
+      if (!tradeWindow.openNow) {
+        const venue = trade.primaryExchange || trade.exchange || trade.symbol;
+        const blockReason = `Target venue ${venue} is closed for this order (${tradeWindow.reason}).`;
+        console.error(`  ✗ ${trade.symbol}: ${blockReason}`);
+        markTradeBlocked(trade, {
+          blockCode: 'venue_closed_for_row',
+          blockReason,
+          nextAction: `Retry during the venue trading session. Next open: ${tradeWindow.nextOpen}`,
+        });
+        continue;
+      }
+    }
     console.log(`Fetching live quote for ${trade.symbol}...`);
     const quote = await getLiveQuote(trade);
     if (!quote?.ok) {
