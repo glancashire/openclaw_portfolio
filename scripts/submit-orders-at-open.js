@@ -15,6 +15,7 @@ const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing
 const { calculateSmartLimit, analyzeQuoteTrend, shouldBlockForTrend, evaluateMarketOpenBlock } = require('../src/execution/marketOpenPolicy');
 const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
 const { prepareOrderForSubmission } = require('../src/execution/orderPreparation');
+const { resolveVenueAwareMarketWindow } = require('../src/execution/venueAwareMarketWindow');
 
 const cliArgs = process.argv.slice(2);
 const DRY_RUN = cliArgs.includes('--dry-run');
@@ -158,19 +159,20 @@ async function main() {
   console.log(`Portfolio: ${portfolioDir}`);
   console.log('');
 
+  const marketEntryPolicy = loadMarketEntryPolicy();
+  const executable = buildExecutableOrders();
+
   if (!DRY_RUN && !FORCE) {
-    const market = isMarketOpen('EBS');
-    if (!market.open) {
-      console.error(`\n✗ Market is closed: ${market.reason}`);
-      console.error(`  Next open: ${nextOpenTime('EBS')}`);
+    const marketWindow = resolveVenueAwareMarketWindow({ diagnostics: executable.map((row) => ({ preparedOrder: { primaryExchange: row.primaryExchange, symbol: row.symbol }, approvedInstrument: { ibkrPrimaryExchange: row.primaryExchange }, tickerOrIsin: row.row?.tickerOrIsin })) });
+    if (!marketWindow.openNow) {
+      console.error(`\n✗ Market is closed for ${marketWindow.exchange}: ${marketWindow.reason}`);
+      console.error(`  Next open: ${marketWindow.nextOpen}`);
+      if (marketWindow.instrumentLabel) console.error(`  Instrument context: ${marketWindow.instrumentLabel}`);
       console.error(`  Schedule this script to run at market open, or use --force to override.`);
       process.exit(1);
     }
-    console.log('✓ Market is open');
+    console.log(`✓ Market is open for ${marketWindow.exchange}`);
   }
-
-  const marketEntryPolicy = loadMarketEntryPolicy();
-  const executable = buildExecutableOrders();
   if (executable.length === 0) {
     const message = 'No approved executable trade rows found for market-open submission.';
     if (DRY_RUN) {

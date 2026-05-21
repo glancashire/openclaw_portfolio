@@ -525,12 +525,14 @@ function cmdStatus() {
 }
 
 function cmdSubmit() {
-  const { isMarketOpen, nextOpenTime } = require('../lib/marketHours');
+  const { buildExecutableOrderDiagnostics } = require('../src/execution/executionDiagnostics');
+  const { resolveVenueAwareMarketWindow } = require('../src/execution/venueAwareMarketWindow');
 
   if (!DRY_RUN && !FORCE) {
-    const market = isMarketOpen('EBS');
-    if (!market.open) {
-      const msg = `Market is closed: ${market.reason}. Next open: ${nextOpenTime('EBS')}`;
+    const diagnostics = buildExecutableOrderDiagnostics({ portfolioDir: DEFAULT_PORTFOLIO_DIR });
+    const marketWindow = resolveVenueAwareMarketWindow({ diagnostics });
+    if (!marketWindow.openNow) {
+      const msg = `Market is closed for ${marketWindow.exchange}: ${marketWindow.reason}. Next open: ${marketWindow.nextOpen}${marketWindow.instrumentLabel ? ` (${marketWindow.instrumentLabel})` : ''}`;
       if (JSON_OUT) printJson({ error: msg });
       else console.error(`✗ ${msg}`);
       process.exit(1);
