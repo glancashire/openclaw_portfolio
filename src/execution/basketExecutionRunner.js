@@ -1,0 +1,156 @@
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { loadApprovalEnvelope } = require('./basketApprovalStore');
+const { stagePortfolioOrder } = require('./portfolioExecution');
+
+const BASKET_RUN_SCHEMA_VERSION = '1.0';
+
+function runsRoot(rootDir = process.cwd()) {
+  return path.join(rootDir, 'runtime', 'basket-runs');
+}
+
+function runPath({ portfolio, approvalId, rootDir = process.cwd() }) {
+  if (!portfolio) throw new Error('portfolio is required');
+  if (!approvalId) throw new Error('approvalId is required');
+  return path.join(runsRoot(rootDir), portfolio, `${approvalId}.json`);
+}
+
+function loadOrCreateRunState({ portfolio, approvalId, rootDir = process.cwd(), now = new Date() }) {
+  const outPath = runPath({ portfolio, approvalId, rootDir });
+  if (fs.existsSync(outPath)) {
+    return { path: outPath, state: JSON.parse(fs.readFileSync(outPath, 'utf8')) };
+  }
+  const state = {
+    schemaVersion: BASKET_RUN_SCHEMA_VERSION,
+    portfolio,
+    approvalId,
+    createdAt: new Date(now).toISOString(),
+    updatedAt: new Date(now).toISOString(),
+    status: 'pending',
+    legs: {},
+    summary: {
+      total: 0,
+      executed: 0,
+      blocked: 0,
+      failed: 0,
+      submitted: 0,
+    },
+  };
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(state, null, 2));
+  return { path: outPath, state };
+}
+
+function persistRunState(outPath, state, now = new Date()) {
+  state.updatedAt = new Date(now).toISOString();
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(state, null, 2));
+  return outPath;
+}
+
+function legAttemptCount(runState, legId) {
+  return Number(runState?.legs?.[legId]?.attempts || 0);
+}
+
+function legEligible(leg = {}, runState = {}) {
+  const attempts = legAttemptCount(runState, leg.legId);
+  const maxAttempts = Number(leg.maxAttempts || 1);
+  if (String(leg.status || '').trim().toLowerCase() !== 'approved') {
+    return { ok: false, code: 'leg_not_approved', reason: `Leg ${leg.legId} is not in approved status.` };
+  }
+  if (attempts >= maxAttempts) {
+    return { ok: false, code: 'attempt_limit_reached', reason: `Leg ${leg.legId} has already used ${attempts}/${maxAttempts} attempts.` };
+  }
+  return { ok: true, attempts, remainingAttempts: maxAttempts - attempts };
+}
+
+function summarizeRun(runState = {}) {
+  const legs = Object.values(runState.legs || {});
+  runState.summary = {
+    total: legs.length,
+    executed: legs.filter((leg) => ['submitted', 'filled', 'partially_filled'].includes(leg.status)).length,
+    blocked: legs.filter((leg) => leg.status === 'blocked').length,
+    failed: legs.filter((leg) => leg.status === 'failed').length,
+    submitted: legs.filter((leg) => leg.status === 'submitted').length,
+  };
+  if (runState.summary.failed > 0 && runState.summary.executed === 0 && runState.summary.blocked === 0) runState.status = 'failed';
+  else if (runState.summary.executed > 0 && (runState.summary.blocked > 0 || runState.summary.failed > 0)) runState.status = 'partial';
+  else if (runState.summary.executed === runState.summary.total && runState.summary.total > 0) runState.status = 'submitted';
+  else if (runState.summary.blocked === runState.summary.total && runState.summary.total > 0) runState.status = 'blocked';
+  return runState;
+}
+
+async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = process.cwd(), now = new Date(), submitLeg = null } = {}) {
+  const portfolio = path.basename(portfolioDir);
+  const { envelope } = loadApprovalEnvelope({ portfolio, approvalId, rootDir, now });
+  const { path: statePath, state } = loadOrCreateRunState({ portfolio, approvalId, rootDir, now });
+
+  for (const leg of envelope.legs || []) {
+    const eligibility = legEligible(leg, state);
+    if (!eligibility.ok) {
+      state.legs[leg.legId] = {
+        ...(state.legs[leg.legId] || {}),
+        legId: leg.legId,
+        instrument: leg.instrument,
+        attempts: legAttemptCount(state, leg.legId),
+        status: eligibility.code === 'attempt_limit_reached' ? 'blocked' : 'failed',
+        lastReason: eligibility.reason,
+        updatedAt: new Date(now).toISOString(),
+      };
+      persistRunState(statePath, summarizeRun(state), now);
+      continue;
+    }
+
+    const order = {
+      identifier: leg.conid || leg.instrument,
+      conid: leg.conid || null,
+      symbol: leg.ibkrSymbol || null,
+      action: leg.action,
+      quantity: leg.quantity,
+      limitPrice: leg.limitPrice,
+      currency: leg.currency,
+      exchange: leg.exchange || 'SMART',
+      primaryExchange: leg.primaryExchange || null,
+      userApproved: true,
+      transmittedLiveAck: 'I UNDERSTAND THIS WILL TRANSMIT A LIVE ORDER',
+      transmit: true,
+    };
+
+    const executor = submitLeg || (async ({ portfolioDir: targetPortfolioDir, order: targetOrder }) => stagePortfolioOrder({
+      portfolioDir: targetPortfolioDir,
+      order: targetOrder,
+      dryRun: false,
+      revocableOnly: true,
+      transmitLive: true,
+    }));
+
+    const result = await executor({ portfolioDir, order, leg, envelope, runState: state });
+    const attempts = legAttemptCount(state, leg.legId) + 1;
+    state.legs[leg.legId] = {
+      legId: leg.legId,
+      instrument: leg.instrument,
+      attempts,
+      status: result?.ok ? 'submitted' : result?.reason === 'policy_blocked' ? 'blocked' : 'failed',
+      brokerOrderId: result?.brokerResult?.order?.orderId || null,
+      lastReason: result?.error || result?.reason || null,
+      updatedAt: new Date(now).toISOString(),
+    };
+    persistRunState(statePath, summarizeRun(state), now);
+  }
+
+  return { path: statePath, runState: summarizeRun(state), approvalId, portfolio };
+}
+
+module.exports = {
+  BASKET_RUN_SCHEMA_VERSION,
+  runsRoot,
+  runPath,
+  loadOrCreateRunState,
+  persistRunState,
+  legAttemptCount,
+  legEligible,
+  summarizeRun,
+  executeApprovedBasket,
+};
