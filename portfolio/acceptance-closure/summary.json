@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-22T10:56:02.669Z",
+  "generatedAt": "2026-05-22T11:03:24.307Z",
   "portfolio": "acceptance-closure",
   "status": {
     "health": "warning",
@@ -412,6 +412,27 @@
   },
   "recentMaterialEvents": [
     {
+      "time": "2026-05-22 11:03:23.760 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-22 11:03:21.020 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-22 11:03:15.749 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
       "time": "2026-05-22 10:56:02.277 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
@@ -420,27 +441,6 @@
     },
     {
       "time": "2026-05-22 10:55:56.770 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-22 10:55:54.716 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-22 10:55:15.977 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-22 10:55:10.249 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",

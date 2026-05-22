@@ -12,7 +12,7 @@
 
 ## Health Snapshot
 - Strategy status: rebalance_needed
-- Last successful sync: 2026-05-22 10:42:05
+- Last successful sync: 2026-05-22 11:03:04
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
@@ -28,9 +28,9 @@
 8. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Portfolio Value Snapshot
-- Total value CHF: 22315.24
+- Total value CHF: 22209.4831212
 - Cash CHF: 0
-- Invested CHF: 22315.24
+- Invested CHF: 22209.4831212
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
@@ -41,8 +41,8 @@
 ## Allocation Health
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 83.3 | 60 | 23.3 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 16.7 | 20 | -3.3 | on_track | no | within tolerance |
+| Global equities | 83.26 | 60 | 23.26 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 16.74 | 20 | -3.26 | on_track | no | within tolerance |
 | Bonds / cash-like | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
 
 ## Instrument Actions Queue
@@ -52,7 +52,7 @@
 | LU0950668870 | 0 | 20 | watch | No active proposal | watch |
 | CH0032912732 | 0 | 12 | watch | No active proposal | watch |
 | CH0130595124 | 0 | 8 | watch | No active proposal | watch |
-| CASH-CHF | 9.07 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| CASH-CHF | 9.11 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 
 ## Safety / Risk Diagnostics
 - Safety status: clear
@@ -85,11 +85,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
+| 2026-05-22 10:56:00.798 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:56:00.445 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:55:53.584 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
 | 2026-05-22 10:55:14.519 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
 | 2026-05-22 10:55:14.144 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:55:07.073 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:54:45.987 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:54:45.631 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-22
@@ -113,7 +113,7 @@ CH0032912732: Broker rejected the order because available cash or buying power w
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 20291.11 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 20185.35 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: Transmitted live broker order submitted.
 - Observability shows 92 recent blocked execution-policy event(s).
 
@@ -133,7 +133,7 @@ CH0032912732: Broker rejected the order because available cash or buying power w
 - Staged: 0
 - Submitted: 0
 - Partially filled: 0
-- Filled: 0
+- Filled: 3
 - Cancelled: 0
 - Failed: 0
 - Planned-only entries: 1
@@ -146,8 +146,8 @@ CH0032912732: Broker rejected the order because available cash or buying power w
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
 |---|---|---|---:|---|
+| 2026-05-22 11:00:07 | buy | CH0032912732 | 0 | filled |
+| 2026-05-22 11:00:07 | buy | LU0950668870 | 0 | filled |
+| 2026-05-22 11:00:07 | buy | IE00B5BMR087 | 0 | filled |
 | 2026-05-22 10:41:58 | buy | UBS SPI Mid ETF (SPI ohne SMI) | 2441.5 | inactive |
 | 2026-05-22 10:41:46 | buy | UBS SLI ETF (SMI gleichgewichtet) | 1134 | inactive |
-| 2026-05-22 10:41:42 | buy | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | 244.53 | inactive |
-| 2026-05-22 10:41:41 | buy | iShares Core S&P 500 UCITS ETF USD (Acc) | 11056.32 | inactive |
-| 2026-05-21 14:41:06 | buy | iShares Core S&P 500 UCITS ETF USD (Acc) | 1322.4 | inactive |

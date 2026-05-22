@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-22T10:56:04.828Z",
+  "generatedAt": "2026-05-22T11:03:25.391Z",
   "portfolio": "etf",
   "status": {
     "health": "attention_needed",
@@ -11,14 +11,100 @@
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": null,
+  "readiness": {
+    "ok": true,
+    "portfolio": "etf",
+    "generatedAt": "2026-05-22T11:03:22.675Z",
+    "executionMode": "transmitted_live",
+    "armedForMarketOpen": true,
+    "armExpiresAt": "2026-05-22T12:00:00Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": true,
+      "reachable": true,
+      "mode": "native-socket",
+      "fallbackRequired": false,
+      "marketDataMode": "live_or_realtime",
+      "marketDataDetail": "Live/realtime bid/ask/last values are available via approved instrument IE00B5BMR087.",
+      "marketDataProbe": {
+        "conid": "75776072",
+        "symbol": "SXR8",
+        "tickerOrIsin": "IE00B5BMR087",
+        "label": "approved instrument IE00B5BMR087",
+        "source": "approved_instrument"
+      },
+      "reason": "ready",
+      "portalSessionState": "unknown_or_separate",
+      "guidance": "Broker path is healthy.",
+      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
+    },
+    "marketWindow": {
+      "exchange": "EBS",
+      "openNow": true,
+      "reason": "Market is open",
+      "nextOpen": "2026-05-25T09:00:00.000Z",
+      "diagnostics": []
+    },
+    "approvalState": {
+      "basketApprovalState": {
+        "approvedCount": 2,
+        "executableCount": 2,
+        "hasApprovedBasket": true,
+        "hasExecutableApprovedBasket": true,
+        "executableBaskets": [
+          {
+            "approvalId": "basket-etf-20260522-0841",
+            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522-0841.json"
+          },
+          {
+            "approvalId": "basket-etf-20260522T1041",
+            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522T1041.json"
+          }
+        ],
+        "latestApprovedAt": "2026-05-22T08:41:00Z",
+        "approvedBaskets": [
+          {
+            "approvalId": "basket-etf-20260522-0841",
+            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522-0841.json"
+          },
+          {
+            "approvalId": "basket-etf-20260522T1041",
+            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522T1041.json"
+          }
+        ]
+      },
+      "proposedCount": 0,
+      "approvedCount": 0,
+      "basketApprovedCount": 2,
+      "basketExecutableCount": 2,
+      "hasApprovedBasket": true,
+      "hasExecutableApprovedBasket": true,
+      "executableCount": 0,
+      "latestApprovedAt": null,
+      "approvalAgeHours": null,
+      "staleApproval": false,
+      "staleApprovedRows": [],
+      "maxApprovalAgeHours": 24,
+      "ambiguousQueuedCount": 0,
+      "hasAnyApprovedRows": false,
+      "hasExecutableApprovedRows": false,
+      "executableRows": [],
+      "excludedApprovedRows": []
+    },
+    "rows": [],
+    "excludedRows": [],
+    "blockers": [],
+    "warnings": [],
+    "recommendedNextAction": "Preflight passed. Confirm the submission path intentionally and reconcile promptly after transmission.",
+    "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
+  },
   "holdings": {
-    "totalValueChf": 22315.24,
+    "totalValueChf": 22209.4831212,
     "cashChf": 0,
-    "investedChf": 22315.24,
+    "investedChf": 22209.4831212,
     "holdingCount": 3,
     "baseCurrency": "CHF",
-    "lastSyncAt": "2026-05-22 10:42:05",
+    "lastSyncAt": "2026-05-22 11:03:04",
     "source": "broker_api",
     "latestSnapshotDate": "2026-05-22",
     "dailyChangeChf": 0,
@@ -225,10 +311,10 @@
       "staged": 0,
       "submitted": 0,
       "partiallyFilled": 0,
-      "filled": 0,
+      "filled": 3,
       "cancelled": 0,
       "failed": 0,
-      "inactive": 6,
+      "inactive": 3,
       "simulated": 0,
       "planned": 1,
       "withBrokerOrderId": 6
@@ -242,7 +328,8 @@
       },
       "staleNeedsReapproval": 0,
       "canonicalStates": {
-        "blocked_hard": 29
+        "blocked_hard": 29,
+        "filled": 3
       }
     },
     "blockedRows": [
@@ -342,9 +429,9 @@
           "limitPrice": 0,
           "targetPct": 20,
           "intendedChf": 2024.13,
-          "intendedPct": 9.07,
+          "intendedPct": 9.11,
           "executableChf": 2024.13,
-          "executablePct": 9.07,
+          "executablePct": 9.11,
           "executionGapChf": 0,
           "approval": "blocked_by_min_trade_size",
           "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 39.82%; drift before -20%; drift after 19.82%; drift corrected 0.18%; expected cost CHF 2024.13; funding source cash; Planning entry only; no broker order required for the cash sleeve."
@@ -359,24 +446,24 @@
     "proposalTotals": {
       "plannedCashSleeve": 2024.13,
       "executableBuys": 0,
-      "residualTradableCash": 20291.11
+      "residualTradableCash": 20185.35
     }
   },
   "allocation": [
     {
       "assetClass": "Global equities",
-      "currentPct": 83.3,
+      "currentPct": 83.26,
       "targetPct": 60,
-      "driftPct": 23.3,
+      "driftPct": 23.26,
       "minPct": 50,
       "maxPct": 70,
       "status": "out_of_bounds"
     },
     {
       "assetClass": "Swiss equities",
-      "currentPct": 16.7,
+      "currentPct": 16.74,
       "targetPct": 20,
-      "driftPct": -3.3,
+      "driftPct": -3.26,
       "minPct": 10,
       "maxPct": 30,
       "status": "on_track"
@@ -473,7 +560,7 @@
     "actions": []
   },
   "explanations": {
-    "biggestDrift": "Global equities is 23.3% over target and outside the allowed band around the 60% target.",
+    "biggestDrift": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
     "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
     "executionBlock": "No explicit execution block is currently surfaced.",
     "approvalBacklog": "29 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
@@ -550,6 +637,51 @@
   },
   "recentTrades": [
     {
+      "date": "2026-05-22 11:00:07",
+      "status": "filled",
+      "action": "buy",
+      "tickerOrIsin": "CH0032912732",
+      "instrument": "CH0032912732",
+      "quantity": "7",
+      "limitPrice": "161.88",
+      "estimatedChf": "0",
+      "amount": "0",
+      "actualChf": "1133.16",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9126"
+    },
+    {
+      "date": "2026-05-22 11:00:07",
+      "status": "filled",
+      "action": "buy",
+      "tickerOrIsin": "LU0950668870",
+      "instrument": "LU0950668870",
+      "quantity": "6",
+      "limitPrice": "40.7408",
+      "estimatedChf": "0",
+      "amount": "0",
+      "actualChf": "244.44",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9125"
+    },
+    {
+      "date": "2026-05-22 11:00:07",
+      "status": "filled",
+      "action": "buy",
+      "tickerOrIsin": "IE00B5BMR087",
+      "instrument": "IE00B5BMR087",
+      "quantity": "16",
+      "limitPrice": "691.04",
+      "estimatedChf": "0",
+      "amount": "0",
+      "actualChf": "11056.64",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9124"
+    },
+    {
       "date": "2026-05-22 10:41:58",
       "status": "inactive",
       "action": "buy",
@@ -576,51 +708,6 @@
       "amount": "1134",
       "actualChf": "0",
       "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11262.87 CHF",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9127"
-    },
-    {
-      "date": "2026-05-22 10:41:42",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "LU0950668870",
-      "instrument": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
-      "quantity": "6",
-      "limitPrice": "40.85",
-      "estimatedChf": "244.53",
-      "amount": "244.53",
-      "actualChf": "0",
-      "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11262.87 CHF",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9127"
-    },
-    {
-      "date": "2026-05-22 10:41:41",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "IE00B5BMR087",
-      "instrument": "iShares Core S&P 500 UCITS ETF USD (Acc)",
-      "quantity": "16",
-      "limitPrice": "692.5",
-      "estimatedChf": "11056.32",
-      "amount": "11056.32",
-      "actualChf": "0",
-      "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11262.87 CHF",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9127"
-    },
-    {
-      "date": "2026-05-21 14:41:06",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "IE00B5BMR087",
-      "instrument": "iShares Core S&P 500 UCITS ETF USD (Acc)",
-      "quantity": "2",
-      "limitPrice": "687.18",
-      "estimatedChf": "1322.4",
-      "amount": "1322.4",
-      "actualChf": "0",
-      "reason": "Scoped retry attempt for SXR8 after operator reported IBKR permissions enabled; retry allowed only for non-fill, non-policy failure if route validates cleanly.; Market-open live submission attempted.; Execution reconciliation: broker status Filled, order id 9123, filled 2, remaining 0, avg fill 687.18, last fill 687.18, exec id 00020f63.6a0ef76c.01.01, executed at 2026-05-21T14:43:59+00:00; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11262.87 CHF",
       "approval": "broker_inactive",
       "brokerOrderId": "9127"
     }
