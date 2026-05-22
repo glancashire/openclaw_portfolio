@@ -66,15 +66,45 @@ function nextVersion(rootDir, portfolio, approvalId) {
   return max + 1;
 }
 
-/** Build a reproposal envelope for cancelled legs. Returns { path, envelope, version, skipped }. */
-async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState, originalEnvelope, quoteFn, rootDir, now = new Date() }) {
+/** Build a reproposal envelope for cancelled legs. Returns { path, envelope, version, skipped, excludedLegs }. */
+async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState, originalEnvelope, quoteFn, rootDir, now = new Date(), circuitBreakerThreshold = 3 }) {
   const cancelled = Object.values(runState.legs || {}).filter((leg) => leg.status === 'cancelled');
   if (cancelled.length === 0) return { skipped: true, reason: 'no_cancelled_legs' };
+
+  // Phase 199: load the cancel-loop circuit breaker module lazily so existing tests
+  // that stub `quoteFn` and don't touch breakers still work without filesystem state.
+  let evaluateCircuitBreaker = null;
+  try { ({ evaluateCircuitBreaker } = require('./cancelLoopBreaker')); } catch (_) { /* optional */ }
 
   const originalByLegId = new Map((originalEnvelope?.legs || []).map((l) => [l.legId, l]));
 
   const reproposalLegs = [];
+  const excludedLegs = [];
   for (const leg of cancelled) {
+    // Phase 199: if the instrument has tripped its circuit breaker, exclude it from reproposal.
+    if (evaluateCircuitBreaker && rootDir && portfolio) {
+      try {
+        const evalResult = evaluateCircuitBreaker({
+          portfolio,
+          instrument: leg.instrument,
+          latestApprovalId: approvalId,
+          rootDir,
+          threshold: circuitBreakerThreshold,
+          now,
+        });
+        if (evalResult.tripped) {
+          excludedLegs.push({
+            legId: leg.legId,
+            instrument: leg.instrument,
+            reason: 'circuit_breaker_tripped',
+            consecutiveCancellations: evalResult.count,
+            threshold: evalResult.threshold,
+            markerPath: evalResult.savedPath,
+          });
+          continue;
+        }
+      } catch (_) { /* breaker check is best-effort */ }
+    }
     const orig = originalByLegId.get(leg.legId) || {};
     const conid = Number(orig.conid || leg.conid || 0);
     let quote = null;
@@ -111,6 +141,10 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
     });
   }
 
+  if (reproposalLegs.length === 0) {
+    return { skipped: true, reason: 'all_legs_circuit_broken', excludedLegs };
+  }
+
   const version = nextVersion(rootDir, portfolio, approvalId);
   const envelope = {
     schemaVersion: '1.0',
@@ -137,7 +171,7 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
     archived = sweep.archived || [];
   } catch (_) { /* archiver optional */ }
 
-  return { path: outPath, envelope, version, skipped: false, archived };
+  return { path: outPath, envelope, version, skipped: false, archived, excludedLegs };
 }
 
 module.exports = {

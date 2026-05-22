@@ -1080,6 +1080,7 @@ function buildPortfolioIndex(summaries = []) {
 function buildPendingActionsOverview(summaries = [], options = {}) {
   const rootDir = options.rootDir || null;
   const reproposalSurface = rootDir ? require('./reproposalSurface') : null;
+  const circuitBreakerSurface = rootDir ? (() => { try { return require('./circuitBreakerSurface'); } catch (_) { return null; } })() : null;
   const reproposalItems = reproposalSurface
     ? summaries.flatMap((summary) => reproposalSurface
         .listLatestPendingReproposals({ rootDir, portfolio: summary.portfolio })
@@ -1088,7 +1089,14 @@ function buildPendingActionsOverview(summaries = [], options = {}) {
           return { ...desc, severity: 'high' };
         }))
     : [];
+  // Phase 199: surface tripped circuit breakers with severity 'high' (critical sub-classification on the item).
+  const breakerItems = circuitBreakerSurface
+    ? circuitBreakerSurface.listCircuitBreakerSurfaceItems({ rootDir })
+        .filter((item) => summaries.some((s) => s.portfolio === item.portfolio))
+        .map((item) => ({ ...item, severity: 'high', status: 'blocked', queueType: 'attention' }))
+    : [];
   const items = [
+    ...breakerItems,
     ...reproposalItems,
     ...summaries.flatMap((summary) => (summary.operatorQueue?.items || []).map((item) => ({ ...item }))),
   ];
@@ -1123,6 +1131,7 @@ function approvalUrgencyForItem(item = {}) {
 function buildApprovalsQueue(summaries = [], options = {}) {
   const rootDir = options.rootDir || null;
   const reproposalSurface = rootDir ? require('./reproposalSurface') : null;
+  const circuitBreakerSurface = rootDir ? (() => { try { return require('./circuitBreakerSurface'); } catch (_) { return null; } })() : null;
   const items = summaries.flatMap((summary) => {
     const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
     const basketApprovedCount = Number(summary.readiness?.approvalState?.basketApprovalState?.approvedCount || 0);
@@ -1146,7 +1155,15 @@ function buildApprovalsQueue(summaries = [], options = {}) {
           .map((rep) => reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep }))
       : [];
 
+    // Phase 199: tripped circuit breakers surface above approvals.
+    const breakerItems = circuitBreakerSurface
+      ? circuitBreakerSurface.listCircuitBreakerSurfaceItems({ rootDir })
+          .filter((item) => item.portfolio === summary.portfolio)
+          .map((item) => ({ ...item, urgency: 'high', queueType: 'attention' }))
+      : [];
+
     return [
+      ...breakerItems,
       ...reproposalItems,
       ...basketItems,
       ...queueItems
