@@ -43,6 +43,19 @@ function listPendingReproposals({ rootDir, portfolio }) {
 }
 
 /**
+ * Like `listPendingReproposals`, but collapses to only the highest-version per parent.
+ */
+function listLatestPendingReproposals({ rootDir, portfolio }) {
+  const all = listPendingReproposals({ rootDir, portfolio });
+  const byParent = new Map();
+  for (const item of all) {
+    const existing = byParent.get(item.parentApprovalId);
+    if (!existing || item.version > existing.version) byParent.set(item.parentApprovalId, item);
+  }
+  return Array.from(byParent.values()).sort((a, b) => String(a.parentApprovalId).localeCompare(String(b.parentApprovalId)));
+}
+
+/**
  * Build a queue item describing a single pending reproposal.
  */
 function describeReproposalItem({ portfolio, reproposal }) {
@@ -71,4 +84,4 @@ function describeReproposalItem({ portfolio, reproposal }) {
   };
 }
 
-module.exports = { listPendingReproposals, describeReproposalItem, reproposalDirFor, approvedDirFor };
+module.exports = { listPendingReproposals, listLatestPendingReproposals, describeReproposalItem, reproposalDirFor, approvedDirFor };

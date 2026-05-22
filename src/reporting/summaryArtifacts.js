@@ -1082,7 +1082,7 @@ function buildPendingActionsOverview(summaries = [], options = {}) {
   const reproposalSurface = rootDir ? require('./reproposalSurface') : null;
   const reproposalItems = reproposalSurface
     ? summaries.flatMap((summary) => reproposalSurface
-        .listPendingReproposals({ rootDir, portfolio: summary.portfolio })
+        .listLatestPendingReproposals({ rootDir, portfolio: summary.portfolio })
         .map((rep) => {
           const desc = reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep });
           return { ...desc, severity: 'high' };
@@ -1140,9 +1140,9 @@ function buildApprovalsQueue(summaries = [], options = {}) {
       severity: 'medium',
     }] : [];
 
-    // Phase 193: pending reproposals
+    // Phase 193 + 194: pending reproposals — surface only latest per parent
     const reproposalItems = reproposalSurface
-      ? reproposalSurface.listPendingReproposals({ rootDir, portfolio: summary.portfolio })
+      ? reproposalSurface.listLatestPendingReproposals({ rootDir, portfolio: summary.portfolio })
           .map((rep) => reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep }))
       : [];
 

@@ -128,7 +128,15 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
   const outPath = path.join(dir, `${approvalId}-reproposal-${version}.json`);
   fs.writeFileSync(outPath, JSON.stringify(envelope, null, 2));
 
-  return { path: outPath, envelope, version, skipped: false };
+  // Phase 194: archive superseded reproposals so the operator surface stays clean.
+  let archived = [];
+  try {
+    const { sweepSupersededReproposals } = require('./basketReproposalArchiver');
+    const sweep = sweepSupersededReproposals({ rootDir, portfolio });
+    archived = sweep.archived || [];
+  } catch (_) { /* archiver optional */ }
+
+  return { path: outPath, envelope, version, skipped: false, archived };
 }
 
 module.exports = {
