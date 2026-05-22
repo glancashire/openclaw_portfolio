@@ -35,6 +35,9 @@ function listPendingReproposals({ rootDir, portfolio }) {
       approvalId: envelope.approvalId,
       legs: Array.isArray(envelope.legs) ? envelope.legs : [],
       createdAt: envelope.createdAt,
+      requiresOperatorAttention: Boolean(envelope.requiresOperatorAttention),
+      quoteQualitySummary: envelope.quoteQualitySummary || null,
+      currencyDeployment: envelope.currencyDeployment || null,
     });
   }
   out.sort((a, b) => String(a.parentApprovalId).localeCompare(String(b.parentApprovalId))
@@ -81,6 +84,10 @@ function describeReproposalItem({ portfolio, reproposal }) {
     effectIfApproved: `Assistant will run scripts/approve-and-execute-reproposal.js --parent=${reproposal.parentApprovalId} which promotes the envelope and transmits via the canonical runner.`,
     effectIfIgnored: 'The cancelled leg(s) remain unfilled and the portfolio stays partially deployed.',
     recommendedOperatorAction: `Reply approve to transmit; assistant will run scripts/approve-and-execute-reproposal.js --parent=${reproposal.parentApprovalId}`,
+    // Phase 203: envelope-level annotations surfaced for operator transparency.
+    requiresOperatorAttention: Boolean(reproposal.requiresOperatorAttention),
+    quoteQualitySummary: reproposal.quoteQualitySummary || null,
+    currencyDeployment: reproposal.currencyDeployment || null,
   };
 }
 
