@@ -119,6 +119,7 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
     parentApprovalId: approvalId,
     reproposalVersion: version,
     createdAt: (typeof now === 'string' ? now : now.toISOString()),
+    expiresAt: new Date((typeof now === 'string' ? Date.parse(now) : now.getTime()) + 4 * 60 * 60 * 1000).toISOString(),
     status: 'pending_user_approval',
     legs: reproposalLegs,
   };
