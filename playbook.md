@@ -38,3 +38,7 @@ When implementing this repo:
 - Keep trade execution behind explicit approval/default safety gates.
 - Keep ETF-only / CHF-first / read-only-first MVP scope intact unless the spec changes.
 - Keep the MVP broker scope focused on Interactive Brokers only until the implementation is complete and stable.
+
+## Basket execution runbook
+
+For live basket execution (Phases 184–198), see `docs/basket-execution-runbook.md`. The summary: every round is one `approve` interaction; assistant never edits code between rounds; failed legs auto-generate a fresh reproposal with one new approval gate.
