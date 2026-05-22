@@ -18,6 +18,7 @@ const PORTFOLIO_DIR = path.join(ROOT, 'portfolio', 'etf');
 const { saveApprovalEnvelope } = require(path.join(ROOT, 'src/execution/basketApprovalStore'));
 const { executeApprovedBasket, reconcileBasketRunFromBroker, runPath } = require(path.join(ROOT, 'src/execution/basketExecutionRunner'));
 const { mirrorBasketRunToTrades } = require(path.join(ROOT, 'src/execution/basketTradesMirror'));
+const { buildReproposalForCancelledLegs } = require(path.join(ROOT, 'src/execution/basketReproposalBuilder'));
 const { InteractiveBrokersClient } = require(path.join(ROOT, 'src/brokers/interactive-brokers/client'));
 const { notifyTradeFill } = require(path.join(ROOT, 'lib/tradeExecutionNotifier'));
 
@@ -202,6 +203,39 @@ async function main() {
   if (cancelledLegs.length > 0) {
     console.log('Cancelled legs (need reproposal):');
     for (const leg of cancelledLegs) console.log(`  - ${leg.instrument} (${leg.ibkrSymbol || ''}) brokerOrderId=${leg.brokerOrderId}`);
+
+    // Phase 190: build a reproposal envelope
+    try {
+      const envelopePath = path.join(ROOT, 'runtime', 'approved-order-baskets', 'etf', `${approvalId}.json`);
+      const originalEnvelope = JSON.parse(fs.readFileSync(envelopePath, 'utf8'));
+      const quoteFn = async (conid) => {
+        try {
+          const snap = await client.native.fetchMarketSnapshot([Number(conid)]);
+          const row = (snap || []).find((s) => Number(s.conid) === Number(conid)) || (snap && snap[0]) || null;
+          if (!row) return null;
+          return { ask: Number(row.ask), bid: Number(row.bid), last: Number(row.last), lastClose: Number(row.close) };
+        } catch (error) {
+          return { error: error.message };
+        }
+      };
+      const reproposal = await buildReproposalForCancelledLegs({
+        portfolio: 'etf',
+        approvalId,
+        runState: reconciled,
+        originalEnvelope,
+        quoteFn,
+        rootDir: ROOT,
+      });
+      if (!reproposal.skipped) {
+        console.log(`\nReproposal v${reproposal.version} written to: ${reproposal.path}`);
+        for (const leg of reproposal.envelope.legs) {
+          console.log(`  Leg ${leg.legId} ${leg.instrument} (${leg.ibkrSymbol || '?'}): ${leg.action} ${leg.quantity} @ ${leg.limitPrice} ${leg.currency} (was ${leg.previousLimit})`);
+        }
+        console.log('\n>>> Awaiting single new operator approval (`approve`) to transmit reproposal.');
+      }
+    } catch (error) {
+      console.error(`Reproposal build failed: ${error.message}`);
+    }
   }
 }
 
