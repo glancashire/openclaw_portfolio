@@ -12,7 +12,7 @@
 
 ## Health Snapshot
 - Strategy status: rebalance_needed
-- Last successful sync: 2026-05-22 10:31:13
+- Last successful sync: 2026-05-22 10:42:05
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
@@ -28,9 +28,9 @@
 8. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Portfolio Value Snapshot
-- Total value CHF: 9874.789999999999
+- Total value CHF: 22315.24
 - Cash CHF: 0
-- Invested CHF: 9874.789999999999
+- Invested CHF: 22315.24
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
@@ -41,8 +41,8 @@
 ## Allocation Health
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 73.78 | 60 | 13.78 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 26.22 | 20 | 6.22 | drifted | watch | drift threshold breached |
+| Global equities | 83.3 | 60 | 23.3 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 16.7 | 20 | -3.3 | on_track | no | within tolerance |
 | Bonds / cash-like | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
 
 ## Instrument Actions Queue
@@ -52,7 +52,7 @@
 | LU0950668870 | 0 | 20 | watch | No active proposal | watch |
 | CH0032912732 | 0 | 12 | watch | No active proposal | watch |
 | CH0130595124 | 0 | 8 | watch | No active proposal | watch |
-| CASH-CHF | 20.5 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| CASH-CHF | 9.07 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 
 ## Safety / Risk Diagnostics
 - Safety status: clear
@@ -85,11 +85,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-21 23:18:55.044 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-21 23:18:52.271 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-21 23:06:00.235 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-21 23:05:57.193 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-21 22:59:54.901 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:55:14.519 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:55:14.144 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:55:07.073 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:54:45.987 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-22 10:54:45.631 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-22
@@ -113,7 +113,7 @@ CH0032912732: Broker rejected the order because available cash or buying power w
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 7850.66 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 20291.11 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: Transmitted live broker order submitted.
 - Observability shows 92 recent blocked execution-policy event(s).
 

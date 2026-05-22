@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-22T10:23:16.345Z",
+  "generatedAt": "2026-05-22T10:56:04.828Z",
   "portfolio": "etf",
   "incidentStatus": "monitor_only",
   "summary": {
@@ -11,45 +11,115 @@
     "dataFreshness": "current",
     "blockerCount": 0,
     "queueItemCount": 1,
-    "pendingApprovals": 5,
-    "recommendedNextStep": "5 proposed trade row(s) still need user approval.",
-    "executionWhy": "Execution is waiting on explicit operator approval of proposed trade rows.",
-    "approvalWhy": "5 proposed row(s) still need approval, 11 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "pendingApprovals": 0,
+    "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+    "executionWhy": "No explicit execution block is currently surfaced.",
+    "approvalWhy": "29 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
-    "5 approval-gated trade rows are still waiting for operator review."
+    "No active incident drivers were detected; this checklist is a verification pass confirming healthy posture."
   ],
   "activeBlockers": [],
   "activeBrokerBlocks": [
     {
       "rank": 1,
-      "dateTime": "2026-05-21 12:02:12",
+      "dateTime": "2026-05-22 10:41:46",
+      "tickerOrIsin": "CH0032912732",
+      "name": "UBS SLI ETF (SMI gleichgewichtet)",
+      "action": "buy",
+      "status": "inactive",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9127",
+      "blockCode": "insufficient_funds_or_buying_power",
+      "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+      "blockedAt": "",
+      "nextAction": "Reduce size or restore buying power, then retry."
+    },
+    {
+      "rank": 2,
+      "dateTime": "2026-05-13 13:57:43",
+      "tickerOrIsin": "IE000XZSV718",
+      "name": "State Street SPDR S&P 500 UCITS ETF USD Unhedged (Acc)",
+      "action": "buy",
+      "status": "inactive",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9127",
+      "blockCode": "insufficient_funds_or_buying_power",
+      "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+      "blockedAt": "",
+      "nextAction": "Reduce size or restore buying power, then retry."
+    },
+    {
+      "rank": 3,
+      "dateTime": "2026-05-22 10:41:42",
+      "tickerOrIsin": "LU0950668870",
+      "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+      "action": "buy",
+      "status": "inactive",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9127",
+      "blockCode": "insufficient_funds_or_buying_power",
+      "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+      "blockedAt": "",
+      "nextAction": "Reduce size or restore buying power, then retry."
+    },
+    {
+      "rank": 4,
+      "dateTime": "2026-05-21 09:27:46",
+      "tickerOrIsin": "IE00BD4TXW66",
+      "name": "UBS Core S&P 500 UCITS ETF USD acc",
+      "action": "buy",
+      "status": "inactive",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9127",
+      "blockCode": "insufficient_funds_or_buying_power",
+      "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+      "blockedAt": "",
+      "nextAction": "Reduce size or restore buying power, then retry."
+    },
+    {
+      "rank": 5,
+      "dateTime": "2026-05-22 10:41:41",
       "tickerOrIsin": "IE00B5BMR087",
       "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
       "action": "buy",
-      "status": "cancelled",
+      "status": "inactive",
       "approval": "broker_inactive",
-      "brokerOrderId": "9122",
-      "blockCode": "broker_submit_rejected",
-      "blockReason": "Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.",
+      "brokerOrderId": "9127",
+      "blockCode": "insufficient_funds_or_buying_power",
+      "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
       "blockedAt": "",
-      "nextAction": "Review the broker rejection reason and correct the order before retrying."
+      "nextAction": "Reduce size or restore buying power, then retry."
+    },
+    {
+      "rank": 6,
+      "dateTime": "2026-05-22 10:41:58",
+      "tickerOrIsin": "CH0130595124",
+      "name": "UBS SPI Mid ETF (SPI ohne SMI)",
+      "action": "buy",
+      "status": "inactive",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9127",
+      "blockCode": "insufficient_funds_or_buying_power",
+      "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+      "blockedAt": "",
+      "nextAction": "Reduce size or restore buying power, then retry."
     }
   ],
   "actionChecklist": [
     {
       "step": 1,
-      "priority": "medium",
-      "title": "5 proposed trade row(s) still need user approval.",
-      "action": "Review the proposed trades and approve or reject them explicitly.",
+      "priority": "low",
+      "title": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "action": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
-      "source": "trade_lifecycle"
+      "source": "recommendation_engine"
     }
   ],
   "verificationChecks": [
     "Broker health remains healthy or intentionally degraded with operator awareness.",
     "Freshness posture remains current.",
-    "All approval-gated rows are explicitly approved, rejected, or intentionally left pending.",
+    "No approval backlog remains.",
     "No active blockers remain."
   ],
   "completionCriteria": [
@@ -73,19 +143,19 @@
     {
       "rank": 3,
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
+      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
       "timestamp": null
     },
     {
       "rank": 4,
       "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments.",
+      "summary": "Portfolio requires confirmation before first live trade.",
       "timestamp": null
     },
     {
       "rank": 5,
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
+      "summary": "Requested instrument is not in Approved Instruments.",
       "timestamp": null
     }
   ]

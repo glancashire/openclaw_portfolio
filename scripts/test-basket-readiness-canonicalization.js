@@ -129,7 +129,8 @@ function loadModules(readiness, runtimeState = { brokerErrors: {}, liveExecution
         { legId: 'leg-1', instrument: 'IE00B5BMR087', ibkrSymbol: 'SXR8', conid: '75776072', action: 'BUY', quantity: 2, limitPrice: 689.2, currency: 'EUR', exchange: 'SMART', primaryExchange: 'IBIS2', maxAttempts: 1, retryPolicy: 'none', status: 'approved' },
       ],
     }, { rootDir: tempDir, now: new Date('2026-05-10T11:00:00Z') });
-    const mod = loadModules({ configured: true, authenticated: true, reachable: true, fallbackRequired: false, message: 'ready' });
+    const armState = { liveExecutionArms: { etf: { armedAt: '2026-05-10T08:00:00Z', expiresAt: '2099-05-10T18:00:00Z', note: 'armed' } } };
+    const mod = loadModules({ configured: true, authenticated: true, reachable: true, fallbackRequired: false, message: 'ready' }, armState);
     const authority = await mod.authority.evaluateExecutionAuthority({ portfolioDir });
     assert.strictEqual(authority.effectiveAuthority.liveExecutionPossibleNow, true);
     assert.strictEqual(authority.effectiveAuthority.requiresExplicitOperatorAction, false);

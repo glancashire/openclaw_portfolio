@@ -69,14 +69,20 @@ function legEligible(leg = {}, runState = {}) {
 
 function summarizeRun(runState = {}) {
   const legs = Object.values(runState.legs || {});
+  const filled = legs.filter((leg) => leg.status === 'filled').length;
+  const cancelled = legs.filter((leg) => leg.status === 'cancelled').length;
   runState.summary = {
     total: legs.length,
     executed: legs.filter((leg) => ['submitted', 'filled', 'partially_filled'].includes(leg.status)).length,
     blocked: legs.filter((leg) => leg.status === 'blocked').length,
     failed: legs.filter((leg) => leg.status === 'failed').length,
     submitted: legs.filter((leg) => leg.status === 'submitted').length,
+    filled,
+    cancelled,
   };
   if (runState.summary.failed > 0 && runState.summary.executed === 0 && runState.summary.blocked === 0) runState.status = 'failed';
+  else if (filled > 0 && (cancelled > 0 || runState.summary.failed > 0 || runState.summary.blocked > 0)) runState.status = 'partial';
+  else if (filled === runState.summary.total && runState.summary.total > 0) runState.status = 'filled';
   else if (runState.summary.executed > 0 && (runState.summary.blocked > 0 || runState.summary.failed > 0)) runState.status = 'partial';
   else if (runState.summary.executed === runState.summary.total && runState.summary.total > 0) runState.status = 'submitted';
   else if (runState.summary.blocked === runState.summary.total && runState.summary.total > 0) runState.status = 'blocked';
@@ -149,6 +155,50 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
   return { path: statePath, runState: summarizeRun(state), approvalId, portfolio };
 }
 
+function classifyBrokerOutcome({ orderId, executions = [], completedOrders = [] }) {
+  const idStr = String(orderId);
+  const fills = (executions || []).filter((row) => String(row.orderId) === idStr);
+  if (fills.length > 0) {
+    const totalShares = fills.reduce((sum, f) => sum + Number(f.shares || f.quantity || 0), 0);
+    const totalNotional = fills.reduce((sum, f) => sum + (Number(f.shares || f.quantity || 0) * Number(f.price || 0)), 0);
+    const avgFillPrice = totalShares > 0 ? Number((totalNotional / totalShares).toFixed(6)) : null;
+    return {
+      status: 'filled',
+      fillQuantity: totalShares,
+      avgFillPrice,
+      executionIds: fills.map((f) => f.execId).filter(Boolean),
+    };
+  }
+  const completed = (completedOrders || []).find((row) => {
+    if (!row || !row.symbol) return false;
+    const status = String(row.status || row.completedStatus || '').toLowerCase();
+    return status.includes('cancel');
+  });
+  if (completed) {
+    return {
+      status: 'cancelled',
+      cancelledReason: completed.completedStatus || completed.status || 'cancelled',
+    };
+  }
+  return { status: 'unknown' };
+}
+
+function reconcileBasketRunFromBroker({ portfolio, approvalId, rootDir = process.cwd(), executions = [], completedOrders = [], now = new Date() } = {}) {
+  const outPath = runPath({ portfolio, approvalId, rootDir });
+  if (!fs.existsSync(outPath)) {
+    throw new Error(`Basket run state not found: ${outPath}`);
+  }
+  const state = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+  for (const leg of Object.values(state.legs || {})) {
+    if (!leg.brokerOrderId) continue;
+    if (['filled', 'cancelled'].includes(leg.status)) continue;
+    const outcome = classifyBrokerOutcome({ orderId: leg.brokerOrderId, executions, completedOrders });
+    if (outcome.status === 'unknown') continue;
+    Object.assign(leg, outcome, { updatedAt: new Date(now).toISOString() });
+  }
+  return persistRunState(outPath, summarizeRun(state), now);
+}
+
 module.exports = {
   BASKET_RUN_SCHEMA_VERSION,
   runsRoot,
@@ -159,4 +209,6 @@ module.exports = {
   legEligible,
   summarizeRun,
   executeApprovedBasket,
+  classifyBrokerOutcome,
+  reconcileBasketRunFromBroker,
 };
