@@ -43,6 +43,7 @@ async function evaluateExecutionAuthority({ portfolioDir } = {}) {
     brokerReadiness,
     runtimePause,
     liveArm: armState,
+    approvalState,
     effectiveAuthority: {
       liveExecutionPossibleNow: Boolean(
         parsePortfolioStatus(portfolioText) === 'active'

@@ -133,6 +133,8 @@ function loadModules(readiness, runtimeState = { brokerErrors: {}, liveExecution
     const authority = await mod.authority.evaluateExecutionAuthority({ portfolioDir });
     assert.strictEqual(authority.effectiveAuthority.liveExecutionPossibleNow, true);
     assert.strictEqual(authority.effectiveAuthority.requiresExplicitOperatorAction, false);
+    assert.strictEqual(authority.liveArm.armedForMarketOpen, true);
+    assert.strictEqual(authority.approvalState.hasExecutableApprovedBasket, true);
     process.chdir(cwd);
   }
 

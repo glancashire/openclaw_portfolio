@@ -1110,22 +1110,39 @@ function approvalUrgencyForItem(item = {}) {
 function buildApprovalsQueue(summaries = []) {
   const items = summaries.flatMap((summary) => {
     const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
-    return queueItems
-      .filter((item) => ['approval'].includes(item.queueType || queueTypeForItem(item)) || item.kind === 'approval')
-      .map((item) => ({
-        portfolio: summary.portfolio,
-        urgency: approvalUrgencyForItem(item),
-        status: item.status,
-        summary: item.summary,
-        explanation: item.summary,
-        effectIfApproved: item.status === 'pending_user_approval'
-          ? 'The operator can move this proposal from review into the next staging / execution decision step.'
-          : 'The operator can advance the reviewed item into the next workflow step with fewer manual joins.',
-        effectIfIgnored: 'The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.',
-        recommendedOperatorAction: item.recommendedOperatorAction || 'Review and resolve the approval item explicitly.',
-        queueType: item.queueType || queueTypeForItem(item),
-        severity: item.severity,
-      }));
+    const basketApprovedCount = Number(summary.readiness?.approvalState?.basketApprovalState?.approvedCount || 0);
+    const basketExecutableCount = Number(summary.readiness?.approvalState?.basketApprovalState?.executableCount || 0);
+    const basketItems = basketExecutableCount > 0 ? [{
+      portfolio: summary.portfolio,
+      urgency: 'medium',
+      status: 'basket_approved',
+      summary: `${basketApprovedCount} approved basket(s) are ready for execution.`,
+      explanation: `${basketExecutableCount} approved basket(s) are executable now; row-level proposed trades remain legacy context.`,
+      effectIfApproved: 'The operator can transmit the approved basket without re-approving row-level trade log entries.',
+      effectIfIgnored: 'The basket remains ready but unsubmitted, so the portfolio stays staged instead of executing.',
+      recommendedOperatorAction: 'Review the approved basket and submit when satisfied with the price bands and market window.',
+      queueType: 'approval',
+      severity: 'medium',
+    }] : [];
+    return [
+      ...basketItems,
+      ...queueItems
+        .filter((item) => ['approval'].includes(item.queueType || queueTypeForItem(item)) || item.kind === 'approval')
+        .map((item) => ({
+          portfolio: summary.portfolio,
+          urgency: approvalUrgencyForItem(item),
+          status: item.status,
+          summary: item.summary,
+          explanation: item.summary,
+          effectIfApproved: item.status === 'pending_user_approval'
+            ? 'The operator can move this proposal from review into the next staging / execution decision step.'
+            : 'The operator can advance the reviewed item into the next workflow step with fewer manual joins.',
+          effectIfIgnored: 'The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.',
+          recommendedOperatorAction: item.recommendedOperatorAction || 'Review and resolve the approval item explicitly.',
+          queueType: item.queueType || queueTypeForItem(item),
+          severity: item.severity,
+        }))
+    ];
   });
 
   items.sort((a, b) => {

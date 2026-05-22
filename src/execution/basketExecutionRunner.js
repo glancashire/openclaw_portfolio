@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { loadApprovalEnvelope } = require('./basketApprovalStore');
 const { stagePortfolioOrder } = require('./portfolioExecution');
+const { prepareOrderForSubmission } = require('./orderPreparation');
 
 const BASKET_RUN_SCHEMA_VERSION = '1.0';
 
@@ -103,7 +104,7 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
       continue;
     }
 
-    const order = {
+    const order = prepareOrderForSubmission({
       identifier: leg.conid || leg.instrument,
       conid: leg.conid || null,
       symbol: leg.ibkrSymbol || null,
@@ -116,7 +117,12 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
       userApproved: true,
       transmittedLiveAck: 'I UNDERSTAND THIS WILL TRANSMIT A LIVE ORDER',
       transmit: true,
-    };
+    }, {
+      ibkrConid: leg.conid,
+      ibkrSymbol: leg.ibkrSymbol,
+      ibkrPrimaryExchange: leg.primaryExchange,
+      currency: leg.currency,
+    }, { enforceMarketHours: false });
 
     const executor = submitLeg || (async ({ portfolioDir: targetPortfolioDir, order: targetOrder }) => stagePortfolioOrder({
       portfolioDir: targetPortfolioDir,
