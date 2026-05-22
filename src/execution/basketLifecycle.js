@@ -1,0 +1,242 @@
+'use strict';
+
+/* Phase 192 — Shared basket lifecycle: monitor → reconcile → mirror → notify → reproposal hook.
+ *
+ * Used by both `scripts/execute-approved-basket-end-to-end.js` and
+ * `scripts/approve-and-execute-reproposal.js` so behavior cannot drift.
+ *
+ * Dependencies are injected so the helper is unit-testable without a live broker.
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+const DEFAULT_CYCLE_TIMEOUT_MS = 10 * 60 * 1000;
+const DEFAULT_POLL_INTERVAL_MS = 30 * 1000;
+const DEFAULT_SETTLE_DELAY_MS = 5 * 1000;
+
+const { reconcileBasketRunFromBroker, runPath } = require('./basketExecutionRunner');
+const { mirrorBasketRunToTrades } = require('./basketTradesMirror');
+const { buildReproposalForCancelledLegs } = require('./basketReproposalBuilder');
+
+/**
+ * Run the post-execution lifecycle for a basket.
+ *
+ * @param {object} params
+ * @param {string} params.portfolio
+ * @param {string} params.approvalId
+ * @param {string} params.rootDir
+ * @param {string} params.portfolioDir
+ * @param {object} params.client - exposes `native.fetchOpenOrders`, `native.fetchMarketSnapshot`, `cancelOrder`
+ * @param {object} params.runState - the runner's run state (legs + brokerOrderIds)
+ * @param {object} [params.options]
+ * @param {boolean} [params.options.skipMonitor=false] - skip monitor/cancel block (reconcile-only mode)
+ * @param {number}  [params.options.cycleTimeoutMs]
+ * @param {number}  [params.options.pollIntervalMs]
+ * @param {number}  [params.options.settleDelayMs]
+ * @param {function} [params.options.ibkrJson] - fn(args) returning parsed JSON or null
+ * @param {function} [params.options.notifyTradeFill] - fn({trade, portfolio, openOrders, portfolioDir})
+ * @param {function} [params.options.resyncHoldings] - fn() that does the resync
+ * @param {function} [params.options.logger] - fn(msg)
+ */
+async function runBasketLifecycle({
+  portfolio,
+  approvalId,
+  rootDir,
+  portfolioDir,
+  client,
+  runState,
+  options = {},
+}) {
+  const log = options.logger || ((msg) => console.log(msg));
+  const cycleTimeoutMs = options.cycleTimeoutMs ?? DEFAULT_CYCLE_TIMEOUT_MS;
+  const pollIntervalMs = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
+  const settleDelayMs = options.settleDelayMs ?? DEFAULT_SETTLE_DELAY_MS;
+  const ibkrJson = options.ibkrJson || defaultIbkrJson(rootDir);
+  const notifyTradeFill = options.notifyTradeFill || require(path.join(rootDir, 'lib/tradeExecutionNotifier')).notifyTradeFill;
+  const resyncHoldings = options.resyncHoldings || (() => defaultResyncHoldings(rootDir, portfolio, log));
+
+  const brokerOrderIds = Object.values(runState.legs || {})
+    .map((leg) => leg.brokerOrderId)
+    .filter((id) => Number.isFinite(Number(id)))
+    .map((id) => Number(id));
+
+  if (!options.skipMonitor) {
+    if (brokerOrderIds.length === 0) {
+      log('No live orders transmitted. Skipping monitor.');
+    } else {
+      await monitorAndCancel({ client, brokerOrderIds, cycleTimeoutMs, pollIntervalMs, settleDelayMs, log });
+    }
+  }
+
+  log('Fetching broker evidence for reconciliation...');
+  const executions = ibkrJson('executions') || [];
+  const completedOrders = ibkrJson('completed-orders') || [];
+  const reconciledPath = reconcileBasketRunFromBroker({
+    portfolio,
+    approvalId,
+    rootDir,
+    executions,
+    completedOrders,
+  });
+  const reconciled = JSON.parse(fs.readFileSync(reconciledPath, 'utf8'));
+  log(`Reconciled summary: ${JSON.stringify(reconciled.summary)}`);
+
+  const mirror = mirrorBasketRunToTrades({ portfolioDir, runState: reconciled });
+  log(`Trade log mirror: appended=${mirror.appended} skipped=${mirror.skipped ? mirror.skipped.length : 0}`);
+
+  // Notify ONLY for legs newly mirrored in this run, to keep emails idempotent.
+  const newlyMirroredOrderIds = new Set((mirror.mirrored || []).filter((m) => m.status === 'filled').map((m) => String(m.brokerOrderId)));
+  const orderIdSet = new Set(brokerOrderIds.map(String));
+  const myExecs = executions.filter((e) => orderIdSet.has(String(e.orderId)) && newlyMirroredOrderIds.has(String(e.orderId)));
+  log(`Executions to notify: ${myExecs.length} (skipping ${executions.filter((e) => orderIdSet.has(String(e.orderId))).length - myExecs.length} already-notified)`);
+
+  const notifyResults = [];
+  for (const exec of myExecs) {
+    const trade = {
+      symbol: exec.symbol || (exec.contract && exec.contract.symbol) || '?',
+      action: exec.side || exec.action || 'BUY',
+      qty: Number(exec.shares || exec.quantity || 0),
+      fillQty: Number(exec.shares || exec.quantity || 0),
+      fillPrice: Number(exec.price || 0),
+      price: Number(exec.price || 0),
+      currency: exec.currency || 'CHF',
+      costChf: Number(exec.shares || exec.quantity || 0) * Number(exec.price || 0),
+    };
+    try {
+      const r = await notifyTradeFill({ trade, portfolio: { name: `${portfolio.toUpperCase()} Portfolio`, totalValueChf: 0, cashChf: 0, holdings: [] }, openOrders: [], portfolioDir });
+      notifyResults.push({ orderId: exec.orderId, ok: true, result: r });
+      log(`Notified order ${exec.orderId}`);
+    } catch (error) {
+      notifyResults.push({ orderId: exec.orderId, ok: false, error: error.message });
+      log(`Notify ${exec.orderId} failed: ${error.message}`);
+    }
+  }
+
+  try {
+    log('Resyncing holdings...');
+    const r = await resyncHoldings();
+    if (r) log(typeof r === 'string' ? r : JSON.stringify(r).slice(0, 400));
+  } catch (error) {
+    log(`Resync failed: ${error.message}`);
+  }
+
+  // Reproposal hook for any legs that ended cancelled.
+  let reproposal = null;
+  const cancelledLegs = Object.values(reconciled.legs).filter((leg) => leg.status === 'cancelled');
+  if (cancelledLegs.length > 0) {
+    log('Cancelled legs (need reproposal):');
+    for (const leg of cancelledLegs) log(`  - ${leg.instrument} (${leg.ibkrSymbol || ''}) brokerOrderId=${leg.brokerOrderId}`);
+    try {
+      const envelopePath = path.join(rootDir, 'runtime', 'approved-order-baskets', portfolio, `${approvalId}.json`);
+      if (!fs.existsSync(envelopePath)) {
+        log(`Reproposal skipped: original approval envelope not found at ${envelopePath}`);
+      } else {
+        const originalEnvelope = JSON.parse(fs.readFileSync(envelopePath, 'utf8'));
+        const quoteFn = options.quoteFn || (async (conid) => {
+          try {
+            const snap = await client.native.fetchMarketSnapshot([Number(conid)]);
+            const row = (snap || []).find((s) => Number(s.conid) === Number(conid)) || (snap && snap[0]) || null;
+            if (!row) return null;
+            return { ask: Number(row.ask), bid: Number(row.bid), last: Number(row.last), lastClose: Number(row.close) };
+          } catch (error) { return { error: error.message }; }
+        });
+        reproposal = await buildReproposalForCancelledLegs({
+          portfolio,
+          approvalId,
+          runState: reconciled,
+          originalEnvelope,
+          quoteFn,
+          rootDir,
+        });
+        if (reproposal && !reproposal.skipped) {
+          log(`Reproposal v${reproposal.version} written to: ${reproposal.path}`);
+          for (const leg of reproposal.envelope.legs) {
+            log(`  Leg ${leg.legId} ${leg.instrument} (${leg.ibkrSymbol || '?'}): ${leg.action} ${leg.quantity} @ ${leg.limitPrice} ${leg.currency} (was ${leg.previousLimit})`);
+          }
+          log('>>> Awaiting single new operator approval (`approve`) to transmit reproposal.');
+        }
+      }
+    } catch (error) {
+      log(`Reproposal build failed: ${error.message}`);
+    }
+  }
+
+  return {
+    approvalId,
+    reconciledPath,
+    reconciled,
+    mirror,
+    notifyResults,
+    reproposal,
+    cancelledLegCount: cancelledLegs.length,
+    brokerOrderIds,
+  };
+}
+
+async function monitorAndCancel({ client, brokerOrderIds, cycleTimeoutMs, pollIntervalMs, settleDelayMs, log }) {
+  const stillOpen = new Set(brokerOrderIds);
+  const startMs = Date.now();
+  await new Promise((r) => setTimeout(r, settleDelayMs));
+
+  while (Date.now() - startMs < cycleTimeoutMs && stillOpen.size > 0) {
+    const elapsed = Math.round((Date.now() - startMs) / 1000);
+    let open;
+    try {
+      open = await client.native.fetchOpenOrders();
+    } catch (error) {
+      log(`[${elapsed}s] fetchOpenOrders error: ${error.message}`);
+      await new Promise((r) => setTimeout(r, pollIntervalMs));
+      continue;
+    }
+    const openIds = new Set((open || []).map((o) => Number(o.orderId)));
+    for (const id of [...stillOpen]) {
+      if (!openIds.has(id)) { log(`[${elapsed}s] order ${id} no longer open`); stillOpen.delete(id); }
+    }
+    if (stillOpen.size === 0) break;
+    log(`[${elapsed}s] still open: ${[...stillOpen].join(', ')}`);
+    await new Promise((r) => setTimeout(r, pollIntervalMs));
+  }
+
+  if (stillOpen.size > 0) {
+    log(`Timeout reached. Cancelling ${stillOpen.size} unfilled orders...`);
+    for (const id of stillOpen) {
+      try {
+        const r = await client.cancelOrder(Number(id));
+        log(`Cancelled ${id}: ${JSON.stringify(r && r.cancel ? r.cancel : r)}`);
+      } catch (error) { log(`Cancel ${id} failed: ${error.message}`); }
+    }
+  }
+}
+
+function defaultIbkrJson(rootDir) {
+  const cli = path.join(rootDir, 'skills/ibkr/scripts/ibkr_cli.py');
+  return function ibkrJson(args) {
+    try {
+      const out = execSync(`python3 ${cli} ${args} --json`, { encoding: 'utf8', timeout: 30000 });
+      return JSON.parse(out.trim());
+    } catch (error) {
+      console.error(`[ibkr-cli] ${args} failed: ${error.message}`);
+      return null;
+    }
+  };
+}
+
+function defaultResyncHoldings(rootDir, portfolio, log) {
+  try {
+    const out = execSync(`node scripts/sync-interactive-brokers-holdings.js portfolio/${portfolio}`, { encoding: 'utf8', timeout: 120000, cwd: rootDir });
+    return out;
+  } catch (error) {
+    log && log(`Resync subprocess failed: ${error.message}`);
+    return null;
+  }
+}
+
+function loadRunState({ portfolio, approvalId, rootDir }) {
+  const statePath = runPath({ portfolio, approvalId, rootDir });
+  if (!fs.existsSync(statePath)) return null;
+  return JSON.parse(fs.readFileSync(statePath, 'utf8'));
+}
+
+module.exports = { runBasketLifecycle, monitorAndCancel, loadRunState };
