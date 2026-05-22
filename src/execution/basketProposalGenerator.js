@@ -203,4 +203,26 @@ function saveProposalEnvelope({ rootDir, portfolio, envelope }) {
   return outPath;
 }
 
-module.exports = { generateBasketProposal, parseApprovedInstruments, saveProposalEnvelope };
+/**
+ * Returns the most recent proposal envelope under runtime/basket-proposals/<portfolio>/,
+ * or null if none. Result: { path, envelope, mtimeMs }.
+ */
+function latestProposalForPortfolio({ rootDir, portfolio }) {
+  const dir = path.join(rootDir, 'runtime', 'basket-proposals', portfolio);
+  if (!fs.existsSync(dir)) return null;
+  let best = null;
+  for (const name of fs.readdirSync(dir)) {
+    if (!name.endsWith('.json')) continue;
+    const full = path.join(dir, name);
+    const stat = fs.statSync(full);
+    if (!stat.isFile()) continue;
+    if (!best || stat.mtimeMs > best.mtimeMs) best = { path: full, mtimeMs: stat.mtimeMs };
+  }
+  if (!best) return null;
+  try {
+    best.envelope = JSON.parse(fs.readFileSync(best.path, 'utf8'));
+  } catch (_) { return null; }
+  return best;
+}
+
+module.exports = { generateBasketProposal, parseApprovedInstruments, saveProposalEnvelope, latestProposalForPortfolio };
