@@ -5,6 +5,7 @@ const path = require('path');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 const { parseExecutionMode, parsePortfolioStatus } = require('./portfolioExecution');
 const { readTradesTable, listExecutableTradeRows, classifyExecutableRow } = require('./tradeState');
+const { listApprovalEnvelopes } = require('./basketApprovalStore');
 const { brokerErrorStatus, readExecutionState, writeExecutionState } = require('./runtimeState');
 const { parseTradeDate, hoursBetween } = require('./executionClassification');
 const { isMarketOpen, nextOpenTime } = require('../../lib/marketHours');
@@ -67,8 +68,25 @@ function clearLiveExecutionArm(portfolioDir) {
   return { ok: true };
 }
 
-function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFAULT_APPROVAL_MAX_AGE_HOURS) {
+function summarizeBasketApprovalState({ portfolioDir = null, repoRoot = process.cwd(), now = new Date(), maxAgeHours = DEFAULT_APPROVAL_MAX_AGE_HOURS } = {}) {
+  const portfolio = portfolioDir ? path.basename(portfolioDir) : null;
+  const envelopes = portfolio ? listApprovalEnvelopes({ portfolio, rootDir: repoRoot, now, includeExpired: true }) : [];
+  const approved = envelopes.filter((item) => item.ok && !item.expired);
+  const executable = approved.filter((item) => (item.envelope?.legs || []).every((leg) => String(leg.status || 'approved').trim().toLowerCase() === 'approved'));
+  return {
+    approvedCount: approved.length,
+    executableCount: executable.length,
+    hasApprovedBasket: approved.length > 0,
+    hasExecutableApprovedBasket: executable.length > 0,
+    executableBaskets: executable.map((item) => ({ approvalId: item.approvalId, path: item.path })),
+    latestApprovedAt: approved[0]?.envelope?.createdAt || null,
+    approvedBaskets: approved.map((item) => ({ approvalId: item.approvalId, path: item.path })),
+  };
+}
+
+function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFAULT_APPROVAL_MAX_AGE_HOURS, { portfolioDir = null, repoRoot = process.cwd() } = {}) {
   const table = readTradesTable(tradesPath);
+  const basketState = summarizeBasketApprovalState({ portfolioDir, repoRoot, now, maxAgeHours });
   const rows = table.rows;
   const proposedRows = rows.filter((row) => String(row.Status || '').trim().toLowerCase() === 'proposed');
   const approvedRows = rows.filter((row) => String(row.Status || '').trim().toLowerCase() === 'approved');
@@ -125,8 +143,13 @@ function summarizeApprovalState(tradesPath, now = new Date(), maxAgeHours = DEFA
   });
 
   return {
+    basketApprovalState: basketState,
     proposedCount: proposedRows.length,
     approvedCount: approvedRows.length,
+    basketApprovedCount: basketState.approvedCount,
+    basketExecutableCount: basketState.executableCount,
+    hasApprovedBasket: basketState.hasApprovedBasket,
+    hasExecutableApprovedBasket: basketState.hasExecutableApprovedBasket,
     executableCount: executableRows.length,
     latestApprovedAt: latestApprovedAt ? latestApprovedAt.toISOString() : null,
     approvalAgeHours: approvalAgeHours == null ? null : Number(approvalAgeHours.toFixed(2)),
@@ -185,7 +208,7 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
   const portfolio = path.basename(portfolioDir);
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio });
-  const approvalState = summarizeApprovalState(tradesPath, now, maxApprovalAgeHours);
+  const approvalState = summarizeApprovalState(tradesPath, now, maxApprovalAgeHours, { portfolioDir, repoRoot: path.dirname(path.dirname(portfolioDir)) });
   const armState = getLiveArmState(portfolioDir);
   const marketWindow = evaluateMarketWindow(portfolioDir, { contractDetailsByTicker, now });
   const errorState = brokerErrorStatus(portfolio);
@@ -205,11 +228,11 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
   if (!brokerReadiness.authenticated || brokerReadiness.fallbackRequired) {
     blockers.push({ code: 'broker_unready', message: `Broker readiness is not healthy: ${brokerReadiness.message}` });
   }
-  if (!approvalState.hasAnyApprovedRows) {
-    blockers.push({ code: 'no_approved_rows', message: 'No approved trade rows exist in trades.md for live execution.' });
+  if (!approvalState.hasAnyApprovedRows && !approvalState.hasExecutableApprovedBasket) {
+    blockers.push({ code: 'no_approved_rows', message: 'No approved trade rows or approved basket exist for live execution.' });
   }
-  if (!approvalState.hasExecutableApprovedRows) {
-    blockers.push({ code: 'no_executable_rows', message: 'No executable approved trade rows are currently eligible for submission.' });
+  if (!approvalState.hasExecutableApprovedRows && !approvalState.hasExecutableApprovedBasket) {
+    blockers.push({ code: 'no_executable_rows', message: 'No executable approved trade rows or approved basket are currently eligible for submission.' });
   }
   if (approvalState.excludedApprovedRows.length > 0) {
     const sample = approvalState.excludedApprovedRows[0];
@@ -221,7 +244,7 @@ async function evaluateLiveReadinessPreflight({ portfolioDir, now = new Date(), 
   if (approvalState.staleApproval) {
     blockers.push({ code: 'stale_approval', message: `Latest approval is stale at ${approvalState.approvalAgeHours}h; max allowed is ${approvalState.maxApprovalAgeHours}h.` });
   }
-  if (approvalState.proposedCount > 0 && approvalState.approvedCount === 0) {
+  if (approvalState.proposedCount > 0 && approvalState.approvedCount === 0 && !approvalState.hasExecutableApprovedBasket) {
     blockers.push({ code: 'approval_state_mismatch', message: 'Trades remain proposed with no approved rows recorded, so approval intent is not reflected in the active trade log.' });
   }
   if (approvalState.ambiguousQueuedCount > 0) {

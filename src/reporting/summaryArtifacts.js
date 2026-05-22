@@ -52,13 +52,19 @@ function explainExecutionBlock({ brokerReadiness = null, freshness = null, block
   return 'No explicit execution block is currently surfaced.';
 }
 
-function explainApprovalBacklog(lifecycleSummary = {}, tradeStateSummary = {}, staleApprovals = []) {
+function explainApprovalBacklog(lifecycleSummary = {}, tradeStateSummary = {}, staleApprovals = [], basketApprovalState = null) {
   const proposed = Number(lifecycleSummary?.proposed || 0);
   const approved = Number(lifecycleSummary?.approved || 0);
   const stale = Array.isArray(staleApprovals) ? staleApprovals.length : 0;
   const freshApproved = Math.max(0, approved - stale);
   const queued = Number(tradeStateSummary?.queuedForOpenRunner || 0);
   const blocked = Number(tradeStateSummary?.blocked || 0);
+  const basketCount = Number(basketApprovalState?.approvedCount || 0);
+  const basketExecutable = Number(basketApprovalState?.executableCount || 0);
+  const basketReady = basketExecutable > 0;
+  if (basketReady) {
+    return `One approved basket (${basketCount}) is executable and should be treated as the canonical approval-ready path; row-level backlog is legacy noise unless explicitly selected.`;
+  }
   if (proposed > 0 || approved > 0 || queued > 0 || blocked > 0) {
     const parts = [];
     if (proposed > 0) parts.push(`${proposed} proposed row(s) still need approval`);

@@ -5,7 +5,7 @@ const path = require('path');
 const { parsePortfolioStatus, parseExecutionMode, parseBrokerAccountReference, parseHoldingsHealth } = require('./portfolioExecution');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
 const { brokerErrorStatus } = require('./runtimeState');
-const { getLiveArmState } = require('./liveReadinessPreflight');
+const { getLiveArmState, summarizeApprovalState } = require('./liveReadinessPreflight');
 
 function parseFlag(text, label) {
   const match = String(text || '').match(new RegExp(`- ${label}:\\s*(.+)`));
@@ -25,6 +25,7 @@ async function evaluateExecutionAuthority({ portfolioDir } = {}) {
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio });
   const runtimePause = brokerErrorStatus(portfolio);
   const armState = getLiveArmState(portfolioDir);
+  const approvalState = summarizeApprovalState(path.join(portfolioDir, 'trades.md'), new Date(), 24, { portfolioDir, repoRoot: path.dirname(path.dirname(path.resolve(portfolioDir))) });
 
   return {
     schemaVersion: '1.0',
@@ -50,6 +51,7 @@ async function evaluateExecutionAuthority({ portfolioDir } = {}) {
         && !brokerReadiness.fallbackRequired
         && !runtimePause.stopAutomation
         && armState.armedForMarketOpen
+        && (approvalState.hasExecutableApprovedRows || approvalState.hasExecutableApprovedBasket)
       ),
       requiresExplicitOperatorAction: Boolean(
         parseExecutionMode(portfolioText) !== 'transmitted_live'
@@ -57,6 +59,7 @@ async function evaluateExecutionAuthority({ portfolioDir } = {}) {
         || !brokerReadiness.authenticated
         || brokerReadiness.fallbackRequired
         || runtimePause.stopAutomation
+        || !(approvalState.hasExecutableApprovedRows || approvalState.hasExecutableApprovedBasket)
       ),
     },
   };
