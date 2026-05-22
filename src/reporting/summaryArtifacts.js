@@ -1077,8 +1077,21 @@ function buildPortfolioIndex(summaries = []) {
   };
 }
 
-function buildPendingActionsOverview(summaries = []) {
-  const items = summaries.flatMap((summary) => (summary.operatorQueue?.items || []).map((item) => ({ ...item })));
+function buildPendingActionsOverview(summaries = [], options = {}) {
+  const rootDir = options.rootDir || null;
+  const reproposalSurface = rootDir ? require('./reproposalSurface') : null;
+  const reproposalItems = reproposalSurface
+    ? summaries.flatMap((summary) => reproposalSurface
+        .listPendingReproposals({ rootDir, portfolio: summary.portfolio })
+        .map((rep) => {
+          const desc = reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep });
+          return { ...desc, severity: 'high' };
+        }))
+    : [];
+  const items = [
+    ...reproposalItems,
+    ...summaries.flatMap((summary) => (summary.operatorQueue?.items || []).map((item) => ({ ...item }))),
+  ];
   items.sort((a, b) => {
     const severityRank = { high: 0, medium: 1, low: 2 };
     const statusRank = { blocked: 0, degraded: 1, paused: 2, failed: 3, pending_user_approval: 4, ready_for_review: 5, in_flight: 6, pending: 7, stale: 8, warning: 9, recommended: 10 };
@@ -1107,7 +1120,9 @@ function approvalUrgencyForItem(item = {}) {
   return 'low';
 }
 
-function buildApprovalsQueue(summaries = []) {
+function buildApprovalsQueue(summaries = [], options = {}) {
+  const rootDir = options.rootDir || null;
+  const reproposalSurface = rootDir ? require('./reproposalSurface') : null;
   const items = summaries.flatMap((summary) => {
     const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
     const basketApprovedCount = Number(summary.readiness?.approvalState?.basketApprovalState?.approvedCount || 0);
@@ -1124,7 +1139,15 @@ function buildApprovalsQueue(summaries = []) {
       queueType: 'approval',
       severity: 'medium',
     }] : [];
+
+    // Phase 193: pending reproposals
+    const reproposalItems = reproposalSurface
+      ? reproposalSurface.listPendingReproposals({ rootDir, portfolio: summary.portfolio })
+          .map((rep) => reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep }))
+      : [];
+
     return [
+      ...reproposalItems,
       ...basketItems,
       ...queueItems
         .filter((item) => ['approval'].includes(item.queueType || queueTypeForItem(item)) || item.kind === 'approval')
@@ -1465,8 +1488,8 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     summaries.push(summary);
   }
   const portfolioIndex = buildPortfolioIndex(summaries);
-  const pendingActions = buildPendingActionsOverview(summaries);
-  const approvalsQueue = buildApprovalsQueue(summaries);
+  const pendingActions = buildPendingActionsOverview(summaries, { rootDir: repoRoot });
+  const approvalsQueue = buildApprovalsQueue(summaries, { rootDir: repoRoot });
   const approvalsQueueMarkdown = renderApprovalsQueueMarkdown(approvalsQueue);
   const dailySummary = buildDailySummary(summaries, approvalsQueue);
   const dailySummaryMarkdown = renderDailySummaryMarkdown(dailySummary);
