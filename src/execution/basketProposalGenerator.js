@@ -126,21 +126,26 @@ async function generateBasketProposal({
     const gapNative = target.gapChf / fxToChf;
     const qty = Math.floor(gapNative / limitNative);
     if (qty <= 0) continue;
+    const quoteClassification = (() => {
+      try { return require('./quoteQuality').classifyQuoteQuality(quote); }
+      catch (_) { return null; }
+    })();
     const estChf = qty * limitNative * fxToChf;
     if (estChf > remainingCash) {
       // shrink qty to fit
       const fittedQty = Math.floor(remainingCash / (limitNative * fxToChf));
       if (fittedQty <= 0) continue;
       const fittedChf = fittedQty * limitNative * fxToChf;
-      legs.push(buildLeg(legCounter++, target, fittedQty, limitNative, fittedChf, ask, lastClose));
+      legs.push(buildLeg(legCounter++, target, fittedQty, limitNative, fittedChf, ask, lastClose, quoteClassification));
       remainingCash -= fittedChf;
     } else {
-      legs.push(buildLeg(legCounter++, target, qty, limitNative, estChf, ask, lastClose));
+      legs.push(buildLeg(legCounter++, target, qty, limitNative, estChf, ask, lastClose, quoteClassification));
       remainingCash -= estChf;
     }
   }
 
   const approvalId = `basket-${portfolio}-${nowStamp(new Date())}`;
+  const attentionLegs = legs.filter((l) => l.quoteQuality && (l.quoteQuality.tier === 'stale_only' || l.quoteQuality.tier === 'unknown'));
   const envelope = {
     schemaVersion: '1.0',
     approvalId,
@@ -153,6 +158,11 @@ async function generateBasketProposal({
       substitutionAllowed: false,
     },
     legs,
+    requiresOperatorAttention: attentionLegs.length > 0,
+    quoteQualitySummary: legs.length > 0 ? {
+      tiers: legs.reduce((acc, l) => { const t = l.quoteQuality?.tier || 'unknown'; acc[t] = (acc[t] || 0) + 1; return acc; }, {}),
+      attentionLegIds: attentionLegs.map((l) => l.legId),
+    } : null,
     summary: `Auto-proposal from live holdings; total CHF ${totalChf.toFixed(2)}, cash CHF ${Number(cashChf).toFixed(2)}, deploying CHF ${(Number(cashChf) - remainingCash).toFixed(2)}.`,
     source: 'auto_generated_proposal',
   };
@@ -166,7 +176,7 @@ async function generateBasketProposal({
   };
 }
 
-function buildLeg(idx, target, qty, limitPrice, estChf, ask, lastClose) {
+function buildLeg(idx, target, qty, limitPrice, estChf, ask, lastClose, quoteQuality) {
   return {
     legId: `leg-${idx}`,
     instrument: target.isin,
@@ -185,6 +195,7 @@ function buildLeg(idx, target, qty, limitPrice, estChf, ask, lastClose) {
     estimatedChf: Number(estChf.toFixed(2)),
     referenceAsk: Number.isFinite(ask) ? ask : null,
     referenceClose: Number.isFinite(lastClose) ? lastClose : null,
+    quoteQuality: quoteQuality ? { tier: quoteQuality.tier, missingFields: quoteQuality.missingFields, observedFields: quoteQuality.observedFields } : null,
   };
 }
 

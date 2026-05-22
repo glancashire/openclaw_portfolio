@@ -116,9 +116,13 @@ async function main() {
   console.log(`Deployment CHF: ${result.deploymentChf}`);
   console.log(`Residual CHF: ${result.residualChf}`);
   console.log('\nLegs:');
+  if (result.envelope.requiresOperatorAttention) {
+    console.log('  ⚠️  one or more legs have degraded quote quality — review the tier column before approving.');
+  }
   for (const leg of result.envelope.legs) {
-    const ref = Number.isFinite(leg.referenceAsk) && leg.referenceAsk > 0 ? `ask ${leg.referenceAsk}` : `close ${leg.referenceClose}`;
-    console.log(`  ${leg.legId} ${leg.ibkrSymbol || leg.instrument}: BUY ${leg.quantity} @ ${leg.limitPrice} ${leg.currency} (ref ${ref}) ≈ CHF ${leg.estimatedChf}`);
+    const ref = leg.referenceAsk ? `ask ${leg.referenceAsk}` : (leg.referenceClose ? `close ${leg.referenceClose}` : 'none');
+    const tier = leg.quoteQuality ? `tier=${leg.quoteQuality.tier}` : 'tier=unknown';
+    console.log(`  ${leg.legId} ${leg.ibkrSymbol || leg.instrument}: BUY ${leg.quantity} @ ${leg.limitPrice} ${leg.currency} (ref ${ref}; ${tier}) ≈ CHF ${leg.estimatedChf}`);
   }
 
   const proposalPath = saveProposalEnvelope({ rootDir: ROOT, portfolio, envelope: result.envelope });
