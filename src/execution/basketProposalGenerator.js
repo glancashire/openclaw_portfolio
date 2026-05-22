@@ -146,6 +146,12 @@ async function generateBasketProposal({
 
   const approvalId = `basket-${portfolio}-${nowStamp(new Date())}`;
   const attentionLegs = legs.filter((l) => l.quoteQuality && (l.quoteQuality.tier === 'stale_only' || l.quoteQuality.tier === 'unknown'));
+  // Phase 202: aggregate native deployment per currency.
+  const currencyDeployment = legs.reduce((acc, leg) => {
+    const ccy = leg.currency || 'UNKNOWN';
+    acc[ccy] = Number(((acc[ccy] || 0) + (leg.nativeAmount || 0)).toFixed(2));
+    return acc;
+  }, {});
   const envelope = {
     schemaVersion: '1.0',
     approvalId,
@@ -163,6 +169,7 @@ async function generateBasketProposal({
       tiers: legs.reduce((acc, l) => { const t = l.quoteQuality?.tier || 'unknown'; acc[t] = (acc[t] || 0) + 1; return acc; }, {}),
       attentionLegIds: attentionLegs.map((l) => l.legId),
     } : null,
+    currencyDeployment,
     summary: `Auto-proposal from live holdings; total CHF ${totalChf.toFixed(2)}, cash CHF ${Number(cashChf).toFixed(2)}, deploying CHF ${(Number(cashChf) - remainingCash).toFixed(2)}.`,
     source: 'auto_generated_proposal',
   };
@@ -177,6 +184,7 @@ async function generateBasketProposal({
 }
 
 function buildLeg(idx, target, qty, limitPrice, estChf, ask, lastClose, quoteQuality) {
+  const nativeAmount = Number((qty * limitPrice).toFixed(2));
   return {
     legId: `leg-${idx}`,
     instrument: target.isin,
@@ -192,6 +200,7 @@ function buildLeg(idx, target, qty, limitPrice, estChf, ask, lastClose, quoteQua
     retryPolicy: 'none',
     allowSubstitution: false,
     status: 'pending_user_approval',
+    nativeAmount,
     estimatedChf: Number(estChf.toFixed(2)),
     referenceAsk: Number.isFinite(ask) ? ask : null,
     referenceClose: Number.isFinite(lastClose) ? lastClose : null,

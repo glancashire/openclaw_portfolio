@@ -115,6 +115,10 @@ async function main() {
   console.log(`Total CHF: ${result.totalChf}`);
   console.log(`Deployment CHF: ${result.deploymentChf}`);
   console.log(`Residual CHF: ${result.residualChf}`);
+  if (result.envelope.currencyDeployment && Object.keys(result.envelope.currencyDeployment).length > 0) {
+    const parts = Object.entries(result.envelope.currencyDeployment).map(([c, v]) => `${c} ${v}`).join(', ');
+    console.log(`Native-currency deployment: ${parts}`);
+  }
   console.log('\nLegs:');
   if (result.envelope.requiresOperatorAttention) {
     console.log('  ⚠️  one or more legs have degraded quote quality — review the tier column before approving.');
