@@ -10,7 +10,7 @@ const { buildHealthMonitorJob, parseArgs } = require('./health-monitor-cron');
   assert.strictEqual(job.schedule.tz, 'UTC');
   assert.strictEqual(job.payload.kind, 'agentTurn');
   assert.strictEqual(job.sessionTarget, 'current');
-  assert.strictEqual(job.delivery.mode, 'none');
+  assert.strictEqual(job.delivery.mode, 'announce');
   assert(job.payload.message.includes(path.resolve('portfolio/etf')));
   assert(job.payload.message.includes('run-health-check.js'));
 

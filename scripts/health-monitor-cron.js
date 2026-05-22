@@ -1,6 +1,6 @@
 const path = require('path');
 
-function buildHealthMonitorJob({ portfolioDir, scheduleExpr = '0 8,14,20 * * *', tz = 'UTC', deliveryMode = 'none' }) {
+function buildHealthMonitorJob({ portfolioDir, scheduleExpr = '0 8,14,20 * * *', tz = 'UTC', deliveryMode = 'announce' }) {
   const resolvedPortfolioDir = path.resolve(portfolioDir);
   const portfolio = path.basename(resolvedPortfolioDir);
   return {
