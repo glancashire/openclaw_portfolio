@@ -1293,8 +1293,30 @@ function renderDailySummaryMarkdown(daily = {}) {
 }
 
 function renderApprovalsQueueMarkdown(queue = {}) {
+  const renderItem = (item) => {
+    const lines = [
+      `### Approval ${item.rank}: ${item.portfolio}`,
+      `- Urgency: ${item.urgency}`,
+      `- Summary: ${item.summary}`,
+      `- Explanation: ${item.explanation}`,
+    ];
+    // Phase 204: surface envelope annotations when present.
+    if (item.requiresOperatorAttention) {
+      const tiers = item.quoteQualitySummary?.tiers || {};
+      const tierLine = Object.entries(tiers).map(([t, c]) => `${t}=${c}`).join(', ');
+      lines.push(`- ⚠️ Requires attention: degraded quote quality (${tierLine || 'see envelope'})`);
+    }
+    if (item.currencyDeployment && Object.keys(item.currencyDeployment).length > 0) {
+      const parts = Object.entries(item.currencyDeployment).map(([c, v]) => `${c} ${v}`).join(', ');
+      lines.push(`- Native deployment: ${parts}`);
+    }
+    lines.push(`- Effect if approved: ${item.effectIfApproved}`);
+    lines.push(`- Effect if ignored: ${item.effectIfIgnored}`);
+    lines.push(`- Recommended action: ${item.recommendedOperatorAction}`);
+    return lines.join('\n');
+  };
   const rows = Array.isArray(queue.items) && queue.items.length
-    ? queue.items.map((item) => `### Approval ${item.rank}: ${item.portfolio}\n- Urgency: ${item.urgency}\n- Summary: ${item.summary}\n- Explanation: ${item.explanation}\n- Effect if approved: ${item.effectIfApproved}\n- Effect if ignored: ${item.effectIfIgnored}\n- Recommended action: ${item.recommendedOperatorAction}`).join('\n\n')
+    ? queue.items.map(renderItem).join('\n\n')
     : '### Approval 1: none\n- Urgency: low\n- Summary: No pending approval items.\n- Explanation: No approval-gated actions are currently waiting.\n- Effect if approved: No action required.\n- Effect if ignored: No approval backlog remains.\n- Recommended action: Continue normal monitoring.';
   return `# Approvals Queue\n\n## Summary\n- Generated at: ${queue.generatedAt || 'unknown'}\n- Approval items: ${queue.itemCount || 0}\n\n## Approval Review Queue\n\n${rows}\n`;
 }
