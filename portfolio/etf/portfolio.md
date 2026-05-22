@@ -45,10 +45,11 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 ## Approved Instruments
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
 |---|---|---|---:|---:|---:|---|---|---|
-| IE00BD4TXW66 | UBS Core S&P 500 UCITS ETF USD acc | Global equities | 40 | 30 | 50 | IBIS / SMART | EUR | Preferred SPYL replacement; low TER 0.03%; accumulating; physical replication; validated via native IBKR contract details; ibkr_symbol=UBSPX; ibkr_local_symbol=BCFT; ibkr_conid=808613958; ibkr_primary_exchange=IBIS; fx_to_chf=0.96 |
+| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 40 | 30 | 50 | Xetra / SMART | EUR | Preferred operational replacement after UBSPX execution failures; physical replication; validated via native IBKR contract details and live quote path on SXR8; ibkr_symbol=SXR8; ibkr_conid=75776072; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
 | LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 20 | 10 | 30 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer; ibkr_symbol=EMUAA; ibkr_conid=243939970; fx_to_chf=0.96 |
-| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 20 | 10 | 30 | SIX | CHF | Swiss home-market sleeve; equal-weight tilt reduces single-name concentration; ibkr_symbol=UBSSLI; ibkr_conid=150029461; fx_to_chf=1 |
-| CASH-CHF | CHF cash balance | Bonds / cash-like | 20 | 10 | 30 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF 5000 scale. |
+| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 12 | 8 | 16 | SIX / EBS | CHF | Swiss large-cap sleeve; equal-weight tilt reduces single-name concentration; live broker contract identity previously surfaced as CHSPI during native placement/reconciliation, so conid truth must win over cosmetic ticker alias drift; ibkr_symbol=UBSSLI; ibkr_local_symbol=CHSPI; ibkr_conid=150029461; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Swiss equities | 8 | 4 | 12 | SIX / EBS | CHF | Swiss mid-cap complement; improves breadth of the Swiss sleeve; validated via IBKR contract details; ibkr_symbol=SPMCHA; ibkr_conid=91639399; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| CASH-CHF | CHF cash balance | Bonds / cash-like | 20 | 10 | 30 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF scale. |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
@@ -100,5 +101,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 ## Notes / Open Questions
 - ETF issuer preferences: prefer UBS and iShares; exclude Invesco.
 - Replacement validated through native IBKR contract details for the UBS Core S&P 500 alternative; use that line for future S&P 500 sleeve proposals.
+- Future instrument consideration list retained: CH0032912732, CH0130595124, LU0950668870, LU0950670850, IE00B5BMR087, IE00B44T3H88, IE00B5L8K969, IE00B4L5YX21, US37950E2596.
 - Already-held instruments note: none
 - Defensive sleeve is intentionally held as CHF cash for this starter-scale MVP portfolio; revisit a CHF money-market or short-duration bond ETF later if portfolio size and trading costs justify it.
+- 2026-05-22 rebalance decision: treat the settled IBKR broker cash balance (CHF 20,841.44 at last holdings sync) as the active defensive sleeve allocation for now, rather than forcing additional buys while the ETF sleeve cash bucket remains zero in portfolio-local accounting.

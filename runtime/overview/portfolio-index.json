@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-17T08:13:30.105Z",
+  "generatedAt": "2026-05-22T10:23:16.346Z",
   "portfolioCount": 2,
-  "totalValueChf": 5327.03,
+  "totalValueChf": 9886.91,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 7,
+      "pendingActions": 6,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -38,74 +38,74 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
-      "status": "warning",
-      "strategyStatus": "blocked",
-      "totalValueChf": 5327.0300003,
-      "cashChf": 116.64,
-      "investedChf": 5210.3900003,
-      "lastSyncAt": "2026-05-13 14:29:30",
-      "latestSnapshotDate": "2026-05-15",
-      "pendingApprovals": 1,
+      "status": "attention_needed",
+      "strategyStatus": "rebalance_needed",
+      "totalValueChf": 9886.91,
+      "cashChf": 0,
+      "investedChf": 9886.91,
+      "lastSyncAt": "2026-05-22 08:13:31",
+      "latestSnapshotDate": "2026-05-22",
+      "pendingApprovals": 5,
       "blockers": 0,
-      "pendingActions": 2,
-      "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
+      "pendingActions": 1,
+      "recommendedNextStep": "5 proposed trade row(s) still need user approval.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
       "blockedTradeCount": 1,
       "topBrokerBlock": {
-        "tickerOrIsin": "CH0032912732",
-        "name": "UBS SLI ETF (SMI gleichgewichtet)",
-        "blockCode": "quote_unavailable",
-        "blockReason": "No broker quote was available during market-open execution.",
-        "nextAction": "Restore broker pricing and rerun the market-open submission path.",
-        "brokerOrderId": ""
+        "tickerOrIsin": "IE00B5BMR087",
+        "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+        "blockCode": "broker_submit_rejected",
+        "blockReason": "Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.",
+        "nextAction": "Review the broker rejection reason and correct the order before retrying.",
+        "brokerOrderId": "9122"
       },
       "driftStatuses": [
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 13.81
+          "driftPct": 13.71
         },
         {
           "assetClass": "Swiss equities",
-          "status": "on_track",
-          "driftPct": 4
+          "status": "drifted",
+          "driftPct": 6.29
         },
         {
           "assetClass": "Bonds / cash-like",
           "status": "out_of_bounds",
-          "driftPct": -17.81
+          "driftPct": -20
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "ready",
       "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 9,
-    "blocking": 7,
+    "total": 7,
+    "blocking": 5,
     "approvals": 1,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 2,
+    "recovery": 0,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
     "workflow": 0,
     "bySeverity": {
-      "high": 7,
+      "high": 5,
       "medium": 2,
       "low": 0
     }

@@ -1,15 +1,28 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-17T08:13:30.105Z",
-  "itemCount": 1,
+  "generatedAt": "2026-05-22T10:23:16.346Z",
+  "itemCount": 2,
   "items": [
     {
       "rank": 1,
       "portfolio": "etf",
       "urgency": "medium",
+      "status": "basket_approved",
+      "summary": "1 approved basket(s) are ready for execution.",
+      "explanation": "1 approved basket(s) are executable now; row-level proposed trades remain legacy context.",
+      "effectIfApproved": "The operator can transmit the approved basket without re-approving row-level trade log entries.",
+      "effectIfIgnored": "The basket remains ready but unsubmitted, so the portfolio stays staged instead of executing.",
+      "recommendedOperatorAction": "Review the approved basket and submit when satisfied with the price bands and market window.",
+      "queueType": "approval",
+      "severity": "medium"
+    },
+    {
+      "rank": 2,
+      "portfolio": "etf",
+      "urgency": "medium",
       "status": "pending_user_approval",
-      "summary": "1 proposed trade row(s) still need user approval.",
-      "explanation": "1 proposed trade row(s) still need user approval.",
+      "summary": "5 proposed trade row(s) still need user approval.",
+      "explanation": "5 proposed trade row(s) still need user approval.",
       "effectIfApproved": "The operator can move this proposal from review into the next staging / execution decision step.",
       "effectIfIgnored": "The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.",
       "recommendedOperatorAction": "Review the proposed trades and approve or reject them explicitly.",

@@ -4,13 +4,13 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-11T06:04:09.029Z"
+      "lastAt": "2026-05-21T23:18:55.242Z"
     },
     "portfolio": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-12T22:42:10.849Z"
+      "lastAt": "2026-05-21T23:22:07.250Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -34,14 +34,38 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-13T14:29:30.583Z"
+      "lastAt": "2026-05-22T10:41:58.850Z"
+    },
+    "dryrun-no-write2-tMfst2": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-20T15:14:25.617Z"
+    },
+    "execution-safety-closure-AJMHB5": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-21T23:18:12.788Z"
+    },
+    "execution-safety-closure-JHU9vk": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-21T23:18:26.913Z"
+    },
+    "execution-safety-closure-DZ2zsg": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-21T23:22:06.724Z"
     }
   },
   "liveExecutionArms": {
     "etf": {
-      "armedAt": "2026-05-13T13:30:35.037Z",
-      "expiresAt": "2026-05-14T07:30:35.037Z",
-      "note": "Armed from canonical trade CLI."
+      "armedAt": "2026-05-22T09:19:33.048Z",
+      "expiresAt": "2026-05-22T12:00:00Z",
+      "note": "basket approval ready for execution"
     }
   }
 }

@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-17T08:13:30.105Z",
+  "generatedAt": "2026-05-22T10:23:16.346Z",
   "totals": {
     "portfolioCount": 2,
-    "totalCashChf": 116.64,
-    "approvalCount": 1,
+    "totalCashChf": 0,
+    "approvalCount": 2,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
   },
   "healthHeadline": "warning",
-  "cashWaitingToDeployChf": 116.64,
+  "cashWaitingToDeployChf": 0,
   "biggestDrift": {
     "portfolio": "acceptance-closure",
     "assetClass": "Global equities",
@@ -18,27 +18,27 @@
     "status": "out_of_bounds",
     "absDrift": 50
   },
-  "brokerHealth": "degraded",
+  "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
-  "pendingApprovals": 1,
-  "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
-  "biggestDriftWhy": "Bonds / cash-like is 17.81% under target and outside the allowed band around the 20% target.",
+  "pendingApprovals": 2,
+  "recommendedNextStep": "5 proposed trade row(s) still need user approval.",
+  "biggestDriftWhy": "Bonds / cash-like is 20% under target and outside the allowed band around the 20% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
-    "health": "warning",
-    "cashChf": 116.64,
-    "brokerHealth": "degraded",
+    "health": "attention_needed",
+    "cashChf": 0,
+    "brokerHealth": "healthy",
     "deliveryPosture": "ready",
-    "pendingApprovals": 1,
+    "pendingApprovals": 5,
     "blockedTradeCount": 1,
     "topBrokerBlock": {
-      "tickerOrIsin": "CH0032912732",
-      "name": "UBS SLI ETF (SMI gleichgewichtet)",
-      "blockCode": "quote_unavailable",
-      "blockReason": "No broker quote was available during market-open execution.",
-      "nextAction": "Restore broker pricing and rerun the market-open submission path."
+      "tickerOrIsin": "IE00B5BMR087",
+      "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+      "blockCode": "broker_submit_rejected",
+      "blockReason": "Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.",
+      "nextAction": "Review the broker rejection reason and correct the order before retrying."
     },
-    "recommendedNextStep": "1 proposed trade row(s) still need user approval.",
-    "whyNow": "No broker quote was available during market-open execution."
+    "recommendedNextStep": "5 proposed trade row(s) still need user approval.",
+    "whyNow": "Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal."
   }
 }
