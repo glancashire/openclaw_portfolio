@@ -37,6 +37,8 @@ function seedPortfolio(repoRoot) {
   const parsed = JSON.parse(output);
   assert.strictEqual(parsed.ok, true);
   assert.strictEqual(parsed.selfHeal.dryRun, true);
+  assert(Array.isArray(parsed.selfHeal.classified));
+  assert(Array.isArray(parsed.selfHeal.openIssues));
   assert(parsed.artifacts.htmlPath.endsWith('health-report.html'));
   console.log(JSON.stringify({ ok: true }, null, 2));
 })();

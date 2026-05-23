@@ -34,10 +34,15 @@ function seedPortfolio(repoRoot) {
   assert(report.before);
   assert(report.after);
   assert(report.health);
+  assert(Array.isArray(report.selfHeal.classified));
+  assert(Array.isArray(report.selfHeal.openIssues));
   assert(fs.existsSync(artifacts.jsonPath));
   assert(fs.existsSync(artifacts.mdPath));
   assert(fs.existsSync(artifacts.htmlPath));
   assert(artifacts.html.includes('system health report'));
+  assert(artifacts.html.includes('Classified symptoms'));
+  assert(artifacts.html.includes('Open issues for operator'));
+  assert(fs.existsSync(path.join(repoRoot, 'runtime', 'observability', 'event-log.jsonl')));
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {
   console.error(error.stack || String(error));

@@ -17,22 +17,31 @@ async function main() {
   delete require.cache[target];
   Module._load = function(request, parent, isMain) {
     if (request.endsWith('../brokers/interactive-brokers/readiness') || request === '../brokers/interactive-brokers/readiness') {
-      return { getInteractiveBrokersReadiness: async () => ({ fallbackRequired: true, reachable: false, authenticated: false, message: 'gateway down' }) };
+      return { getInteractiveBrokersReadiness: async () => ({ fallbackRequired: true, reachable: false, authenticated: false, message: 'connect ECONNREFUSED 127.0.0.1:4001' }) };
     }
     if (request.endsWith('../reporting/deliveryPolicy') || request === '../reporting/deliveryPolicy') {
-      return { reportDeliveryStatus: () => ({ pendingActions: ['delivery backlog'] }) };
+      return { reportDeliveryStatus: () => ({ pendingActions: ['Delivering to Telegram requires target <chatId>'] }) };
+    }
+    if (request.endsWith('../reporting/cronJobsFetcher') || request === '../reporting/cronJobsFetcher') {
+      return { fetchCronHealth: () => ({ jobs: [{ id: 'job-1', name: 'daily-sync', consecutiveErrors: 12 }] }) };
     }
     return original.apply(this, arguments);
   };
   try {
     const { buildSelfHealPlan } = require(target);
-    const result = await buildSelfHealPlan({ portfolioDir, repoRoot: tempDir });
+    const result = await buildSelfHealPlan({ portfolioDir, repoRoot: tempDir, now: new Date('2026-05-23T10:00:00Z') });
     assert.strictEqual(result.dryRun, true);
     assert.strictEqual(result.health.health, 'blocked');
+    assert(result.classified.some((entry) => entry.category === 'ibkr_socket_dead'));
+    assert(result.classified.some((entry) => entry.category === 'delivery_missing_target'));
+    assert(result.classified.some((entry) => entry.category === 'cron_excessive_errors'));
+    assert(result.healed.some((entry) => entry.kind === 'restart_ibkr_gateway_if_socket_dead'));
+    assert(result.healed.some((entry) => entry.kind === 'disable_cron_after_N_consecutive_errors'));
+    assert(result.openIssues.some((entry) => entry.category === 'delivery_missing_target'));
     assert(result.actions.some((entry) => /reconcile-live/i.test(entry.command || '')));
     assert(result.actions.some((entry) => /requeue-open|delivery/i.test(entry.command || '')));
     assert(result.health.recommendedActions.some((entry) => /native IBKR connectivity/i.test(entry)));
-    console.log(JSON.stringify({ ok: true, actionCount: result.actions.length }, null, 2));
+    console.log(JSON.stringify({ ok: true, actionCount: result.actions.length, classified: result.classified.length }, null, 2));
   } finally {
     Module._load = original;
   }

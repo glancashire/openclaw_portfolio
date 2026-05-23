@@ -4,6 +4,8 @@ const { brokerErrorStatus } = require('./runtimeState');
 const { summarizeOpenRunnerRetryState, staleApprovalInventory } = require('./tradeState');
 const { reportDeliveryStatus } = require('../reporting/deliveryPolicy');
 const { loadFillNotificationState } = require('../reporting/fillNotificationState');
+const { fetchCronHealth } = require('../reporting/cronJobsFetcher');
+const { classifySymptoms, applyHealRecipes, buildOpenIssues } = require('./selfHeal');
 
 function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRows, retryState, deliveryStatus, fillNotificationState }) {
   const blockers = [];
@@ -50,7 +52,7 @@ function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRow
     blockers.push({ code: 'delivery_attention', message: deliveryStatus.pendingActions[0] });
   }
 
-  const summary = {
+  return {
     health,
     severity,
     blockerCount: blockers.length,
@@ -58,10 +60,9 @@ function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRow
     recommendedActions: Array.from(new Set(recommendedActions)),
     nextAction: recommendedActions[0] || 'No immediate operator action is required.',
   };
-  return summary;
 }
 
-async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd() }) {
+async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now = new Date(), cronHealth = null }) {
   const portfolio = path.basename(portfolioDir);
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const brokerReadiness = await getInteractiveBrokersReadiness();
@@ -79,6 +80,10 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd() }) {
   const deliveryStatus = reportDeliveryStatus({ portfolioDir });
   const fillNotificationState = loadFillNotificationState(repoRoot);
   const health = classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRows, retryState, deliveryStatus, fillNotificationState });
+  const resolvedCronHealth = cronHealth || fetchCronHealth();
+  const classified = classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth: resolvedCronHealth, errorState });
+  const healed = applyHealRecipes(classified, { now });
+  const openIssues = buildOpenIssues({ classified, healed });
 
   const actions = [];
   if (errorState.stopAutomation) actions.push({ kind: 'manual', command: null, reason: 'Broker automation is paused; inspect and clear the broker error state intentionally.' });
@@ -87,7 +92,16 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd() }) {
   if ((retryState.queuedRetry || 0) > 0) actions.push({ kind: 'command', command: 'node scripts/trade.js requeue-open portfolio/etf --all', reason: 'Hand retryable rows back to the market-open runner only after recovery.' });
   if ((fillNotificationState.reconciledUnnotifiedFills || []).length > 0) actions.push({ kind: 'command', command: 'node scripts/trade.js delivery portfolio/etf', reason: 'Review reconciled fills pending notification backfill.' });
 
-  return { ok: true, dryRun: true, portfolio, health, actions };
+  return {
+    ok: true,
+    dryRun: true,
+    portfolio,
+    health,
+    classified,
+    healed,
+    openIssues,
+    actions,
+  };
 }
 
 module.exports = { classifyPortfolioHealth, buildSelfHealPlan };

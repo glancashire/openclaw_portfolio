@@ -4,6 +4,7 @@ const { regenerateDashboard } = require('./dashboardGenerator');
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('./summaryArtifacts');
 const { fetchCronHealth } = require('./cronJobsFetcher');
 const { buildSelfHealPlan, classifyPortfolioHealth } = require('../execution/portfolioHealth');
+const { appendObservabilityEvent } = require('../execution/selfHeal');
 const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { evaluateDeliveryPosture } = require('./deliveryDiagnostic');
 const { loadFillNotificationState } = require('./fillNotificationState');
@@ -66,18 +67,18 @@ async function attemptSafeSelfHeal({ portfolioDir }) {
   const actions = [];
   try {
     const dashboardPath = await regenerateDashboard(portfolioDir);
-    actions.push({ kind: 'regenerate_dashboard', ok: true, dashboardPath });
+    actions.push({ kind: 'regenerate_dashboard', ok: true, applied: true, dashboardPath });
   } catch (error) {
-    actions.push({ kind: 'regenerate_dashboard', ok: false, error: error.message });
+    actions.push({ kind: 'regenerate_dashboard', ok: false, applied: false, error: error.message });
   }
 
   try {
     const summary = await generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles: true });
     const repoRoot = path.dirname(path.dirname(portfolioDir)) || process.cwd();
     const overview = await generateOverviewArtifacts({ repoRoot, writeFiles: true, cronHealth: fetchCronHealth() });
-    actions.push({ kind: 'regenerate_reporting_artifacts', ok: true, summaryPath: summary.outPath, overviewIndexPath: overview.portfolioIndexPath });
+    actions.push({ kind: 'regenerate_reporting_artifacts', ok: true, applied: true, summaryPath: summary.outPath, overviewIndexPath: overview.portfolioIndexPath });
   } catch (error) {
-    actions.push({ kind: 'regenerate_reporting_artifacts', ok: false, error: error.message });
+    actions.push({ kind: 'regenerate_reporting_artifacts', ok: false, applied: false, error: error.message });
   }
 
   return actions;
@@ -94,6 +95,8 @@ function buildHealthReportMarkdown(report) {
   const deliveryPending = Array.isArray(report.after?.deliveryStatus?.pendingActions) ? report.after.deliveryStatus.pendingActions : [];
   const fillBackfillCount = Number(report.after?.fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   const acknowledgedBackfillCount = Number(report.after?.fillNotificationState?.acknowledgedBackfilledFills?.length || 0);
+  const classified = Array.isArray(report.selfHeal?.classified) ? report.selfHeal.classified : [];
+  const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
 
   return [
     `# Health Report: ${report.portfolio}`,
@@ -107,6 +110,12 @@ function buildHealthReportMarkdown(report) {
     `- Remediated items: ${healed.length}`,
     `- Failed remediations: ${failedFixes.length}`,
     '',
+    '## Classified symptoms',
+    ...(classified.length ? classified.map((item) => `- [${item.category}] ${item.symptom}`) : ['- None.']),
+    '',
+    '## Open issues for operator',
+    ...(openIssues.length ? openIssues.map((item) => `- [${item.category}] ${item.summary}`) : ['- None.']),
+    '',
     '## Unresolved exceptions',
     ...(blockers.length ? blockers.map((item) => `- [${item.code}] ${item.message}`) : ['- None.']),
     '',
@@ -114,7 +123,7 @@ function buildHealthReportMarkdown(report) {
     ...nextActions.map((item) => `- ${item}`),
     '',
     '## Remediated during this run',
-    ...(healed.length ? healed.map((item) => `- ${item.kind}: fixed`) : ['- None.']),
+    ...(healed.length ? healed.map((item) => `- ${item.kind}: ${item.applied ? 'applied' : item.blocked || 'not applied'}`) : ['- None.']),
     '',
     '## Remediation attempts that still need attention',
     ...(failedFixes.length ? failedFixes.map((item) => `- ${item.kind}: failed (${item.error || 'unknown error'})`) : ['- None.']),
@@ -140,6 +149,8 @@ function buildHealthReportHtml(report) {
   const deliveryPending = Array.isArray(report.after?.deliveryStatus?.pendingActions) ? report.after.deliveryStatus.pendingActions : [];
   const fillBackfillCount = Number(report.after?.fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   const acknowledgedBackfillCount = Number(report.after?.fillNotificationState?.acknowledgedBackfilledFills?.length || 0);
+  const classified = Array.isArray(report.selfHeal?.classified) ? report.selfHeal.classified : [];
+  const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
   const statusBadge = badge({ label: `${report.health.health} / ${report.health.severity}`, tone: severityTone(report.health.severity) });
   const nextActionBadge = badge({ label: blockers.length ? 'Action required' : 'No urgent exception', tone: blockers.length ? 'danger' : 'success' });
 
@@ -160,6 +171,20 @@ function buildHealthReportHtml(report) {
     `,
   });
 
+  const classifiedCard = card({
+    title: 'Classified symptoms',
+    contentHtml: classified.length
+      ? bulletList(classified.map((item) => `[${item.category}] ${item.symptom}`))
+      : '<p style="margin:0;color:#6b7280;">No classified symptoms were detected.</p>',
+  });
+
+  const openIssuesCard = card({
+    title: 'Open issues for operator',
+    contentHtml: openIssues.length
+      ? bulletList(openIssues.map((item) => `[${item.category}] ${item.summary}`))
+      : '<p style="margin:0;color:#166534;font-weight:600;">No operator-only open issues are currently surfaced.</p>',
+  });
+
   const issuesCard = card({
     title: 'Unresolved exceptions',
     contentHtml: blockers.length
@@ -175,7 +200,7 @@ function buildHealthReportHtml(report) {
   const remediatedCard = card({
     title: 'Remediated during this run',
     contentHtml: healed.length
-      ? bulletList(healed.map((item) => `${item.kind}: fixed`))
+      ? bulletList(healed.map((item) => `${item.kind}: ${item.applied ? 'applied' : item.blocked || 'not applied'}`))
       : '<p style="margin:0;color:#6b7280;">No issues were remediated during this run.</p>',
   });
 
@@ -205,9 +230,9 @@ function buildHealthReportHtml(report) {
   return page({
     eyebrow: 'OpenClaw Health Monitor',
     title: `${report.portfolio} system health report`,
-    subtitle: 'Exceptions and next actions first, followed by remediated items and lower-priority reference details.',
+    subtitle: 'Exceptions and next actions first, followed by classified symptoms, remediated items, and lower-priority reference details.',
     accent: '#7c2d12',
-    bodyHtml: `${summaryCard}${issuesCard}${nextActionsCard}${remediatedCard}${failedFixesCard}${referenceCard}`,
+    bodyHtml: `${summaryCard}${classifiedCard}${openIssuesCard}${issuesCard}${nextActionsCard}${remediatedCard}${failedFixesCard}${referenceCard}`,
     footer: 'OpenClaw Portfolio Manager • Health monitoring report',
   });
 }
@@ -225,14 +250,17 @@ function writeHealthReportArtifacts(portfolioDir, report) {
 async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySafeFixes = true }) {
   const before = await collectHealthSignals({ portfolioDir, repoRoot });
   const plan = await buildSelfHealPlan({ portfolioDir, repoRoot });
+  const recipeActions = Array.isArray(plan.healed) ? plan.healed : [];
   const selfHeal = {
     dryRun: !applySafeFixes,
     plannedActions: plan.actions,
-    actions: applySafeFixes ? await attemptSafeSelfHeal({ portfolioDir }) : [],
+    classified: plan.classified || [],
+    openIssues: plan.openIssues || [],
+    actions: applySafeFixes ? [...recipeActions, ...(await attemptSafeSelfHeal({ portfolioDir }))] : recipeActions,
   };
   const after = applySafeFixes ? await collectHealthSignals({ portfolioDir, repoRoot }) : before;
   const report = {
-    schemaVersion: '1.0',
+    schemaVersion: '2.0',
     portfolio: before.portfolio,
     generatedAt: new Date().toISOString(),
     before,
@@ -241,6 +269,16 @@ async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySaf
     selfHeal,
   };
   const artifacts = writeHealthReportArtifacts(portfolioDir, report);
+  appendObservabilityEvent({
+    kind: 'health_check',
+    portfolio: report.portfolio,
+    health: report.health.health,
+    severity: report.health.severity,
+    blockerCount: report.health.blockerCount,
+    classified: selfHeal.classified.map((item) => item.category),
+    healed: selfHeal.actions.map((item) => item.kind),
+    openIssues: selfHeal.openIssues.map((item) => item.category),
+  }, { repoRoot });
   return { report, artifacts };
 }
 
