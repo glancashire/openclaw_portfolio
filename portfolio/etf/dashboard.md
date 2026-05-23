@@ -85,11 +85,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-23 13:11:08.221 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 13:11:05.196 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 13:08:07.123 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 13:08:04.092 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 12:59:05.633 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
+| 2026-05-23 16:17:31.255 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 16:17:28.232 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 16:16:14.081 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 16:16:11.058 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 16:09:12.100 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-23
@@ -115,14 +115,14 @@ CH0032912732: Broker rejected the order because the contract identity or venue r
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 20185.35 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: weekly report cycle snapshot
-- Observability shows 93 recent blocked execution-policy event(s).
+- Observability shows 98 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
 - Recent runtime events scanned: 100
-- Recent blocked trade events: 93
+- Recent blocked trade events: 98
 - Open-runner first handoff events: 2
-- Open-runner retry events: 5
+- Open-runner retry events: 0
 - Recent degraded broker events: 0
 - Recent stale-data events: 0
 

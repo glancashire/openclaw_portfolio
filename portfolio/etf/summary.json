@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T13:12:59.190Z",
+  "generatedAt": "2026-05-23T16:23:21.097Z",
   "portfolio": "etf",
   "status": {
     "health": "attention_needed",
@@ -483,38 +483,38 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-23 13:11:08.221 UTC",
+      "time": "2026-05-23 16:17:31.255 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 13:11:05.196 UTC",
+      "time": "2026-05-23 16:17:28.232 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 13:08:07.123 UTC",
+      "time": "2026-05-23 16:16:14.081 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 13:08:04.092 UTC",
+      "time": "2026-05-23 16:16:11.058 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 12:59:05.633 UTC",
+      "time": "2026-05-23 16:09:12.100 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
@@ -523,20 +523,20 @@
     "recentSummary": {
       "total": 100,
       "byLevel": {
-        "info": 7,
-        "warn": 93
+        "warn": 98,
+        "info": 2
       },
       "byCategory": {
-        "execution": 7,
-        "market_open_execution": 15,
         "risk": 13,
-        "execution_policy": 65
+        "market_open_execution": 8,
+        "execution_policy": 77,
+        "execution": 2
       },
-      "blockedTrades": 93,
+      "blockedTrades": 98,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
       "openRunnerQueueEvents": 2,
-      "openRunnerRetryEvents": 5
+      "openRunnerRetryEvents": 0
     }
   },
   "delivery": {

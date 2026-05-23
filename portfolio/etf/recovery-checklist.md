@@ -68,4 +68,4 @@
 2. [warn] Requested instrument is not in Approved Instruments.
 3. [warn] Portfolio requires confirmation before first live trade.
 4. [warn] Requested instrument is not in Approved Instruments.
-5. [warn] Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+5. [warn] Portfolio requires confirmation before first live trade.

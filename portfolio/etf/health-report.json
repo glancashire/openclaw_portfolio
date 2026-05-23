@@ -1,10 +1,10 @@
 {
   "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-05-23T13:05:58.830Z",
+  "generatedAt": "2026-05-23T16:22:27.003Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-23T13:05:53.063Z",
+    "generatedAt": "2026-05-23T16:22:21.193Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -62,7 +62,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779541147907.7124,
+        "dashboardMtimeMs": 1779553101167.3464,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1779497862698.9204
       },
@@ -107,7 +107,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-23T13:05:53.061Z",
+      "generatedAt": "2026-05-23T16:22:21.192Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -163,7 +163,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779541147907.7124,
+          "dashboardMtimeMs": 1779553101167.3464,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1779497862698.9204
         },
@@ -268,7 +268,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-23T13:05:53.063Z",
+    "generatedAt": "2026-05-23T16:22:21.193Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -326,7 +326,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779541147907.7124,
+        "dashboardMtimeMs": 1779553101167.3464,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1779497862698.9204
       },
@@ -371,7 +371,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-23T13:05:53.061Z",
+      "generatedAt": "2026-05-23T16:22:21.192Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -427,7 +427,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779541147907.7124,
+          "dashboardMtimeMs": 1779553101167.3464,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1779497862698.9204
         },
@@ -581,14 +581,57 @@
         "openIssues": [
           "ibkr_socket_dead"
         ]
+      },
+      {
+        "at": "2026-05-23T13:05:58.832Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "healthy",
+        "severity": "low",
+        "blockerCount": 0,
+        "classified": [],
+        "healed": [],
+        "openIssues": []
+      },
+      {
+        "at": "2026-05-23T14:01:56.229Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "healthy",
+        "severity": "low",
+        "blockerCount": 0,
+        "classified": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": []
+      },
+      {
+        "at": "2026-05-23T14:02:31.925Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "healthy",
+        "severity": "low",
+        "blockerCount": 0,
+        "classified": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": []
       }
     ],
     "summaryLines": [
       "2026-05-23T09:15:47.109Z: blocked/high (blockers=1)",
-      "2026-05-23T09:24:55.698Z: blocked/high (blockers=1)"
+      "2026-05-23T09:24:55.698Z: blocked/high (blockers=1)",
+      "2026-05-23T13:05:58.832Z: healthy/low (blockers=0)",
+      "2026-05-23T14:01:56.229Z: healthy/low (blockers=0)",
+      "2026-05-23T14:02:31.925Z: healthy/low (blockers=0)"
     ],
     "counts": {
-      "blocked": 2
+      "blocked": 2,
+      "healthy": 3
     }
   }
 }
