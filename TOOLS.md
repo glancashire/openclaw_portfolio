@@ -2,13 +2,14 @@
 
 Things that matter in this setup:
 
-### Cron job invariants (enforced 2026-05-22, Phase 204)
-- This host has **no Docker daemon**. Any cron job created with `sessionTarget: 'isolated'` (or any other sandbox-requiring target) will fail with `"Sandbox mode requires Docker, but the Docker daemon is not available"`.
+### Cron job invariants (revised 2026-05-23, Phase 204c)
+- This host has **no Docker daemon**.
+- **`agents.defaults.sandbox.mode` MUST stay `"off"`** in `~/.openclaw/openclaw.json`. Any other value (`"non-main"`, `"all"`) makes cron sub-agent turns demand Docker and fail 100%. Per-job `sessionTarget: 'current'` is necessary but **NOT** sufficient — the gateway sandbox subsystem runs upstream of session targeting.
+- **Gateway restart is required** after changing `agents.defaults.sandbox.mode` — SIGUSR1 soft reload does not pick it up. `kill -KILL <pid>` is safe: supervisord respawns within 5-10s.
 - Use `sessionTarget: 'current'` for cron jobs that should run in the main agent session.
-- Always set `delivery.mode: 'announce'` (or webhook) on cron jobs so failures surface to Graham. `delivery.mode: 'none'` means failures are silent and burn through `consecutiveErrors` invisibly.
-- Avoid `delivery.mode: 'announce'` with no chatId on Telegram-only routes — routes back through current default channel; if Telegram is the only channel and `chatId` is missing, delivery still fails.
+- `delivery.mode: 'announce'` currently fails-closed on this host because Telegram is the only channel and no chatId is configured. Cron *job state* is unaffected (consecutiveErrors resets correctly when the agent turn succeeds), but cron *output* doesn't reach the operator. Phase 207 will replace with Mailgun-webhook delivery.
 - After 3 consecutive cron errors, prefer `cron disable` over leaving them red — Phase 208 will auto-disable.
-- See `master-plan-204-212.md` and `phase-204-cron-hotfix-plan.md` for the original triage.
+- See `master-plan-204-212-refined.md` and `phase-204c-gateway-sandbox-disable-report.md` for the validated fix path. The original `phase-204-cron-hotfix-plan.md` reflects only the (necessary but insufficient) per-job hot-fix step.
 
 ### IBKR native gateway recovery
 - Known-good native path: `/home/ubuntu/ibgateway-native/start-ibc.sh`
