@@ -1,3 +1,5 @@
+NOTE: This file was originally named as a Phase 204 plan but the work belonged to Phase 205. Renamed in Phase 219 to reduce plan-file confusion.
+
 # Phase 204 — Render envelope annotations in approvals-queue.md
 
 ## Objective

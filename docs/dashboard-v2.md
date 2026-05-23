@@ -1,6 +1,6 @@
 # Dashboard v2
 
-_Last updated: Phase 212 — dashboard/reporting surfaces aligned with health email, digest email, and operator queue v2._
+_Last updated: Phase 219 — dashboard/reporting surfaces aligned with stable resting-state generation, health email, digest email, and operator queue v2._
 
 ## Purpose
 
@@ -213,3 +213,8 @@ Dashboard v2 is intentionally operator-first:
 - it does **not** remove approval requirements for live trading
 
 If a surface looks contradictory, trust the most recent broker-readiness and queue/block context, then rerun the health check before acting.
+
+
+## Stable-state notes
+
+The dashboard and overview generators now use conditional writes for unchanged content. That keeps the repo calmer after verification while still updating truthfully when the underlying state changes.

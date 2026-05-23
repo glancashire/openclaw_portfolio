@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+echo "[pre-commit] running focused verification checks"
+node scripts/test-artifact-policy-contract.js
+node scripts/test-artifact-writer.js
+node scripts/test-email-html-rendering.js
+node scripts/test-dashboard-digest-rendering.js
+node scripts/test-live-report-email-path.js

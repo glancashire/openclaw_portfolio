@@ -185,3 +185,8 @@ node scripts/run-health-check.js portfolio/etf --send-email
 Self-heal is intentionally conservative.
 
 It is designed to reduce operator toil around reporting/diagnostics, not to take ownership of trading decisions or broker recovery steps that need human review.
+
+
+## Stable-state note
+
+Self-heal remains conservative: it classifies and reports, but the stable-state cleanup work keeps the generated artifacts idempotent so verification does not create avoidable noise.

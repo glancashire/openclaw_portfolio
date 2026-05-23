@@ -1,6 +1,6 @@
 # Basket Execution Runbook
 
-_Last updated: Phase 212 — aligned with current approval gates, dashboard/reporting surfaces, and recovery helpers._
+_Last updated: Phase 219 — aligned with the stable resting-state workflow, dashboard/reporting surfaces, and recovery helpers._
 
 ## TL;DR
 
@@ -35,6 +35,7 @@ Useful checks:
 node scripts/check-interactive-brokers-readiness.js
 node scripts/run-health-check.js portfolio/etf --dry-run
 node scripts/regenerate-dashboard.js portfolio/etf
+node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily --dry-run
 ```
 
 ---
@@ -243,3 +244,16 @@ Cleanup is conservative and only removes stale superseded/generated runtime arti
 - when dashboard/health/summary disagree, regenerate and trust the newest broker-backed state
 
 The assistant can automate a lot of prep, reporting, and reconciliation, but it should not be used to smuggle a risky trade through unclear runtime conditions.
+
+
+## Stable resting-state maintenance
+
+When the repo is in a leave-behind state, prefer these checks before changing anything:
+
+```bash
+node scripts/test-artifact-writer.js
+node scripts/test-resting-state-artifact-writes.js
+node scripts/verify-repo.js
+```
+
+If verification re-dirties only `runtime/events/runtime-events.jsonl` or `runtime/execution-state.json`, treat that as expected ephemeral churn unless the content indicates a real regression.

@@ -175,3 +175,8 @@ It does not:
 - hide broker/readiness degradation
 
 If the digest and the live dashboard disagree, rerun the health/reporting generation path and trust the newest broker-readiness-backed surface.
+
+
+## Stable-state note
+
+The digest is generated through the same conditional artifact-writing path as the summary/dashboard surfaces, so repeated regeneration should not create content-only churn.

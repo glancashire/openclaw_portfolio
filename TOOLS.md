@@ -35,3 +35,7 @@ Things that matter in this setup:
 - If readiness says `connect ECONNREFUSED 127.0.0.1:4001`, the wrapper started but the gateway has not completed login and exposed the API port yet.
 - Last verified launch display: `:99` via Xvfb.
 - The practical finish step is completing the IB Gateway login / second-factor approval on that display, then rerunning `node scripts/check-interactive-brokers-readiness.js`.
+
+### Repo hygiene
+- A local pre-commit hook lives in `.githooks/pre-commit` and runs the focused verification subset before commits.
+- If hooks are bypassed for an emergency commit, rerun the focused suite manually before pushing.
