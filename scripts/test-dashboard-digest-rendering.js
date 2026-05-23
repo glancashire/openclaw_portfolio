@@ -52,6 +52,9 @@ function seed(repoRoot) {
   assert(digest.html.includes('Instrument health'));
   assert(digest.html.includes('Cron health'));
   assert(digest.html.includes('Open issues and workflow'));
+  assert(digest.html.includes('max-width:720px'));
+  assert(digest.html.includes('linear-gradient(135deg'));
+  assert(digest.html.includes('display:inline-block;vertical-align:top;width:calc(50% - 10px)'));
   assert(digest.html.includes('health-monitor'));
   assert(digest.text.includes('Cron health: 1/2 healthy, 1 failing'));
   console.log(JSON.stringify({ ok: true }, null, 2));

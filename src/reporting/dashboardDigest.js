@@ -61,8 +61,9 @@ function renderSparklineCard(portfolioDir) {
   const spark = buildSparklineSvg(values, { width: 720, height: 120, strokeColor: '#2563eb', fillColor: 'rgba(37, 99, 235, 0.12)', strokeWidth: 2 });
   return card({
     title: 'Portfolio trend',
+    tone: 'surface',
     contentHtml: `
-      <div style="margin-bottom:12px;color:#6b7280;font-size:13px;">Last ${series.length || 0} end-of-day snapshot(s).</div>
+      <div style="margin-bottom:10px;color:#475569;font-size:13px;line-height:1.5;">Last ${series.length || 0} end-of-day snapshot(s).</div>
       <div style="padding:8px 0 4px;">${spark}</div>
       <div style="margin-top:12px;font-size:14px;color:#111827;">
         <strong>${Number.isFinite(current) ? formatCurrency(current, 'CHF') : '—'}</strong>
@@ -83,6 +84,7 @@ function renderAllocationCard(summary = {}) {
   ]);
   return card({
     title: 'Allocation drift',
+    tone: 'surface',
     contentHtml: dataTable({
       columns: [
         { label: 'Sleeve' },
@@ -107,6 +109,7 @@ function renderInstrumentHealthCard(summary = {}) {
   ]);
   return card({
     title: 'Instrument health',
+    tone: 'surface',
     contentHtml: dataTable({
       columns: [
         { label: 'Instrument' },
@@ -131,6 +134,7 @@ function renderCronHealthCard(cronHealth = {}) {
   ]);
   return card({
     title: 'Cron health',
+    tone: 'surface',
     contentHtml: `
       <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;">
         ${badge({ label: `${cronHealth.healthy || 0}/${cronHealth.total || 0} healthy`, tone: (cronHealth.failing || 0) > 0 ? 'warn' : 'success' })}
@@ -159,6 +163,7 @@ function renderWorkflowCard(summary = {}, deliveryStatus = {}) {
   }
   return card({
     title: 'Open issues and workflow',
+    tone: 'warn',
     contentHtml: bulletList(items),
   });
 }
@@ -177,8 +182,9 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
   const bodyHtml = [
     card({
       title: 'Digest summary',
+      tone: 'info',
       contentHtml: `
-        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
           ${badge({ label: String(summary.status?.health || 'unknown').replace(/_/g, ' '), tone: summary.status?.health === 'healthy' ? 'success' : summary.status?.health === 'blocked' ? 'danger' : 'warn' })}
           ${badge({ label: String(summary.status?.executionPosture || 'unknown').replace(/_/g, ' '), tone: String(summary.status?.executionPosture || '').includes('ready') ? 'success' : 'warn' })}
           ${badge({ label: String(frequency).toLowerCase() === 'weekly' ? 'weekly digest' : 'daily digest', tone: 'info' })}
@@ -196,7 +202,7 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
   const html = page({
     eyebrow: 'OpenClaw Portfolio Digest',
     title: `${portfolioName} ${String(frequency).toLowerCase() === 'weekly' ? 'weekly' : 'daily'} portfolio digest`,
-    subtitle: 'Operational summary with portfolio drift, instrument health, cron health, and next actions.',
+    subtitle: 'A tighter operational snapshot: value, drift, health, cron posture, and what needs attention next.',
     accent: '#0f172a',
     bodyHtml,
     footer: 'OpenClaw Portfolio Manager • Digest email',
