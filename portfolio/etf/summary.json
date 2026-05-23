@@ -1,84 +1,60 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-22T11:03:25.391Z",
+  "generatedAt": "2026-05-23T12:34:42.947Z",
   "portfolio": "etf",
   "status": {
-    "health": "attention_needed",
-    "strategy": "rebalance_needed",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
+    "health": "warning",
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
   "readiness": {
-    "ok": true,
+    "ok": false,
     "portfolio": "etf",
-    "generatedAt": "2026-05-22T11:03:22.675Z",
+    "generatedAt": "2026-05-23T12:34:34.682Z",
     "executionMode": "transmitted_live",
-    "armedForMarketOpen": true,
+    "armedForMarketOpen": false,
     "armExpiresAt": "2026-05-22T12:00:00Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": true,
-      "reachable": true,
-      "mode": "native-socket",
-      "fallbackRequired": false,
-      "marketDataMode": "live_or_realtime",
-      "marketDataDetail": "Live/realtime bid/ask/last values are available via approved instrument IE00B5BMR087.",
-      "marketDataProbe": {
-        "conid": "75776072",
-        "symbol": "SXR8",
-        "tickerOrIsin": "IE00B5BMR087",
-        "label": "approved instrument IE00B5BMR087",
-        "source": "approved_instrument"
-      },
-      "reason": "ready",
-      "portalSessionState": "unknown_or_separate",
-      "guidance": "Broker path is healthy.",
-      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "marketWindow": {
       "exchange": "EBS",
-      "openNow": true,
-      "reason": "Market is open",
+      "openNow": false,
+      "reason": "Weekend (day 6)",
       "nextOpen": "2026-05-25T09:00:00.000Z",
       "diagnostics": []
     },
     "approvalState": {
       "basketApprovalState": {
-        "approvedCount": 2,
-        "executableCount": 2,
-        "hasApprovedBasket": true,
-        "hasExecutableApprovedBasket": true,
-        "executableBaskets": [
-          {
-            "approvalId": "basket-etf-20260522-0841",
-            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522-0841.json"
-          },
-          {
-            "approvalId": "basket-etf-20260522T1041",
-            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522T1041.json"
-          }
-        ],
-        "latestApprovedAt": "2026-05-22T08:41:00Z",
-        "approvedBaskets": [
-          {
-            "approvalId": "basket-etf-20260522-0841",
-            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522-0841.json"
-          },
-          {
-            "approvalId": "basket-etf-20260522T1041",
-            "path": "/home/ubuntu/.openclaw/workspace/runtime/approved-order-baskets/etf/basket-etf-20260522T1041.json"
-          }
-        ]
+        "approvedCount": 0,
+        "executableCount": 0,
+        "hasApprovedBasket": false,
+        "hasExecutableApprovedBasket": false,
+        "executableBaskets": [],
+        "latestApprovedAt": null,
+        "approvedBaskets": []
       },
       "proposedCount": 0,
       "approvedCount": 0,
-      "basketApprovedCount": 2,
-      "basketExecutableCount": 2,
-      "hasApprovedBasket": true,
-      "hasExecutableApprovedBasket": true,
+      "basketApprovedCount": 0,
+      "basketExecutableCount": 0,
+      "hasApprovedBasket": false,
+      "hasExecutableApprovedBasket": false,
       "executableCount": 0,
       "latestApprovedAt": null,
       "approvalAgeHours": null,
@@ -93,9 +69,31 @@
     },
     "rows": [],
     "excludedRows": [],
-    "blockers": [],
-    "warnings": [],
-    "recommendedNextAction": "Preflight passed. Confirm the submission path intentionally and reconcile promptly after transmission.",
+    "blockers": [
+      {
+        "code": "not_armed_for_market_open",
+        "message": "Live execution is not armed for the next market-open window."
+      },
+      {
+        "code": "broker_unready",
+        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      },
+      {
+        "code": "no_approved_rows",
+        "message": "No approved trade rows or approved basket exist for live execution."
+      },
+      {
+        "code": "no_executable_rows",
+        "message": "No executable approved trade rows or approved basket are currently eligible for submission."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "market_closed",
+        "message": "Market is currently closed (Weekend (day 6)). Next open: 2026-05-25T09:00:00.000Z"
+      }
+    ],
+    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight.",
     "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
   },
   "holdings": {
@@ -104,9 +102,9 @@
     "investedChf": 22209.4831212,
     "holdingCount": 3,
     "baseCurrency": "CHF",
-    "lastSyncAt": "2026-05-22 11:03:04",
+    "lastSyncAt": "2026-05-22 15:52:43",
     "source": "broker_api",
-    "latestSnapshotDate": "2026-05-22",
+    "latestSnapshotDate": "2026-05-23",
     "dailyChangeChf": 0,
     "dailyChangePct": 0
   },
@@ -121,36 +119,36 @@
   "operatorQueue": {
     "summary": {
       "total": 1,
-      "blocking": 0,
+      "blocking": 1,
       "approvals": 0,
       "execution": 0,
       "freshApprovals": 0,
       "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 0,
+      "recovery": 1,
       "delivery": 0,
       "data": 0,
       "warnings": 0,
-      "workflow": 1,
+      "workflow": 0,
       "bySeverity": {
-        "high": 0,
+        "high": 1,
         "medium": 0,
-        "low": 1
+        "low": 0
       }
     },
     "items": [
       {
         "rank": 1,
-        "queueType": "workflow",
+        "queueType": "recovery",
         "portfolio": "etf",
-        "kind": "workflow",
-        "severity": "low",
-        "status": "recommended",
-        "summary": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
-        "source": "recommendation_engine"
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
       }
     ]
   },
@@ -311,40 +309,39 @@
       "staged": 0,
       "submitted": 0,
       "partiallyFilled": 0,
-      "filled": 3,
+      "filled": 0,
       "cancelled": 0,
       "failed": 0,
-      "inactive": 3,
+      "inactive": 6,
       "simulated": 0,
       "planned": 1,
       "withBrokerOrderId": 6
     },
     "tradeState": {
       "queuedForOpenRunner": 0,
-      "blocked": 29,
+      "blocked": 34,
       "blockedByCode": {
-        "insufficient_funds_or_buying_power": 28,
+        "contract_resolution_failed": 33,
         "hold_action": 1
       },
       "staleNeedsReapproval": 0,
       "canonicalStates": {
-        "blocked_hard": 29,
-        "filled": 3
+        "blocked_hard": 34
       }
     },
     "blockedRows": [
       {
-        "dateTime": "2026-05-22 10:41:46",
+        "dateTime": "2026-05-22 11:00:07",
         "tickerOrIsin": "CH0032912732",
-        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "name": "CH0032912732",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9127",
-        "blockCode": "insufficient_funds_or_buying_power",
-        "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+        "brokerOrderId": "9129",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
-        "nextAction": "Reduce size or restore buying power, then retry."
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
         "dateTime": "2026-05-13 13:57:43",
@@ -353,24 +350,24 @@
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9127",
-        "blockCode": "insufficient_funds_or_buying_power",
-        "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+        "brokerOrderId": "9129",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
-        "nextAction": "Reduce size or restore buying power, then retry."
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
-        "dateTime": "2026-05-22 10:41:42",
+        "dateTime": "2026-05-22 11:00:07",
         "tickerOrIsin": "LU0950668870",
-        "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+        "name": "LU0950668870",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9127",
-        "blockCode": "insufficient_funds_or_buying_power",
-        "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+        "brokerOrderId": "9129",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
-        "nextAction": "Reduce size or restore buying power, then retry."
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
         "dateTime": "2026-05-21 09:27:46",
@@ -379,37 +376,37 @@
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9127",
-        "blockCode": "insufficient_funds_or_buying_power",
-        "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+        "brokerOrderId": "9129",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
-        "nextAction": "Reduce size or restore buying power, then retry."
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
-        "dateTime": "2026-05-22 10:41:41",
+        "dateTime": "2026-05-22 11:00:07",
         "tickerOrIsin": "IE00B5BMR087",
-        "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+        "name": "IE00B5BMR087",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9127",
-        "blockCode": "insufficient_funds_or_buying_power",
-        "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+        "brokerOrderId": "9129",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
-        "nextAction": "Reduce size or restore buying power, then retry."
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
-        "dateTime": "2026-05-22 10:41:58",
+        "dateTime": "2026-05-22 12:59:21",
         "tickerOrIsin": "CH0130595124",
         "name": "UBS SPI Mid ETF (SPI ohne SMI)",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9127",
-        "blockCode": "insufficient_funds_or_buying_power",
-        "blockReason": "Broker rejected the order because available cash or buying power was insufficient.",
+        "brokerOrderId": "9129",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
-        "nextAction": "Reduce size or restore buying power, then retry."
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       }
     ],
     "openRunnerRetryState": {
@@ -542,63 +539,103 @@
     }
   ],
   "pendingActions": [
-    "Review and approve the current dry-run instrument proposals before broker connectivity is enabled."
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
   ],
-  "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
   "selfHealPlan": {
     "ok": true,
     "dryRun": true,
     "portfolio": "etf",
     "health": {
-      "health": "healthy",
-      "severity": "low",
-      "blockerCount": 0,
-      "blockers": [],
-      "recommendedActions": [],
-      "nextAction": "No immediate operator action is required."
+      "health": "blocked",
+      "severity": "high",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
     },
-    "actions": []
+    "classified": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "symptom": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "recommendedAction": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "healable": true,
+        "recipe": "restart_ibkr_gateway_if_socket_dead"
+      }
+    ],
+    "healed": [
+      {
+        "ok": true,
+        "kind": "restart_ibkr_gateway_if_socket_dead",
+        "applied": false,
+        "blocked": "operator_present_restart_only",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator."
+      }
+    ],
+    "openIssues": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "symptom": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      }
+    ],
+    "actions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ]
   },
   "explanations": {
     "biggestDrift": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
-    "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
-    "executionBlock": "No explicit execution block is currently surfaced.",
-    "approvalBacklog": "29 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "approvalBacklog": "34 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-22 10:56:00.798 UTC",
+      "time": "2026-05-23 12:34:20.775 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-22 10:56:00.445 UTC",
+      "time": "2026-05-23 12:34:20.773 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-22 10:55:53.584 UTC",
-      "eventType": "submission_blocked",
-      "severity": "warn",
-      "summary": "CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-22 10:55:14.519 UTC",
+      "time": "2026-05-23 12:30:34.543 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-22 10:55:14.144 UTC",
+      "time": "2026-05-23 12:30:34.541 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-23 09:45:12.057 UTC",
+      "eventType": "live_execution_blocked",
+      "severity": "warn",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
@@ -611,10 +648,10 @@
         "info": 8
       },
       "byCategory": {
-        "execution_policy": 63,
+        "execution_policy": 61,
         "market_open_execution": 18,
         "execution": 8,
-        "risk": 11
+        "risk": 13
       },
       "blockedTrades": 92,
       "degradedBrokerEvents": 0,
@@ -633,12 +670,42 @@
     "brokerAutomationPaused": false,
     "consecutiveBrokerErrors": 0,
     "lastBrokerErrorReason": null,
-    "lastBrokerErrorAt": "2026-05-22T10:41:58.850Z"
+    "lastBrokerErrorAt": "2026-05-22T12:59:21.154Z"
   },
   "recentTrades": [
     {
+      "date": "2026-05-22 12:59:21",
+      "status": "inactive",
+      "action": "buy",
+      "tickerOrIsin": "CH0130595124",
+      "instrument": "UBS SPI Mid ETF (SPI ohne SMI)",
+      "quantity": "19",
+      "limitPrice": "130.15",
+      "estimatedChf": "2427.44",
+      "amount": "2427.44",
+      "actualChf": "0",
+      "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9129"
+    },
+    {
+      "date": "2026-05-22 12:38:13",
+      "status": "inactive",
+      "action": "buy",
+      "tickerOrIsin": "CH0130595124",
+      "instrument": "UBS SPI Mid ETF (SPI ohne SMI)",
+      "quantity": "19",
+      "limitPrice": "129.5",
+      "estimatedChf": "2441.5",
+      "amount": "2441.5",
+      "actualChf": "0",
+      "reason": "Portfolio-approved transmitted live broker order submitted.; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9129"
+    },
+    {
       "date": "2026-05-22 11:00:07",
-      "status": "filled",
+      "status": "inactive",
       "action": "buy",
       "tickerOrIsin": "CH0032912732",
       "instrument": "CH0032912732",
@@ -646,14 +713,14 @@
       "limitPrice": "161.88",
       "estimatedChf": "0",
       "amount": "0",
-      "actualChf": "1133.16",
-      "reason": "basket fill",
-      "approval": "basket_approved",
-      "brokerOrderId": "9126"
+      "actualChf": "0",
+      "reason": "basket fill; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9129"
     },
     {
       "date": "2026-05-22 11:00:07",
-      "status": "filled",
+      "status": "inactive",
       "action": "buy",
       "tickerOrIsin": "LU0950668870",
       "instrument": "LU0950668870",
@@ -661,14 +728,14 @@
       "limitPrice": "40.7408",
       "estimatedChf": "0",
       "amount": "0",
-      "actualChf": "244.44",
-      "reason": "basket fill",
-      "approval": "basket_approved",
-      "brokerOrderId": "9125"
+      "actualChf": "0",
+      "reason": "basket fill; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
+      "approval": "broker_inactive",
+      "brokerOrderId": "9129"
     },
     {
       "date": "2026-05-22 11:00:07",
-      "status": "filled",
+      "status": "inactive",
       "action": "buy",
       "tickerOrIsin": "IE00B5BMR087",
       "instrument": "IE00B5BMR087",
@@ -676,40 +743,10 @@
       "limitPrice": "691.04",
       "estimatedChf": "0",
       "amount": "0",
-      "actualChf": "11056.64",
-      "reason": "basket fill",
-      "approval": "basket_approved",
-      "brokerOrderId": "9124"
-    },
-    {
-      "date": "2026-05-22 10:41:58",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "CH0130595124",
-      "instrument": "UBS SPI Mid ETF (SPI ohne SMI)",
-      "quantity": "19",
-      "limitPrice": "129",
-      "estimatedChf": "2441.5",
-      "amount": "2441.5",
       "actualChf": "0",
-      "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11262.87 CHF",
+      "reason": "basket fill; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
       "approval": "broker_inactive",
-      "brokerOrderId": "9127"
-    },
-    {
-      "date": "2026-05-22 10:41:46",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "CH0032912732",
-      "instrument": "UBS SLI ETF (SMI gleichgewichtet)",
-      "quantity": "7",
-      "limitPrice": "162.5",
-      "estimatedChf": "1134",
-      "amount": "1134",
-      "actualChf": "0",
-      "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11262.87 CHF",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9127"
+      "brokerOrderId": "9129"
     }
   ]
 }

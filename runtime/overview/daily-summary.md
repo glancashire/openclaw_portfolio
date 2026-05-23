@@ -4,23 +4,23 @@
 - Overall health: warning
 - Portfolios tracked: 2
 - Cash waiting to deploy CHF: 0
-- Pending approvals: 2
-- Broker health: healthy
+- Pending approvals: 1
+- Broker health: degraded
 - Reporting health: attention_needed
-- Recommended next step: 5 proposed trade row(s) still need user approval.
+- Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 
 ## Biggest Drift Today
 - acceptance-closure: Global equities drift -50% (out_of_bounds)
-- Why it matters: Bonds / cash-like is 20% under target and outside the allowed band around the 20% target.
+- Why it matters: Global equities is 23.26% over target and outside the allowed band around the 60% target.
 
 ## Highlighted Portfolio
 - Portfolio: etf
-- Health: attention_needed
+- Health: warning
 - Cash CHF: 0
-- Broker health: healthy
+- Broker health: degraded
 - Delivery posture: ready
-- Pending approvals: 5
-- Broker-blocked rows: 1
-- Top broker block: broker_submit_rejected (IE00B5BMR087)
-- Recommended next step: 5 proposed trade row(s) still need user approval.
-- Why now: Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.
+- Pending approvals: 0
+- Broker-blocked rows: 6
+- Top broker block: contract_resolution_failed (CH0032912732)
+- Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Why now: Broker rejected the order because the contract identity or venue resolution was not accepted.

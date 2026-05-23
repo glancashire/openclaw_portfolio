@@ -4,13 +4,13 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-21T23:18:55.242Z"
+      "lastAt": "2026-05-23T12:34:20.878Z"
     },
     "portfolio": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-21T23:22:07.250Z"
+      "lastAt": "2026-05-23T12:34:22.561Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -28,13 +28,13 @@
       "consecutive": 1,
       "lastReason": "status_error",
       "lastMessage": "temporary issue",
-      "lastAt": "2026-05-10T22:14:55.568Z"
+      "lastAt": "2026-05-23T12:34:47.000Z"
     },
     "etf": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-22T10:41:58.850Z"
+      "lastAt": "2026-05-22T12:59:21.154Z"
     },
     "dryrun-no-write2-tMfst2": {
       "consecutive": 0,
@@ -59,6 +59,24 @@
       "lastReason": null,
       "lastMessage": null,
       "lastAt": "2026-05-21T23:22:06.724Z"
+    },
+    "execution-safety-closure-BnQ3v2": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-22T10:54:26.368Z"
+    },
+    "execution-safety-closure-z68XMG": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-22T10:54:54.800Z"
+    },
+    "execution-safety-closure-S0MfxN": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-22T10:55:42.056Z"
     }
   },
   "liveExecutionArms": {

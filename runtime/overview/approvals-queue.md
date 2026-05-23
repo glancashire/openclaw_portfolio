@@ -1,23 +1,15 @@
 # Approvals Queue
 
 ## Summary
-- Generated at: 2026-05-22T10:23:16.346Z
-- Approval items: 2
+- Generated at: 2026-05-23T12:34:42.949Z
+- Approval items: 1
 
 ## Approval Review Queue
 
 ### Approval 1: etf
-- Urgency: medium
-- Summary: 1 approved basket(s) are ready for execution.
-- Explanation: 1 approved basket(s) are executable now; row-level proposed trades remain legacy context.
-- Effect if approved: The operator can transmit the approved basket without re-approving row-level trade log entries.
-- Effect if ignored: The basket remains ready but unsubmitted, so the portfolio stays staged instead of executing.
-- Recommended action: Review the approved basket and submit when satisfied with the price bands and market window.
-
-### Approval 2: etf
-- Urgency: medium
-- Summary: 5 proposed trade row(s) still need user approval.
-- Explanation: 5 proposed trade row(s) still need user approval.
-- Effect if approved: The operator can move this proposal from review into the next staging / execution decision step.
-- Effect if ignored: The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.
-- Recommended action: Review the proposed trades and approve or reject them explicitly.
+- Urgency: high
+- Summary: Circuit breaker tripped for CH0130595124: 3 consecutive cancellations (threshold 3).
+- Explanation: Instrument CH0130595124 has cancelled at the broker 3 times in a row across approval basket-etf-20260522T1041-reproposal-3-reproposal-1; reproposals are now suspended for this instrument.
+- Effect if approved: undefined
+- Effect if ignored: CH0130595124 stays excluded from future reproposals; any sleeve drift toward this instrument will not auto-rebalance.
+- Recommended action: Investigate why CH0130595124 keeps cancelling at the broker (subscription, liquidity, contract config). When fixed, run: node scripts/clear-circuit-breaker.js --portfolio=etf --instrument=CH0130595124

@@ -1,22 +1,23 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-22T11:03:24.307Z",
+  "generatedAt": "2026-05-23T12:34:40.213Z",
   "portfolio": "acceptance-closure",
   "incidentStatus": "action_required",
   "summary": {
     "health": "warning",
-    "brokerHealth": "healthy",
-    "executionPosture": "ready_for_review",
+    "brokerHealth": "degraded",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "stale",
     "blockerCount": 5,
-    "queueItemCount": 6,
+    "queueItemCount": 7,
     "pendingApprovals": 0,
     "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
     "executionWhy": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
     "approvalWhy": "There is no active approval backlog."
   },
   "incidentDrivers": [
+    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.",
     "Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.",
     "5 explicit blocker(s) are preventing a healthy operating posture."
   ],
@@ -91,6 +92,14 @@
     },
     {
       "step": 6,
+      "priority": "high",
+      "title": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
+      "source": "broker_readiness"
+    },
+    {
+      "step": 7,
       "priority": "medium",
       "title": "Dashboard/report freshness is stale relative to source state.",
       "action": "Review report delivery readiness and clear the pending action.",
@@ -99,7 +108,7 @@
     }
   ],
   "verificationChecks": [
-    "Broker health remains healthy or intentionally degraded with operator awareness.",
+    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
     "Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.",
     "No approval backlog remains.",
     "Active blockers are cleared or explicitly documented as accepted constraints."

@@ -45,3 +45,5 @@
 | 2026-05-22 | end_of_day | 9886.91 | 9886.91 | 0 | 0 | 0 | monthly report cycle snapshot |
 | 2026-05-22 | rebalance_review | 9886.91 | 9886.91 | 20841.44 | 0 | 0 | Rebalance decision: treat settled IBKR broker cash as the active defensive sleeve allocation; no additional equity buys proposed. |
 | 2026-05-22 | execution_staged | 9874.789999999999 | 9874.789999999999 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-22 | execution_staged | 22209.4831212 | 22209.4831212 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-23 | end_of_day | 22209.4831212 | 22209.4831212 | 0 | 0 | 0 | weekly report cycle snapshot |

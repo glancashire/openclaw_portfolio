@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-22T10:23:16.350Z",
+  "generatedAt": "2026-05-23T12:34:42.954Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -58,20 +58,20 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-05-22",
+        "latestHistoryDate": "2026-05-23",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 1,
+          "blockedTradeCount": 6,
           "topBrokerBlock": {
-            "tickerOrIsin": "IE00B5BMR087",
-            "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
-            "blockCode": "broker_submit_rejected",
-            "blockReason": "Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.",
-            "nextAction": "Review the broker rejection reason and correct the order before retrying.",
-            "brokerOrderId": "9122"
+            "tickerOrIsin": "CH0032912732",
+            "name": "CH0032912732",
+            "blockCode": "contract_resolution_failed",
+            "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
+            "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
+            "brokerOrderId": "9129"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."

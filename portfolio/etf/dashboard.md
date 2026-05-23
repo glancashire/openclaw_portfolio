@@ -1,31 +1,32 @@
 # Dashboard: etf
 
 ## Immediate Status
-- Portfolio status: attention_needed
-- Top blocker: none currently surfaced
-- Next action: CH0032912732: Broker rejected the order because available cash or buying power was insufficient.
-- Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
-- Execution posture: ready_for_review
+- Portfolio status: warning
+- Top blocker: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Next action: Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Execution posture: degraded_dry_run_only
 - Delivery posture: ready
 - Active blockers: 0
-- Pending operator queue items: 8
+- Pending operator queue items: 9
 
 ## Health Snapshot
-- Strategy status: rebalance_needed
-- Last successful sync: 2026-05-22 11:03:04
+- Strategy status: blocked
+- Last successful sync: 2026-05-22 15:52:43
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
 
 ## Pending Operator Actions
-1. [execution_block/blocked/high] CH0032912732: Broker rejected the order because available cash or buying power was insufficient.
-2. [execution_block/blocked/high] CH0130595124: Broker rejected the order because available cash or buying power was insufficient.
-3. [execution_block/blocked/high] IE000XZSV718: Broker rejected the order because available cash or buying power was insufficient.
-4. [execution_block/blocked/high] IE00B5BMR087: Broker rejected the order because available cash or buying power was insufficient.
-5. [execution_block/blocked/high] IE00BD4TXW66: Broker rejected the order because available cash or buying power was insufficient.
-6. [execution_block/blocked/high] LU0950668870: Broker rejected the order because available cash or buying power was insufficient.
-7. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
-8. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
+1. [execution_block/blocked/high] CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
+2. [execution_block/blocked/high] CH0130595124: Broker rejected the order because the contract identity or venue resolution was not accepted.
+3. [execution_block/blocked/high] IE000XZSV718: Broker rejected the order because the contract identity or venue resolution was not accepted.
+4. [execution_block/blocked/high] IE00B5BMR087: Broker rejected the order because the contract identity or venue resolution was not accepted.
+5. [execution_block/blocked/high] IE00BD4TXW66: Broker rejected the order because the contract identity or venue resolution was not accepted.
+6. [execution_block/blocked/high] LU0950668870: Broker rejected the order because the contract identity or venue resolution was not accepted.
+7. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+8. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
+9. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Portfolio Value Snapshot
 - Total value CHF: 22209.4831212
@@ -36,7 +37,7 @@
 - Since last report CHF: 0
 - Since last report %: 0
 - Number of holdings: 3
-- Latest snapshot date: 2026-05-22
+- Latest snapshot date: 2026-05-23
 
 ## Allocation Health
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
@@ -57,7 +58,7 @@
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
-- Broker/API warnings: 0
+- Broker/API warnings: 1
 - Stale data warnings: 0
 - Execution pause state: active
 - Active blocker detail:
@@ -68,7 +69,7 @@
 - Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.
 
 ## Operator Queue Summary
-- Total queue items: 8
+- Total queue items: 9
 - Blocking items: 0
 - Approval items: 0
 - Fresh actionable approvals: 0
@@ -76,7 +77,7 @@
 - Execution items: 0
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
-- Recovery items: 0
+- Recovery items: 1
 - Delivery items: 0
 - Data items: 2
 - Warning items: 0
@@ -85,14 +86,14 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-22 10:56:00.798 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:56:00.445 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:55:53.584 UTC | submission_blocked | warn | CSPX blocked before submission: Interactive Brokers returned delayed-only market data for this instrument because the required market-data entitlement is not active. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:55:14.519 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-22 10:55:14.144 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 12:34:20.775 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
+| 2026-05-23 12:34:20.773 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 12:30:34.543 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
+| 2026-05-23 12:30:34.541 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-23 09:45:12.057 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
-- Weekly report: latest history 2026-05-22
+- Weekly report: latest history 2026-05-23
 - Monthly report: email_and_repo
 - Quarterly report: local_operator_review
 - Delivery readiness: ready
@@ -102,19 +103,20 @@
 - Acknowledged backfilled fills: 1
 
 ## Recommended Next Step
-CH0032912732: Broker rejected the order because available cash or buying power was insufficient.
+CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
 
 ## Status Labels
 - Pending approvals queue count: 0
 - In-flight execution rows: 0
 - Latest action recommendations:
-  - Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
-  - Refresh history snapshots after holdings updates and trade execution.
+  - Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
+  - Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 20185.35 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: Transmitted live broker order submitted.
+- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Latest history note: weekly report cycle snapshot
 - Observability shows 92 recent blocked execution-policy event(s).
 
 ## Observability Status
@@ -133,7 +135,7 @@ CH0032912732: Broker rejected the order because available cash or buying power w
 - Staged: 0
 - Submitted: 0
 - Partially filled: 0
-- Filled: 3
+- Filled: 0
 - Cancelled: 0
 - Failed: 0
 - Planned-only entries: 1
@@ -146,8 +148,8 @@ CH0032912732: Broker rejected the order because available cash or buying power w
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
 |---|---|---|---:|---|
-| 2026-05-22 11:00:07 | buy | CH0032912732 | 0 | filled |
-| 2026-05-22 11:00:07 | buy | LU0950668870 | 0 | filled |
-| 2026-05-22 11:00:07 | buy | IE00B5BMR087 | 0 | filled |
-| 2026-05-22 10:41:58 | buy | UBS SPI Mid ETF (SPI ohne SMI) | 2441.5 | inactive |
-| 2026-05-22 10:41:46 | buy | UBS SLI ETF (SMI gleichgewichtet) | 1134 | inactive |
+| 2026-05-22 12:59:21 | buy | UBS SPI Mid ETF (SPI ohne SMI) | 2427.44 | inactive |
+| 2026-05-22 12:38:13 | buy | UBS SPI Mid ETF (SPI ohne SMI) | 2441.5 | inactive |
+| 2026-05-22 11:00:07 | buy | CH0032912732 | 0 | inactive |
+| 2026-05-22 11:00:07 | buy | LU0950668870 | 0 | inactive |
+| 2026-05-22 11:00:07 | buy | IE00B5BMR087 | 0 | inactive |

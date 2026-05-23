@@ -1,7 +1,7 @@
 # Holdings: etf
 
 ## Last Sync
-- Date/time: 2026-05-22 11:03:04
+- Date/time: 2026-05-22 15:52:43
 - Source: broker_api
 - Broker: interactive-brokers
 - Base currency: CHF
@@ -36,4 +36,4 @@
  - Some holdings are shown with avg-cost fallback rather than broker market snapshot pricing.
  - Portfolio cash is marked unknown unless sourced from a trusted portfolio-local accounting path.
  - Portfolio cash and broker account cash may differ when the portfolio is only one sleeve of a larger broker account.
-- Cash detail (CHF ledger tags): AvailableFunds=9381.22, BuyingPower=9381.22, NetLiquidation=30068.91, SettledCash=9381.22, TotalCashValue=9381.22
+- Cash detail (CHF ledger tags): AvailableFunds=9381.22, BuyingPower=9381.22, NetLiquidation=30136.23, SettledCash=9381.22, TotalCashValue=9381.22

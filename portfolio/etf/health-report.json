@@ -1,29 +1,29 @@
 {
   "schemaVersion": "1.0",
   "portfolio": "etf",
-  "generatedAt": "2026-05-16T22:06:53.959Z",
+  "generatedAt": "2026-05-23T08:00:17.220Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T22:02:04.534Z",
+    "generatedAt": "2026-05-23T08:00:14.003Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": true,
-      "reachable": true,
-      "mode": "native-socket",
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
       "fallbackRequired": true,
-      "marketDataMode": "unknown",
-      "marketDataDetail": "approved instrument IE00BD4TXW66: market data request returned no usable price fields | approved instrument LU0950668870: market data request returned no usable price fields | approved instrument CH0032912732: market data request returned no usable price fields",
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
       "marketDataProbe": null,
-      "reason": "unknown",
-      "portalSessionState": "unknown_or_separate",
-      "guidance": "Prefer native raw contract details / market-data probes before assuming the portal session is required.",
-      "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "errorState": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-13T14:29:30.583Z",
+      "lastAt": "2026-05-22T12:59:21.154Z",
       "stopAutomation": false,
       "threshold": 3
     },
@@ -52,39 +52,45 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-05-15",
+      "latestHistoryDate": "2026-05-23",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778968740519.0828,
+        "dashboardMtimeMs": 1779523209049.42,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-        "newestSourceMtimeMs": 1778842973840.5232
+        "newestSourceMtimeMs": 1779497862698.9204
       },
       "lifecycleSummary": {
-        "proposed": 1,
+        "proposed": 0,
         "approved": 0,
         "rejected": 0,
         "staged": 0,
         "submitted": 0,
         "partiallyFilled": 0,
-        "filled": 2,
+        "filled": 0,
         "cancelled": 0,
         "failed": 0,
-        "inactive": 0,
+        "inactive": 6,
         "simulated": 0,
         "planned": 1,
-        "withBrokerOrderId": 2
+        "withBrokerOrderId": 6
       },
       "brokerErrorState": {
         "consecutive": 0,
         "lastReason": null,
         "lastMessage": null,
-        "lastAt": "2026-05-13T14:29:30.583Z",
+        "lastAt": "2026-05-22T12:59:21.154Z",
         "stopAutomation": false,
         "threshold": 3
       },
       "fillNotificationState": {
-        "notifiedFills": [],
+        "notifiedFills": [
+          9110,
+          9111,
+          9114,
+          9115,
+          9123
+        ],
         "reconciledUnnotifiedFills": [],
         "acknowledgedBackfilledFills": [
           9107
@@ -95,7 +101,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T22:02:04.532Z",
+      "generatedAt": "2026-05-23T08:00:14.002Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -147,39 +153,45 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-05-15",
+        "latestHistoryDate": "2026-05-23",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778968740519.0828,
+          "dashboardMtimeMs": 1779523209049.42,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-          "newestSourceMtimeMs": 1778842973840.5232
+          "newestSourceMtimeMs": 1779497862698.9204
         },
         "lifecycleSummary": {
-          "proposed": 1,
+          "proposed": 0,
           "approved": 0,
           "rejected": 0,
           "staged": 0,
           "submitted": 0,
           "partiallyFilled": 0,
-          "filled": 2,
+          "filled": 0,
           "cancelled": 0,
           "failed": 0,
-          "inactive": 0,
+          "inactive": 6,
           "simulated": 0,
           "planned": 1,
-          "withBrokerOrderId": 2
+          "withBrokerOrderId": 6
         },
         "brokerErrorState": {
           "consecutive": 0,
           "lastReason": null,
           "lastMessage": null,
-          "lastAt": "2026-05-13T14:29:30.583Z",
+          "lastAt": "2026-05-22T12:59:21.154Z",
           "stopAutomation": false,
           "threshold": 3
         },
         "fillNotificationState": {
-          "notifiedFills": [],
+          "notifiedFills": [
+            9110,
+            9111,
+            9114,
+            9115,
+            9123
+          ],
           "reconciledUnnotifiedFills": [],
           "acknowledgedBackfilledFills": [
             9107
@@ -206,27 +218,33 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-05-15",
+        "latestHistoryDate": "2026-05-23",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 1,
+          "blockedTradeCount": 6,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
-            "name": "UBS SLI ETF (SMI gleichgewichtet)",
-            "blockCode": "quote_unavailable",
-            "blockReason": "No broker quote was available during market-open execution.",
-            "nextAction": "Restore broker pricing and rerun the market-open submission path.",
-            "brokerOrderId": ""
+            "name": "CH0032912732",
+            "blockCode": "contract_resolution_failed",
+            "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
+            "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
+            "brokerOrderId": "9129"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."
       }
     },
     "fillNotificationState": {
-      "notifiedFills": [],
+      "notifiedFills": [
+        9110,
+        9111,
+        9114,
+        9115,
+        9123
+      ],
       "reconciledUnnotifiedFills": [],
       "acknowledgedBackfilledFills": [
         9107
@@ -240,7 +258,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
         }
       ],
       "recommendedActions": [
@@ -251,26 +269,26 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-16T22:06:53.959Z",
+    "generatedAt": "2026-05-23T08:00:17.220Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": true,
-      "reachable": true,
-      "mode": "native-socket",
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
       "fallbackRequired": true,
-      "marketDataMode": "unknown",
-      "marketDataDetail": "approved instrument IE00BD4TXW66: market data request returned no usable price fields | approved instrument LU0950668870: market data request returned no usable price fields | approved instrument CH0032912732: market data request returned no usable price fields",
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
       "marketDataProbe": null,
-      "reason": "unknown",
-      "portalSessionState": "unknown_or_separate",
-      "guidance": "Prefer native raw contract details / market-data probes before assuming the portal session is required.",
-      "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "errorState": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-13T14:29:30.583Z",
+      "lastAt": "2026-05-22T12:59:21.154Z",
       "stopAutomation": false,
       "threshold": 3
     },
@@ -299,39 +317,45 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-05-15",
+      "latestHistoryDate": "2026-05-23",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1778968991055.2278,
+        "dashboardMtimeMs": 1779523214048.6785,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-        "newestSourceMtimeMs": 1778842973840.5232
+        "newestSourceMtimeMs": 1779497862698.9204
       },
       "lifecycleSummary": {
-        "proposed": 1,
+        "proposed": 0,
         "approved": 0,
         "rejected": 0,
         "staged": 0,
         "submitted": 0,
         "partiallyFilled": 0,
-        "filled": 2,
+        "filled": 0,
         "cancelled": 0,
         "failed": 0,
-        "inactive": 0,
+        "inactive": 6,
         "simulated": 0,
         "planned": 1,
-        "withBrokerOrderId": 2
+        "withBrokerOrderId": 6
       },
       "brokerErrorState": {
         "consecutive": 0,
         "lastReason": null,
         "lastMessage": null,
-        "lastAt": "2026-05-13T14:29:30.583Z",
+        "lastAt": "2026-05-22T12:59:21.154Z",
         "stopAutomation": false,
         "threshold": 3
       },
       "fillNotificationState": {
-        "notifiedFills": [],
+        "notifiedFills": [
+          9110,
+          9111,
+          9114,
+          9115,
+          9123
+        ],
         "reconciledUnnotifiedFills": [],
         "acknowledgedBackfilledFills": [
           9107
@@ -342,7 +366,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-16T22:06:53.958Z",
+      "generatedAt": "2026-05-23T08:00:17.219Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -394,39 +418,45 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-05-15",
+        "latestHistoryDate": "2026-05-23",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1778968991055.2278,
+          "dashboardMtimeMs": 1779523214048.6785,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-          "newestSourceMtimeMs": 1778842973840.5232
+          "newestSourceMtimeMs": 1779497862698.9204
         },
         "lifecycleSummary": {
-          "proposed": 1,
+          "proposed": 0,
           "approved": 0,
           "rejected": 0,
           "staged": 0,
           "submitted": 0,
           "partiallyFilled": 0,
-          "filled": 2,
+          "filled": 0,
           "cancelled": 0,
           "failed": 0,
-          "inactive": 0,
+          "inactive": 6,
           "simulated": 0,
           "planned": 1,
-          "withBrokerOrderId": 2
+          "withBrokerOrderId": 6
         },
         "brokerErrorState": {
           "consecutive": 0,
           "lastReason": null,
           "lastMessage": null,
-          "lastAt": "2026-05-13T14:29:30.583Z",
+          "lastAt": "2026-05-22T12:59:21.154Z",
           "stopAutomation": false,
           "threshold": 3
         },
         "fillNotificationState": {
-          "notifiedFills": [],
+          "notifiedFills": [
+            9110,
+            9111,
+            9114,
+            9115,
+            9123
+          ],
           "reconciledUnnotifiedFills": [],
           "acknowledgedBackfilledFills": [
             9107
@@ -453,27 +483,33 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-05-15",
+        "latestHistoryDate": "2026-05-23",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 1,
+          "blockedTradeCount": 6,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
-            "name": "UBS SLI ETF (SMI gleichgewichtet)",
-            "blockCode": "quote_unavailable",
-            "blockReason": "No broker quote was available during market-open execution.",
-            "nextAction": "Restore broker pricing and rerun the market-open submission path.",
-            "brokerOrderId": ""
+            "name": "CH0032912732",
+            "blockCode": "contract_resolution_failed",
+            "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
+            "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
+            "brokerOrderId": "9129"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."
       }
     },
     "fillNotificationState": {
-      "notifiedFills": [],
+      "notifiedFills": [
+        9110,
+        9111,
+        9114,
+        9115,
+        9123
+      ],
       "reconciledUnnotifiedFills": [],
       "acknowledgedBackfilledFills": [
         9107
@@ -487,7 +523,7 @@
       "blockers": [
         {
           "code": "broker_unready",
-          "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
         }
       ],
       "recommendedActions": [
@@ -503,7 +539,7 @@
     "blockers": [
       {
         "code": "broker_unready",
-        "message": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture."
+        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
       }
     ],
     "recommendedActions": [

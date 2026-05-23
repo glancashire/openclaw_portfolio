@@ -43,11 +43,11 @@ nav a:hover { background: #dbeafe; }
 <h1>Operator Cockpit</h1>
 <div class="status-grid">
   <div class="status-card"><div class="label">Overall Health</div><div class="value"><span class="badge badge-warning">warning</span></div></div>
-  <div class="status-card"><div class="label">Pending Approvals</div><div class="value">2</div></div>
+  <div class="status-card"><div class="label">Pending Approvals</div><div class="value">1</div></div>
   <div class="status-card"><div class="label">Cash to Deploy (CHF)</div><div class="value">0</div></div>
   <div class="status-card"><div class="label">Biggest Drift</div><div class="value">Global equities -50%</div></div>
-  <div class="status-card"><div class="label">Broker Health</div><div class="value">healthy</div></div>
-  <div class="status-card"><div class="label">Reports Available</div><div class="value">13</div></div>
+  <div class="status-card"><div class="label">Broker Health</div><div class="value">degraded</div></div>
+  <div class="status-card"><div class="label">Reports Available</div><div class="value">14</div></div>
 </div>
 
 <h2>Navigation</h2>
@@ -62,14 +62,27 @@ nav a:hover { background: #dbeafe; }
 <h2>Portfolios</h2>
 <ul>
 <li><a href="../../portfolio/acceptance-closure/summary.html">acceptance-closure</a> <span class="badge badge-warning">warning</span></li>
-<li><a href="../../portfolio/etf/summary.html">etf</a> <span class="badge badge-warning">attention_needed</span></li>
+<li><a href="../../portfolio/etf/summary.html">etf</a> <span class="badge badge-warning">warning</span></li>
 </ul>
 <h2>Delivery Broker Blocks</h2>
 <ul>
-<li><strong>etf</strong>: [broker_submit_rejected] IE00B5BMR087 — iShares Core S&P 500 UCITS ETF USD (Acc)<br />Reason: Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.<br />Next action: Review the broker rejection reason and correct the order before retrying.</li>
+<li><strong>etf</strong>: [contract_resolution_failed] CH0032912732 — CH0032912732<br />Reason: Broker rejected the order because the contract identity or venue resolution was not accepted.<br />Next action: Verify conid, symbol, exchange, and primary exchange before retrying.</li>
 </ul>
+<h2>Cron Health (8/8 healthy)</h2>
+<ul>
+<li><span class="badge badge-healthy">ok</span> <strong>daily-rebalance-check</strong> &mdash; 0 consecutive errors, last run 11.6h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>ibkr-native-gateway-keepalive</strong> &mdash; 0 consecutive errors, last run 4.6h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-daily-sync-and-dashboard</strong> &mdash; 0 consecutive errors, last run 11.6h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-monthly-report</strong> &mdash; 0 consecutive errors, last run never</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-quarterly-report</strong> &mdash; 0 consecutive errors, last run never</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-weekly-report</strong> &mdash; 0 consecutive errors, last run 11.6h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-health-monitor-etf</strong> &mdash; 0 consecutive errors, last run 4.6h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>verify-six-l1-subscription-monday</strong> &mdash; 0 consecutive errors, last run never</li>
+</ul>
+<h2>Portfolio Trend (last days)</h2>
+<div style="padding:8px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="400" height="60" viewBox="0 0 400 60"><path d="M4 53.27 L43.2 53.27 L82.4 53.27 L121.6 53.27 L160.8 56 L200 52.34 L239.2 52.34 L278.4 37.71 L317.6 37.37 L356.8 39.28 L396 4 L396 56 L4 56 Z" fill="rgba(29, 78, 216, 0.10)" stroke="none"/><path d="M4 53.27 L43.2 53.27 L82.4 53.27 L121.6 53.27 L160.8 56 L200 52.34 L239.2 52.34 L278.4 37.71 L317.6 37.37 L356.8 39.28 L396 4" fill="none" stroke="#1d4ed8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="396" cy="4" r="2" fill="#1d4ed8"/></svg></div>
 
-<p class="meta">Generated: 2026-05-22T10:23:16.351Z</p>
+<p class="meta">Generated: 2026-05-23T12:34:42.955Z</p>
 </div>
 </body>
 </html>

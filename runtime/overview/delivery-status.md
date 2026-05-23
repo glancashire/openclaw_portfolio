@@ -1,6 +1,6 @@
 # Delivery & Alerting Status
 
-- Generated at: 2026-05-22T10:23:16.350Z
+- Generated at: 2026-05-23T12:34:42.954Z
 - Portfolios: 2
 - All ready: no
 
@@ -28,7 +28,7 @@
 - Pending actions:
   - None
 - Broker block context:
-  - Count: 1
-  - Top block: [broker_submit_rejected] IE00B5BMR087 — iShares Core S&P 500 UCITS ETF USD (Acc)
-  - Reason: Broker rejected or inactivated the order: Order rejected - reason:Not allowed to open a position: no trading permission. You may need to add the appropriate trading permission <br>through Client Portal.
-  - Next action: Review the broker rejection reason and correct the order before retrying.
+  - Count: 6
+  - Top block: [contract_resolution_failed] CH0032912732 — CH0032912732
+  - Reason: Broker rejected the order because the contract identity or venue resolution was not accepted.
+  - Next action: Verify conid, symbol, exchange, and primary exchange before retrying.
