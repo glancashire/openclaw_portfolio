@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-23T12:34:42.949Z",
+  "generatedAt": "2026-05-23T13:12:59.196Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 0,
@@ -18,16 +18,16 @@
     "status": "out_of_bounds",
     "absDrift": 50
   },
-  "brokerHealth": "degraded",
+  "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
   "pendingApprovals": 1,
-  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+  "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
   "biggestDriftWhy": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
-    "health": "warning",
+    "health": "attention_needed",
     "cashChf": 0,
-    "brokerHealth": "degraded",
+    "brokerHealth": "healthy",
     "deliveryPosture": "ready",
     "pendingApprovals": 0,
     "blockedTradeCount": 6,
@@ -38,7 +38,7 @@
       "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
       "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
     },
-    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
     "whyNow": "Broker rejected the order because the contract identity or venue resolution was not accepted."
   }
 }

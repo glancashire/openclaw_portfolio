@@ -1,23 +1,23 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-23T12:34:42.947Z",
+  "generatedAt": "2026-05-23T13:12:59.190Z",
   "portfolio": "etf",
-  "incidentStatus": "action_required",
+  "incidentStatus": "monitor_only",
   "summary": {
-    "health": "warning",
-    "brokerHealth": "degraded",
-    "executionPosture": "degraded_dry_run_only",
+    "health": "attention_needed",
+    "brokerHealth": "healthy",
+    "executionPosture": "ready_for_review",
     "deliveryPosture": "ready",
     "dataFreshness": "current",
     "blockerCount": 0,
     "queueItemCount": 1,
     "pendingApprovals": 0,
-    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+    "executionWhy": "No explicit execution block is currently surfaced.",
     "approvalWhy": "34 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
-    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered."
+    "No active incident drivers were detected; this checklist is a verification pass confirming healthy posture."
   ],
   "activeBlockers": [],
   "activeBrokerBlocks": [
@@ -109,29 +109,29 @@
   "actionChecklist": [
     {
       "step": 1,
-      "priority": "high",
-      "title": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
-      "source": "broker_readiness"
+      "priority": "low",
+      "title": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "action": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "recommendation_engine"
     }
   ],
   "verificationChecks": [
-    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
+    "Broker health remains healthy or intentionally degraded with operator awareness.",
     "Freshness posture remains current.",
     "No approval backlog remains.",
     "No active blockers remain."
   ],
   "completionCriteria": [
-    "Blocking recovery items no longer appear in the operator queue.",
-    "Portfolio health no longer depends on unresolved blocker conditions.",
-    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
+    "Portfolio remains in a healthy or intentionally monitored posture.",
+    "No blocker-class recovery work is outstanding.",
+    "The next operating step is clear from the summary surface."
   ],
   "recentSignals": [
     {
       "rank": 1,
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "summary": "Portfolio requires confirmation before first live trade.",
       "timestamp": null
     },
     {
@@ -143,7 +143,7 @@
     {
       "rank": 3,
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "summary": "Portfolio requires confirmation before first live trade.",
       "timestamp": null
     },
     {

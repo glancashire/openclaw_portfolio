@@ -1,8 +1,8 @@
 {
   "lastRestartAt": "2026-05-17T11:02:57.836Z",
-  "lastReadyAt": "2026-05-22T13:00:12.068Z",
+  "lastReadyAt": "2026-05-23T13:04:52.218Z",
   "awaiting2faSince": null,
   "awaiting2faMailSentAt": null,
-  "lastError": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-  "downMailSentAt": "2026-05-23T08:00:36.509Z"
+  "lastError": null,
+  "downMailSentAt": null
 }

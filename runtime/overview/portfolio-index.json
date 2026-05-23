@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T12:34:42.948Z",
+  "generatedAt": "2026-05-23T13:12:59.192Z",
   "portfolioCount": 2,
   "totalValueChf": 22209.48,
   "portfolios": [
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 7,
+      "pendingActions": 6,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -38,15 +38,15 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
-      "status": "warning",
-      "strategyStatus": "blocked",
+      "status": "attention_needed",
+      "strategyStatus": "rebalance_needed",
       "totalValueChf": 22209.4831212,
       "cashChf": 0,
       "investedChf": 22209.4831212,
@@ -55,7 +55,7 @@
       "pendingApprovals": 0,
       "blockers": 0,
       "pendingActions": 1,
-      "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
       "blockedTradeCount": 6,
@@ -84,30 +84,30 @@
           "driftPct": -20
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "ready",
       "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 8,
-    "blocking": 7,
+    "total": 7,
+    "blocking": 5,
     "approvals": 0,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 2,
+    "recovery": 0,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 0,
+    "workflow": 1,
     "bySeverity": {
-      "high": 7,
+      "high": 5,
       "medium": 1,
-      "low": 0
+      "low": 1
     }
   }
 }

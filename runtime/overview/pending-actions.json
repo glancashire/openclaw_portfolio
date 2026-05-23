@@ -1,25 +1,25 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T12:34:42.949Z",
-  "itemCount": 9,
+  "generatedAt": "2026-05-23T13:12:59.195Z",
+  "itemCount": 8,
   "queueSummary": {
-    "total": 9,
-    "blocking": 7,
+    "total": 8,
+    "blocking": 5,
     "approvals": 0,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 2,
+    "recovery": 0,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 1,
+    "workflow": 2,
     "bySeverity": {
-      "high": 8,
+      "high": 6,
       "medium": 1,
-      "low": 0
+      "low": 1
     }
   },
   "items": [
@@ -107,30 +107,6 @@
     },
     {
       "rank": 7,
-      "queueType": "recovery",
-      "portfolio": "acceptance-closure",
-      "kind": "broker",
-      "severity": "high",
-      "status": "degraded",
-      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "blocking": true,
-      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "source": "broker_readiness"
-    },
-    {
-      "rank": 8,
-      "queueType": "recovery",
-      "portfolio": "etf",
-      "kind": "broker",
-      "severity": "high",
-      "status": "degraded",
-      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "blocking": true,
-      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-      "source": "broker_readiness"
-    },
-    {
-      "rank": 9,
       "queueType": "delivery",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
@@ -140,6 +116,18 @@
       "blocking": false,
       "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
       "source": "delivery_policy"
+    },
+    {
+      "rank": 8,
+      "queueType": "workflow",
+      "portfolio": "etf",
+      "kind": "workflow",
+      "severity": "low",
+      "status": "recommended",
+      "summary": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "blocking": false,
+      "recommendedOperatorAction": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "source": "recommendation_engine"
     }
   ]
 }

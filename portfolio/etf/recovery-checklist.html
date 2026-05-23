@@ -43,23 +43,23 @@ pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 
 <div class="report-container">
 <h1>Recovery Checklist: etf</h1>
 <h2>Incident Status</h2>
-<ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: degraded</li><li>Execution posture: degraded_dry_run_only</li><li>Delivery posture: ready</li><li>Data freshness: current</li><li>Pending approvals: 0</li><li>Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li></ul>
+<ul><li>Status: monitor_only</li><li>Health: attention_needed</li><li>Broker health: healthy</li><li>Execution posture: ready_for_review</li><li>Delivery posture: ready</li><li>Data freshness: current</li><li>Pending approvals: 0</li><li>Recommended next step: Review and approve the current dry-run instrument proposals before broker connectivity is enabled.</li></ul>
 <h2>Why This Incident Exists</h2>
-<ul><li>Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li><li>34 blocked row(s) still need explicit operator review before the workflow can advance cleanly.</li></ul>
+<ul><li>No explicit execution block is currently surfaced.</li><li>34 blocked row(s) still need explicit operator review before the workflow can advance cleanly.</li></ul>
 <h2>Incident Drivers</h2>
-<ul><li>Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.</li></ul>
+<ul><li>No active incident drivers were detected; this checklist is a verification pass confirming healthy posture.</li></ul>
 <h2>Active Blockers</h2>
 <ol><li>No active blockers.</li></ol>
 <h2>Active Broker Blocks</h2>
 <ol><li>[contract_resolution_failed] CH0032912732 — CH0032912732</li><li>[contract_resolution_failed] IE000XZSV718 — State Street SPDR S&amp;P 500 UCITS ETF USD Unhedged (Acc)</li><li>[contract_resolution_failed] LU0950668870 — LU0950668870</li><li>[contract_resolution_failed] IE00BD4TXW66 — UBS Core S&amp;P 500 UCITS ETF USD acc</li><li>[contract_resolution_failed] IE00B5BMR087 — IE00B5BMR087</li><li>[contract_resolution_failed] CH0130595124 — UBS SPI Mid ETF (SPI ohne SMI)</li></ol>
 <h2>Action Checklist</h2>
-<ol><li>[high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li></ol>
+<ol><li>[low] Review and approve the current dry-run instrument proposals before broker connectivity is enabled.</li></ol>
 <h2>Verification Checks</h2>
-<ul><li>Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.</li><li>Freshness posture remains current.</li><li>No approval backlog remains.</li><li>No active blockers remain.</li></ul>
+<ul><li>Broker health remains healthy or intentionally degraded with operator awareness.</li><li>Freshness posture remains current.</li><li>No approval backlog remains.</li><li>No active blockers remain.</li></ul>
 <h2>Completion Criteria</h2>
-<ul><li>Blocking recovery items no longer appear in the operator queue.</li><li>Portfolio health no longer depends on unresolved blocker conditions.</li><li>The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.</li></ul>
+<ul><li>Portfolio remains in a healthy or intentionally monitored posture.</li><li>No blocker-class recovery work is outstanding.</li><li>The next operating step is clear from the summary surface.</li></ul>
 <h2>Recent Signals</h2>
-<ol><li>[warn] Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li><li>[warn] Requested instrument is not in Approved Instruments.</li><li>[warn] Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li><li>[warn] Requested instrument is not in Approved Instruments.</li><li>[warn] Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li></ol>
+<ol><li>[warn] Portfolio requires confirmation before first live trade.</li><li>[warn] Requested instrument is not in Approved Instruments.</li><li>[warn] Portfolio requires confirmation before first live trade.</li><li>[warn] Requested instrument is not in Approved Instruments.</li><li>[warn] Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001</li></ol>
 </div>
 </body>
 </html>

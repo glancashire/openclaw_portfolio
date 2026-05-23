@@ -1,23 +1,29 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-05-23T08:00:17.220Z",
+  "generatedAt": "2026-05-23T13:05:58.830Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-23T08:00:14.003Z",
+    "generatedAt": "2026-05-23T13:05:53.063Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": false,
-      "reachable": false,
-      "mode": "unknown",
-      "fallbackRequired": true,
-      "marketDataMode": "unavailable",
-      "marketDataDetail": null,
-      "marketDataProbe": null,
-      "reason": "native_error",
-      "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      "authenticated": true,
+      "reachable": true,
+      "mode": "native-socket",
+      "fallbackRequired": false,
+      "marketDataMode": "live_or_realtime",
+      "marketDataDetail": "Live/realtime bid/ask/last values are available via approved instrument IE00B5BMR087.",
+      "marketDataProbe": {
+        "conid": "75776072",
+        "symbol": "SXR8",
+        "tickerOrIsin": "IE00B5BMR087",
+        "label": "approved instrument IE00B5BMR087",
+        "source": "approved_instrument"
+      },
+      "reason": "ready",
+      "portalSessionState": "unknown_or_separate",
+      "guidance": "Broker path is healthy.",
+      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
     },
     "errorState": {
       "consecutive": 0,
@@ -56,7 +62,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779523209049.42,
+        "dashboardMtimeMs": 1779541147907.7124,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1779497862698.9204
       },
@@ -101,7 +107,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-23T08:00:14.002Z",
+      "generatedAt": "2026-05-23T13:05:53.061Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -157,7 +163,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779523209049.42,
+          "dashboardMtimeMs": 1779541147907.7124,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1779497862698.9204
         },
@@ -252,37 +258,36 @@
     },
     "generatedStateIssues": [],
     "health": {
-      "health": "blocked",
-      "severity": "high",
-      "blockerCount": 1,
-      "blockers": [
-        {
-          "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-        }
-      ],
-      "recommendedActions": [
-        "Restore native IBKR connectivity before relying on executable live-state surfaces."
-      ],
-      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      "health": "healthy",
+      "severity": "low",
+      "blockerCount": 0,
+      "blockers": [],
+      "recommendedActions": [],
+      "nextAction": "No immediate operator action is required."
     }
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-23T08:00:17.220Z",
+    "generatedAt": "2026-05-23T13:05:53.063Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": false,
-      "reachable": false,
-      "mode": "unknown",
-      "fallbackRequired": true,
-      "marketDataMode": "unavailable",
-      "marketDataDetail": null,
-      "marketDataProbe": null,
-      "reason": "native_error",
-      "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      "authenticated": true,
+      "reachable": true,
+      "mode": "native-socket",
+      "fallbackRequired": false,
+      "marketDataMode": "live_or_realtime",
+      "marketDataDetail": "Live/realtime bid/ask/last values are available via approved instrument IE00B5BMR087.",
+      "marketDataProbe": {
+        "conid": "75776072",
+        "symbol": "SXR8",
+        "tickerOrIsin": "IE00B5BMR087",
+        "label": "approved instrument IE00B5BMR087",
+        "source": "approved_instrument"
+      },
+      "reason": "ready",
+      "portalSessionState": "unknown_or_separate",
+      "guidance": "Broker path is healthy.",
+      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
     },
     "errorState": {
       "consecutive": 0,
@@ -321,7 +326,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779523214048.6785,
+        "dashboardMtimeMs": 1779541147907.7124,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
         "newestSourceMtimeMs": 1779497862698.9204
       },
@@ -366,7 +371,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-23T08:00:17.219Z",
+      "generatedAt": "2026-05-23T13:05:53.061Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -422,7 +427,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779523214048.6785,
+          "dashboardMtimeMs": 1779541147907.7124,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
           "newestSourceMtimeMs": 1779497862698.9204
         },
@@ -517,57 +522,73 @@
     },
     "generatedStateIssues": [],
     "health": {
-      "health": "blocked",
-      "severity": "high",
-      "blockerCount": 1,
-      "blockers": [
-        {
-          "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-        }
-      ],
-      "recommendedActions": [
-        "Restore native IBKR connectivity before relying on executable live-state surfaces."
-      ],
-      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      "health": "healthy",
+      "severity": "low",
+      "blockerCount": 0,
+      "blockers": [],
+      "recommendedActions": [],
+      "nextAction": "No immediate operator action is required."
     }
   },
   "health": {
-    "health": "blocked",
-    "severity": "high",
-    "blockerCount": 1,
-    "blockers": [
-      {
-        "code": "broker_unready",
-        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-      }
-    ],
-    "recommendedActions": [
-      "Restore native IBKR connectivity before relying on executable live-state surfaces."
-    ],
-    "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    "health": "healthy",
+    "severity": "low",
+    "blockerCount": 0,
+    "blockers": [],
+    "recommendedActions": [],
+    "nextAction": "No immediate operator action is required."
   },
   "selfHeal": {
-    "dryRun": false,
-    "plannedActions": [
+    "dryRun": true,
+    "plannedActions": [],
+    "classified": [],
+    "openIssues": [],
+    "operatorCommands": [],
+    "actions": []
+  },
+  "trends": {
+    "recent": [
       {
-        "kind": "command",
-        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
-        "reason": "Rebuild truthful broker evidence once native connectivity is available."
-      }
-    ],
-    "actions": [
-      {
-        "kind": "regenerate_dashboard",
-        "ok": true,
-        "dashboardPath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/dashboard.md"
+        "at": "2026-05-23T09:15:47.109Z",
+        "kind": "health_check",
+        "portfolio": "demo",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
       },
       {
-        "kind": "regenerate_reporting_artifacts",
-        "ok": true,
-        "summaryPath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/summary.json",
-        "overviewIndexPath": "/home/ubuntu/.openclaw/workspace/runtime/overview/portfolio-index.json"
+        "at": "2026-05-23T09:24:55.698Z",
+        "kind": "health_check",
+        "portfolio": "demo",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
       }
-    ]
+    ],
+    "summaryLines": [
+      "2026-05-23T09:15:47.109Z: blocked/high (blockers=1)",
+      "2026-05-23T09:24:55.698Z: blocked/high (blockers=1)"
+    ],
+    "counts": {
+      "blocked": 2
+    }
   }
 }

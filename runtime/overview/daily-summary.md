@@ -5,9 +5,9 @@
 - Portfolios tracked: 2
 - Cash waiting to deploy CHF: 0
 - Pending approvals: 1
-- Broker health: degraded
+- Broker health: healthy
 - Reporting health: attention_needed
-- Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Recommended next step: Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
 
 ## Biggest Drift Today
 - acceptance-closure: Global equities drift -50% (out_of_bounds)
@@ -15,12 +15,12 @@
 
 ## Highlighted Portfolio
 - Portfolio: etf
-- Health: warning
+- Health: attention_needed
 - Cash CHF: 0
-- Broker health: degraded
+- Broker health: healthy
 - Delivery posture: ready
 - Pending approvals: 0
 - Broker-blocked rows: 6
 - Top broker block: contract_resolution_failed (CH0032912732)
-- Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Recommended next step: Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
 - Why now: Broker rejected the order because the contract identity or venue resolution was not accepted.

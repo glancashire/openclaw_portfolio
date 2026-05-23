@@ -1,101 +1,17 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T12:34:42.947Z",
+  "generatedAt": "2026-05-23T13:12:59.190Z",
   "portfolio": "etf",
   "status": {
-    "health": "warning",
-    "strategy": "blocked",
-    "brokerHealth": "degraded",
-    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-    "executionPosture": "degraded_dry_run_only",
+    "health": "attention_needed",
+    "strategy": "rebalance_needed",
+    "brokerHealth": "healthy",
+    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
+    "executionPosture": "ready_for_review",
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": {
-    "ok": false,
-    "portfolio": "etf",
-    "generatedAt": "2026-05-23T12:34:34.682Z",
-    "executionMode": "transmitted_live",
-    "armedForMarketOpen": false,
-    "armExpiresAt": "2026-05-22T12:00:00Z",
-    "brokerReadiness": {
-      "configured": true,
-      "authenticated": false,
-      "reachable": false,
-      "mode": "unknown",
-      "fallbackRequired": true,
-      "marketDataMode": "unavailable",
-      "marketDataDetail": null,
-      "marketDataProbe": null,
-      "reason": "native_error",
-      "portalSessionState": "not_applicable",
-      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-    },
-    "marketWindow": {
-      "exchange": "EBS",
-      "openNow": false,
-      "reason": "Weekend (day 6)",
-      "nextOpen": "2026-05-25T09:00:00.000Z",
-      "diagnostics": []
-    },
-    "approvalState": {
-      "basketApprovalState": {
-        "approvedCount": 0,
-        "executableCount": 0,
-        "hasApprovedBasket": false,
-        "hasExecutableApprovedBasket": false,
-        "executableBaskets": [],
-        "latestApprovedAt": null,
-        "approvedBaskets": []
-      },
-      "proposedCount": 0,
-      "approvedCount": 0,
-      "basketApprovedCount": 0,
-      "basketExecutableCount": 0,
-      "hasApprovedBasket": false,
-      "hasExecutableApprovedBasket": false,
-      "executableCount": 0,
-      "latestApprovedAt": null,
-      "approvalAgeHours": null,
-      "staleApproval": false,
-      "staleApprovedRows": [],
-      "maxApprovalAgeHours": 24,
-      "ambiguousQueuedCount": 0,
-      "hasAnyApprovedRows": false,
-      "hasExecutableApprovedRows": false,
-      "executableRows": [],
-      "excludedApprovedRows": []
-    },
-    "rows": [],
-    "excludedRows": [],
-    "blockers": [
-      {
-        "code": "not_armed_for_market_open",
-        "message": "Live execution is not armed for the next market-open window."
-      },
-      {
-        "code": "broker_unready",
-        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-      },
-      {
-        "code": "no_approved_rows",
-        "message": "No approved trade rows or approved basket exist for live execution."
-      },
-      {
-        "code": "no_executable_rows",
-        "message": "No executable approved trade rows or approved basket are currently eligible for submission."
-      }
-    ],
-    "warnings": [
-      {
-        "code": "market_closed",
-        "message": "Market is currently closed (Weekend (day 6)). Next open: 2026-05-25T09:00:00.000Z"
-      }
-    ],
-    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight.",
-    "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
-  },
+  "readiness": null,
   "holdings": {
     "totalValueChf": 22209.4831212,
     "cashChf": 0,
@@ -119,36 +35,36 @@
   "operatorQueue": {
     "summary": {
       "total": 1,
-      "blocking": 1,
+      "blocking": 0,
       "approvals": 0,
       "execution": 0,
       "freshApprovals": 0,
       "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 1,
+      "recovery": 0,
       "delivery": 0,
       "data": 0,
       "warnings": 0,
-      "workflow": 0,
+      "workflow": 1,
       "bySeverity": {
-        "high": 1,
+        "high": 0,
         "medium": 0,
-        "low": 0
+        "low": 1
       }
     },
     "items": [
       {
         "rank": 1,
-        "queueType": "recovery",
+        "queueType": "workflow",
         "portfolio": "etf",
-        "kind": "broker",
-        "severity": "high",
-        "status": "degraded",
-        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-        "blocking": true,
-        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
-        "source": "broker_readiness"
+        "kind": "workflow",
+        "severity": "low",
+        "status": "recommended",
+        "summary": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+        "blocking": false,
+        "recommendedOperatorAction": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+        "source": "recommendation_engine"
       }
     ]
   },
@@ -539,100 +455,63 @@
     }
   ],
   "pendingActions": [
-    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+    "Review and approve the current dry-run instrument proposals before broker connectivity is enabled."
   ],
-  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+  "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
   "selfHealPlan": {
     "ok": true,
     "dryRun": true,
     "portfolio": "etf",
     "health": {
-      "health": "blocked",
-      "severity": "high",
-      "blockerCount": 1,
-      "blockers": [
-        {
-          "code": "broker_unready",
-          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-        }
-      ],
-      "recommendedActions": [
-        "Restore native IBKR connectivity before relying on executable live-state surfaces."
-      ],
-      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      "health": "healthy",
+      "severity": "low",
+      "blockerCount": 0,
+      "blockers": [],
+      "recommendedActions": [],
+      "nextAction": "No immediate operator action is required."
     },
-    "classified": [
-      {
-        "category": "ibkr_socket_dead",
-        "severity": "high",
-        "symptom": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-        "recommendedAction": "Restart the native IBKR gateway during market hours or notify the operator.",
-        "healable": true,
-        "recipe": "restart_ibkr_gateway_if_socket_dead"
-      }
-    ],
-    "healed": [
-      {
-        "ok": true,
-        "kind": "restart_ibkr_gateway_if_socket_dead",
-        "applied": false,
-        "blocked": "operator_present_restart_only",
-        "summary": "Restart the native IBKR gateway during market hours or notify the operator."
-      }
-    ],
-    "openIssues": [
-      {
-        "category": "ibkr_socket_dead",
-        "severity": "high",
-        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
-        "symptom": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-      }
-    ],
-    "actions": [
-      {
-        "kind": "command",
-        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
-        "reason": "Rebuild truthful broker evidence once native connectivity is available."
-      }
-    ]
+    "classified": [],
+    "healed": [],
+    "openIssues": [],
+    "actions": []
   },
   "explanations": {
     "biggestDrift": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
-    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
+    "executionBlock": "No explicit execution block is currently surfaced.",
     "approvalBacklog": "34 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-23 12:34:20.775 UTC",
+      "time": "2026-05-23 13:11:08.221 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 12:34:20.773 UTC",
+      "time": "2026-05-23 13:11:05.196 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 12:30:34.543 UTC",
+      "time": "2026-05-23 13:08:07.123 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 12:30:34.541 UTC",
+      "time": "2026-05-23 13:08:04.092 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 09:45:12.057 UTC",
+      "time": "2026-05-23 12:59:05.633 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
@@ -644,20 +523,20 @@
     "recentSummary": {
       "total": 100,
       "byLevel": {
-        "warn": 92,
-        "info": 8
+        "info": 7,
+        "warn": 93
       },
       "byCategory": {
-        "execution_policy": 61,
-        "market_open_execution": 18,
-        "execution": 8,
-        "risk": 13
+        "execution": 7,
+        "market_open_execution": 15,
+        "risk": 13,
+        "execution_policy": 65
       },
-      "blockedTrades": 92,
+      "blockedTrades": 93,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
       "openRunnerQueueEvents": 2,
-      "openRunnerRetryEvents": 6
+      "openRunnerRetryEvents": 5
     }
   },
   "delivery": {
