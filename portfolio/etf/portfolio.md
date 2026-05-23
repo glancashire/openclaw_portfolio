@@ -46,15 +46,29 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
 |---|---|---|---:|---:|---:|---|---|---|
 | IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 40 | 30 | 50 | Xetra / SMART | EUR | Preferred operational replacement after UBSPX execution failures; physical replication; validated via native IBKR contract details and live quote path on SXR8; ibkr_symbol=SXR8; ibkr_conid=75776072; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
-| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 20 | 10 | 30 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer; ibkr_symbol=EMUAA; ibkr_conid=243939970; fx_to_chf=0.96 |
-| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 12 | 8 | 16 | SIX / EBS | CHF | Swiss large-cap sleeve; equal-weight tilt reduces single-name concentration; live broker contract identity previously surfaced as CHSPI during native placement/reconciliation, so conid truth must win over cosmetic ticker alias drift; ibkr_symbol=UBSSLI; ibkr_local_symbol=CHSPI; ibkr_conid=150029461; ibkr_primary_exchange=EBS; fx_to_chf=1 |
-| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Swiss equities | 8 | 4 | 12 | SIX / EBS | CHF | Swiss mid-cap complement; improves breadth of the Swiss sleeve; validated via IBKR contract details; ibkr_symbol=SPMCHA; ibkr_conid=91639399; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 20 | 10 | 30 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer; physical replication; ibkr_symbol=EMUAA; ibkr_conid=243939970; fx_to_chf=0.96 |
+| CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 12 | 8 | 16 | SIX / EBS | CHF | Swiss large-cap sleeve; equal-weight tilt reduces single-name concentration; live broker contract identity previously surfaced as CHSPI during native placement/reconciliation, so conid truth must win over cosmetic ticker alias drift; physical replication; ibkr_symbol=UBSSLI; ibkr_local_symbol=CHSPI; ibkr_conid=150029461; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Swiss equities | 8 | 4 | 12 | SIX / EBS | CHF | Swiss mid-cap complement; improves breadth of the Swiss sleeve; physical replication; ibkr_symbol=SPMCHA; ibkr_conid=91639399; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| LU0950670850 | UBS MSCI United Kingdom UCITS ETF GBP acc | Global equities | 0 | 0 | 0 | LSE / IBKR-supported venue | GBP | Future candidate for UK sleeve; physical replication; ETF should be verified in IBKR before allocation; ibkr_symbol=UK; ibkr_conid=missing; ibkr_primary_exchange=missing; fx_to_chf=1.15 |
+| IE00B44T3H88 | HSBC MSCI China UCITS ETF USD | Global equities | 0 | 0 | 0 | LSE / IBKR-supported venue | USD | Future candidate for China sleeve; physical replication; verify IBKR symbol/conid before any use; ibkr_symbol=missing; ibkr_conid=missing; fx_to_chf=0.88 |
+| IE00B5L8K969 | iShares MSCI EM Asia UCITS ETF (Acc) | Global equities | 0 | 0 | 0 | LSE / IBKR-supported venue | USD | Future candidate for Asia sleeve; physical replication; verify IBKR symbol/conid before any use; ibkr_symbol=missing; ibkr_conid=missing; fx_to_chf=0.88 |
+| IE00B4L5YX21 | iShares Core MSCI Japan IMI UCITS ETF | Global equities | 0 | 0 | 0 | LSE / IBKR-supported venue | USD | Future candidate for Japan sleeve; physical replication; verify IBKR symbol/conid before any use; ibkr_symbol=missing; ibkr_conid=missing; fx_to_chf=0.88 |
 | CASH-CHF | CHF cash balance | Bonds / cash-like | 20 | 10 | 30 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF scale. |
+
+## Candidate Instruments
+| Ticker / ISIN | Region | Theme | Name | TER | Replication | Currency | IBKR status | Notes |
+|---|---|---|---|---:|---|---|---|---|
+| LU0950670850 | UK | MSCI UK | UBS MSCI United Kingdom UCITS ETF GBP acc | 0.20% | physical | GBP | needs IBKR verification | Future UK sleeve candidate retained for later use. |
+| IE00B44T3H88 | China | MSCI China | HSBC MSCI China UCITS ETF USD | 0.28% | physical | USD | needs IBKR verification | Broad China exposure; use only after IBKR contract truth is confirmed. |
+| IE00B5L8K969 | Asia | MSCI EM Asia | iShares MSCI EM Asia UCITS ETF (Acc) | 0.20% | physical | USD | needs IBKR verification | Broad emerging Asia exposure; verify conid/symbol before use. |
+| IE00B4L5YX21 | Japan | MSCI Japan IMI | iShares Core MSCI Japan IMI UCITS ETF | 0.12% | sampling | USD | needs IBKR verification | Broad Japan exposure; verify conid/symbol before use. |
+| IE00B53SZB19 | NASDAQ | Nasdaq 100 | iShares Nasdaq 100 UCITS ETF (Acc) | 0.30% | physical | USD | needs IBKR verification | Best low-TER physical UCITS Nasdaq 100 candidate from the sources checked. |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
 |---|---|
 | IE000XZSV718 | Replaced by UBS Core S&P 500 UCITS ETF USD acc after IBKR execution-path issues on the prior line. |
+| US46438F1012 | BlackRock iShares Bitcoin Trust is not ETF-only / UCITS scope for this portfolio and remains outside the current MVP instrument set. |
 
 ## Rebalancing Policy
 - Check frequency: daily
