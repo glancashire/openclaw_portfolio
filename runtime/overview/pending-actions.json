@@ -1,23 +1,23 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T16:50:33.150Z",
-  "itemCount": 8,
+  "generatedAt": "2026-05-23T20:25:50.124Z",
+  "itemCount": 9,
   "queueSummary": {
-    "total": 8,
-    "blocking": 5,
+    "total": 9,
+    "blocking": 6,
     "approvals": 0,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 0,
+    "recovery": 1,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
     "workflow": 2,
     "bySeverity": {
-      "high": 6,
+      "high": 7,
       "medium": 1,
       "low": 1
     }
@@ -107,6 +107,18 @@
     },
     {
       "rank": 7,
+      "queueType": "recovery",
+      "portfolio": "acceptance-closure",
+      "kind": "broker",
+      "severity": "high",
+      "status": "degraded",
+      "summary": "Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.",
+      "blocking": true,
+      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "source": "broker_readiness"
+    },
+    {
+      "rank": 8,
       "queueType": "delivery",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
@@ -118,7 +130,7 @@
       "source": "delivery_policy"
     },
     {
-      "rank": 8,
+      "rank": 9,
       "queueType": "workflow",
       "portfolio": "etf",
       "kind": "workflow",

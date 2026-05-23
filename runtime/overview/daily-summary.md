@@ -5,7 +5,7 @@
 - Portfolios tracked: 2
 - Cash waiting to deploy CHF: 0
 - Pending approvals: 1
-- Broker health: healthy
+- Broker health: degraded
 - Reporting health: attention_needed
 - Recommended next step: Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
 

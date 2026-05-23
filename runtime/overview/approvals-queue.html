@@ -43,7 +43,7 @@ pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 
 <div class="report-container">
 <h1>Approvals Queue</h1>
 <h2>Summary</h2>
-<ul><li>Generated at: 2026-05-23T16:50:33.150Z</li><li>Approval items: 1</li></ul>
+<ul><li>Generated at: 2026-05-23T20:25:50.125Z</li><li>Approval items: 1</li></ul>
 <h2>Approval Review Queue</h2>
 <h3>Approval 1: etf</h3>
 <ul><li>Urgency: high</li><li>Summary: Circuit breaker tripped for CH0130595124: 3 consecutive cancellations (threshold 3).</li><li>Explanation: Instrument CH0130595124 has cancelled at the broker 3 times in a row across approval basket-etf-20260522T1041-reproposal-3-reproposal-1; reproposals are now suspended for this instrument.</li><li>Effect if approved: undefined</li><li>Effect if ignored: CH0130595124 stays excluded from future reproposals; any sleeve drift toward this instrument will not auto-rebalance.</li><li>Recommended action: Investigate why CH0130595124 keeps cancelling at the broker (subscription, liquidity, contract config). When fixed, run: node scripts/clear-circuit-breaker.js --portfolio=etf --instrument=CH0130595124</li></ul>
