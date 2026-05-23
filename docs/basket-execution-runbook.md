@@ -1,116 +1,245 @@
 # Basket Execution Runbook
 
-_Last updated: Phase 198 — full autonomous flow with single approval per round._
+_Last updated: Phase 212 — aligned with current approval gates, dashboard/reporting surfaces, and recovery helpers._
 
 ## TL;DR
 
-After bootstrap, every rebalance round is exactly:
+A basket round is still approval-gated and operator-driven:
 
-1. Assistant: `node scripts/propose-basket.js --portfolio=etf` (writes a fresh proposal envelope, no broker writes).
-2. Operator: type `approve` if happy with the proposal.
-3. Assistant: `node scripts/execute-approved-basket-end-to-end.js` (no args; loads latest proposal automatically, transmits, monitors, mirrors, notifies, resyncs).
-4. If any leg cancels: assistant emits a reproposal envelope automatically and tells operator.
-5. Operator: type `approve` again if happy with the reproposal.
-6. Assistant: `node scripts/approve-and-execute-reproposal.js --parent=<id>`.
+1. Assistant/operator generates a proposal basket.
+2. Operator reviews the proposal.
+3. Operator gives explicit approval.
+4. Assistant/operator executes the approved basket.
+5. Reconcile, mirror, notify, and refresh reporting.
+6. If a leg cancels or broker state degrades, use the recovery/reporting surfaces before attempting another round.
 
-Steps 4–6 may repeat. Operator never edits code or JSON.
+The system may generate suggestions, summaries, and reproposals automatically. It does **not** remove the approval boundary for live trading.
 
 ---
 
 ## Prerequisites
 
-- IB Gateway running on the pinned native path (see `TOOLS.md`); 2FA login completed; API socket on `127.0.0.1:4001`.
-- Live execution arm in place (`runtime/execution-state.json` shows an `armedForMarketOpen` window covering current time).
-- `portfolio/<portfolio>/portfolio.md` has fresh Approved Instruments table with `ibkr_symbol`, `ibkr_conid`, `ibkr_primary_exchange`, `fx_to_chf` metadata.
-- Holdings synced recently: `node scripts/sync-interactive-brokers-holdings.js portfolio/<portfolio>`.
+- IB Gateway is running via the pinned native path described in `TOOLS.md`.
+- GUI login / 2FA is complete if required.
+- Broker readiness is healthy enough for the intended path.
+- The portfolio state is current enough to trust:
+  - `portfolio/<portfolio>/portfolio.md`
+  - `portfolio/<portfolio>/holdings.md`
+  - `portfolio/<portfolio>/trades.md`
+  - `portfolio/<portfolio>/history.md`
+- Reporting surfaces are fresh enough to review.
 
-## Stage 1 — Propose
+Useful checks:
 
+```bash
+node scripts/check-interactive-brokers-readiness.js
+node scripts/run-health-check.js portfolio/etf --dry-run
+node scripts/regenerate-dashboard.js portfolio/etf
 ```
+
+---
+
+## Stage 1 — Propose a basket
+
+```bash
 node scripts/propose-basket.js --portfolio=etf
 ```
 
 What it does:
+- reads approved instruments + targets
+- reads current holdings and cash posture
+- computes a bounded proposal envelope
+- writes a proposal artifact under `runtime/basket-proposals/<portfolio>/`
 
-- Reads `portfolio/etf/portfolio.md` (Approved Instruments + targets).
-- Reads `portfolio/etf/holdings.md` (current positions + cash).
-- Fetches live quotes via `client.native.fetchMarketSnapshot([conid...])`.
-- Computes per-leg gap, sizes quantity, applies markup over ask (0.5%) or close (0.75%), rounds to instrument tick (0.05 CHF for SIX, 0.01 elsewhere).
-- Preserves Swiss sleeve split: 12% UBSSLI (CHSPI) + 8% SPMCHA.
-- Writes envelope to `runtime/basket-proposals/etf/basket-etf-<timestamp>.json`.
-- Prints a human-readable preview with per-leg limits and reference prices.
+What to review before approval:
+- instruments included
+- sizing / quantity sanity
+- price limits / bands
+- blocked legs
+- residual cash posture
+- whether any broker-readiness or subscription caveats are already known
 
-**Operator action**: read the preview. If happy, reply `approve`. If not, ask for adjustments.
+Operator note:
+- if the proposal looks wrong, regenerate or adjust the inputs; do not push through approval just to “see what happens”
 
-## Stage 2 — Execute
+---
 
+## Stage 2 — Approve explicitly
+
+The live lane remains approval-gated.
+
+Approval should happen only after reviewing:
+- proposal preview
+- dashboard/operator queue
+- health check output if broker state or delivery state looks questionable
+
+Useful review surfaces:
+
+```bash
+node scripts/generate-portfolio-summary.js --portfolio=etf
+node scripts/run-health-check.js portfolio/etf --dry-run
 ```
+
+Review these artifacts when needed:
+- `portfolio/etf/summary.html`
+- `portfolio/etf/health-report.html`
+- `runtime/overview/approvals-queue.html`
+- `runtime/overview/delivery-status.html`
+
+---
+
+## Stage 3 — Execute the approved basket
+
+Canonical end-to-end path:
+
+```bash
 node scripts/execute-approved-basket-end-to-end.js
 ```
 
-(No flags needed.)
+Typical behavior:
+- loads the latest approved/proposed execution context
+- submits/stages through the approved lane
+- monitors/reconciles broker state
+- mirrors trade outcomes back into repo state
+- refreshes reporting state
+- emits reproposal/recovery context if required
 
-What it does:
+Important rule:
+- do not treat a submitted order as complete until reconciliation and mirrored state agree
 
-- Loads the most recent proposal envelope from `runtime/basket-proposals/etf/`.
-- Promotes it to an approved basket envelope (status flipped, `approvedAt` stamped, `promotedFromProposal` recorded).
-- Invokes `executeApprovedBasket` which uses `prepareOrderForSubmission` with `enforceMarketHours: false`. Each leg becomes a transmitted live order.
-- Settling delay (5s) then polls `client.native.fetchOpenOrders()` every 30s for up to 10 minutes.
-- Any leg still open after 10 minutes is cancelled via `client.cancelOrder(...)`.
-- Calls `reconcileBasketRunFromBroker` using IBKR `executions` + `completed-orders` feeds — moves each leg into terminal state (`filled` / `cancelled`).
-- Mirrors filled/cancelled legs into `portfolio/etf/trades.md` (idempotent on broker order id).
-- Sends fill emails via `notifyTradeFill` for legs that were *newly* mirrored in this run (so re-runs do not double-email).
-- Resyncs holdings.
-- If any leg ended `cancelled`, builds a reproposal envelope at `runtime/basket-reproposals/etf/<approvalId>-reproposal-<n>.json` with a fresh limit price (0.5% over current ask, 0.75% over current close, rounded to tick). Older un-promoted reproposals for the same parent are auto-archived to `.superseded/`.
+---
 
-**Operator action**: read the assistant's summary. If a reproposal was emitted, the operator decides whether to approve it.
+## Stage 4 — Reconcile and refresh reporting
 
-## Stage 3 — Reproposal Approval (only if needed)
+After execution activity, refresh the operator surfaces if they are not already refreshed by the runner:
 
-```
-node scripts/approve-and-execute-reproposal.js --parent=<parent-approval-id>
-```
-
-What it does:
-
-- Calls `promoteReproposalToApproval` (idempotent) to convert the latest reproposal envelope into an approved basket.
-- Invokes the canonical runner.
-- Runs the same lifecycle (monitor + reconcile + mirror + notify + resync + reproposal hook).
-- A second-round cancellation triggers a third-round reproposal, etc. Each round is one approval.
-
-**Operator action**: read the assistant's summary. If filled, the round is complete. If cancelled again, decide whether to approve another reproposal.
-
-## Where the operator surface shows pending reproposals
-
-- `runtime/overview/pending-actions.json` — items with `kind: 'basket_reproposal_pending'`.
-- `runtime/overview/approvals-queue.md` — reproposal items appear at the top with severity/urgency.
-- `recommendedOperatorAction` on each item gives the exact command to run.
-
-Each reproposal surface item collapses to the latest version per parent (Phase 194), so the queue does not accumulate noise across iterations.
-
-## Failure modes
-
-| Symptom | Cause | Recovery |
-|---|---|---|
-| `Cannot load proposal: No proposal envelope found` | No proposal exists. | Run Stage 1 first. |
-| `⚠️ Latest proposal is N min old` | Proposal stale (>60 min). | Re-run Stage 1 to refresh quotes. |
-| Runner reports `submitted` but reconcile shows `cancelled` | Broker rejected at exchange (limit too low, tick mismatch, thin liquidity). | A reproposal is auto-emitted; operator may approve it or wait for better quote. |
-| Lifecycle says "fetchOpenOrders error: ECONNREFUSED" | IB Gateway disconnected. | Restart IB Gateway per `TOOLS.md`; re-run `--reconcile-only --approval-id=<id>` to finish reconciling. |
-| Runner says `Stored approval envelope is invalid: expiresAt is required` | Envelope missing required field. | All current generators emit `expiresAt`. If you see this, check the envelope JSON. |
-
-## Re-running reconciliation only
-
-If the lifecycle was interrupted (e.g., assistant died mid-monitor), you can complete the reconcile pass without re-transmitting:
-
-```
-node scripts/execute-approved-basket-end-to-end.js --reconcile-only --approval-id=<id>
+```bash
+node scripts/run-health-check.js portfolio/etf
+node scripts/generate-portfolio-summary.js --portfolio=etf
 ```
 
-This skips the monitor block, fetches fresh broker evidence, mirrors, notifies (idempotent — won't double-email), resyncs, and emits a reproposal if needed.
+What this gives you:
+- updated `health-report.*`
+- updated `summary.*`
+- refreshed overview artifacts
+- current operator queue / delivery status / retry state
 
-## Operator's contract
+---
 
-- One `approve` per round.
-- Never edit code in `scripts/` or `src/` between rounds. The proposal and reproposal envelopes are the only inputs the assistant needs.
-- If the proposal preview looks wrong (e.g., the math is off, or you want to skip a leg), say so — assistant will adjust and write a new proposal envelope, then ask for approval again.
-- The assistant will NOT transmit a basket without an explicit `approve`.
+## Reproposal / retry path
+
+If legs cancel or are requeued, use the surfaced recovery state instead of improvising.
+
+Helpful surfaces:
+- `runtime/overview/approvals-queue.html`
+- `runtime/overview/daily-summary.html`
+- `portfolio/etf/health-report.html`
+
+What to look for:
+- stale approvals needing reapproval
+- blocked retry reasons
+- broker recovery blockers
+- delivery backfill review state
+- circuit-breaker warnings for repeated cancels
+
+If the system generated a reproposal, review it as a new approval decision rather than assuming it is safe to re-send unchanged.
+
+---
+
+## If broker readiness is degraded
+
+Do **not** keep pushing live execution steps when readiness is degraded.
+
+Typical symptoms:
+- `ECONNREFUSED 127.0.0.1:4001`
+- fallback-required readiness
+- broker automation paused after repeated errors
+- missing subscription / contract-quality warnings
+
+Recommended sequence:
+
+```bash
+node scripts/check-interactive-brokers-readiness.js
+node scripts/run-health-check.js portfolio/etf --dry-run
+```
+
+If native socket connectivity is down, the known-good launcher is:
+
+```bash
+/home/ubuntu/ibgateway-native/start-ibc.sh
+```
+
+Then:
+1. restore login/2FA if needed
+2. rerun readiness
+3. rerun health check
+4. only then revisit live execution
+
+---
+
+## Circuit breakers and repeated cancels
+
+Circuit breakers exist to stop repeated bad retries from becoming silent loops.
+
+Relevant runtime path:
+- `runtime/circuit-breakers/<portfolio>/`
+
+Meaning:
+- repeated cancel patterns can mark an instrument as operator-review-only
+- active breakers should not be cleared casually
+- only clear after the underlying cause is understood and fixed
+
+Useful helper:
+```bash
+node scripts/clear-circuit-breaker.js --portfolio=etf --instrument=<ticker-or-isin>
+```
+
+Only use that after confirming the subscription/liquidity/contract issue is genuinely resolved.
+
+---
+
+## Delivery and reporting follow-up
+
+After a real execution round, also check whether any fill-notification backfill review is pending.
+
+Relevant surfaces:
+- `runtime/overview/delivery-status.html`
+- `portfolio/etf/summary.html`
+- `runtime/fill-notifications-state.json`
+
+If the queue shows `backfill_review`, resolve that delivery workflow before treating the round as fully closed.
+
+---
+
+## Useful maintenance helpers
+
+### Health check
+```bash
+node scripts/run-health-check.js portfolio/etf --dry-run
+node scripts/run-health-check.js portfolio/etf --send-email
+```
+
+### Portfolio digest
+```bash
+node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily --dry-run
+```
+
+### Runtime cleanup
+```bash
+node scripts/cleanup-runtime-artifacts.js --portfolio=etf --dry-run
+node scripts/cleanup-runtime-artifacts.js --portfolio=etf
+```
+
+Cleanup is conservative and only removes stale superseded/generated runtime artifacts.
+
+---
+
+## Operator contract
+
+- live execution still requires explicit approval
+- do not bypass broker-readiness warnings
+- do not clear active circuit breakers without understanding the cause
+- do not assume email/report delivery succeeded without checking the surfaced status
+- when dashboard/health/summary disagree, regenerate and trust the newest broker-backed state
+
+The assistant can automate a lot of prep, reporting, and reconciliation, but it should not be used to smuggle a risky trade through unclear runtime conditions.
