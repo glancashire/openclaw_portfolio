@@ -1,38 +1,27 @@
-# Phase 215 Plan — Verification Tail Cleanup and Runtime Staging Ergonomics
+# Phase 215 — verification visibility and runtime evidence staging
 
 ## Objectives
-- Resolve the awkward end-state where `npm test` appears to go quiet or stall after surfacing successful verification progress.
-- Improve repository hygiene around tracked runtime evidence under `runtime/` while preserving the current artifact policy distinction between versioned evidence and ephemeral churn.
-- Make the repo easier to leave in a stable operator-ready state and easier to refresh for later usage-evidence gathering.
+- Make repository verification visibly progress through long-running checks so `npm test` no longer appears stuck during quiet stretches.
+- Preserve the existing verification contract while surfacing per-check timing and an explicit completion summary.
+- Reduce operator friction when staging intentionally versioned `runtime/overview/*` evidence that lives under a broadly ignored `runtime/` tree.
+- Keep runtime-ephemeral churn (`runtime/events/runtime-events.jsonl`, `runtime/execution-state.json`) out of the staging helper by default.
 
-## Current State
-- Phase 214 left the repo in a healthy/stable state with committed operator-facing evidence surfaces.
-- The broker path is healthy and summary delivery succeeded.
-- Two files remain intentionally dirty as ephemeral runtime churn:
-  - `runtime/events/runtime-events.jsonl`
-  - `runtime/execution-state.json`
-- `runtime/` is broadly ignored by `.gitignore`, but some `runtime/overview/*` and `runtime/ibkr/*` files are tracked/versioned, which forces `git add -f` during curated staging.
-- `npm test` reported green progress multiple times but appeared to hang silently at the tail, making verification less crisp than it should be.
+## Risks / dependencies
+- Verification wrappers currently mix short checks with long quiet checks; changes must not hide child failures or alter exit codes.
+- The runtime artifact policy intentionally distinguishes reviewable generated evidence from ephemeral runtime churn; staging ergonomics must follow that contract rather than weaken it.
+- Some generated portfolio artifacts are also versioned evidence; any helper should stay narrow and predictable instead of staging unrelated churn.
 
-## Risks / Dependencies
-- The test tail issue may be caused by an open handle, long-running child process, or a verifier script that completes work but fails to exit.
-- Adjusting staging ergonomics must not accidentally start committing ephemeral runtime churn.
-- Changes to verification wrappers can affect CI/operator expectations if they alter output format or exit semantics too aggressively.
+## Actionable checklist
+- [ ] Refactor verification check lists into shared modules with regression coverage so wrapper behavior can be tested without duplicating check arrays.
+- [ ] Update `scripts/verify-repo.js` and `scripts/verify-execution-surface.js` to print start/finish markers, durations, and an explicit final summary while preserving failure behavior.
+- [ ] Add tests for verification wrapper progress reporting and list coverage.
+- [ ] Add a small staging helper for versioned runtime evidence plus regression tests that prove it selects only intended files.
+- [ ] Remove temporary debugging helpers before finalizing the phase.
+- [ ] Run focused verification tests, then full `npm test`, then commit and push.
 
-## Actionable Checklist
-- Inspect `package.json`, `scripts/verify-repo.js`, and any long-running verification helpers for open-handle / exit-tail behavior.
-- Reproduce the quiet-tail behavior in a narrower command if possible.
-- Add/adjust tests around verification completion behavior if practical.
-- Improve runtime staging ergonomics without weakening artifact policy:
-  - either document/automate forced staging of tracked runtime evidence
-  - or refine ignore/layout behavior in a narrowly scoped way
-- Add regression coverage for any new helper or policy behavior.
-- Run focused tests for verification and artifact-policy paths.
-- Run full `npm test` and confirm clean completion semantics.
-- Commit and push the phase.
-
-## Acceptance Criteria
-- `npm test` completes cleanly with an unambiguous exit in normal successful runs.
-- Versioned runtime evidence is easier to stage intentionally without broad accidental inclusion of ephemeral runtime churn.
-- Artifact policy distinctions remain intact and tested.
-- Full verification passes and the resulting repo state is easier to maintain while gathering usage evidence.
+## Acceptance criteria
+- Running repository verification shows clear progress before and after each top-level check, including long-running ones.
+- Verification exits cleanly with an explicit success summary and preserves non-zero exit behavior on failures.
+- A dedicated helper stages versioned runtime evidence without including known ephemeral runtime files.
+- New/updated tests cover wrapper behavior and runtime evidence staging selection.
+- Full repository verification passes after the implementation.
