@@ -7,6 +7,12 @@ function parseUbspxGateTimestamp() {
   return Number.isFinite(gateMs) ? gateMs : null;
 }
 
+const UBSPX_GATE_LABEL = '20260521 09:00:00 MET';
+
+function shouldForceUbspxGate(options = {}) {
+  return options.forcePreOpenGate === true || options.applyLegacyUbspxGate === true;
+}
+
 function applyExecutionTimingPolicy(order = {}, instrument = null, options = {}) {
   const next = { ...order };
   const symbol = normalizedUpper(order?.symbol || instrument?.ibkrSymbol || '');
@@ -18,10 +24,12 @@ function applyExecutionTimingPolicy(order = {}, instrument = null, options = {})
   if (symbol === 'UBSPX' && primaryExchange === 'IBIS') {
     if (next.outsideRth == null) next.outsideRth = false;
     const gateMs = parseUbspxGateTimestamp();
-    if (!next.goodAfterTime && gateMs != null && nowMs < gateMs) next.goodAfterTime = '20260521 09:00:00 MET';
+    if (!next.goodAfterTime && (shouldForceUbspxGate(options) || (gateMs != null && nowMs < gateMs))) {
+      next.goodAfterTime = UBSPX_GATE_LABEL;
+    }
   }
 
   return next;
 }
 
-module.exports = { applyExecutionTimingPolicy };
+module.exports = { applyExecutionTimingPolicy, UBSPX_GATE_LABEL };

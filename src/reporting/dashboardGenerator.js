@@ -348,15 +348,31 @@ function bestNextStep({ pendingActions = [], blockers = [], recommendedActionsLi
       'open_runner_queue::ready_for_review': 8,
       'delivery::backfill_review': 9,
       'backfill_review::backfill_review': 9,
+      'delivery::backfill_review::backfill_review': 9,
+      'backfill_review::delivery::backfill_review': 9,
       'delivery::pending': 10,
       'data::stale': 11,
       'workflow::recommended': 11,
     };
     const prioritized = [...pendingActions].sort((a, b) => {
-      const aKey = `${a.queueType || a.kind || 'unknown'}::${a.status}`;
-      const bKey = `${b.queueType || b.kind || 'unknown'}::${b.status}`;
-      const aRank = recommendationPriority[aKey] ?? 99;
-      const bRank = recommendationPriority[bKey] ?? 99;
+      const aQueue = a.queueType || 'unknown';
+      const aKind = a.kind || 'unknown';
+      const bQueue = b.queueType || 'unknown';
+      const bKind = b.kind || 'unknown';
+      const aKeys = [
+        `${aQueue}::${a.status}`,
+        `${aKind}::${a.status}`,
+        `${aKind}::${aQueue}::${a.status}`,
+        `${aQueue}::${aKind}::${a.status}`,
+      ];
+      const bKeys = [
+        `${bQueue}::${b.status}`,
+        `${bKind}::${b.status}`,
+        `${bKind}::${bQueue}::${b.status}`,
+        `${bQueue}::${bKind}::${b.status}`,
+      ];
+      const aRank = Math.min(...aKeys.map((key) => recommendationPriority[key] ?? 99));
+      const bRank = Math.min(...bKeys.map((key) => recommendationPriority[key] ?? 99));
       return aRank - bRank || String(a.summary || '').localeCompare(String(b.summary || ''));
     });
     return prioritized[0];

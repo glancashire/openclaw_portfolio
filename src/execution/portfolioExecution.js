@@ -320,7 +320,9 @@ async function stagePortfolioOrder({ portfolioDir, order, dryRun = true, revocab
     };
   }
 
-  const preparedOrder = prepareOrderForSubmission(order, policy.instrument);
+  const preparedOrder = prepareOrderForSubmission(order, policy.instrument, {
+    forcePreOpenGate: dryRun === true && transmitLive === false,
+  });
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
   const brokerResult = await client.placeOrder(preparedOrder, { dryRun, revocableOnly, transmitLive });
   if (!brokerResult.ok) {

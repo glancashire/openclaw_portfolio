@@ -167,7 +167,7 @@ async function main() {
   if (!DRY_RUN && !FORCE) {
     const marketWindow = resolveVenueAwareMarketWindow({ diagnostics: executable.map((row) => ({ preparedOrder: { primaryExchange: row.primaryExchange, symbol: row.symbol }, approvedInstrument: { ibkrPrimaryExchange: row.primaryExchange }, tickerOrIsin: row.row?.tickerOrIsin })) });
     if (!marketWindow.openNow) {
-      console.log(`! Market is not open for ${marketWindow.exchange}: ${marketWindow.reason}`);
+      console.log(`! Market is closed for ${marketWindow.exchange}: ${marketWindow.reason}`);
       console.log(`  Next open: ${marketWindow.nextOpen}`);
       if (marketWindow.instrumentLabel) console.log(`  Instrument context: ${marketWindow.instrumentLabel}`);
       console.log('  Closed-venue rows will be parked; open-venue rows may still continue.');

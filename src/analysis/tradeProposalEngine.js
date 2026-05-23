@@ -121,7 +121,7 @@ function materiallyImprovesDrift(row, estimatedChf, totalValueChf, turnoverThres
 
 function buildProposal({ row, estimatedChf, totalValueChf, minimumTradeSizeChf, preferCashBeforeSelling, forcedByBounds = false, turnoverBlocked = false, cashDragBlocked = false, remainingCashPct = 0 }) {
   const currentValueChf = Number((((row.current || 0) / 100) * totalValueChf).toFixed(2));
-  const deployedChf = Math.min(Math.max(Number(estimatedChf || 0), 0), Math.max(Number(totalValueChf || 0) - currentValueChf, 0));
+  const deployedChf = Math.max(Number(estimatedChf || 0), 0);
   const allocationAfter = totalValueChf > 0
     ? Number((((currentValueChf + deployedChf) / totalValueChf) * 100).toFixed(2))
     : Number(row.current || 0);
@@ -195,11 +195,7 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
   }
 
   const totalTargetGap = eligible.reduce((sum, row) => sum + Math.abs(Number(row.target || 0) - Number(row.current || 0)), 0);
-  const targetGapDeploymentChf = Number(eligible.reduce((sum, row) => {
-    const targetGapPct = Math.max(Number(row.target || 0) - Number(row.current || 0), 0);
-    return sum + ((targetGapPct / 100) * totalValueChf);
-  }, 0).toFixed(2));
-  const deployableCashChf = Math.min(cashChf, targetGapDeploymentChf > 0 ? targetGapDeploymentChf : cashChf);
+  const deployableCashChf = cashChf;
   const plannedAllocations = eligible
     .map((row) => {
       const share = totalTargetGap > 0 ? Math.abs(Number(row.target || 0) - Number(row.current || 0)) / totalTargetGap : 0;
@@ -209,7 +205,8 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
     .filter(({ estimatedChf }) => estimatedChf > 0);
 
   const totalPlannedDeploymentChf = Number(plannedAllocations.reduce((sum, item) => sum + Number(item.estimatedChf || 0), 0).toFixed(2));
-  const basketRemainingCashPct = totalValueChf > 0 ? Number((((cashChf - totalPlannedDeploymentChf) / totalValueChf) * 100).toFixed(2)) : 0;
+  const residualCashChf = Math.max(0, Number((cashChf - totalPlannedDeploymentChf).toFixed(2)));
+  const basketRemainingCashPct = totalValueChf > 0 ? Number(((residualCashChf / totalValueChf) * 100).toFixed(2)) : 0;
   const basketCashDragBlocked = policy.maxCashDragAfterDeploymentPct > 0 && basketRemainingCashPct > policy.maxCashDragAfterDeploymentPct + 0.01 && totalPlannedDeploymentChf < cashChf;
 
   const proposals = plannedAllocations

@@ -91,14 +91,15 @@ function formatGenerationStatus(generationMeta = {}) {
 }
 
 function formatDeliveryStatus(deliveryStatus = {}) {
+  const status = deliveryStatus || {};
   return [
-    `- Delivery mode: ${deliveryStatus.deliveryMode || 'unknown'}`,
-    `- Intended channels: ${(deliveryStatus.intendedChannels || []).join(', ') || 'unknown'}`,
-    `- External delivery enabled: ${deliveryStatus.externalDeliveryEnabled ? 'yes' : 'no'}`,
-    `- Failure alert mode: ${deliveryStatus.failureAlertMode || 'unknown'}`,
-    `- Failure alert targets: ${(deliveryStatus.failureAlertTargets || []).join(', ') || 'unknown'}`,
-    `- Policy override loaded: ${deliveryStatus.overrideLoaded ? 'yes' : 'no'}`,
-    `- Delivery readiness: ${deliveryStatus.ready ? 'ready' : 'needs_operator_attention'}`,
+    `- Delivery mode: ${status.deliveryMode || 'unknown'}`,
+    `- Intended channels: ${(status.intendedChannels || []).join(', ') || 'unknown'}`,
+    `- External delivery enabled: ${status.externalDeliveryEnabled ? 'yes' : 'no'}`,
+    `- Failure alert mode: ${status.failureAlertMode || 'unknown'}`,
+    `- Failure alert targets: ${(status.failureAlertTargets || []).join(', ') || 'unknown'}`,
+    `- Policy override loaded: ${status.overrideLoaded ? 'yes' : 'no'}`,
+    `- Delivery readiness: ${status.ready ? 'ready' : 'needs_operator_attention'}`,
   ].join('\n');
 }
 
