@@ -63,12 +63,13 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | IE00B5L8K969 | Asia | MSCI EM Asia | iShares MSCI EM Asia UCITS ETF (Acc) | 0.20% | physical | USD | needs IBKR verification | Broad emerging Asia exposure; verify conid/symbol before use. |
 | IE00B4L5YX21 | Japan | MSCI Japan IMI | iShares Core MSCI Japan IMI UCITS ETF | 0.12% | sampling | USD | needs IBKR verification | Broad Japan exposure; verify conid/symbol before use. |
 | IE00B53SZB19 | NASDAQ | Nasdaq 100 | iShares Nasdaq 100 UCITS ETF (Acc) | 0.30% | physical | USD | needs IBKR verification | Best low-TER physical UCITS Nasdaq 100 candidate from the sources checked. |
+| XS2940466316 | Crypto | Bitcoin ETP | iShares Bitcoin ETP | 0.15% temporary / 0.25% standard | physically backed ETP | USD | needs IBKR verification | Suitable Europe/Switzerland-friendly Bitcoin alternative to US IBIT for future consideration; not UCITS and not in the ETF-only MVP lane. |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
 |---|---|
 | IE000XZSV718 | Replaced by UBS Core S&P 500 UCITS ETF USD acc after IBKR execution-path issues on the prior line. |
-| US46438F1012 | BlackRock iShares Bitcoin Trust is not ETF-only / UCITS scope for this portfolio and remains outside the current MVP instrument set. |
+| US46438F1012 | BlackRock iShares Bitcoin Trust is US-specific trust structure; keep excluded from the ETF-only MVP portfolio and prefer the European iShares Bitcoin ETP candidate if crypto exposure is ever approved. |
 
 ## Rebalancing Policy
 - Check frequency: daily
