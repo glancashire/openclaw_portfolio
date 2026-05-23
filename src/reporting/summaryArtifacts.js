@@ -13,6 +13,8 @@ const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { markdownToBasicHtml } = require('./pdfExport');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep } = require('./dashboardGenerator');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
+const { buildSparklineSvg } = require('./sparkline');
+const { readNetLiqHistory, lastNDays } = require('./historyDigest');
 const { summarizeContractIntelligence } = require('./contractIntelligenceStatus');
 const { readTradesTable, summarizeOpenRunnerRetryState, staleApprovalInventory } = require('../execution/tradeState');
 const { classifyTradeRowExecution } = require('../execution/executionClassification');
@@ -1424,7 +1426,7 @@ function renderDeliveryStatusMarkdown(overview = {}) {
   return `# Delivery & Alerting Status\n\n- Generated at: ${overview.generatedAt || 'unknown'}\n- Portfolios: ${overview.portfolioCount || 0}\n- All ready: ${overview.allReady ? 'yes' : 'no'}\n\n## Per-Portfolio Delivery Posture\n\n${portfolioSections}\n`;
 }
 
-function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHistory = {}, summaries = [], deliveryOverview = {} }) {
+function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHistory = {}, summaries = [], deliveryOverview = {}, cronHealth = null, netLiqSparklineSvg = '' }) {
   const health = dailySummary.healthHeadline || 'unknown';
   const badgeClass = health === 'healthy' ? 'badge-healthy' : health === 'blocked' ? 'badge-blocked' : 'badge-warning';
   const drift = dailySummary.biggestDrift;
@@ -1446,6 +1448,23 @@ function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHisto
 ${deliveryBrokerBlockItems}
 </ul>`
     : '';
+
+  // Phase 206: cron health card section
+  let cronHealthSection = '';
+  if (cronHealth && Array.isArray(cronHealth.jobs) && cronHealth.jobs.length > 0) {
+    const severityToBadge = { critical: 'badge-blocked', alert: 'badge-blocked', warning: 'badge-warning', stale: 'badge-warning', ok: 'badge-healthy' };
+    const cronRows = cronHealth.jobs.map((j) => {
+      const badge = severityToBadge[j.severity] || 'badge-info';
+      const ageHrs = j.lastRunAgeHours != null ? `${j.lastRunAgeHours.toFixed(1)}h ago` : 'never';
+      const errLine = j.lastError ? ` <span style="color:#dc2626;font-size:0.8em">(${String(j.lastError).slice(0, 80).replace(/[<>]/g, '')})</span>` : '';
+      return `<li><span class="badge ${badge}">${j.severity}</span> <strong>${j.name}</strong> &mdash; ${j.consecutiveErrors} consecutive errors, last run ${ageHrs}${errLine}</li>`;
+    }).join('\n');
+    cronHealthSection = `\n<h2>Cron Health (${cronHealth.healthy}/${cronHealth.total} healthy)</h2>\n<ul>\n${cronRows}\n</ul>`;
+  }
+
+  // Phase 206: net-liq sparkline section
+  const sparklineSection = netLiqSparklineSvg ? `\n<h2>Portfolio Trend (last days)</h2>\n<div style="padding:8px 0;">${netLiqSparklineSvg}</div>` : '';
+
   return `<!doctype html>
 <html>
 <head>
@@ -1510,7 +1529,7 @@ nav a:hover { background: #dbeafe; }
 <h2>Portfolios</h2>
 <ul>
 ${portfolioCards}
-</ul>${deliveryBrokerBlockSection}
+</ul>${deliveryBrokerBlockSection}${cronHealthSection}${sparklineSection}
 
 <p class="meta">Generated: ${new Date().toISOString()}</p>
 </div>
@@ -1518,7 +1537,7 @@ ${portfolioCards}
 </html>`;
 }
 
-async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles = true, readiness = null } = {}) {
+async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles = true, readiness = null, cronHealth = null } = {}) {
   const portfolioDirs = listPortfolioDirectories(repoRoot);
   const summaries = [];
   for (const portfolioDir of portfolioDirs) {
@@ -1571,8 +1590,22 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
     fs.writeFileSync(deliveryStatusHtmlPath, markdownToBasicHtml(deliveryStatusMarkdown));
   }
   const cockpitHtmlPath = path.join(overviewDir, 'index.html');
+  // Phase 206: compute net-liq sparkline from first portfolio with history data.
+  let netLiqSparklineSvg = '';
+  for (const s of summaries) {
+    try {
+      const dir = path.join(repoRoot, 'portfolio', s.portfolio);
+      const series = lastNDays(readNetLiqHistory(dir), 30);
+      if (series.length >= 2) {
+        netLiqSparklineSvg = buildSparklineSvg(series.map((r) => r.totalChf), { width: 400, height: 60 });
+        break;
+      }
+    } catch (_) {
+      // try next
+    }
+  }
   if (writeFiles) {
-    const cockpitHtml = renderCockpitPage({ dailySummary, approvalsQueue, reportHistory, summaries, deliveryOverview });
+    const cockpitHtml = renderCockpitPage({ dailySummary, approvalsQueue, reportHistory, summaries, deliveryOverview, cronHealth, netLiqSparklineSvg });
     fs.writeFileSync(cockpitHtmlPath, cockpitHtml);
   }
   return {

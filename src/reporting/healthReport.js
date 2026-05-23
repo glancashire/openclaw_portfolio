@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { regenerateDashboard } = require('./dashboardGenerator');
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('./summaryArtifacts');
+const { fetchCronHealth } = require('./cronJobsFetcher');
 const { buildSelfHealPlan, classifyPortfolioHealth } = require('../execution/portfolioHealth');
 const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { evaluateDeliveryPosture } = require('./deliveryDiagnostic');
@@ -73,7 +74,7 @@ async function attemptSafeSelfHeal({ portfolioDir }) {
   try {
     const summary = await generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles: true });
     const repoRoot = path.dirname(path.dirname(portfolioDir)) || process.cwd();
-    const overview = await generateOverviewArtifacts({ repoRoot, writeFiles: true });
+    const overview = await generateOverviewArtifacts({ repoRoot, writeFiles: true, cronHealth: fetchCronHealth() });
     actions.push({ kind: 'regenerate_reporting_artifacts', ok: true, summaryPath: summary.outPath, overviewIndexPath: overview.portfolioIndexPath });
   } catch (error) {
     actions.push({ kind: 'regenerate_reporting_artifacts', ok: false, error: error.message });

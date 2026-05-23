@@ -1,5 +1,6 @@
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 const { deliverPortfolioSummaryEmail } = require('../src/reporting/deliveryExecutor');
+const { fetchCronHealth } = require('../src/reporting/cronJobsFetcher');
 
 async function main() {
   const target = process.argv[2];
@@ -9,7 +10,8 @@ async function main() {
   }
 
   const result = await generatePortfolioSummaryArtifacts({ portfolioDir: target, writeFiles: true });
-  const overview = await generateOverviewArtifacts({ writeFiles: true });
+  const cronHealth = fetchCronHealth();
+  const overview = await generateOverviewArtifacts({ writeFiles: true, cronHealth });
   const emailDelivery = await deliverPortfolioSummaryEmail({
     portfolioDir: target,
     period: 'summary',

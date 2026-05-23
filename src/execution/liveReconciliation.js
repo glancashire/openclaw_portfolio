@@ -7,6 +7,7 @@ const { resyncPortfolioOrders } = require('./portfolioExecution');
 const { readTradesTable, listOpenBrokerOrderRows } = require('./tradeState');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('../reporting/summaryArtifacts');
+const { fetchCronHealth } = require('../reporting/cronJobsFetcher');
 const {
   loadFillNotificationState,
   saveFillNotificationState,
@@ -119,7 +120,7 @@ async function refreshBasketExecutionArtifacts({ portfolioDir, repoRoot = proces
   if (refreshDerivedArtifacts) {
     dashboardPath = await regenerateDashboard(portfolioDir);
     summaryArtifacts = await generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles: true });
-    overviewArtifacts = await generateOverviewArtifacts({ writeFiles: true });
+    overviewArtifacts = await generateOverviewArtifacts({ writeFiles: true, cronHealth: fetchCronHealth() });
   }
 
   const openRowsAfter = listOpenBrokerOrderRows(path.join(portfolioDir, 'trades.md'));
