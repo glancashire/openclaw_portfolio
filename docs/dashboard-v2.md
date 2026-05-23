@@ -218,3 +218,8 @@ If a surface looks contradictory, trust the most recent broker-readiness and que
 ## Stable-state notes
 
 The dashboard and overview generators now use conditional writes for unchanged content. That keeps the repo calmer after verification while still updating truthfully when the underlying state changes.
+
+
+## Runtime evidence split
+
+The dashboard refresh flow may update ephemeral runtime state as it observes the system, but the versioned evidence is the overview and portfolio artifact set.

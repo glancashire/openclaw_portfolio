@@ -40,3 +40,10 @@
 
 ## Rule
 Keep runtime evidence local, structured, and short. Use Markdown for the operator view, JSONL for detail.
+
+
+## Runtime evidence split
+
+- `runtime/events/runtime-events.jsonl` and `runtime/execution-state.json` are ephemeral runtime state.
+- `runtime/overview/*` and the portfolio summary/recovery artifacts are versioned operator evidence.
+- The stage helper intentionally stages only the versioned evidence paths.

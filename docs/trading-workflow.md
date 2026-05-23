@@ -54,3 +54,8 @@ Then use the active workflow entry points:
 - `scripts/execute-trades.js` is obsolete and intentionally no longer the active path.
 - Prefer portfolio-backed trade execution over any static trade list.
 - `Queued for open runner` is the total handoff pool; reporting now breaks that out into `Open-runner first handoffs` and `Open-runner retries` where space allows.
+
+
+## Runtime evidence split
+
+Workflow evidence that should be reviewed and committed lives in the portfolio summary/overview artifacts. Event log churn stays in runtime state files and should not be mixed into unrelated commits.

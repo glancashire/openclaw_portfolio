@@ -257,3 +257,8 @@ node scripts/verify-repo.js
 ```
 
 If verification re-dirties only `runtime/events/runtime-events.jsonl` or `runtime/execution-state.json`, treat that as expected ephemeral churn unless the content indicates a real regression.
+
+
+## Runtime evidence split
+
+`runtime/events/runtime-events.jsonl` and `runtime/execution-state.json` are expected to churn during verification and operator runs. The stable evidence set is the portfolio and overview artifacts under `portfolio/` and `runtime/overview/`.

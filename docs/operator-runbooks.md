@@ -57,3 +57,8 @@ This is the active incident and operator reference.
 
 ## Obsolete material
 Old duplicate operator notes were folded into this file. If a runbook is no longer used, remove it instead of keeping multiple versions.
+
+
+## Runtime state vs evidence
+
+When verification re-dirties only the runtime event/state files, that is expected ephemeral churn. Treat it as operational evidence, not a source regression.

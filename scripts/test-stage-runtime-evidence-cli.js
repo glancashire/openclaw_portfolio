@@ -1,8 +1,13 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const { execFileSync } = require('child_process');
 const { listRuntimeEvidencePaths } = require('../src/reporting/runtimeEvidence');
 
 (function main() {
+  const touched = path.join(process.cwd(), 'runtime/overview/index.html');
+  const original = fs.readFileSync(touched, 'utf8');
+  fs.writeFileSync(touched, original + '\n<!-- test-stage-runtime-evidence-cli -->\n');
   const output = execFileSync('node', ['scripts/stage-runtime-evidence.js'], {
     cwd: process.cwd(),
     encoding: 'utf8',
@@ -29,6 +34,7 @@ const { listRuntimeEvidencePaths } = require('../src/reporting/runtimeEvidence')
     cwd: process.cwd(),
     stdio: 'ignore',
   });
+  fs.writeFileSync(touched, original);
 
   console.log(JSON.stringify({ ok: true, stagedCount: staged.length }, null, 2));
 })();
