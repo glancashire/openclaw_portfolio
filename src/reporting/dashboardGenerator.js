@@ -12,6 +12,7 @@ const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { summarizeOperatorQueue } = require('./operatorQueue');
 const { summarizeContractIntelligence } = require('./contractIntelligenceStatus');
+const { writeTextIfChanged } = require('./artifactWriter');
 const { loadFillNotificationState } = require('./fillNotificationState');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 
@@ -552,7 +553,7 @@ async function regenerateDashboard(portfolioDir) {
     fillNotificationState,
     recentEvents,
   });
-  fs.writeFileSync(dashboardPath, dashboard);
+  writeTextIfChanged(dashboardPath, dashboard);
   freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   deliveryStatus = reportDeliveryStatus({ portfolioDir });
   dashboard = generateDashboard({
@@ -577,7 +578,7 @@ async function regenerateDashboard(portfolioDir) {
     fillNotificationState,
     recentEvents,
   });
-  fs.writeFileSync(dashboardPath, dashboard);
+  writeTextIfChanged(dashboardPath, dashboard);
   return dashboardPath;
 }
 

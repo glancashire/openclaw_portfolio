@@ -11,6 +11,7 @@ const { fileFreshnessSummary } = require('./freshness');
 const { readRuntimeEvents, summarizeRuntimeEvents } = require('../observability/runtimeEvents');
 const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { markdownToBasicHtml } = require('./pdfExport');
+const { writeJsonIfChanged, writeTextIfChanged } = require('./artifactWriter');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep } = require('./dashboardGenerator');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 const { buildSparklineSvg } = require('./sparkline');
@@ -1014,11 +1015,11 @@ async function generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles = tr
   const recoveryHtmlPath = path.join(portfolioDir, 'recovery-checklist.html');
   const recoveryMarkdown = renderRecoveryChecklistMarkdown(checklist);
   if (writeFiles) {
-    fs.writeFileSync(outPath, JSON.stringify(summary, null, 2) + '\n');
-    fs.writeFileSync(htmlPath, renderPortfolioSummaryHtml(summary));
-    fs.writeFileSync(recoveryPath, JSON.stringify(checklist, null, 2) + '\n');
-    fs.writeFileSync(recoveryMarkdownPath, recoveryMarkdown);
-    fs.writeFileSync(recoveryHtmlPath, markdownToBasicHtml(recoveryMarkdown));
+    writeJsonIfChanged(outPath, summary);
+    writeTextIfChanged(htmlPath, renderPortfolioSummaryHtml(summary));
+    writeJsonIfChanged(recoveryPath, checklist);
+    writeTextIfChanged(recoveryMarkdownPath, recoveryMarkdown);
+    writeTextIfChanged(recoveryHtmlPath, markdownToBasicHtml(recoveryMarkdown));
   }
   return { summary, checklist, outPath, htmlPath, markdown, recoveryPath, recoveryMarkdownPath, recoveryHtmlPath, recoveryMarkdown };
 }

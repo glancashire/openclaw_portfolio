@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T16:23:21.097Z",
+  "generatedAt": "2026-05-23T16:50:33.144Z",
   "portfolio": "etf",
   "status": {
     "health": "attention_needed",
@@ -483,6 +483,20 @@
   },
   "recentMaterialEvents": [
     {
+      "time": "2026-05-23 16:24:52.111 UTC",
+      "eventType": "live_execution_blocked",
+      "severity": "warn",
+      "summary": "Portfolio requires confirmation before first live trade.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-23 16:24:48.838 UTC",
+      "eventType": "draft_execution_blocked",
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
       "time": "2026-05-23 16:17:31.255 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
@@ -502,20 +516,6 @@
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-23 16:16:11.058 UTC",
-      "eventType": "draft_execution_blocked",
-      "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-23 16:09:12.100 UTC",
-      "eventType": "live_execution_blocked",
-      "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
-      "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
   "observability": {
@@ -527,9 +527,9 @@
         "info": 2
       },
       "byCategory": {
-        "risk": 13,
+        "risk": 11,
         "market_open_execution": 8,
-        "execution_policy": 77,
+        "execution_policy": 79,
         "execution": 2
       },
       "blockedTrades": 98,

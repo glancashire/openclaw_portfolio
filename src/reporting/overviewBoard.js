@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { markdownToBasicHtml } = require('./pdfExport');
+const { ensureDirFor, writeTextIfChanged } = require('./artifactWriter');
 const { generateOverviewArtifacts } = require('./summaryArtifacts');
 const { fetchCronHealth } = require('./cronJobsFetcher');
 const { evaluateLiveReadinessPreflight } = require('../execution/liveReadinessPreflight');
@@ -96,9 +97,9 @@ async function generateOverviewBoard({ repoRoot = process.cwd(), writeFiles = tr
   const markdownPath = path.join(overviewDir, 'portfolio-overview.md');
   const htmlPath = path.join(overviewDir, 'portfolio-overview.html');
   if (writeFiles) {
-    fs.mkdirSync(overviewDir, { recursive: true });
-    fs.writeFileSync(markdownPath, markdown);
-    fs.writeFileSync(htmlPath, markdownToBasicHtml(markdown));
+    ensureDirFor(markdownPath);
+    writeTextIfChanged(markdownPath, markdown);
+    writeTextIfChanged(htmlPath, markdownToBasicHtml(markdown));
   }
   return {
     markdown,

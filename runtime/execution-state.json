@@ -4,13 +4,13 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-23T12:34:20.878Z"
+      "lastAt": "2026-05-23T16:24:52.318Z"
     },
     "portfolio": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-23T12:34:22.561Z"
+      "lastAt": "2026-05-23T16:25:38.597Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -28,7 +28,7 @@
       "consecutive": 1,
       "lastReason": "status_error",
       "lastMessage": "temporary issue",
-      "lastAt": "2026-05-23T12:34:47.000Z"
+      "lastAt": "2026-05-23T16:27:59.351Z"
     },
     "etf": {
       "consecutive": 0,
