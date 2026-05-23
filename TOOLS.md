@@ -8,6 +8,7 @@ Things that matter in this setup:
 - **Gateway restart is required** after changing `agents.defaults.sandbox.mode` — SIGUSR1 soft reload does not pick it up. `kill -KILL <pid>` is safe: supervisord respawns within 5-10s.
 - Use `sessionTarget: 'current'` for cron jobs that should run in the main agent session.
 - `delivery.mode: 'announce'` currently fails-closed on this host because Telegram is the only channel and no chatId is configured. Cron *job state* is unaffected (consecutiveErrors resets correctly when the agent turn succeeds), but cron *output* doesn't reach the operator. Phase 207 will replace with Mailgun-webhook delivery.
+- **Set `--best-effort-deliver` on every cron job** to prevent delivery-layer failures from incrementing consecutiveErrors. Applied 2026-05-23 via `openclaw cron edit <id> --best-effort-deliver` to 6 active jobs (verify-six-l1-subscription-monday skipped — has a payload-update validation quirk).
 - After 3 consecutive cron errors, prefer `cron disable` over leaving them red — Phase 208 will auto-disable.
 - See `master-plan-204-212-refined.md` and `phase-204c-gateway-sandbox-disable-report.md` for the validated fix path. The original `phase-204-cron-hotfix-plan.md` reflects only the (necessary but insufficient) per-job hot-fix step.
 
