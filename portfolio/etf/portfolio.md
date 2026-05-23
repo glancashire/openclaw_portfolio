@@ -62,8 +62,8 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | IE00B44T3H88 | China | MSCI China | HSBC MSCI China UCITS ETF USD | 0.28% | physical | USD | needs IBKR verification | Broad China exposure; use only after IBKR contract truth is confirmed. |
 | IE00B5L8K969 | Asia | MSCI EM Asia | iShares MSCI EM Asia UCITS ETF (Acc) | 0.20% | physical | USD | needs IBKR verification | Broad emerging Asia exposure; verify conid/symbol before use. |
 | IE00B4L5YX21 | Japan | MSCI Japan IMI | iShares Core MSCI Japan IMI UCITS ETF | 0.12% | sampling | USD | needs IBKR verification | Broad Japan exposure; verify conid/symbol before use. |
-| IE00B53SZB19 | NASDAQ | Nasdaq 100 | iShares Nasdaq 100 UCITS ETF (Acc) | 0.30% | physical | USD | needs IBKR verification | Best low-TER physical UCITS Nasdaq 100 candidate from the sources checked. |
-| XS2940466316 | Crypto | Bitcoin ETP | iShares Bitcoin ETP | 0.15% temporary / 0.25% standard | physically backed ETP | USD | needs IBKR verification | Suitable Europe/Switzerland-friendly Bitcoin alternative to US IBIT for future consideration; not UCITS and not in the ETF-only MVP lane. |
+| IE00B53SZB19 | NASDAQ | Nasdaq 100 | iShares Nasdaq 100 UCITS ETF (Acc) | 0.30% | physical | USD | research-only | Best low-TER physical UCITS Nasdaq 100 candidate from the sources checked. |
+| XS2940466316 | Crypto | Bitcoin ETP | iShares Bitcoin ETP | 0.15% temporary / 0.25% standard | physically backed ETP | USD | research-only | Suitable Europe/Switzerland-friendly Bitcoin alternative to US IBIT for future consideration; not UCITS and not in the ETF-only MVP lane. |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
