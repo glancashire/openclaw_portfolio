@@ -171,6 +171,13 @@ class InteractiveBrokersClient {
     return this.request(`/portfolio/${encodeURIComponent(accountId)}/positions/0`);
   }
 
+  async fetchContractDetailsByConid(conid) {
+    if (!conid) throw new Error('fetchContractDetailsByConid requires a conid');
+    if (this.native) return this.native.fetchContractDetailsByConid(conid);
+    if (this.skill) return this.skill.fetchContractDetailsByConid(conid);
+    throw new Error('fetchContractDetailsByConid requires native or skill client');
+  }
+
   assertWritable(action = 'broker write') {
     if (this.config.readonly) {
       throw new Error(`Interactive Brokers is configured readonly=true; refusing ${action}`);

@@ -56,9 +56,11 @@ function normalizeInstrumentCalendarRow(row = {}, now = new Date()) {
   };
 }
 
-function buildMarketCalendarArtifact({ portfolioDir, generatedAt = new Date().toISOString(), source = 'ibkr_contract_hours', brokerReady = false, instruments = [], now = new Date() } = {}) {
+function buildMarketCalendarArtifact({ portfolioDir, generatedAt = new Date().toISOString(), source = 'ibkr_contract_hours', brokerReady = false, instruments = [], now = new Date(), preNormalized = false } = {}) {
   const portfolio = path.basename(portfolioDir || 'unknown');
-  const normalized = (Array.isArray(instruments) ? instruments : []).map((row) => normalizeInstrumentCalendarRow(row, now));
+  const normalized = preNormalized
+    ? (Array.isArray(instruments) ? instruments : [])
+    : (Array.isArray(instruments) ? instruments : []).map((row) => normalizeInstrumentCalendarRow(row, now));
   return {
     portfolio,
     generatedAt,

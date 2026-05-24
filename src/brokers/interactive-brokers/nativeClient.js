@@ -1,5 +1,10 @@
 const { normalizeContractIntelligence } = require('./contractIntelligence');
 
+function stringOrNull(value) {
+  const text = String(value ?? '').trim();
+  return text ? text : null;
+}
+
 let ibModule = null;
 let testLoadIbModule = null;
 
@@ -113,6 +118,16 @@ class InteractiveBrokersNativeClient {
         results.push(await waitForMarketSnapshot(api, buildConidContract(conid)));
       }
       return results;
+    });
+  }
+
+  async fetchContractDetailsByConid(conid) {
+    if (!conid) throw new Error('fetchContractDetailsByConid requires a conid');
+    return this.withApi(async ({ api, connected }) => {
+      await connected;
+      const contract = buildConidContract(conid);
+      const rows = await waitForContractDetails(api, contract);
+      return rows.length ? rows[0] : null;
     });
   }
 
@@ -695,11 +710,14 @@ function shouldResolveNow(status) {
 
 function normalizeContractDetails(details) {
   const normalized = normalizeContractIntelligence(details);
+  const summary = details?.summary || {};
+  const detail = details?.details || details || {};
   return {
     conid: normalized.conid,
     symbol: normalized.symbol,
     localSymbol: normalized.localSymbol,
     primaryExch: normalized.primaryExch,
+    primaryExchange: normalized.primaryExch,
     name: normalized.name,
     description: normalized.description,
     exchange: normalized.exchange,
@@ -708,6 +726,8 @@ function normalizeContractDetails(details) {
     isin: normalized.isin,
     venue: normalized.venue,
     venueKey: normalized.venueKey,
+    tradingHours: stringOrNull(detail.tradingHours ?? summary.tradingHours) || '',
+    liquidHours: stringOrNull(detail.liquidHours ?? summary.liquidHours) || '',
     raw: details,
   };
 }

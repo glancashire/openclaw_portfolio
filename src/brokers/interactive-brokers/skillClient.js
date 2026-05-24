@@ -67,6 +67,26 @@ class InteractiveBrokersSkillClient {
     return [];
   }
 
+  async fetchContractDetailsByConid(conid) {
+    if (!conid) throw new Error('fetchContractDetailsByConid requires a conid');
+    const result = await this.run(['contract-details', '--con-id', String(conid), '--symbol', 'DUMMY', '--sec-type', 'STK', '--json', '--readonly']);
+    if (!result.ok) throw new Error(result.error);
+    const detail = Array.isArray(result.data) ? result.data[0] : null;
+    if (!detail) return null;
+    return {
+      conid: detail.conId || detail.conid || Number(conid),
+      symbol: detail.symbol || null,
+      localSymbol: detail.localSymbol || null,
+      primaryExchange: detail.primaryExch || detail.primaryExchange || null,
+      exchange: detail.exchange || null,
+      currency: detail.currency || null,
+      secType: detail.secType || null,
+      name: detail.longName || detail.name || null,
+      tradingHours: detail.tradingHours || '',
+      liquidHours: detail.liquidHours || '',
+    };
+  }
+
   async fetchMarketSnapshot(conids) {
     const ids = Array.isArray(conids) ? conids : [conids];
     const out = [];
