@@ -130,6 +130,9 @@ function availabilityText(value, fallback = 'Unavailable') {
 function buildInvestorHoldingsTable(summary = null) {
   const investorHoldings = Array.isArray(summary?.investorHoldings?.rows) ? summary.investorHoldings.rows : [];
   const totals = summary?.investorHoldings?.totals || {};
+  if (!investorHoldings.length) {
+    return '<div style="padding:14px 15px;background:#ffffff;border:1px solid #dbe4f0;border-radius:14px;color:#475569;line-height:1.6;">Held instruments data is not available in this sample yet.</div>';
+  }
   const table = dataTable({
     columns: [
       { label: 'Symbol' },
@@ -165,6 +168,10 @@ function buildInvestorHoldingsText(summary = null) {
   const investorHoldings = Array.isArray(summary?.investorHoldings?.rows) ? summary.investorHoldings.rows : [];
   const totals = summary?.investorHoldings?.totals || {};
   const lines = ['Held instruments'];
+  if (!investorHoldings.length) {
+    lines.push('Held instruments data is not available in this sample yet.');
+    return lines.join('\n');
+  }
   for (const row of investorHoldings) {
     lines.push(`- ${availabilityText(row.symbol, '—')} — ${availabilityText(row.name, 'Unnamed instrument')}`);
     lines.push(`  Quantity: ${row.quantityHeld == null ? '—' : row.quantityHeld}`);
@@ -223,9 +230,6 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
     '',
     `Top blocker: ${topBlocker || 'none.'}`,
     pending.length ? `Workflow items pending: ${pending.length}.` : 'Workflow items pending: none.',
-    '',
-    'Supporting detail',
-    summaryMarkdown,
   ].join('\n');
 }
 
@@ -286,17 +290,12 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
     contentHtml: `<div style="padding:12px 14px;background:#ffffff;border:1px solid #bbf7d0;border-radius:14px;font-size:15px;line-height:1.6;color:#14532d;font-weight:700;"><div style="font-size:11px;color:#166534;text-transform:uppercase;letter-spacing:0.04em;font-weight:800;margin-bottom:6px;">What matters now</div>${escapeHtml(nextAction || 'Continue monitoring')}</div>`,
   });
 
-  const detailCard = card({
-    title: 'Supporting detail',
-    contentHtml: `<div class="report-email-summary" style="line-height:1.7;color:#0f172a;">${summaryHtml}</div>`,
-  });
-
   return page({
     eyebrow: 'OpenClaw Portfolio Report',
     title: `${portfolioName} ${period} investor overview`,
     subtitle: 'Top line first: performance, next step, workflow status, then the full report detail.',
     accent: '#1e3a8a',
-    bodyHtml: `${summaryCard}${holdingsCard}${improvementCard}${actionCard}${statusCard}${postureCard}${detailCard}`,
+    bodyHtml: `${summaryCard}${holdingsCard}${improvementCard}${actionCard}${statusCard}${postureCard}`,
     footer: 'OpenClaw Portfolio Manager • Policy-gated, auditable reporting',
   });
 }

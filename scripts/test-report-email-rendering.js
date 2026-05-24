@@ -97,5 +97,40 @@ const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting
   assert(text.includes('What matters now: Add gradually to the underweight global equity position while keeping some CHF cash in reserve.'));
   assert(text.includes('Total held instruments: 2'));
 
+  const sparseSummary = {
+    holdings: {},
+    investorHoldings: { rows: [], totals: {} },
+    status: {},
+    recommendedNextStep: null,
+  };
+
+  const sparseHtml = buildReportEmailHtml({
+    portfolioName: 'etf',
+    period: 'weekly',
+    summaryHtml: '<p>Should not render in investor email</p>',
+    summary: sparseSummary,
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: null,
+    nextAction: null,
+  });
+
+  const sparseText = buildReportEmailText({
+    portfolioName: 'etf',
+    period: 'weekly',
+    summaryMarkdown: 'Should not render in investor email',
+    summary: sparseSummary,
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: null,
+    nextAction: null,
+  });
+
+  assert(sparseHtml.includes('etf has a fresh weekly report ready'));
+  assert(sparseHtml.includes('Held instruments data is not available in this sample yet.'));
+  assert(!sparseHtml.includes('Supporting detail'));
+  assert(sparseText.includes('etf has a fresh weekly report ready'));
+  assert(sparseText.includes('Held instruments data is not available in this sample yet.'));
+  assert(!sparseText.includes('Supporting detail'));
+  assert(!sparseText.includes('Should not render in investor email'));
+
   console.log(JSON.stringify({ ok: true }, null, 2));
 })();

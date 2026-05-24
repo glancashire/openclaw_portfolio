@@ -57,13 +57,13 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportHtml.includes('What matters now'));
   assert(reportHtml.includes('Status snapshot'));
   assert(reportHtml.includes('Workflow items'));
-  assert(reportHtml.includes('Supporting detail'));
-  assert(reportHtml.includes('report-email-summary'));
+  assert(!reportHtml.includes('Supporting detail'));
+  assert(!reportHtml.includes('report-email-summary'));
   assert(reportHtml.includes('Restore broker connectivity first.'));
   assert(reportHtml.includes('[broker_unready] Broker connectivity is degraded.'));
   assert(reportHtml.includes('1 delivery item needs review'));
   assert(!reportHtml.includes('No active blocker is currently surfaced.'));
-  assert(reportHtml.indexOf('Management summary') < reportHtml.indexOf('Supporting detail'));
+  assert(reportHtml.includes('Management summary'));
 
   assert(reportText.includes('Management summary'));
   assert(reportText.includes('Headline metrics'));
@@ -73,6 +73,7 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
   assert(reportText.includes('What matters now: Restore broker connectivity first.'));
   assert(reportText.includes('Next action: Restore broker connectivity first.'));
+  assert(!reportText.includes('Supporting detail'));
 
   const tradeInput = {
     symbol: 'SLICHA',
@@ -112,6 +113,7 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(tradeHtml.includes('Portfolio after fill'));
   assert(tradeHtml.includes('Remaining open orders'));
   assert(tradeHtml.includes('BUY filled'));
+  assert(tradeHtml.includes('1 open order(s)'));
   assert(tradeHtml.includes('SLICHA fill confirmed'));
   assert(tradeText.includes('Purchase summary'));
   assert(tradeText.includes('Symbol: SLICHA'));

@@ -89,7 +89,7 @@ function badge({ label, tone = 'info' }) {
     neutral: { fg: BRAND.neutral, bg: BRAND.neutralBg },
   };
   const chosen = tones[tone] || tones.info;
-  return `<span style="display:inline-block;padding:6px 10px;border-radius:999px;background:${chosen.bg};color:${chosen.fg};font-size:12px;font-weight:800;letter-spacing:0.01em;line-height:1.2;">${escapeHtml(label)}</span>`;
+  return `<span style="display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border-radius:999px;background:${chosen.bg};color:${chosen.fg};font-size:12px;font-weight:800;letter-spacing:0.01em;line-height:1.2;box-sizing:border-box;vertical-align:top;">${escapeHtml(label)}</span>`;
 }
 
 function metricGrid(items) {
