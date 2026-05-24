@@ -1,5 +1,7 @@
 const assert = require('assert');
-const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting/reportEmail');
+const fs = require('fs');
+const path = require('path');
+const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = require('../src/reporting/reportEmail');
 
 (function main() {
   const summary = {
@@ -131,6 +133,72 @@ const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting
   assert(sparseText.includes('Held instruments data is not available in this sample yet.'));
   assert(!sparseText.includes('Supporting detail'));
   assert(!sparseText.includes('Should not render in investor email'));
+
+  const tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'report-email-'));
+  const reportMarkdownPath = path.join(tmpDir, 'portfolio_report_etf_weekly_20260524.md');
+  const reportHtmlPath = path.join(tmpDir, 'portfolio_report_etf_weekly_20260524.html');
+  const reportJsonPath = path.join(tmpDir, 'portfolio_report_etf_weekly_20260524.json');
+  const generatedSummary = {
+    holdings: {
+      totalValueChf: 22209.48,
+      investedChf: 22209.48,
+      cashChf: 0,
+      holdingCount: 3,
+      latestSnapshotDate: '2026-05-23',
+    },
+    investorHoldings: {
+      rows: [
+        { symbol: 'SXR8', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', quantityHeld: 18, valueChf: 12439.53, currency: 'EUR' },
+        { symbol: 'EMUAA', name: 'UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc', quantityHeld: 151, valueChf: 6052.12, currency: 'EUR' },
+        { symbol: 'CHSPI', name: 'UBS SLI ETF (SMI gleichgewichtet)', quantityHeld: 23, valueChf: 3717.83, currency: 'CHF' },
+      ],
+      totals: {
+        rowCount: 3,
+        totalValueChf: 22209.48,
+        totalGainChf: null,
+      },
+    },
+    status: {
+      health: 'attention_needed',
+      executionPosture: 'ready_for_review',
+    },
+    recommendedNextStep: 'Review the current dry-run proposal set.',
+    topBlocker: 'No urgent blocker surfaced.',
+  };
+  fs.writeFileSync(reportMarkdownPath, '# sample report\n');
+  fs.writeFileSync(reportHtmlPath, '<p>sample report</p>');
+  fs.writeFileSync(reportJsonPath, JSON.stringify(generatedSummary, null, 2));
+
+  const loaded = loadSummaryEmailSource({ summaryPath: reportMarkdownPath, summaryHtmlPath: reportHtmlPath });
+  assert.strictEqual(loaded.summary.holdings.totalValueChf, 22209.48);
+  assert.strictEqual(loaded.summary.investorHoldings.rows.length, 3);
+  assert.strictEqual(loaded.summary.investorHoldings.rows[0].symbol, 'SXR8');
+
+  const generatedHtml = buildReportEmailHtml({
+    portfolioName: 'etf',
+    period: 'weekly',
+    summaryHtml: loaded.summaryHtml,
+    summary: loaded.summary,
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: loaded.summary.topBlocker,
+    nextAction: loaded.summary.recommendedNextStep,
+  });
+  const generatedText = buildReportEmailText({
+    portfolioName: 'etf',
+    period: 'weekly',
+    summaryMarkdown: loaded.summaryMarkdown,
+    summary: loaded.summary,
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: loaded.summary.topBlocker,
+    nextAction: loaded.summary.recommendedNextStep,
+  });
+
+  assert(generatedHtml.includes('22&#39;209.48'));
+  assert(generatedHtml.includes('SXR8'));
+  assert(generatedHtml.includes('EMUAA'));
+  assert(generatedText.includes("etf is worth CHF 22'209.48"));
+  assert(generatedText.includes('Total held instruments: 3'));
+  assert(generatedText.includes('SXR8'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 })();

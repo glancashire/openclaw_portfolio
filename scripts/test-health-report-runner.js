@@ -41,16 +41,18 @@ function seedPortfolio(repoRoot) {
   assert(Array.isArray(report.selfHeal.classified));
   assert(Array.isArray(report.selfHeal.openIssues));
   assert(Array.isArray(report.selfHeal.operatorCommands));
-  assert(Array.isArray(report.trends.summaryLines));
-  assert(report.trends.summaryLines.length >= 2);
+  assert(report.trends);
+  assert(typeof report.trends.direction === 'string');
+  assert(typeof report.trends.summary === 'string');
   assert(fs.existsSync(artifacts.jsonPath));
   assert(fs.existsSync(artifacts.mdPath));
   assert(fs.existsSync(artifacts.htmlPath));
   assert(artifacts.html.includes('system health report'));
   assert(artifacts.html.includes('Management summary'));
-  assert(artifacts.html.includes('What the system already handled'));
-  assert(artifacts.html.includes('What still needs you'));
-  assert(artifacts.html.includes('Recent trends'));
+  assert(artifacts.html.includes('What matters now'));
+  assert(artifacts.html.includes('Health direction'));
+  assert(!artifacts.html.includes('What still needs you'));
+  assert(!artifacts.html.includes('Recent trends'));
   assert(fs.existsSync(path.join(repoRoot, 'runtime', 'observability', 'event-log.jsonl')));
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {

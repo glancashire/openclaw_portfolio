@@ -8,6 +8,7 @@ const { fileFreshnessSummary } = require('./freshness');
 const { brokerErrorStatus } = require('../execution/runtimeState');
 const { reportDeliveryStatus, reportPendingActions } = require('./deliveryPolicy');
 const { summarizeOperatorQueue } = require('./operatorQueue');
+const { collectPortfolioSummary } = require('./summaryArtifacts');
 
 function defaultPeriodBounds(period, latestSnapshot) {
   const end = latestSnapshot?.date || new Date().toISOString().slice(0, 10);
@@ -398,6 +399,7 @@ function writeReport({ portfolioDir, period, dateStamp, content }) {
 }
 
 async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflow = null }) {
+  const resolvedDateStamp = dateStamp || new Date().toISOString().slice(0, 10).replace(/-/g, '');
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const historyPath = path.join(portfolioDir, 'history.md');
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
@@ -414,11 +416,11 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   const initialGenerationMeta = { markdownWritten: true, pdfMode: 'pending', pdfPath: null, htmlPath: null, renderWarning: null };
   const initialDeliveryStatus = reportDeliveryStatus({ portfolioDir, generationMeta: initialGenerationMeta, workflow });
   const initialPendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta: initialGenerationMeta, workflow, policy: initialDeliveryStatus });
-  const previousReportContext = loadPreviousReportContext({ portfolioDir, period, currentDateStamp: dateStamp });
+  const previousReportContext = loadPreviousReportContext({ portfolioDir, period, currentDateStamp: resolvedDateStamp });
   const markdownPath = writeReport({
     portfolioDir,
     period,
-    dateStamp,
+    dateStamp: resolvedDateStamp,
     content: formatReport({
       portfolioName,
       period,
@@ -467,11 +469,16 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
     previousReportContext,
   });
   fs.writeFileSync(markdownPath, finalContent);
+  const summary = await collectPortfolioSummary({ portfolioDir });
+  const jsonPath = markdownPath.replace(/\.md$/i, '.json');
+  fs.writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
   return {
     markdownPath,
     pdfPath: pdf.pdfPath,
     pdfMode: pdf.mode,
     htmlPath: pdf.htmlPath || null,
+    jsonPath,
+    summary,
     generationMeta,
     deliveryStatus,
     pendingActions,

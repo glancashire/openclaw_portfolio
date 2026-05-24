@@ -307,11 +307,13 @@ function loadSummaryEmailSource({ summaryPath = null, summaryHtmlPath = null }) 
   const summaryHtml = fs.existsSync(resolvedHtmlPath)
     ? fs.readFileSync(resolvedHtmlPath, 'utf8')
     : `<pre>${escapeHtml(summaryMarkdown)}</pre>`;
-  const summaryJsonPath = path.join(path.dirname(summaryPath), 'summary.json');
+  const siblingJsonPath = path.join(path.dirname(summaryPath), `${path.basename(summaryPath, path.extname(summaryPath))}.json`);
+  const fallbackJsonPath = path.join(path.dirname(summaryPath), 'summary.json');
+  const summaryJsonPath = fs.existsSync(siblingJsonPath) ? siblingJsonPath : fallbackJsonPath;
   const summary = fs.existsSync(summaryJsonPath)
     ? JSON.parse(fs.readFileSync(summaryJsonPath, 'utf8'))
     : null;
-  return { summaryMarkdown, summaryHtml, summaryHtmlPath: resolvedHtmlPath, summary };
+  return { summaryMarkdown, summaryHtml, summaryHtmlPath: resolvedHtmlPath, summary, summaryJsonPath };
 }
 
 module.exports = {

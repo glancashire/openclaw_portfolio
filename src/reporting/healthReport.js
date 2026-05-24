@@ -51,10 +51,30 @@ function summarizeHealthTrends(events = [], { limit = 7 } = {}) {
     acc[event.health] = (acc[event.health] || 0) + 1;
     return acc;
   }, {});
+  const latest = recent[recent.length - 1] || null;
+  const blockedCount = Number(counts.blocked || 0);
+  const warningCount = Number(counts.warning || 0) + Number(counts.attention_needed || 0);
+  const healthyCount = Number(counts.healthy || 0);
+  let direction = 'stable';
+  if (!recent.length) direction = 'unknown';
+  else if (latest?.health === 'blocked' || blockedCount >= Math.max(1, Math.ceil(recent.length / 2))) direction = 'worsening';
+  else if (latest?.health === 'healthy' && healthyCount >= Math.max(1, recent.length - 1)) direction = 'stable';
+  else if (latest?.health === 'healthy' && (blockedCount > 0 || warningCount > 0)) direction = 'improving';
+  else if (warningCount > 0) direction = 'watching';
+
+  let summary = 'No recent health-check trend data yet.';
+  if (recent.length) {
+    if (direction === 'stable') summary = 'Health direction is stable: recent checks stayed healthy or close to healthy, and no new operating risk is building.';
+    else if (direction === 'improving') summary = 'Health direction is improving: earlier issues have eased and the latest posture is healthier than the recent baseline.';
+    else if (direction === 'worsening') summary = `Health direction is worsening: ${blockedCount} of the last ${recent.length} checks showed blocked posture or the latest run is still blocked.`;
+    else if (direction === 'watching') summary = 'Health direction needs watching: the system is running, but recent checks show recurring attention signals that should not be ignored.';
+  }
+
   return {
     recent,
-    summaryLines: recent.map((event) => `${event.at}: ${event.health}/${event.severity} (blockers=${event.blockerCount || 0})`),
     counts,
+    direction,
+    summary,
   };
 }
 
@@ -128,8 +148,18 @@ function buildHealthReportMarkdown(report) {
   const classified = Array.isArray(report.selfHeal?.classified) ? report.selfHeal.classified : [];
   const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
   const operatorCommands = Array.isArray(report.selfHeal?.operatorCommands) ? report.selfHeal.operatorCommands : [];
-  const trends = report.trends || { summaryLines: [] };
+  const trends = report.trends || { direction: 'unknown', summary: 'No recent health-check trend data yet.' };
   const isHealthy = blockers.length === 0 && failedFixes.length === 0 && openIssues.length === 0;
+  const attentionSummary = blockers.length
+    ? blockers[0].message
+    : openIssues.length
+      ? openIssues[0].summary
+      : failedFixes.length
+        ? `${failedFixes[0].kind}: not fixed automatically (${failedFixes[0].error || 'unknown error'})`
+        : 'No urgent exceptions are open right now.';
+  const handledSummary = healed.length
+    ? `The system already handled ${healed.length} issue(s) automatically.`
+    : 'No automatic fixes were needed this cycle.';
 
   return [
     `# Health Report: ${report.portfolio}`,
@@ -142,20 +172,17 @@ function buildHealthReportMarkdown(report) {
     `- Automatic fixes applied: ${healed.length}`,
     `- Issues still needing attention: ${blockers.length + openIssues.length + failedFixes.length}`,
     '',
-    '## What needs attention now',
-    ...(blockers.length ? blockers.map((item) => `- [${item.code}] ${item.message}`) : ['- No urgent exceptions are open right now.']),
-    ...(nextActions.length ? nextActions.map((item) => `- Next action: ${item}`) : []),
+    '## What matters now',
+    `- ${attentionSummary}`,
+    `- Next action: ${report.health.nextAction || nextActions[0]}`,
     '',
     '## What the system already handled',
-    ...(healed.length ? healed.map((item) => `- ${item.kind}: ${item.applied ? 'applied automatically' : item.blocked || 'not applied'}`) : ['- No automatic fixes were needed this cycle.']),
-    ...(classified.length ? ['', '### Detected symptoms', ...classified.map((item) => `- [${item.category}] ${item.symptom}`)] : []),
-    '',
-    '## What still needs you',
-    ...(openIssues.length ? openIssues.map((item, index) => `- [${item.category}] ${item.summary}${operatorCommands[index] ? ` — Suggested command: ${operatorCommands[index].command}` : ''}`) : ['- Nothing operator-only is waiting right now.']),
+    `- ${handledSummary}`,
+    ...(classified.length ? [`- Main detected symptom: ${classified[0].symptom}`] : []),
     ...(failedFixes.length ? failedFixes.map((item) => `- ${item.kind}: not fixed automatically (${item.error || 'unknown error'})`) : []),
     '',
-    '## Recent trends',
-    ...(trends.summaryLines.length ? trends.summaryLines.map((line) => `- ${line}`) : ['- No recent health-check trend data yet.']),
+    '## Health direction',
+    `- ${trends.summary}`,
     '',
     '## Remaining status and reference details',
     `- Generated-state issues: ${generatedIssues.length}`,
@@ -181,7 +208,7 @@ function buildHealthReportHtml(report) {
   const classified = Array.isArray(report.selfHeal?.classified) ? report.selfHeal.classified : [];
   const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
   const operatorCommands = Array.isArray(report.selfHeal?.operatorCommands) ? report.selfHeal.operatorCommands : [];
-  const trends = report.trends || { summaryLines: [] };
+  const trends = report.trends || { direction: 'unknown', summary: 'No recent health-check trend data yet.' };
   const isHealthy = blockers.length === 0 && failedFixes.length === 0 && openIssues.length === 0;
   const statusBadge = badge({ label: `${report.health.health} / ${report.health.severity}`, tone: severityTone(report.health.severity) });
   const nextActionBadge = badge({ label: blockers.length ? 'Action required' : 'Everything important looks healthy', tone: blockers.length ? 'danger' : 'success' });
@@ -204,43 +231,39 @@ function buildHealthReportHtml(report) {
     `,
   });
 
+  const attentionSummary = blockers.length
+    ? blockers[0].message
+    : openIssues.length
+      ? openIssues[0].summary
+      : failedFixes.length
+        ? `${failedFixes[0].kind}: not fixed automatically (${failedFixes[0].error || 'unknown error'})`
+        : 'No urgent exceptions are open right now.';
+
   const issuesCard = card({
-    title: 'What needs attention now',
-    tone: blockers.length ? 'warn' : 'success',
-    contentHtml: `${blockers.length
-      ? bulletList(blockers.map((item) => `[${item.code}] ${item.message}`))
-      : '<p style="margin:0;color:#166534;font-weight:600;">No urgent exceptions are open right now.</p>'}
-      <div style="height:12px"></div>
-      ${bulletList(nextActions.map((item) => `Next action: ${item}`))}`,
+    title: 'What matters now',
+    tone: blockers.length || openIssues.length || failedFixes.length ? 'warn' : 'success',
+    contentHtml: `
+      <div style="margin:0 0 12px;padding:16px 18px;background:${blockers.length || openIssues.length || failedFixes.length ? '#fff7ed' : '#ecfdf5'};border:1px solid ${blockers.length || openIssues.length || failedFixes.length ? '#fdba74' : '#86efac'};border-radius:14px;">
+        <div style="font-size:16px;font-weight:700;line-height:1.6;color:#0f172a;">${attentionSummary}</div>
+      </div>
+      <div style="font-size:14px;line-height:1.6;color:#334155;"><strong>Next action:</strong> ${report.health.nextAction || nextActions[0]}</div>`,
   });
+
+  const handledSummary = healed.length
+    ? `The system already handled ${healed.length} issue(s) automatically.`
+    : 'No automatic fixes were needed this cycle.';
 
   const healedCard = card({
     title: 'What the system already handled',
-    contentHtml: `${healed.length
-      ? bulletList(healed.map((item) => `${item.kind}: ${item.applied ? 'applied automatically' : item.blocked || 'not applied'}`))
-      : '<p style="margin:0;color:#6b7280;">No automatic fixes were needed this cycle.</p>'}
-      ${classified.length ? `<div style="height:12px"></div><div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:8px;">Detected symptoms</div>${bulletList(classified.map((item) => `[${item.category}] ${item.symptom}`))}` : ''}`,
-  });
-
-  const openIssuesCard = card({
-    title: 'What still needs you',
-    contentHtml: openIssues.length
-      ? bulletList(openIssues.map((item, index) => `[${item.category}] ${item.summary}${operatorCommands[index] ? ` — Suggested command: ${operatorCommands[index].command}` : ''}`))
-      : '<p style="margin:0;color:#166534;font-weight:600;">Nothing operator-only is waiting right now.</p>',
-  });
-
-  const failedFixesCard = card({
-    title: 'Automatic fixes that did not finish cleanly',
-    contentHtml: failedFixes.length
-      ? bulletList(failedFixes.map((item) => `${item.kind}: not fixed automatically (${item.error || 'unknown error'})`))
-      : '<p style="margin:0;color:#6b7280;">No failed automatic fixes were recorded.</p>',
+    contentHtml: `
+      <div style="font-size:14px;line-height:1.6;color:#334155;">${handledSummary}</div>
+      ${classified.length ? `<div style="margin-top:10px;font-size:14px;line-height:1.6;color:#334155;"><strong>Main detected symptom:</strong> ${classified[0].symptom}</div>` : ''}
+      ${failedFixes.length ? `<div style="margin-top:10px;font-size:14px;line-height:1.6;color:#7c2d12;"><strong>Still unresolved:</strong> ${failedFixes[0].kind}: not fixed automatically (${failedFixes[0].error || 'unknown error'})</div>` : ''}`,
   });
 
   const trendsCard = card({
-    title: 'Recent trends',
-    contentHtml: trends.summaryLines.length
-      ? bulletList(trends.summaryLines)
-      : '<p style="margin:0;color:#6b7280;">No recent health-check trend data yet.</p>',
+    title: 'Health direction',
+    contentHtml: `<div style="font-size:14px;line-height:1.7;color:#334155;"><strong>${String(trends.direction || 'unknown').replace(/^./, (c) => c.toUpperCase())}.</strong> ${trends.summary}</div>`,
   });
 
   const referenceCard = card({
@@ -262,9 +285,9 @@ function buildHealthReportHtml(report) {
   return page({
     eyebrow: 'OpenClaw Health Monitor',
     title: `${report.portfolio} system health report`,
-    subtitle: 'Exceptions and next actions first, followed by self-heal output, operator guidance, trends, and lower-priority reference details.',
+    subtitle: 'Short investor-facing health summary: what matters now, what was already handled, and whether the overall direction is stable or changing.',
     accent: '#7c2d12',
-    bodyHtml: `${summaryCard}${issuesCard}${healedCard}${openIssuesCard}${failedFixesCard}${trendsCard}${referenceCard}`,
+    bodyHtml: `${summaryCard}${issuesCard}${healedCard}${trendsCard}${referenceCard}`,
     footer: 'OpenClaw Portfolio Manager • Health monitoring report',
   });
 }

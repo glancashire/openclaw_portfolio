@@ -36,24 +36,31 @@ const { buildHealthReportMarkdown, buildHealthReportHtml } = require('../src/rep
         { kind: 'regenerate_reporting_artifacts', ok: false, error: 'write failed' },
       ],
     },
+    trends: {
+      direction: 'worsening',
+      summary: 'Health direction is worsening: 1 of the last 2 checks was blocked and the latest run is still blocked.',
+    },
   };
 
   const markdown = buildHealthReportMarkdown(report);
   const html = buildHealthReportHtml(report);
 
-  assert(markdown.indexOf('## Management summary') < markdown.indexOf('## What needs attention now'), 'expected management summary before attention section');
-  assert(markdown.indexOf('## What needs attention now') < markdown.indexOf('## What the system already handled'), 'expected attention section before handled section');
-  assert(markdown.indexOf('## What the system already handled') < markdown.indexOf('## Remaining status and reference details'), 'expected handled section before reference details');
+  assert(markdown.indexOf('## Management summary') < markdown.indexOf('## What matters now'), 'expected management summary before action section');
+  assert(markdown.indexOf('## What matters now') < markdown.indexOf('## Health direction'), 'expected action section before health direction');
+  assert(markdown.indexOf('## Health direction') < markdown.indexOf('## Remaining status and reference details'), 'expected health direction before reference details');
   assert(markdown.includes('Restore broker connectivity first.'));
   assert(markdown.includes('What the system already handled'));
-  assert(markdown.includes('What still needs you'));
+  assert(markdown.includes('Health direction is worsening'));
   assert(markdown.includes('write failed'));
+  assert(!markdown.includes('What still needs you'));
+  assert(!markdown.includes('Recent trends'));
 
   assert(html.includes('Management summary'));
-  assert(html.includes('What needs attention now'));
+  assert(html.includes('What matters now'));
   assert(html.includes('What the system already handled'));
-  assert(html.includes('What still needs you'));
+  assert(html.includes('Health direction'));
   assert(html.includes('Remaining status and reference details'));
+  assert(!html.includes('What still needs you'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 })();
