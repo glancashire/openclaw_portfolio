@@ -47,7 +47,7 @@ function seedPortfolio(repoRoot) {
   assert(fs.existsSync(artifacts.mdPath));
   assert(fs.existsSync(artifacts.htmlPath));
   assert(artifacts.html.includes('system health report'));
-  assert(artifacts.html.includes('Issues auto-healed this cycle'));
+  assert(artifacts.html.includes('Remediated during this run'));
   assert(artifacts.html.includes('Open issues for operator'));
   assert(artifacts.html.includes('Recent trends'));
   assert(fs.existsSync(path.join(repoRoot, 'runtime', 'observability', 'event-log.jsonl')));
