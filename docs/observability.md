@@ -4,6 +4,9 @@
 - `runtime/events/runtime-events.jsonl` for structured runtime evidence
 - `runtime/execution-state.json` for broker pause state
 - portfolio dashboards and history files for operator-facing state
+- structured summary/overview artifacts under `portfolio/<name>/summary.json` and `runtime/overview/*`
+- health-report and dashboard-digest delivery/reporting surfaces for operator and investor-facing review
+- emerging market-calendar artifacts under `runtime/market-calendar/` as the calendar lane is completed
 
 ## Typical checks
 - `node scripts/trade.js preflight portfolio/etf --json`
@@ -36,6 +39,8 @@
 - Use `trade.js authority` when you need to understand whether execution authority could permit action in principle.
 - Use `trade.js config` to inspect the effective redacted broker/runtime config behind the current posture.
 - Use `trade.js delivery` to confirm whether reporting or delivery posture needs operator attention.
+- Use `run-health-check.js` when you want a synthesized health/reporting view rather than raw broker/readiness diagnostics.
+- Use the summary/overview artifacts when you need cross-surface consistency checks, not just one CLI snapshot.
 - If a dashboard or summary disagrees with these diagnostic surfaces, prefer the canonical command output and treat the rendered artifact as potentially stale.
 
 ## Rule

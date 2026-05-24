@@ -4,30 +4,30 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 ## Summary
 
-- Overall status: the original roadmap is implemented through Phase 27, the expanded operator-UX follow-on roadmap is complete through Phase 42, the later reporting/overview hardening lane visible in repo history is complete through Phase 100, the post-acceptance hardening lane extends through Phase 154, and the live recovery / execution-truth / hardening work now continues through Phase 156. That includes the command-center dashboard uplift, structured UI-ready summary artifacts, generated multi-portfolio overview outputs, a unified operator queue across dashboard/report/summary/overview surfaces, decision-oriented reporting, grouped progress-aware onboarding workflow, per-portfolio static HTML summary pages, later open-runner/runtime-event/reporting visibility work, explicit overview/pending-actions contract hardening, canonical live-preflight/execution-authority/effective-config/delivery diagnostics, transmitted-live acceptance coverage, contract-backed operator documentation alignment, later broker-block context truth-alignment across portfolio summary, delivery diagnostics, delivery status artifacts, cockpit rendering, generated overview regression coverage, live reconciliation, planner truth fixes, truthful native IBKR live submission, post-fill holdings normalization, and replacement-instrument contract validation via the native gateway.
-- Strongest areas: scaffolding, Markdown contracts, validation, reporting, dry-run workflow, Interactive Brokers read-only holdings sync, execution lifecycle reconciliation back into Markdown state, fail-closed execution safety gating, artifact freshness surfacing, operator runbooks, local observability evidence, a materially clearer per-portfolio operator dashboard, stable JSON summary artifacts for UI/digest consumers, a top-level board across portfolios, a shared structured pending-actions queue model for operator-facing outputs, a workflow-ready onboarding summary surface for draft completion, and direct per-portfolio HTML summary rendering for control-UI-style consumption.
-- Biggest remaining gap: All expanded specification acceptance criteria (section 13, items 1-8) and all identified operator-experience gaps (section 2, items 1-8) are now addressed through Phases 28-42, with later hardening continuing through Phase 154. The remaining work beyond this point would require either a new specification expansion or a deliberate decision to widen the live-execution product scope further.
-- Scope change applied: the repo targets Interactive Brokers only for the MVP and no longer carries IG-specific implementation paths.
+- Overall status: the repository has moved well beyond the earlier read-only MVP closure. The active system now includes native IBKR-backed execution/readiness diagnostics, portfolio-aware trade lifecycle handling, structured summary/overview artifacts, investor-facing portfolio/fill/health email reporting, delivery and digest surfaces, bounded self-heal/health guidance, and later stabilization/cleanup work. Historical docs that implied closure around Phase 156 are stale.
+- Strongest areas: Markdown portfolio contracts, validation, guarded execution workflow, native IBKR integration posture, reporting generation, structured runtime/overview artifacts, operator diagnostics, investor-facing email rendering, and verification coverage.
+- Current active implementation lane: market-calendar persistence/sync for approved instruments is in progress (Phase 166a complete, 166b underway at the code level, and broader documentation/roll-up consolidation underway in Phase 166c).
+- Scope posture: Interactive Brokers remains the only supported broker for the active MVP/product lane. ETF-first, CHF-first, approval-gated operation remains the intended guardrail.
 
 ## Progress by specification area
 
 | Spec area | Status | Notes |
 |---|---|---|
-| 4. Repository / Folder Structure | done | Portfolio, broker, config, runtime, scripts, and `src/` layout are present and aligned with the active IBKR-only MVP path. |
-| 6-10. Portfolio Markdown contracts | done | Template + real ETF portfolio files exist and validators cover required structure. Execution reconciliation now writes back into `trades.md`, `history.md`, and `dashboard.md` with richer state semantics. |
-| 11. Broker adapter interface | done | Interface now includes audited IBKR auth, holdings, pricing, quote preview, dry-run preview, open-order status, execution/fill fallback, completed-order lookup, cancel scaffolding, clearer diagnostics for blocked/degraded paths, and truthful native live submission/reconciliation behavior. |
-| 12. Interactive Brokers adapter MVP | done | Native TWS / IB Gateway socket connectivity is working for the active ETF path, holdings sync is live, current proposals can use broker-backed pricing, and the repo now exposes normalized quote/dry-run/status/cancel scaffolding plus truthful live submission, completed-order inspection, and recovery hardening. |
-| 13. Portfolio creation workflow | done | Create/bootstrap/apply-answers/next-questions workflow now includes structured guided intake prompts, activation-readiness alignment, and clean draft-state completion for the ETF MVP path. |
-| 14. Strategy and ETF selection workflow | done | Approved instruments, validation, shortlist generation, richer screening filters, rationale, rejection reporting, and approval-gated shortlist application are now in place for the ETF MVP path. |
-| 15. Market entry workflow | done | Portfolio-aware execution gating, approval transitions, durable status reconciliation, cancel scaffolding with runtime error handling, and truthful writable live submission after explicit operator approval now exist. |
-| 16. Rebalancing workflow | done | Allocation analysis and proposal generation now honor thresholds, min/max allocation breaches, minimum size, cash-drag policy, cash-first behavior, avoidable-turnover suppression, and post-fill/live-priced regeneration for the ETF MVP path. |
-| 17. Reporting | done | Weekly/monthly/quarterly Markdown reports and HTML/PDF artifacts are generated. Reports and dashboards now surface execution lifecycle, freshness metadata, generation/render status, operator-state pause evidence, delivery mode, readiness, and pending-action state, with a local-only delivery policy/readiness check that avoids external side effects. |
-| 18. Scheduling | partial | Schedule docs exist and OpenClaw cron jobs are wired for daily maintenance plus weekly/monthly/quarterly report cycles. Scheduled report automation now returns explicit workflow, failure, delivery-mode, readiness, and pending-action metadata with read-only mode tagging; remaining work is broader broker live-path hardening and observability depth. |
-| 19-20. Safety + error handling | done | Safety checks, activation blockers, broker error pause state, typed execution snapshots, bundled execution verification, fail-closed blocks for unresolved questions / excluded-instrument conflicts / stale-or-simulated pricing, documented operator recovery runbooks, local structured runtime logging, richer risk diagnostics, and observability docs now exist. |
-| 21. Template portfolio | done | `portfolio/_template/` contains the expected files and sample strategy content. |
-| 22. MVP build order | done | The planned MVP build lanes are implemented through reporting, safety, scheduling, broker completeness audit, and end-to-end read-only/dry-run acceptance closure; remaining work is a deliberate post-MVP-style writable-live enablement lane. |
-| 23. Acceptance criteria | done | The in-scope MVP acceptance sweep now passes for portfolio creation, draft blocking, IBKR read-only connectivity/holdings posture, dry-run proposal generation, dashboard/report generation, safety gating, and auditable Markdown outputs. True transmitted live execution remains intentionally outside the accepted read-only/dry-run MVP boundary. |
-| 24. First portfolio to create | done | `portfolio/etf/` exists, is active, confirmation-gated, and backed by live read-only broker sync, satisfying the first-portfolio requirement for the accepted read-only/dry-run MVP scope. |
+| 4. Repository / Folder Structure | done | Portfolio, broker, config, runtime, scripts, and `src/` layout are present and actively used. |
+| 6-10. Portfolio Markdown contracts | done | Template + real ETF portfolio files exist; validators and reconciliation/reporting flows consume them. |
+| 11. Broker adapter interface | done | IBKR auth/readiness, holdings, pricing, quote preview, dry-run preview, status lookup, cancel support, completed/fill fallback, and contract-intelligence seams are present. |
+| 12. Interactive Brokers adapter MVP | done | Native TWS / IB Gateway socket connectivity is the primary path; holdings sync, pricing, proposal support, live-readiness diagnostics, and truthful reconciliation are implemented. |
+| 13. Portfolio creation workflow | done | Create/bootstrap/apply-answers/next-questions workflow exists with validation and readiness checks. |
+| 14. Strategy and ETF selection workflow | done | Approved-instrument workflow, shortlist generation, validation, and approval-gated application are implemented. |
+| 15. Market entry workflow | done | Proposal, approval, queue/open-runner handoff, submit/reconcile/cancel, and explicit live diagnostics are implemented with guarded posture. |
+| 16. Rebalancing workflow | done | Allocation analysis, live-priced proposal generation, threshold/min-trade handling, and post-fill regeneration are implemented. |
+| 17. Reporting | done | Weekly/monthly/quarterly reports, structured summary artifacts, overview artifacts, portfolio summary email delivery, health reports, dashboard digests, and investor-facing HTML/text reporting are implemented. |
+| 18. Scheduling | partial | Cron-backed reporting/health workflows exist, but current-host delivery caveats and the newer market-calendar sync automation lane are not fully closed yet. |
+| 19-20. Safety + error handling | done | Activation blockers, safety checks, runtime pause/error posture, preflight/authority/config/delivery diagnostics, health classification, and bounded self-heal guidance are implemented. |
+| 21. Template portfolio | done | `portfolio/_template/` contains the expected starter contract. |
+| 22. MVP build order | done | The practical MVP build order and later expansions have already been implemented; what remains now is incremental hardening/new capability rather than basic MVP assembly. |
+| 23. Acceptance criteria | done | The implemented system satisfies the practical repository acceptance bar for the active ETF/IBKR path, with live action still intentionally guarded by approvals, readiness, and runtime policy. |
+| 24. First portfolio to create | done | `portfolio/etf/` remains the canonical active portfolio and is integrated with the current workflows. |
 
 ## Concrete evidence in repo
 
@@ -35,88 +35,75 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 - `portfolio/_template/*`
 - `portfolio/etf/*`
 - `src/markdown/*`
-- `scripts/create-portfolio.js`
-- `scripts/bootstrap-portfolio-from-json.js`
-
-### Validation and safety
-- `scripts/validate-portfolio.js`
-- `scripts/validate-strategy.js`
-- `scripts/check-portfolio-activation.js`
-- `scripts/check-generated-state.js`
-- `scripts/check-safety-controls.js`
 - `src/validation/*`
-
-### Workflow helpers
-- `scripts/next-portfolio-questions.js`
-- `scripts/apply-portfolio-answers.js`
 - `src/workflows/*`
 
-### Analysis/reporting/execution state
-- `scripts/propose-trades.js`
-- `scripts/propose-instrument-trades.js`
-- `scripts/write-trade-proposals.js`
-- `scripts/regenerate-dashboard.js`
-- `scripts/write-history-snapshot.js`
-- `scripts/run-report-cycle.js`
-- `scripts/verify-execution-surface.js`
-- `scripts/demo-portfolio-execution-flow.js`
-- `src/analysis/*`
-- `src/reporting/*`
+### Execution and operator surfaces
+- `scripts/trade.js`
 - `src/execution/*`
+- `docs/execution-command-surface.md`
+- `docs/trading-workflow.md`
+- `docs/operator-runbooks.md`
+- `docs/observability.md`
+- `docs/transmitted-live-operations.md`
+
+### Reporting and investor-facing delivery
+- `src/reporting/*`
+- `lib/tradeNotificationEmail.js`
+- `lib/tradeExecutionNotifier.js`
+- `scripts/run-report-cycle.js`
+- `scripts/run-health-check.js`
+- `scripts/send-dashboard-digest.js`
+- `portfolio/<name>/summary.json`
+- `runtime/overview/*`
 
 ### Broker work
-- `brokers/interactive-brokers/*`
-- `scripts/test-interactive-brokers-auth.js`
-- `scripts/check-interactive-brokers-config.js`
-- `scripts/sync-interactive-brokers-holdings.js`
-- `scripts/search-interactive-brokers-instruments.js`
-- `scripts/fetch-interactive-brokers-price.js`
-- `scripts/resolve-interactive-brokers-conids.js`
 - `src/brokers/interactive-brokers/*`
-- `src/brokers/shared/*`
+- `scripts/check-interactive-brokers-readiness.js`
+- `scripts/check-live-readiness-preflight.js`
+- `scripts/resolve-interactive-brokers-conids.js`
 - `skills/ibkr/scripts/ibkr_cli.py`
 
-## Remaining limits beyond the accepted MVP closure
+## Implemented feature groups beyond the earlier closure docs
 
-1. The ETF portfolio is now balanced within current policy constraints, but the broader self-healing/health-model lane (`155E`) is still not fully implemented as first-class automation.
-2. Holdings are live-synced successfully from IBKR for the ETF portfolio; remaining broker work is about more automation, broader venue/instrument resilience, and deeper operational polish rather than basic execution correctness.
-3. The fragile Client Portal gateway path has effectively been superseded by native TWS / IB Gateway socket transport for the active integration path, though portal login state can still diverge and remains a secondary lookup path.
-4. Interactive Brokers instrument lookup, price lookup, normalized quote preview, dry-run preview, open-order status lookup, execution/fill fallback, completed-order lookup, cancel scaffolding, and truthful transmitted-mode submission now exist; remaining work is better automation around health checks, bounded retries, and operator workflow polish.
-5. Bundled execution verification exists and passes, and later phases now also add explicit local structured runtime-event evidence, risk-observability surfaces, richer dashboard diagnostics, and targeted regressions for the tricky native live path.
+### Investor-facing reporting redesign
+Implemented across the recent completed phases:
+- normalized investor holdings/fill data contract
+- portfolio investor email with management summary, held instruments, and next-step guidance
+- investor-friendly fill / purchase notification redesign
+- condensed health-report synthesis for non-technical readers
+- cross-report wording consistency
+- report-specific structured summary JSON beside dated report artifacts
 
-## Most recent improvements
+### Health, delivery, and observability
+Implemented surfaces include:
+- `trade.js preflight`
+- `trade.js authority`
+- `trade.js config`
+- `trade.js delivery`
+- `trade.js health`
+- `trade.js self-heal`
+- `run-health-check.js`
+- `send-dashboard-digest.js`
+- structured overview/daily-summary/report-history/delivery-status artifacts
 
-- Added a portfolio execution service above the broker client with approval-aware policy checks.
-- Added trade lifecycle reconciliation helpers for approved/submitted/partially_filled/filled/cancelled/failed states.
-- Added scripts for approving trades, syncing order status, cancelling by order id, and verifying the execution surface.
-- Hardened native IB client loading so missing optional native dependency no longer blocks policy/test paths.
-- Added post-fill holdings refresh hook plus broker error pause state after repeated failures.
-- Added execution-fill and completed-order fallback paths for broker status lookup.
-- Added typed execution history snapshots and richer dashboard execution lifecycle visibility.
-- Added reconciliation note compaction and a safe demo execution flow script.
-- Added cancel-path runtime broker error tracking and recovery clearing so cancel failures participate in the same safety pause posture as stage/status failures.
-- Hardened trade blocking so unresolved portfolio questions, excluded/approved instrument overlap, stale pricing, simulated pricing, and unresolved live account references fail closed before broker writes.
-- Added dashboard/report freshness surfacing plus stale-state detection against source Markdown drift, and made report cycles return explicit history/dashboard refresh evidence.
-- Hardened rebalancing proposal generation to honor configured thresholds, explain cash-first behavior, and surface exact below-minimum blocking reasons.
-- Hardened ETF shortlist generation so exclusions produce explicit rejections, approved instruments remain visible in ranked output, and shortlist reasons expose scoring drivers more clearly.
-- Hardened portfolio draft/activation readiness so missing generated files, unresolved placeholders, and unanswered intake questions are surfaced explicitly before activation.
-- Hardened report generation so outputs expose generation/render metadata, narratives stay more consistent across periods, and the CLI correctly awaits async report completion.
-- Hardened scheduled report-cycle automation so it returns explicit step-level workflow/failure metadata and preserves clear read-only reporting mode boundaries.
-- Hardened broker-path diagnostics so blocked, unavailable, and degraded Interactive Brokers operations return more explicit mode/operation/reason metadata for operators and automation.
-- Completed the ETF suggestion workflow with richer screening filters and explicit approval gating before shortlist rows can rewrite Approved Instruments.
-- Completed portfolio guided intake so draft-state gaps now produce structured prompts with guidance and answer-format hints aligned to activation blockers.
-- Completed execution/safety closure so unmatched holdings and max-single-ETF breaches now fail closed with explicit operator-facing blockers.
-- Completed rebalancing closure so proposals now honor min/max bounds, cash-drag policy, and avoidable-turnover suppression in addition to thresholds and minimum size rules.
-- Expanded verification coverage with lifecycle, snapshot-typing, dashboard execution-summary, material-event history, cancel-runtime-error, staged-order handoff, trade-blocking safety, execution-safety-closure, dashboard/report freshness, rebalancing-hardening, rebalancing-closure, ETF-suggestion-hardening, ETF-suggestion-completion, portfolio-creation-hardening, portfolio-guided-intake, reporting-completeness, scheduling-ops-reliability, broker-adapter-completeness, and optional-Playwright-fallback tests.
-- Closed the final acceptance sweep for the read-only + dry-run MVP and removed the remaining non-browser proposal-path regression caused by eager browser-session imports.
-- Defined the post-MVP roadmap covering transmitted live execution hardening, operator runbooks, production reporting/delivery polish, and risk/logging/observability hardening.
-- Added a local-only report delivery policy, a report-delivery readiness CLI, richer delivery/pending-action metadata in dashboard/report/report-cycle outputs, and focused verification for that production reporting posture.
-- Completed Phase 28 command-center dashboard uplift with explicit health snapshot, portfolio value snapshot, blocker and pending-action surfacing, material-event timeline, report/delivery posture section, and one recommended-next-step summary.
-- Completed Phase 29 structured UI summary artifacts with per-portfolio `summary.json`, repo-level `runtime/overview/portfolio-index.json` and `runtime/overview/pending-actions.json`, stable schema coverage, and dashboard-alignment verification.
-- Completed Phase 30 multi-portfolio overview board with generated Markdown/HTML overview artifacts, explicit active-vs-demo-like portfolio labeling, cross-portfolio recommended actions, and focused aggregation coverage.
-- Completed Phase 31 unified operator queue surfacing so dashboard, report, structured summary artifacts, and multi-portfolio overview outputs now share richer pending-action items with queue type, severity, status, ranking, and summary rollups.
-- Completed Phase 32 decision-oriented reporting uplift with a Decision View vs Audit Detail split, incident/blocker summary, previous-report change summary, and urgency-labeled recommendations/next actions.
-- Completed Phase 33 guided onboarding/workflow uplift with grouped onboarding sections, progress metrics, explicit next-step guidance, and workflow-ready CLI/readiness output for draft portfolios.
-- Completed Phase 34 control-UI portfolio summary page generation with static per-portfolio `summary.html` output rendered from the structured summary artifact surface.
-- Continued and completed the later reporting/overview hardening sequence through Phase 100, covering recovery/incident/operator UX follow-ons, open-runner visibility, runtime-event/reporting alignment, generated overview surface tightening, and explicit `runtime/overview/pending-actions.json` contract assertions.
-- Extended the later post-acceptance hardening lane through Phases 124-126 and 150-154, covering native readiness/pricing truth alignment plus broker-block context propagation across portfolio summary, delivery diagnostics, delivery markdown/HTML, delivery-status JSON, cockpit rendering, and generated overview regression coverage.
+### Stabilization and cleanup
+The repo now explicitly distinguishes:
+- source-of-truth Markdown/contracts/code
+- generated runtime/report artifacts
+- ephemeral runtime churn that should usually not ride along in unrelated commits
+
+## Active outstanding work
+
+The most relevant still-open work is now tracked in the maintained roll-up plan instead of being inferred from old closure docs:
+- `ROLLUP_OUTSTANDING_PLAN.md`
+
+At the time of this update, the top active lane is:
+- market-calendar intelligence for persisted/approved instruments
+  - core helper/store model complete
+  - IBKR sync integration in progress
+  - readiness/reporting/cron integration still to be closed
+
+## Historical note
+
+The repository still contains many phase-plan files. They are useful as audit history, but they should not be treated as the current truth source for project status. Use this file plus `ROLLUP_OUTSTANDING_PLAN.md` for the current state.

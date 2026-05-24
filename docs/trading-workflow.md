@@ -54,7 +54,8 @@ Then use the active workflow entry points:
 - `scripts/execute-trades.js` is obsolete and intentionally no longer the active path.
 - Prefer portfolio-backed trade execution over any static trade list.
 - `Queued for open runner` is the total handoff pool; reporting now breaks that out into `Open-runner first handoffs` and `Open-runner retries` where space allows.
-
+- Investor-facing reporting now sits alongside the execution workflow: periodic summary emails, fill notifications, and health/digest outputs should be treated as downstream communication surfaces, not authority to trade.
+- As the market-calendar lane completes, exchange-hours intelligence should complement readiness interpretation rather than override broker truth.
 
 ## Runtime evidence split
 
