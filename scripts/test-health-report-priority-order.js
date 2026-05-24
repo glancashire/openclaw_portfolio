@@ -41,18 +41,18 @@ const { buildHealthReportMarkdown, buildHealthReportHtml } = require('../src/rep
   const markdown = buildHealthReportMarkdown(report);
   const html = buildHealthReportHtml(report);
 
-  assert(markdown.indexOf('## Immediate status') < markdown.indexOf('## Unresolved exceptions'), 'expected immediate status before unresolved exceptions');
-  assert(markdown.indexOf('## Unresolved exceptions') < markdown.indexOf('## Recommended next actions'), 'expected exceptions before recommended next actions');
-  assert(markdown.indexOf('## Recommended next actions') < markdown.indexOf('## Remediated during this run'), 'expected next actions before remediated section');
-  assert(markdown.indexOf('## Remediated during this run') < markdown.indexOf('## Remaining status and reference details'), 'expected remediated section before reference details');
-  assert(markdown.includes('regenerate_dashboard'));
-  assert(markdown.includes('write failed'));
+  assert(markdown.indexOf('## Management summary') < markdown.indexOf('## What needs attention now'), 'expected management summary before attention section');
+  assert(markdown.indexOf('## What needs attention now') < markdown.indexOf('## What the system already handled'), 'expected attention section before handled section');
+  assert(markdown.indexOf('## What the system already handled') < markdown.indexOf('## Remaining status and reference details'), 'expected handled section before reference details');
   assert(markdown.includes('Restore broker connectivity first.'));
+  assert(markdown.includes('What the system already handled'));
+  assert(markdown.includes('What still needs you'));
+  assert(markdown.includes('write failed'));
 
-  assert(html.includes('Immediate status'));
-  assert(html.includes('Unresolved exceptions'));
-  assert(html.includes('Recommended next actions'));
-  assert(html.includes('Remediated during this run'));
+  assert(html.includes('Management summary'));
+  assert(html.includes('What needs attention now'));
+  assert(html.includes('What the system already handled'));
+  assert(html.includes('What still needs you'));
   assert(html.includes('Remaining status and reference details'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));

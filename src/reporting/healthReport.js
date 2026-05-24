@@ -129,39 +129,33 @@ function buildHealthReportMarkdown(report) {
   const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
   const operatorCommands = Array.isArray(report.selfHeal?.operatorCommands) ? report.selfHeal.operatorCommands : [];
   const trends = report.trends || { summaryLines: [] };
+  const isHealthy = blockers.length === 0 && failedFixes.length === 0 && openIssues.length === 0;
 
   return [
     `# Health Report: ${report.portfolio}`,
     '',
-    '## Immediate status',
+    '## Management summary',
     `- Generated at: ${report.generatedAt}`,
-    `- Health: ${report.health.health}`,
-    `- Severity: ${report.health.severity}`,
-    `- Next action: ${report.health.nextAction || nextActions[0]}`,
-    `- Unresolved exceptions: ${blockers.length}`,
-    `- Remediated items: ${healed.length}`,
-    `- Failed remediations: ${failedFixes.length}`,
+    `- Current status: ${report.health.health} (${report.health.severity})`,
+    `- Management summary: ${isHealthy ? 'Everything important is working normally. No action is needed right now.' : report.health.nextAction || nextActions[0]}`,
+    `- Next step: ${report.health.nextAction || nextActions[0]}`,
+    `- Automatic fixes applied: ${healed.length}`,
+    `- Issues still needing attention: ${blockers.length + openIssues.length + failedFixes.length}`,
     '',
-    '## Classified symptoms',
-    ...(classified.length ? classified.map((item) => `- [${item.category}] ${item.symptom}`) : ['- None.']),
+    '## What needs attention now',
+    ...(blockers.length ? blockers.map((item) => `- [${item.code}] ${item.message}`) : ['- No urgent exceptions are open right now.']),
+    ...(nextActions.length ? nextActions.map((item) => `- Next action: ${item}`) : []),
     '',
-    '## Unresolved exceptions',
-    ...(blockers.length ? blockers.map((item) => `- [${item.code}] ${item.message}`) : ['- None.']),
+    '## What the system already handled',
+    ...(healed.length ? healed.map((item) => `- ${item.kind}: ${item.applied ? 'applied automatically' : item.blocked || 'not applied'}`) : ['- No automatic fixes were needed this cycle.']),
+    ...(classified.length ? ['', '### Detected symptoms', ...classified.map((item) => `- [${item.category}] ${item.symptom}`)] : []),
     '',
-    '## Recommended next actions',
-    ...nextActions.map((item) => `- ${item}`),
-    '',
-    '## Remediated during this run',
-    ...(healed.length ? healed.map((item) => `- ${item.kind}: ${item.applied ? 'applied' : item.blocked || 'not applied'}`) : ['- None.']),
-    '',
-    '## Open issues for operator',
-    ...(openIssues.length ? openIssues.map((item, index) => `- [${item.category}] ${item.summary}${operatorCommands[index] ? ` — Command: ${operatorCommands[index].command}` : ''}`) : ['- None.']),
+    '## What still needs you',
+    ...(openIssues.length ? openIssues.map((item, index) => `- [${item.category}] ${item.summary}${operatorCommands[index] ? ` — Suggested command: ${operatorCommands[index].command}` : ''}`) : ['- Nothing operator-only is waiting right now.']),
+    ...(failedFixes.length ? failedFixes.map((item) => `- ${item.kind}: not fixed automatically (${item.error || 'unknown error'})`) : []),
     '',
     '## Recent trends',
     ...(trends.summaryLines.length ? trends.summaryLines.map((line) => `- ${line}`) : ['- No recent health-check trend data yet.']),
-    '',
-    '## Remediation attempts that still need attention',
-    ...(failedFixes.length ? failedFixes.map((item) => `- ${item.kind}: failed (${item.error || 'unknown error'})`) : ['- None.']),
     '',
     '## Remaining status and reference details',
     `- Generated-state issues: ${generatedIssues.length}`,
@@ -188,52 +182,58 @@ function buildHealthReportHtml(report) {
   const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
   const operatorCommands = Array.isArray(report.selfHeal?.operatorCommands) ? report.selfHeal.operatorCommands : [];
   const trends = report.trends || { summaryLines: [] };
+  const isHealthy = blockers.length === 0 && failedFixes.length === 0 && openIssues.length === 0;
   const statusBadge = badge({ label: `${report.health.health} / ${report.health.severity}`, tone: severityTone(report.health.severity) });
-  const nextActionBadge = badge({ label: blockers.length ? 'Action required' : 'No urgent exception', tone: blockers.length ? 'danger' : 'success' });
+  const nextActionBadge = badge({ label: blockers.length ? 'Action required' : 'Everything important looks healthy', tone: blockers.length ? 'danger' : 'success' });
 
   const summaryCard = card({
-    title: 'Immediate status',
+    title: 'Management summary',
     tone: 'info',
     contentHtml: `
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">${statusBadge}${nextActionBadge}</div>
-      <div style="margin:0 0 14px;padding:14px 15px;background:#ffffff;border:1px solid #bfdbfe;border-radius:14px;">
-        <div style="font-size:11px;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;margin-bottom:6px;">Next action</div>
-        <div style="font-size:16px;font-weight:800;color:#0f172a;line-height:1.5;">${report.health.nextAction || nextActions[0]}</div>
+      <div style="margin:0 0 14px;padding:16px 18px;background:${isHealthy ? '#ecfdf5' : '#fff7ed'};border:1px solid ${isHealthy ? '#86efac' : '#fdba74'};border-radius:14px;">
+        <div style="font-size:11px;color:${isHealthy ? '#166534' : '#9a3412'};text-transform:uppercase;letter-spacing:0.05em;font-weight:800;margin-bottom:6px;">Management summary</div>
+        <div style="font-size:16px;font-weight:800;color:#0f172a;line-height:1.6;">${isHealthy ? 'Everything important is working normally. No action is needed right now.' : report.health.nextAction || nextActions[0]}</div>
       </div>
       ${kvTable([
         { label: 'Generated at', value: report.generatedAt },
-        { label: 'Unresolved exceptions', value: String(blockers.length) },
-        { label: 'Remediated items', value: String(healed.length) },
-        { label: 'Failed remediations', value: String(failedFixes.length) },
+        { label: 'Next step', value: report.health.nextAction || nextActions[0] },
+        { label: 'Automatic fixes applied', value: String(healed.length) },
+        { label: 'Issues still needing attention', value: String(blockers.length + openIssues.length + failedFixes.length) },
       ])}
     `,
   });
 
-  const classifiedCard = card({
-    title: 'Classified symptoms',
-    contentHtml: classified.length
-      ? bulletList(classified.map((item) => `[${item.category}] ${item.symptom}`))
-      : '<p style="margin:0;color:#6b7280;">No classified symptoms this cycle.</p>',
-  });
-
-  const nextActionsCard = card({
-    title: 'Recommended next actions',
-    tone: 'warn',
-    contentHtml: bulletList(nextActions),
+  const issuesCard = card({
+    title: 'What needs attention now',
+    tone: blockers.length ? 'warn' : 'success',
+    contentHtml: `${blockers.length
+      ? bulletList(blockers.map((item) => `[${item.code}] ${item.message}`))
+      : '<p style="margin:0;color:#166534;font-weight:600;">No urgent exceptions are open right now.</p>'}
+      <div style="height:12px"></div>
+      ${bulletList(nextActions.map((item) => `Next action: ${item}`))}`,
   });
 
   const healedCard = card({
-    title: 'Remediated during this run',
-    contentHtml: healed.length
-      ? bulletList(healed.map((item) => `${item.kind}: ${item.applied ? 'applied' : item.blocked || 'not applied'}`))
-      : '<p style="margin:0;color:#6b7280;">No safe fix ran this cycle.</p>',
+    title: 'What the system already handled',
+    contentHtml: `${healed.length
+      ? bulletList(healed.map((item) => `${item.kind}: ${item.applied ? 'applied automatically' : item.blocked || 'not applied'}`))
+      : '<p style="margin:0;color:#6b7280;">No automatic fixes were needed this cycle.</p>'}
+      ${classified.length ? `<div style="height:12px"></div><div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:8px;">Detected symptoms</div>${bulletList(classified.map((item) => `[${item.category}] ${item.symptom}`))}` : ''}`,
   });
 
   const openIssuesCard = card({
-    title: 'Open issues for operator',
+    title: 'What still needs you',
     contentHtml: openIssues.length
-      ? bulletList(openIssues.map((item, index) => `[${item.category}] ${item.summary}${operatorCommands[index] ? ` — Command: ${operatorCommands[index].command}` : ''}`))
-      : '<p style="margin:0;color:#166534;font-weight:600;">No operator-only open issues surfaced.</p>',
+      ? bulletList(openIssues.map((item, index) => `[${item.category}] ${item.summary}${operatorCommands[index] ? ` — Suggested command: ${operatorCommands[index].command}` : ''}`))
+      : '<p style="margin:0;color:#166534;font-weight:600;">Nothing operator-only is waiting right now.</p>',
+  });
+
+  const failedFixesCard = card({
+    title: 'Automatic fixes that did not finish cleanly',
+    contentHtml: failedFixes.length
+      ? bulletList(failedFixes.map((item) => `${item.kind}: not fixed automatically (${item.error || 'unknown error'})`))
+      : '<p style="margin:0;color:#6b7280;">No failed automatic fixes were recorded.</p>',
   });
 
   const trendsCard = card({
@@ -241,20 +241,6 @@ function buildHealthReportHtml(report) {
     contentHtml: trends.summaryLines.length
       ? bulletList(trends.summaryLines)
       : '<p style="margin:0;color:#6b7280;">No recent health-check trend data yet.</p>',
-  });
-
-  const issuesCard = card({
-    title: 'Unresolved exceptions',
-    contentHtml: blockers.length
-      ? bulletList(blockers.map((item) => `[${item.code}] ${item.message}`))
-      : '<p style="margin:0;color:#166534;font-weight:600;">No unresolved exceptions surfaced.</p>',
-  });
-
-  const failedFixesCard = card({
-    title: 'Remediation attempts that still need attention',
-    contentHtml: failedFixes.length
-      ? bulletList(failedFixes.map((item) => `${item.kind}: not fixed (${item.error || 'unknown error'})`))
-      : '<p style="margin:0;color:#6b7280;">No failed remediation attempts recorded.</p>',
   });
 
   const referenceCard = card({
@@ -278,7 +264,7 @@ function buildHealthReportHtml(report) {
     title: `${report.portfolio} system health report`,
     subtitle: 'Exceptions and next actions first, followed by self-heal output, operator guidance, trends, and lower-priority reference details.',
     accent: '#7c2d12',
-    bodyHtml: `${summaryCard}${classifiedCard}${issuesCard}${nextActionsCard}${healedCard}${openIssuesCard}${trendsCard}${failedFixesCard}${referenceCard}`,
+    bodyHtml: `${summaryCard}${issuesCard}${healedCard}${openIssuesCard}${failedFixesCard}${trendsCard}${referenceCard}`,
     footer: 'OpenClaw Portfolio Manager • Health monitoring report',
   });
 }
