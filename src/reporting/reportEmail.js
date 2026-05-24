@@ -218,6 +218,7 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
     '',
     'Next step to improve the portfolio',
     `${nextAction || 'Continue monitoring.'}`,
+    `What matters now: ${nextAction || 'Continue monitoring.'}`,
     `Next action: ${nextAction || 'Continue monitoring.'}`,
     '',
     `Top blocker: ${topBlocker || 'none.'}`,
@@ -252,7 +253,7 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
     tone: 'warn',
     contentHtml: `
       <div style="margin:0 0 10px;padding:14px 15px;background:#ffffff;border:1px solid #fdba74;border-radius:14px;">
-        <div style="font-size:11px;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;font-weight:800;margin-bottom:6px;">Next action</div>
+        <div style="font-size:11px;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;font-weight:800;margin-bottom:6px;">What matters now</div>
         <div style="font-size:16px;font-weight:800;color:#7c2d12;line-height:1.45;">${escapeHtml(nextAction || 'Continue monitoring')}</div>
       </div>
       <div style="padding:12px 14px;background:#fffaf5;border:1px solid #fed7aa;border-radius:14px;line-height:1.55;color:#7c2d12;">
@@ -282,7 +283,7 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
   const improvementCard = card({
     title: 'Next step to improve the portfolio',
     tone: 'success',
-    contentHtml: `<div style="padding:12px 14px;background:#ffffff;border:1px solid #bbf7d0;border-radius:14px;font-size:15px;line-height:1.6;color:#14532d;font-weight:700;">${escapeHtml(nextAction || 'Continue monitoring')}</div>`,
+    contentHtml: `<div style="padding:12px 14px;background:#ffffff;border:1px solid #bbf7d0;border-radius:14px;font-size:15px;line-height:1.6;color:#14532d;font-weight:700;"><div style="font-size:11px;color:#166534;text-transform:uppercase;letter-spacing:0.04em;font-weight:800;margin-bottom:6px;">What matters now</div>${escapeHtml(nextAction || 'Continue monitoring')}</div>`,
   });
 
   const detailCard = card({

@@ -54,6 +54,7 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportHtml.includes('+CHF 116.64'));
   assert(reportHtml.includes('+2.2%'));
   assert(reportHtml.includes('Immediate priorities'));
+  assert(reportHtml.includes('What matters now'));
   assert(reportHtml.includes('Status snapshot'));
   assert(reportHtml.includes('Workflow items'));
   assert(reportHtml.includes('Supporting detail'));
@@ -70,6 +71,7 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportText.includes('Gain since purchase (CHF): +CHF 116.64'));
   assert(reportText.includes('Gain since purchase (%): +2.2%'));
   assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
+  assert(reportText.includes('What matters now: Restore broker connectivity first.'));
   assert(reportText.includes('Next action: Restore broker connectivity first.'));
 
   const tradeInput = {

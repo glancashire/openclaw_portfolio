@@ -74,6 +74,7 @@ const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting
   assert(html.includes('Latest price'));
   assert(html.includes('Gain since purchase'));
   assert(html.includes('Next step to improve the portfolio'));
+  assert(html.includes('What matters now'));
   assert(html.includes('Total held instruments'));
   assert(html.includes('Cost basis unavailable'));
   assert(html.includes('YTD unavailable'));
@@ -93,6 +94,7 @@ const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting
   assert(text.includes('Average buy price: CHF 190.00'));
   assert(text.includes('Average buy price: unavailable'));
   assert(text.includes('Next step to improve the portfolio'));
+  assert(text.includes('What matters now: Add gradually to the underweight global equity position while keeping some CHF cash in reserve.'));
   assert(text.includes('Total held instruments: 2'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));
