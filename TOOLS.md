@@ -36,6 +36,16 @@ Things that matter in this setup:
 - Last verified launch display: `:99` via Xvfb.
 - The practical finish step is completing the IB Gateway login / second-factor approval on that display, then rerunning `node scripts/check-interactive-brokers-readiness.js`.
 
+### Reporting stabilization (Phases 163–165)
+- Dated portfolio reports now persist a sibling structured JSON artifact beside the dated markdown/html report; investor email loading should prefer that sibling JSON before falling back to `summary.json`.
+- `generateAndWriteReport(...)` must never emit `portfolio_report_*_undefined.*`; if `dateStamp` is omitted it should default to the current `YYYYMMDD` date.
+- Investor weekly overview expectations now covered by tests:
+  - management summary should surface concrete CHF totals when holdings totals exist
+  - held instruments should render actual rows when holdings data exists
+- Investor health report is intentionally shorter and synthesized; prefer plain-language direction summaries over long itemized trend lists unless debugging an operator issue.
+- For now, prefer gathering usage evidence over more wording/layout churn. Inspect real generated artifacts before redesigning reporting again.
+- If report-history or multi-portfolio overview tests fail on malformed dates, check for stray generated report artifacts before changing code.
+
 ### Repo hygiene
 - A local pre-commit hook lives in `.githooks/pre-commit` and runs the focused verification subset before commits.
 - If hooks are bypassed for an emergency commit, rerun the focused suite manually before pushing.
