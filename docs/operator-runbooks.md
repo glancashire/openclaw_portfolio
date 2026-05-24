@@ -21,6 +21,8 @@ This is the active incident and operator reference.
 - `node scripts/trade.js status portfolio/etf`
 - `node scripts/run-health-check.js portfolio/etf --dry-run`
 - `node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily --dry-run`
+- `node scripts/sync-market-calendar.js portfolio/etf --dry-run`
+- `node scripts/sync-market-calendar.js portfolio/etf --json`
 - `node scripts/stage-portfolio-order.js portfolio/etf '<json>' stage`
 - `runtime/overview/portfolio-overview.md`
 - `node scripts/check-transmitted-live-readiness.js portfolio/etf '<json>'`

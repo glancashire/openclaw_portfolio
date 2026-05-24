@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
+const { readMarketCalendarArtifact } = require('./marketCalendarStore');
 const { listExecutableTradeRows } = require('./tradeState');
 const { prepareOrderForSubmission } = require('./orderPreparation');
 const { getVenueHoursReference, evaluateVenueReferenceState } = require('./venueHoursReference');
@@ -83,10 +84,34 @@ function buildExecutableOrderDiagnostics({ portfolioDir, contractDetailsByTicker
   });
 }
 
+function getCalendarCoverageSummary({ portfolioDir, now = new Date() } = {}) {
+  try {
+    const repoRoot = path.dirname(path.dirname(portfolioDir));
+    const runtimeRoot = path.join(repoRoot, 'runtime');
+    const artifact = readMarketCalendarArtifact({ portfolioDir, runtimeRoot });
+    if (!artifact) {
+      return { available: false, reason: 'no_artifact', generatedAt: null, coverage: null };
+    }
+    const ageMs = now.getTime() - new Date(artifact.generatedAt).getTime();
+    const stale = ageMs > 7 * 24 * 60 * 60 * 1000;
+    return {
+      available: !stale,
+      reason: stale ? 'stale' : 'ok',
+      generatedAt: artifact.generatedAt,
+      ageHours: Math.round(ageMs / (60 * 60 * 1000)),
+      brokerReady: artifact.brokerReady,
+      coverage: artifact.coverage || null,
+    };
+  } catch {
+    return { available: false, reason: 'error', generatedAt: null, coverage: null };
+  }
+}
+
 module.exports = {
   findApprovedInstrument,
   executableRowToDraftOrder,
   parseHoursSegments,
   evaluateHoursState,
   buildExecutableOrderDiagnostics,
+  getCalendarCoverageSummary,
 };

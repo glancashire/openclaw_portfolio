@@ -19,11 +19,11 @@ Teach the system when the relevant exchanges for persisted/approved instruments 
 ### Status summary
 - [x] Shared market-calendar helper model
 - [x] Persisted market-calendar artifact/store
-- [ ] IBKR contract-hours sync module and script path
-- [ ] Graceful degraded handling for missing identity / broker unavailable cases across the whole sync path
-- [ ] Readiness integration that consumes the persisted calendar artifact
-- [ ] Reporting/diagnostic surfacing of market-calendar coverage/state
-- [ ] Cron refresh automation and operator guidance
+- [x] IBKR contract-hours sync module and script path
+- [x] Graceful degraded handling for missing identity / broker unavailable cases across the whole sync path
+- [x] Readiness integration that consumes the persisted calendar artifact
+- [x] Reporting/diagnostic surfacing of market-calendar coverage/state
+- [x] Cron refresh automation and operator guidance
 - [ ] Full closeout verification and documentation refresh for the calendar lane
 
 ### Key files / lanes

@@ -9,6 +9,8 @@ const { listApprovalEnvelopes } = require('./basketApprovalStore');
 const { brokerErrorStatus, readExecutionState, writeExecutionState } = require('./runtimeState');
 const { parseTradeDate, hoursBetween } = require('./executionClassification');
 const { isMarketOpen, nextOpenTime } = require('../../lib/marketHours');
+const { readMarketCalendarArtifact } = require('./marketCalendarStore');
+const { parseHoursSegments, evaluateHoursState } = require('./marketCalendar');
 const { buildExecutableOrderDiagnostics } = require('./executionDiagnostics');
 
 const DEFAULT_APPROVAL_MAX_AGE_HOURS = 24;
@@ -181,15 +183,71 @@ function inferExcludedApprovedReason(row) {
   return 'Approved row is not currently executable.';
 }
 
+const CALENDAR_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function evaluateMarketWindowFromCalendar(portfolioDir, exchange, now = new Date()) {
+  try {
+    const repoRoot = path.dirname(path.dirname(portfolioDir));
+    const runtimeRoot = path.join(repoRoot, 'runtime');
+    const artifact = readMarketCalendarArtifact({ portfolioDir, runtimeRoot });
+    if (!artifact || !artifact.generatedAt) return null;
+
+    const generatedMs = new Date(artifact.generatedAt).getTime();
+    if (isNaN(generatedMs) || (now.getTime() - generatedMs) > CALENDAR_MAX_AGE_MS) return null;
+
+    const instruments = Array.isArray(artifact.instruments) ? artifact.instruments : [];
+    // Find best match: prefer liquidHours for the target exchange
+    const matched = instruments.find((row) =>
+      row.syncStatus === 'ok' &&
+      row.liquidHoursRaw &&
+      (row.ibkrPrimaryExchange === exchange || row.exchange === exchange)
+    ) || instruments.find((row) =>
+      row.syncStatus === 'ok' && row.liquidHoursRaw
+    );
+
+    if (!matched || !matched.liquidHoursRaw) return null;
+
+    const segments = parseHoursSegments(matched.liquidHoursRaw);
+    const state = evaluateHoursState(segments, now);
+
+    if (state.status === 'unknown') return null; // not definitive
+    return {
+      open: state.status === 'open',
+      reason: `calendar:${state.status}`,
+      source: 'calendar_artifact',
+      exchange: matched.ibkrPrimaryExchange || matched.exchange || exchange,
+      instrument: matched.tickerOrIsin,
+    };
+  } catch {
+    return null;
+  }
+}
+
 function evaluateMarketWindow(portfolioDir, { contractDetailsByTicker = {}, now = new Date() } = {}) {
   const diagnostics = buildExecutableOrderDiagnostics({ portfolioDir, contractDetailsByTicker, now });
   const primaryExchange = diagnostics[0]?.preparedOrder?.primaryExchange || diagnostics[0]?.approvedInstrument?.ibkrPrimaryExchange || null;
   const exchange = primaryExchange || 'EBS';
+
+  // Try persisted calendar first
+  const calendarResult = evaluateMarketWindowFromCalendar(portfolioDir, exchange, now);
+  if (calendarResult) {
+    return {
+      exchange: calendarResult.exchange || exchange,
+      openNow: calendarResult.open,
+      reason: calendarResult.reason,
+      source: calendarResult.source,
+      nextOpen: calendarResult.open ? null : nextOpenTime(exchange),
+      diagnostics,
+    };
+  }
+
+  // Fallback to heuristic
   const openNow = isMarketOpen(exchange);
   return {
     exchange,
     openNow: Boolean(openNow.open),
     reason: openNow.reason,
+    source: 'heuristic',
     nextOpen: nextOpenTime(exchange),
     diagnostics,
   };
