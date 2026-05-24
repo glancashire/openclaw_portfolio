@@ -8,6 +8,7 @@ const {
   bulletList,
   metricGrid,
   kvTable,
+  dataTable,
   formatCurrency,
   formatPercent,
 } = require('./emailHtml');
@@ -122,6 +123,65 @@ function buildHeadlineMetrics(summary = null) {
   ];
 }
 
+function availabilityText(value, fallback = 'Unavailable') {
+  return value == null || value === '' ? fallback : value;
+}
+
+function buildInvestorHoldingsTable(summary = null) {
+  const investorHoldings = Array.isArray(summary?.investorHoldings?.rows) ? summary.investorHoldings.rows : [];
+  const totals = summary?.investorHoldings?.totals || {};
+  const table = dataTable({
+    columns: [
+      { label: 'Symbol' },
+      { label: 'Name' },
+      { label: 'Quantity', align: 'right' },
+      { label: 'Average buy price', align: 'right' },
+      { label: 'Latest price', align: 'right' },
+      { label: 'Total value', align: 'right' },
+      { label: 'Gain since purchase', align: 'right' },
+      { label: 'YTD', align: 'right' },
+      { label: 'Value in CHF', align: 'right' },
+      { label: 'Gains in CHF', align: 'right' },
+    ],
+    rows: investorHoldings.map((row) => ([
+      escapeHtml(row.symbol || '—'),
+      escapeHtml(row.name || '—'),
+      escapeHtml(Number.isFinite(Number(row.quantityHeld)) ? String(row.quantityHeld) : '—'),
+      escapeHtml(row.averageBuyPrice == null ? 'Cost basis unavailable' : formatCurrency(row.averageBuyPrice, row.currency || 'CHF')),
+      escapeHtml(row.lastTradedPrice == null ? '—' : formatCurrency(row.lastTradedPrice, row.currency || 'CHF')),
+      escapeHtml(row.totalValue == null ? '—' : formatCurrency(row.totalValue, row.currency || 'CHF')),
+      escapeHtml(row.gainSincePurchasePct == null ? 'Cost basis unavailable' : formatPercent(row.gainSincePurchasePct)),
+      escapeHtml(row.ytdPct == null ? 'YTD unavailable' : formatPercent(row.ytdPct)),
+      escapeHtml(row.valueChf == null ? '—' : formatCurrency(row.valueChf, 'CHF')),
+      escapeHtml(row.gainSincePurchaseChf == null ? 'Cost basis unavailable' : formatCurrency(row.gainSincePurchaseChf, 'CHF')),
+    ])),
+  });
+
+  const summaryLine = `<div style="margin-top:12px;padding:12px 14px;background:#ffffff;border:1px solid #dbe4f0;border-radius:14px;color:#0f172a;line-height:1.6;"><strong>Total held instruments:</strong> ${escapeHtml(String(totals.rowCount || 0))} &nbsp;•&nbsp; <strong>Total value in CHF:</strong> ${escapeHtml(formatCurrency(totals.totalValueChf, 'CHF'))} &nbsp;•&nbsp; <strong>Total gains in CHF:</strong> ${escapeHtml(totals.totalGainChf == null ? 'Cost basis unavailable' : formatCurrency(totals.totalGainChf, 'CHF'))}</div>`;
+  return `${table}${summaryLine}`;
+}
+
+function buildInvestorHoldingsText(summary = null) {
+  const investorHoldings = Array.isArray(summary?.investorHoldings?.rows) ? summary.investorHoldings.rows : [];
+  const totals = summary?.investorHoldings?.totals || {};
+  const lines = ['Held instruments'];
+  for (const row of investorHoldings) {
+    lines.push(`- ${availabilityText(row.symbol, '—')} — ${availabilityText(row.name, 'Unnamed instrument')}`);
+    lines.push(`  Quantity: ${row.quantityHeld == null ? '—' : row.quantityHeld}`);
+    lines.push(`  Average buy price: ${row.averageBuyPrice == null ? 'unavailable' : formatCurrency(row.averageBuyPrice, row.currency || 'CHF')}`);
+    lines.push(`  Latest price: ${row.lastTradedPrice == null ? '—' : formatCurrency(row.lastTradedPrice, row.currency || 'CHF')}`);
+    lines.push(`  Total value: ${row.totalValue == null ? '—' : formatCurrency(row.totalValue, row.currency || 'CHF')}`);
+    lines.push(`  Gain since purchase: ${row.gainSincePurchasePct == null ? 'unavailable' : formatPercent(row.gainSincePurchasePct)}`);
+    lines.push(`  YTD: ${row.ytdPct == null ? 'unavailable' : formatPercent(row.ytdPct)}`);
+    lines.push(`  Value in CHF: ${row.valueChf == null ? '—' : formatCurrency(row.valueChf, 'CHF')}`);
+    lines.push(`  Gains in CHF: ${row.gainSincePurchaseChf == null ? 'unavailable' : formatCurrency(row.gainSincePurchaseChf, 'CHF')}`);
+  }
+  lines.push(`Total held instruments: ${totals.rowCount || 0}`);
+  lines.push(`Total value in CHF: ${formatCurrency(totals.totalValueChf, 'CHF')}`);
+  lines.push(`Total gains in CHF: ${totals.totalGainChf == null ? 'unavailable' : formatCurrency(totals.totalGainChf, 'CHF')}`);
+  return lines.join('\n');
+}
+
 function buildStatusRows(summary = null, deliveryStatus = null, topBlocker = null, nextAction = null) {
   const status = summary?.status || {};
   const metrics = buildInvestorMetrics(summary);
@@ -154,8 +214,13 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
     `- Invested capital (CHF): ${formatCurrency(metrics.investedChf, 'CHF')}`,
     `- Cash balance (CHF): ${formatCurrency(metrics.cashChf, 'CHF')}`,
     '',
+    buildInvestorHoldingsText(summary),
+    '',
+    'Next step to improve the portfolio',
+    `${nextAction || 'Continue monitoring.'}`,
+    `Next action: ${nextAction || 'Continue monitoring.'}`,
+    '',
     `Top blocker: ${topBlocker || 'none.'}`,
-    `Next action: ${nextAction || 'continue monitoring.'}`,
     pending.length ? `Workflow items pending: ${pending.length}.` : 'Workflow items pending: none.',
     '',
     'Supporting detail',
@@ -209,6 +274,17 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
       : '<p style="margin:0;color:#475569;line-height:1.6;">Nothing else needs workflow cleanup right now.</p>',
   });
 
+  const holdingsCard = card({
+    title: 'Held instruments',
+    contentHtml: buildInvestorHoldingsTable(summary),
+  });
+
+  const improvementCard = card({
+    title: 'Next step to improve the portfolio',
+    tone: 'success',
+    contentHtml: `<div style="padding:12px 14px;background:#ffffff;border:1px solid #bbf7d0;border-radius:14px;font-size:15px;line-height:1.6;color:#14532d;font-weight:700;">${escapeHtml(nextAction || 'Continue monitoring')}</div>`,
+  });
+
   const detailCard = card({
     title: 'Supporting detail',
     contentHtml: `<div class="report-email-summary" style="line-height:1.7;color:#0f172a;">${summaryHtml}</div>`,
@@ -219,7 +295,7 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
     title: `${portfolioName} ${period} investor overview`,
     subtitle: 'Top line first: performance, next step, workflow status, then the full report detail.',
     accent: '#1e3a8a',
-    bodyHtml: `${summaryCard}${actionCard}${statusCard}${postureCard}${detailCard}`,
+    bodyHtml: `${summaryCard}${holdingsCard}${improvementCard}${actionCard}${statusCard}${postureCard}${detailCard}`,
     footer: 'OpenClaw Portfolio Manager • Policy-gated, auditable reporting',
   });
 }

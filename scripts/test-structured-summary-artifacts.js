@@ -50,6 +50,9 @@ async function main() {
   assert(typeof summary.explanations.executionBlock === 'string' && summary.explanations.executionBlock.length > 0, 'Expected execution explanation');
   assert(typeof summary.explanations.approvalBacklog === 'string' && summary.explanations.approvalBacklog.length > 0, 'Expected approval explanation');
   assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.queuedForOpenRunner === 'number', 'Expected queued-for-open-runner trade-state count');
+  assert(summary.investorHoldings && Array.isArray(summary.investorHoldings.rows), 'Expected investor holdings rows');
+  assert(summary.investorHoldings && summary.investorHoldings.totals && typeof summary.investorHoldings.totals.rowCount === 'number', 'Expected investor holdings totals');
+  assert(summary.investorHoldings.totals.totalGainPct == null || Number.isFinite(summary.investorHoldings.totals.totalGainPct), 'Expected investor holding total gain pct to be finite or null');
   assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.blocked === 'number', 'Expected blocked trade-state count');
   assert(summary.execution && summary.execution.openRunnerRetryState && typeof summary.execution.openRunnerRetryState.queuedRetry === 'number', 'Expected queued-retry count');
   assert(typeof summary.execution.openRunnerRetryState.queuedInitial === 'number', 'Expected queued-initial count');
@@ -72,6 +75,7 @@ async function main() {
   assert(html.includes('Open-runner first handoff events'), 'Expected first-handoff runtime-event count in html');
   assert(html.includes('Open-runner retry events'), 'Expected retry runtime-event count in html');
   assert(html.includes('Recommended Next Step'), 'Expected recommendation section in html');
+  assert(typeof summary.investorHoldings.rows[0]?.symbol === 'string' || summary.investorHoldings.rows.length === 0, 'Expected investor holding symbol field');
   assert(html.includes('Why This Portfolio Looks This Way'), 'Expected explanation section in html');
   const explanationNeedles = [
     summary.explanations?.biggestDrift,
@@ -138,7 +142,7 @@ async function main() {
     fs.writeFileSync(executionStatePath, executionStateBefore);
   }
 
-  console.log(JSON.stringify({ ok: true, pendingActions: pending.itemCount, dashboardPath }, null, 2));
+  console.log(JSON.stringify({ ok: true, pendingActions: pending.itemCount, investorHoldings: summary.investorHoldings.rows.length, dashboardPath }, null, 2));
 }
 
 main().catch((error) => {

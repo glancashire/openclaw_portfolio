@@ -20,6 +20,7 @@ const { summarizeContractIntelligence } = require('./contractIntelligenceStatus'
 const { readTradesTable, summarizeOpenRunnerRetryState, staleApprovalInventory } = require('../execution/tradeState');
 const { classifyTradeRowExecution } = require('../execution/executionClassification');
 const { buildSelfHealPlan } = require('../execution/portfolioHealth');
+const { buildInvestorHoldingsSnapshot } = require('./investorReportingData');
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -437,10 +438,11 @@ function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerR
   });
 }
 
-function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = null, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [], readiness = null, selfHealPlan = null, contractIntelligence = null }) {
+function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = null, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [], readiness = null, selfHealPlan = null, contractIntelligence = null, historySeries = [] }) {
   const summary = parseHoldingsSummary(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
   const holdingCount = countHoldingRows(holdingsText);
+  const investorHoldings = buildInvestorHoldingsSnapshot({ holdingsText, historyRows: historySeries, approvedInstruments });
   const blockers = safetyDiagnostics?.blockers || [];
   const tradeStateSummary = summarizeTradeStateRows(tradesPath);
   const blockedTradeRows = listBlockedTradeRows(tradesPath);
@@ -518,6 +520,30 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
       latestSnapshotDate: latestSnapshot?.date || null,
       dailyChangeChf: Number(latestSnapshot?.dailyChange || 0),
       dailyChangePct: Number(latestSnapshot?.dailyChangePct || 0),
+    },
+    investorHoldings: {
+      rows: investorHoldings.rows,
+      totals: (() => {
+        const rowsWithGain = investorHoldings.rows.filter((row) => Number.isFinite(Number(row.gainSincePurchaseChf)));
+        const totalValueChf = investorHoldings.rows.reduce((sum, row) => sum + (Number.isFinite(Number(row.valueChf)) ? Number(row.valueChf) : 0), 0);
+        const totalGainChf = rowsWithGain.length
+          ? rowsWithGain.reduce((sum, row) => sum + Number(row.gainSincePurchaseChf), 0)
+          : null;
+        const totalCostBasis = rowsWithGain.reduce((sum, row) => {
+          if (Number.isFinite(Number(row.valueChf))) {
+            return sum + (Number(row.valueChf) - Number(row.gainSincePurchaseChf));
+          }
+          return sum;
+        }, 0);
+        return {
+          rowCount: investorHoldings.rows.length,
+          totalValueChf,
+          totalGainChf,
+          totalGainPct: totalGainChf != null && totalCostBasis > 0
+            ? Number(((totalGainChf / totalCostBasis) * 100).toFixed(1))
+            : null,
+        };
+      })(),
     },
     approvals: {
       proposedCount: Number(lifecycleSummary?.proposed || 0),
@@ -650,6 +676,7 @@ async function collectPortfolioSummary({ portfolioDir, readiness = null }) {
     recentEvents,
     readiness,
     selfHealPlan,
+    historySeries: readNetLiqHistory(portfolioDir),
   });
 }
 

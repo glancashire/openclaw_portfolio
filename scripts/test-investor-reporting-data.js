@@ -51,6 +51,7 @@ const {
 
   const snapshot = buildInvestorHoldingsSnapshot({
     holdingsText: altHoldings,
+    approvedInstruments: [{ tickerOrIsin: 'TEST', name: 'Test Holding', ibkrConid: 'TEST', ibkrSymbol: 'TEST' }],
     historyRows: [
       { date: '2026-01-01', totalChf: 4500 },
       { date: '2026-05-20', totalChf: 5000 },
@@ -68,6 +69,21 @@ const {
   assert.strictEqual(snapshot.rows[0].gainSincePurchasePct, 20);
   assert.strictEqual(snapshot.rows[0].ytdChf, 500);
   assert.strictEqual(snapshot.rows[0].ytdPct, Number(((500 / 4500) * 100).toFixed(1)));
+
+  const brokerishHoldings = `# Holdings: etf
+
+## Current Holdings
+| Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | Allocation % | Target % | Drift % |
+|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|
+| 75776072 | SXR8 | Global equities | 18 | 691.08 (avg cost) | EUR |  | 12439.52 | 0 | 0 | 0 |
+`;
+  const mappedSnapshot = buildInvestorHoldingsSnapshot({
+    holdingsText: brokerishHoldings,
+    approvedInstruments: [{ tickerOrIsin: 'IE00B5BMR087', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', ibkrConid: '75776072', ibkrLocalSymbol: 'SXR8', ibkrSymbol: 'SXR8' }],
+    historyRows: [],
+  });
+  assert.strictEqual(mappedSnapshot.rows[0].symbol, 'IE00B5BMR087');
+  assert.strictEqual(mappedSnapshot.rows[0].name, 'iShares Core S&P 500 UCITS ETF USD (Acc)');
 
   const filledTrade = normalizeFilledTrade({
     trade: {

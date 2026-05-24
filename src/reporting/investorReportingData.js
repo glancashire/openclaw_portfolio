@@ -84,7 +84,7 @@ function lastHistoryValue(historyRows = []) {
   return Number(rows[rows.length - 1].totalChf);
 }
 
-function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [] } = {}) {
+function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [], approvedInstruments = [] } = {}) {
   const rows = parseHoldingsTable(holdingsText);
   const ytdStart = firstHistoryValue(historyRows);
   const ytdEnd = lastHistoryValue(historyRows);
@@ -93,12 +93,21 @@ function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [] } =
 
   return {
     rows: rows.map((row) => {
+      const matchedInstrument = (approvedInstruments || []).find((instrument) => {
+        const candidates = [
+          instrument.tickerOrIsin,
+          instrument.ibkrConid,
+          instrument.ibkrSymbol,
+          instrument.ibkrLocalSymbol,
+        ].filter(Boolean).map((value) => String(value));
+        return candidates.includes(String(row.symbol || '')) || candidates.includes(String(row.name || ''));
+      });
       const gainPct = row.gainSincePurchaseChf != null && row.costBasisChf
         ? Number(((row.gainSincePurchaseChf / row.costBasisChf) * 100).toFixed(1))
         : null;
       return {
-        symbol: row.symbol,
-        name: row.name,
+        symbol: matchedInstrument?.tickerOrIsin || row.name || row.symbol,
+        name: matchedInstrument?.name || row.name || row.symbol,
         quantityHeld: row.quantity,
         averageBuyPrice: row.avgBuyPrice,
         lastTradedPrice: row.lastPrice,
