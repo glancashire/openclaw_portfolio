@@ -144,18 +144,22 @@ function normalizeFilledTrade({ trade = {}, holdingsRows = [] } = {}) {
       ? Number((totalCost + fees).toFixed(2))
       : null;
   const holdingsMatch = (holdingsRows || []).find((row) => String(row.tickerOrIsin || row.symbol) === String(trade.symbol || ''));
-  const resultingTotalHeld = holdingsMatch ? (parseNumber(holdingsMatch.quantity) ?? null) : null;
+  const resultingTotalHeld = holdingsMatch
+    ? (parseNumber(holdingsMatch.quantityHeld) ?? parseNumber(holdingsMatch.quantity) ?? null)
+    : null;
 
   return {
     symbol: trade.symbol || trade.tickerOrIsin || null,
     name: trade.name || trade.instrument || holdingsMatch?.name || null,
     quantityPurchased,
+    pricePerUnit: unitPrice,
     unitPrice,
     totalCost,
     costChfIncludingCommission,
     resultingTotalHeld,
     currency: trade.currency || 'CHF',
     availability: {
+      pricePerUnit: unitPrice == null ? 'missing' : 'available',
       costChfIncludingCommission: costChfIncludingCommission == null ? 'missing' : actualChf != null ? 'actual' : 'estimated_from_fees',
       resultingTotalHeld: resultingTotalHeld == null ? 'missing' : 'available',
     },

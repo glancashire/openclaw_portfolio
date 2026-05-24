@@ -104,6 +104,7 @@ const {
   assert.strictEqual(filledTrade.symbol, 'UBSPX');
   assert.strictEqual(filledTrade.name, 'UBS Core S&P 500');
   assert.strictEqual(filledTrade.quantityPurchased, 8);
+  assert.strictEqual(filledTrade.pricePerUnit, 123.18);
   assert.strictEqual(filledTrade.unitPrice, 123.18);
   assert.strictEqual(filledTrade.totalCost, 984.2);
   assert.strictEqual(filledTrade.costChfIncludingCommission, 986);
@@ -122,7 +123,9 @@ const {
     holdingsRows: [],
   });
   assert.strictEqual(fallbackFilledTrade.costChfIncludingCommission, 102);
+  assert.strictEqual(fallbackFilledTrade.pricePerUnit, 100);
   assert.strictEqual(fallbackFilledTrade.resultingTotalHeld, null);
+  assert.strictEqual(fallbackFilledTrade.availability.pricePerUnit, 'available');
   assert.strictEqual(fallbackFilledTrade.availability.resultingTotalHeld, 'missing');
 
   console.log(JSON.stringify({ ok: true }, null, 2));

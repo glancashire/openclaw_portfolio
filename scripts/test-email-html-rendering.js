@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting/reportEmail');
-const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
+const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotificationEmail');
 
 (function main() {
   const summary = {
@@ -72,8 +72,9 @@ const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
   assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
   assert(reportText.includes('Next action: Restore broker connectivity first.'));
 
-  const tradeHtml = buildTradeEmailHtml({
+  const tradeInput = {
     symbol: 'SLICHA',
+    name: 'UBS ETF SLI',
     action: 'BUY',
     qty: 4,
     fillQty: 4,
@@ -82,23 +83,42 @@ const { buildTradeEmailHtml } = require('../lib/tradeNotificationEmail');
     currency: 'CHF',
     costChf: 887.2,
     fees: 1.5,
+    actualChf: 888.7,
     orderId: '1234567',
     time: '2026-05-15 12:00:00',
-  }, {
+  };
+  const portfolioInput = {
     name: 'ETF Portfolio',
     totalValueChf: 5000,
     cashChf: 4112.8,
     holdings: [
-      { symbol: 'SLICHA', name: 'UBS ETF SLI', valueChf: 887.2, allocPct: 17.7, targetPct: 20, driftPct: -2.3 },
+      { symbol: 'SLICHA', name: 'UBS ETF SLI', quantityHeld: 4, valueChf: 887.2, allocPct: 17.7, targetPct: 20, driftPct: -2.3 },
     ],
-  }, [
+  };
+  const openOrdersInput = [
     { symbol: 'EMUAA', action: 'BUY', qty: 27, limitPrice: 40.3, currency: 'EUR', status: 'Submitted' },
-  ]);
+  ];
+  const tradeHtml = buildTradeEmailHtml(tradeInput, portfolioInput, openOrdersInput);
+  const tradeText = buildTradeEmailText(tradeInput, portfolioInput, openOrdersInput);
   assert(tradeHtml.includes('Management summary'));
+  assert(tradeHtml.includes('Purchase summary'));
+  assert(tradeHtml.includes('Resulting total held'));
+  assert(tradeHtml.includes('Cost in CHF including commission'));
+  assert(tradeHtml.includes('UBS ETF SLI'));
+  assert(tradeHtml.includes('4'));
+  assert(tradeHtml.includes('CHF 888.70'));
   assert(tradeHtml.includes('Portfolio after fill'));
   assert(tradeHtml.includes('Remaining open orders'));
   assert(tradeHtml.includes('BUY filled'));
   assert(tradeHtml.includes('SLICHA fill confirmed'));
+  assert(tradeText.includes('Purchase summary'));
+  assert(tradeText.includes('Symbol: SLICHA'));
+  assert(tradeText.includes('Name: UBS ETF SLI'));
+  assert(tradeText.includes('Quantity purchased: 4'));
+  assert(tradeText.includes('Price per unit: CHF 221.80'));
+  assert(tradeText.includes('Total cost: CHF 887.20'));
+  assert(tradeText.includes('Cost in CHF including commission: CHF 888.70'));
+  assert(tradeText.includes('Resulting total held: 4'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 })();

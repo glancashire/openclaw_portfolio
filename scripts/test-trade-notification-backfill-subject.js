@@ -26,6 +26,8 @@ const { notifyTradeFill } = require('../lib/tradeExecutionNotifier');
   assert.strictEqual(backfill.sent, true);
   assert(sent[0].subject.startsWith('BUY 8 UBSPX filled @ 123.18 EUR'));
   assert(sent[1].subject.startsWith('[Backfill] BUY 8 UBSPX filled @ 123.18 EUR'));
+  assert(sent[0].html.includes('Purchase summary'));
+  assert(sent[0].text.includes('Purchase summary'));
   assert(/delayed notification backfill/i.test(sent[1].text));
 
   console.log(JSON.stringify({ ok: true, subjects: sent.map((p) => p.subject) }, null, 2));
