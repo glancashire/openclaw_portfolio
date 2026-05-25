@@ -27,6 +27,7 @@ const checks = [
   ['test:approved-instruments-sentinel-identity', ['scripts/test-approved-instruments-sentinel-identity.js']],
   ['test:cancel-broker-only-orderid', ['scripts/test-cancel-broker-only-orderid.js']],
   ['test:clear-circuit-breaker-audit', ['scripts/test-clear-circuit-breaker-audit.js']],
+  ['test:cron-job-policy', ['scripts/test-cron-job-policy.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];
