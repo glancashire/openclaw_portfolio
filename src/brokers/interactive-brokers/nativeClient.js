@@ -237,7 +237,15 @@ function waitForOpenOrders(api) {
     api.on(EventName.openOrder, onOpenOrder);
     api.on(EventName.openOrderEnd, onEnd);
     api.on(EventName.error, onError);
-    api.reqOpenOrders();
+    // Use reqAllOpenOrders so cross-client open orders (e.g. GTC orders staged via
+    // TWS UI under clientId 0) are visible to resync. Otherwise resync would only
+    // see orders associated with the current API clientId and report still-open
+    // PreSubmitted/Submitted broker orders as not_found.
+    if (typeof api.reqAllOpenOrders === 'function') {
+      api.reqAllOpenOrders();
+    } else {
+      api.reqOpenOrders();
+    }
   });
 }
 
@@ -764,6 +772,7 @@ module.exports = {
   InteractiveBrokersNativeClient,
   buildConidContract,
   waitForNativeHandshake,
+  waitForOpenOrders,
   normalizeContractDetails,
   __testPlaceNativeOrder: placeNativeOrder,
   __setTestNextOrderId(value) { orderCounter = Number(value); },
