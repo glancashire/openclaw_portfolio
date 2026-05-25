@@ -128,12 +128,29 @@ function saveCircuitBreaker({ portfolio, instrument, rootDir, marker }) {
   return file;
 }
 
-function clearCircuitBreaker({ portfolio, instrument, rootDir }) {
+function clearCircuitBreaker({ portfolio, instrument, rootDir, reason = null, operator = null, clearedAt = new Date().toISOString() }) {
   const dir = circuitBreakerDir(rootDir, portfolio);
   const file = path.join(dir, `${safeFilename(instrument)}.json`);
   if (!fs.existsSync(file)) return { cleared: false, reason: 'no_marker_present' };
+  // Capture pre-clear state for the audit log so we don't lose the history.
+  let priorMarker = null;
+  try { priorMarker = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (_) { /* tolerated */ }
   fs.unlinkSync(file);
-  return { cleared: true, file };
+  // Append to the cleared-breakers audit log so cleared markers remain visible.
+  const auditDir = path.join(rootDir, 'runtime', 'circuit-breakers', portfolio);
+  const auditFile = path.join(auditDir, '_cleared.log.jsonl');
+  try {
+    fs.mkdirSync(auditDir, { recursive: true });
+    fs.appendFileSync(auditFile, JSON.stringify({
+      portfolio,
+      instrument,
+      clearedAt,
+      reason: reason || null,
+      operator: operator || null,
+      priorMarker,
+    }) + '\n');
+  } catch (_) { /* best-effort audit */ }
+  return { cleared: true, file, auditFile, reason, operator };
 }
 
 function listCircuitBreakers({ rootDir }) {

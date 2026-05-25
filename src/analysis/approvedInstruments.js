@@ -49,6 +49,15 @@ function readApprovedInstruments(portfolioPath) {
   return rows.map((row) => {
     const notes = row[8] || '';
     const metadata = parseMetadata(notes);
+    const cleanIdentity = (value) => {
+      if (value === null || value === undefined) return null;
+      const str = String(value).trim();
+      if (!str) return null;
+      // Treat sentinel placeholders as absent identity so downstream
+      // broker calls don't try to look up conid="missing" or symbol="missing".
+      if (str.toLowerCase() === 'missing' || str.toLowerCase() === 'unknown' || str.toLowerCase() === 'n/a') return null;
+      return str;
+    };
     return {
       tickerOrIsin: row[0] || '',
       name: row[1] || '',
@@ -60,10 +69,10 @@ function readApprovedInstruments(portfolioPath) {
       currency: row[7] || 'CHF',
       notes,
       metadata,
-      ibkrConid: metadata.ibkr_conid || metadata.conid || null,
-      ibkrSymbol: metadata.ibkr_symbol || metadata.symbol || null,
-      ibkrLocalSymbol: metadata.ibkr_local_symbol || metadata.local_symbol || null,
-      ibkrPrimaryExchange: metadata.ibkr_primary_exchange || metadata.primary_exchange || null,
+      ibkrConid: cleanIdentity(metadata.ibkr_conid || metadata.conid),
+      ibkrSymbol: cleanIdentity(metadata.ibkr_symbol || metadata.symbol),
+      ibkrLocalSymbol: cleanIdentity(metadata.ibkr_local_symbol || metadata.local_symbol),
+      ibkrPrimaryExchange: cleanIdentity(metadata.ibkr_primary_exchange || metadata.primary_exchange),
       fxToChfHint: metadata.fx_to_chf ? Number(metadata.fx_to_chf) : null,
     };
   });

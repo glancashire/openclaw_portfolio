@@ -9,9 +9,11 @@ const {
 
 /**
  * Determines whether an instrument has enough IBKR identity to attempt a contract-details lookup.
+ * Today the lookup path is conid-only; symbol-only identity is treated as insufficient (the
+ * instrument is recorded as missing_identity so it does not generate noisy broker errors).
  */
 function hasIbkrIdentity(instrument = {}) {
-  return Boolean(instrument.ibkrConid || instrument.ibkrSymbol || instrument.ibkrLocalSymbol || instrument.ibkrPrimaryExchange);
+  return Boolean(instrument.ibkrConid);
 }
 
 /**

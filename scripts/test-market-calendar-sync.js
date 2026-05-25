@@ -39,8 +39,10 @@ test('hasIbkrIdentity returns true when conid is present', () => {
   assert.strictEqual(hasIbkrIdentity({ ibkrConid: '12345' }), true);
 });
 
-test('hasIbkrIdentity returns true when symbol is present', () => {
-  assert.strictEqual(hasIbkrIdentity({ ibkrSymbol: 'SXR8' }), true);
+test('hasIbkrIdentity returns false when only symbol is present (conid-only lookup path)', () => {
+  // Updated 2026-05-25: the sync path only uses conid, so symbol-only identity
+  // is now classified missing_identity to avoid noisy broker errors.
+  assert.strictEqual(hasIbkrIdentity({ ibkrSymbol: 'SXR8' }), false);
 });
 
 test('hasIbkrIdentity returns false when no IBKR fields present', () => {

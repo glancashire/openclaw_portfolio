@@ -12,8 +12,11 @@ function parseArgs(argv) {
   for (const a of argv.slice(2)) {
     if (a === '--list') { args.list = true; continue; }
     if (!a.startsWith('--')) continue;
-    const [k, v] = a.replace(/^--/, '').split('=');
-    args[k] = v === undefined ? true : v;
+    const stripped = a.replace(/^--/, '');
+    const eq = stripped.indexOf('=');
+    const k = eq === -1 ? stripped : stripped.slice(0, eq);
+    const v = eq === -1 ? true : stripped.slice(eq + 1);
+    args[k] = v;
   }
   return args;
 }
@@ -26,11 +29,17 @@ function main() {
     return;
   }
   if (!args.portfolio || !args.instrument) {
-    console.error('Usage: node scripts/clear-circuit-breaker.js --portfolio=<id> --instrument=<isin-or-symbol>');
+    console.error('Usage: node scripts/clear-circuit-breaker.js --portfolio=<id> --instrument=<isin-or-symbol> [--reason="text"] [--operator="name"]');
     console.error('       node scripts/clear-circuit-breaker.js --list');
     process.exit(1);
   }
-  const result = clearCircuitBreaker({ portfolio: args.portfolio, instrument: args.instrument, rootDir: ROOT });
+  const result = clearCircuitBreaker({
+    portfolio: args.portfolio,
+    instrument: args.instrument,
+    rootDir: ROOT,
+    reason: typeof args.reason === 'string' ? args.reason : null,
+    operator: typeof args.operator === 'string' ? args.operator : null,
+  });
   console.log(JSON.stringify({ ...result, portfolio: args.portfolio, instrument: args.instrument }, null, 2));
 }
 
