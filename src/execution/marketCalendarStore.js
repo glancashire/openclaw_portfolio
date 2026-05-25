@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { parseHoursSegments, evaluateHoursState } = require('./marketCalendar');
+const { parseHoursSegments, evaluateHoursState, deriveTodayStatus, extractHolidays } = require('./marketCalendar');
 
 function marketCalendarArtifactPath({ portfolioDir, runtimeRoot = path.join(process.cwd(), 'runtime') } = {}) {
   const portfolio = path.basename(portfolioDir || 'unknown');
@@ -32,6 +32,8 @@ function normalizeInstrumentCalendarRow(row = {}, now = new Date()) {
   const liquidHoursSegments = Array.isArray(row.liquidHoursSegments) ? row.liquidHoursSegments : parseHoursSegments(liquidHoursRaw);
   const hasIbkrIdentity = Boolean(row.ibkrConid || row.ibkrSymbol || row.ibkrLocalSymbol || row.ibkrPrimaryExchange);
   const syncStatus = row.syncStatus || (hasIbkrIdentity ? 'ok' : 'missing_identity');
+  const todayStatus = row.todayStatus || deriveTodayStatus(tradingHoursSegments, liquidHoursSegments, now);
+  const holidays = row.holidays || extractHolidays(tradingHoursSegments);
 
   return {
     tickerOrIsin: row.tickerOrIsin || null,
@@ -48,6 +50,8 @@ function normalizeInstrumentCalendarRow(row = {}, now = new Date()) {
     liquidHoursSegments,
     tradingStateNow: row.tradingStateNow || evaluateHoursState(tradingHoursSegments, now),
     liquidStateNow: row.liquidStateNow || evaluateHoursState(liquidHoursSegments, now),
+    todayStatus,
+    holidays,
     sourceKind: row.sourceKind || 'ibkr_contract',
     lastSyncedAt: row.lastSyncedAt || null,
     syncStatus,
@@ -61,12 +65,22 @@ function buildMarketCalendarArtifact({ portfolioDir, generatedAt = new Date().to
   const normalized = preNormalized
     ? (Array.isArray(instruments) ? instruments : [])
     : (Array.isArray(instruments) ? instruments : []).map((row) => normalizeInstrumentCalendarRow(row, now));
+
+  // Derive top-level holidays union across all instruments
+  const allHolidays = new Set();
+  for (const inst of normalized) {
+    if (Array.isArray(inst.holidays)) {
+      for (const h of inst.holidays) allHolidays.add(h);
+    }
+  }
+
   return {
     portfolio,
     generatedAt,
     source,
     brokerReady: Boolean(brokerReady),
     coverage: summarizeCoverage(normalized),
+    holidays: [...allHolidays].sort(),
     instruments: normalized,
   };
 }
