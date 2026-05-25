@@ -89,11 +89,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-25 14:56:33.760 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 14:56:33.401 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 14:47:43.485 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 14:47:43.129 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 14:25:36.203 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 15:20:49.084 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 15:20:48.724 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 15:13:40.726 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 15:13:40.368 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 15:11:18.026 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-23
@@ -119,13 +119,13 @@ CH0032912732: Broker rejected the order because the contract identity or venue r
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
 - Whole-share draft sizing leaves CHF 20185.35 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: weekly report cycle snapshot
-- Observability shows 98 recent blocked execution-policy event(s).
+- Observability shows 99 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
 - Recent runtime events scanned: 100
-- Recent blocked trade events: 98
-- Open-runner first handoff events: 2
+- Recent blocked trade events: 99
+- Open-runner first handoff events: 1
 - Open-runner retry events: 0
 - Recent degraded broker events: 0
 - Recent stale-data events: 0

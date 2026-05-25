@@ -29,6 +29,7 @@ const checks = [
   ['test:clear-circuit-breaker-audit', ['scripts/test-clear-circuit-breaker-audit.js']],
   ['test:cron-job-policy', ['scripts/test-cron-job-policy.js']],
   ['test:repo-root-cleanliness', ['scripts/test-repo-root-cleanliness.js']],
+  ['test:soak-baseline-shape', ['scripts/test-soak-baseline-shape.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];

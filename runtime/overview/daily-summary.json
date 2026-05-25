@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-23T20:25:50.125Z",
+  "generatedAt": "2026-05-25T15:22:21.746Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 0,
-    "approvalCount": 1,
+    "approvalCount": 0,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
@@ -18,9 +18,9 @@
     "status": "out_of_bounds",
     "absDrift": 50
   },
-  "brokerHealth": "degraded",
+  "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
-  "pendingApprovals": 1,
+  "pendingApprovals": 0,
   "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
   "biggestDriftWhy": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
   "highlightedPortfolio": {

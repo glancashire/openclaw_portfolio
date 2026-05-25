@@ -1,10 +1,10 @@
 {
   "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-05-25T14:56:21.602Z",
+  "generatedAt": "2026-05-25T15:17:33.294Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-25T14:55:54.185Z",
+    "generatedAt": "2026-05-25T15:17:05.196Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -62,7 +62,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779720510843.139,
+        "dashboardMtimeMs": 1779721925319.5776,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
         "newestSourceMtimeMs": 1779703444339.7163
       },
@@ -107,7 +107,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-25T14:55:54.184Z",
+      "generatedAt": "2026-05-25T15:17:05.195Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -163,7 +163,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779720510843.139,
+          "dashboardMtimeMs": 1779721925319.5776,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
           "newestSourceMtimeMs": 1779703444339.7163
         },
@@ -268,7 +268,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-25T14:56:21.602Z",
+    "generatedAt": "2026-05-25T15:17:33.293Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -326,7 +326,7 @@
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779720510843.139,
+        "dashboardMtimeMs": 1779722228652.3005,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
         "newestSourceMtimeMs": 1779703444339.7163
       },
@@ -371,7 +371,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-25T14:56:21.601Z",
+      "generatedAt": "2026-05-25T15:17:33.292Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -427,7 +427,7 @@
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779720510843.139,
+          "dashboardMtimeMs": 1779722228652.3005,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
           "newestSourceMtimeMs": 1779703444339.7163
         },
@@ -563,25 +563,6 @@
   "trends": {
     "recent": [
       {
-        "at": "2026-05-24T08:00:23.118Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "ibkr_socket_dead"
-        ],
-        "healed": [
-          "restart_ibkr_gateway_if_socket_dead",
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "ibkr_socket_dead"
-        ]
-      },
-      {
         "at": "2026-05-24T13:05:36.132Z",
         "kind": "health_check",
         "portfolio": "etf",
@@ -658,11 +639,24 @@
           "regenerate_reporting_artifacts"
         ],
         "openIssues": []
+      },
+      {
+        "at": "2026-05-25T14:56:21.603Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "healthy",
+        "severity": "low",
+        "blockerCount": 0,
+        "classified": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": []
       }
     ],
     "counts": {
-      "blocked": 1,
-      "healthy": 6
+      "healthy": 7
     },
     "direction": "stable",
     "summary": "Health direction is stable: recent checks stayed healthy or close to healthy, and no new operating risk is building."

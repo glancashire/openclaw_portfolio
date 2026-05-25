@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "capturedAt": "2026-05-25T15:20:00Z",
+  "portfolio": "etf",
+  "checks": {
+    "npmTest": { "passed": true, "checkCount": 32 },
+    "healthCheck": { "passed": true, "openIssues": 0, "actionsApplied": true },
+    "interactiveBrokersReadiness": { "passed": true, "reason": "ready", "message": "Live/realtime market data available" },
+    "generatedState": { "passed": true, "result": "OK portfolio/etf" },
+    "safetyControls": { "passed": true, "maxObservedWeightPct": 0, "maxSingleEtfLimitPct": 50 }
+  },
+  "cron": {
+    "enabledCount": 10,
+    "consecutiveErrorsMax": 0,
+    "snapshot": "docs/operations/active-cron-jobs.json"
+  },
+  "circuitBreakers": {
+    "activeCount": 0,
+    "clearedRecently": ["CH0130595124 (cleared 2026-05-25 with documented reason)"]
+  },
+  "knownIssues": [
+    {
+      "id": "unmapped-isins-sentinel",
+      "severity": "low",
+      "what": "4 future-candidate sleeve placeholders (LU0950670850, IE00B44T3H88, IE00B5L8K969, IE00B4L5YX21) have ibkr_conid=missing",
+      "impact": "market-calendar reports them as missing_identity (not as ibkr_error since Phase S2)",
+      "action": "none required while they're 0% targets"
+    },
+    {
+      "id": "telegram-misconfigured",
+      "severity": "low",
+      "what": "Telegram chat channel has no chat-id; all cron announce delivery fail-closed",
+      "impact": "no real-time chat notifications from cron jobs",
+      "action": "bestEffort:true on every job prevents state corruption; email is the working observability path"
+    }
+  ],
+  "operatorActionsExpected": [
+    {
+      "when": "2026-05-26T07:45:00Z",
+      "what": "basket-approval-reminder-tuesday fires; expects Graham to reply 'approve <approvalId>' to the basket email"
+    },
+    {
+      "when": "2026-05-26T09:30:00Z",
+      "what": "rebalance-fill-check-monday fires; reports on order fills (no operator action required if all fill)"
+    }
+  ]
+}

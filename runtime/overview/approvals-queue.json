@@ -1,28 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-23T20:25:50.125Z",
-  "itemCount": 1,
-  "items": [
-    {
-      "rank": 1,
-      "kind": "circuit_breaker_tripped",
-      "portfolio": "etf",
-      "instrument": "CH0130595124",
-      "severity": "critical",
-      "urgency": "high",
-      "summary": "Circuit breaker tripped for CH0130595124: 3 consecutive cancellations (threshold 3).",
-      "explanation": "Instrument CH0130595124 has cancelled at the broker 3 times in a row across approval basket-etf-20260522T1041-reproposal-3-reproposal-1; reproposals are now suspended for this instrument.",
-      "effectIfAddressed": "Operator investigates upstream cause and runs scripts/clear-circuit-breaker.js to resume.",
-      "effectIfIgnored": "CH0130595124 stays excluded from future reproposals; any sleeve drift toward this instrument will not auto-rebalance.",
-      "recommendedOperatorAction": "Investigate why CH0130595124 keeps cancelling at the broker (subscription, liquidity, contract config). When fixed, run: node scripts/clear-circuit-breaker.js --portfolio=etf --instrument=CH0130595124",
-      "firstTrippedAt": "2026-05-22T15:19:58.190Z",
-      "lastSeenAt": "2026-05-22T15:19:58.190Z",
-      "lastBrokerOrderIds": [
-        9129,
-        9128,
-        9127
-      ],
-      "queueType": "attention"
-    }
-  ]
+  "generatedAt": "2026-05-25T15:22:21.746Z",
+  "itemCount": 0,
+  "items": []
 }

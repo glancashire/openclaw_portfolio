@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T20:25:50.122Z",
+  "generatedAt": "2026-05-25T15:22:21.746Z",
   "portfolioCount": 2,
   "totalValueChf": 22209.48,
   "portfolios": [
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 7,
+      "pendingActions": 6,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -38,8 +38,8 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
@@ -91,21 +91,21 @@
     }
   ],
   "queueSummary": {
-    "total": 8,
-    "blocking": 6,
+    "total": 7,
+    "blocking": 5,
     "approvals": 0,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 1,
+    "recovery": 0,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
     "workflow": 1,
     "bySeverity": {
-      "high": 6,
+      "high": 5,
       "medium": 1,
       "low": 1
     }

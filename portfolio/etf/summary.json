@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-25T14:58:06.799Z",
+  "generatedAt": "2026-05-25T15:22:21.744Z",
   "portfolio": "etf",
   "status": {
     "health": "attention_needed",
@@ -14,7 +14,7 @@
   "readiness": {
     "ok": false,
     "portfolio": "etf",
-    "generatedAt": "2026-05-25T14:57:46.035Z",
+    "generatedAt": "2026-05-25T15:22:01.116Z",
     "executionMode": "transmitted_live",
     "armedForMarketOpen": false,
     "armExpiresAt": "2026-05-22T12:00:00Z",
@@ -793,35 +793,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-25 14:56:33.760 UTC",
+      "time": "2026-05-25 15:20:49.084 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 14:56:33.401 UTC",
+      "time": "2026-05-25 15:20:48.724 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 14:47:43.485 UTC",
+      "time": "2026-05-25 15:13:40.726 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 14:47:43.129 UTC",
+      "time": "2026-05-25 15:13:40.368 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 14:25:36.203 UTC",
+      "time": "2026-05-25 15:11:18.026 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
@@ -833,19 +833,19 @@
     "recentSummary": {
       "total": 100,
       "byLevel": {
-        "warn": 98,
-        "info": 2
+        "info": 1,
+        "warn": 99
       },
       "byCategory": {
-        "execution_policy": 93,
-        "execution": 2,
+        "execution": 1,
+        "execution_policy": 94,
         "market_open_execution": 3,
         "risk": 2
       },
-      "blockedTrades": 98,
+      "blockedTrades": 99,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
-      "openRunnerQueueEvents": 2,
+      "openRunnerQueueEvents": 1,
       "openRunnerRetryEvents": 0
     }
   },

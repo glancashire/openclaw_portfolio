@@ -99,6 +99,16 @@
       "payloadKind": "agentTurn",
       "toolsAllow": ["exec", "read", "write", "edit"],
       "delivery": { "mode": "announce", "bestEffort": true }
+    },
+    {
+      "id": "bf50a351-f593-48e1-a2d1-505ae7551748",
+      "name": "soak-self-check-2026-05-30",
+      "schedule": { "kind": "at", "at": "2026-05-30T09:00:00.000Z" },
+      "sessionTarget": "session:agent:main:main",
+      "payloadKind": "agentTurn",
+      "toolsAllow": ["exec", "read", "write"],
+      "delivery": { "mode": "announce", "bestEffort": true },
+      "deleteAfterRun": true
     }
   ],
   "disabledJobs": [

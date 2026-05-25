@@ -21,6 +21,7 @@ this snapshot AND `docs/operations/active-cron-jobs.json` so the
 | portfolio-etf-weekly-report | `20 17 * * 5` UTC | current | exec/read/write/edit | announce, bestEffort | Friday afternoon report cycle |
 | portfolio-etf-monthly-report | `35 17 1 * *` UTC | current | exec/read/write/edit | announce, bestEffort | First-of-month report cycle |
 | portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` UTC | current | exec/read/write/edit | announce, bestEffort | Quarterly report cycle |
+| soak-self-check-2026-05-30 | `at 2026-05-30T09:00:00Z` | session:agent:main:main | exec/read/write | announce, bestEffort | One-shot soak self-check vs baseline; emails Graham |
 
 ## Disabled (kept for audit)
 
@@ -33,7 +34,7 @@ this snapshot AND `docs/operations/active-cron-jobs.json` so the
 
 ## Health snapshot
 
-- All 10 enabled jobs report `consecutiveErrors: 0`.
+- All 11 enabled jobs report `consecutiveErrors: 0`.
 - All enabled jobs use `sessionTarget: "current"` (or sticky `session:agent:main:main`); none are `isolated`.
 - All enabled jobs have `delivery.bestEffort: true` (Telegram announce fails-closed by design on this host; see `docs/operations/cron.md`).
 
