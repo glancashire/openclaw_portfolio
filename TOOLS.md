@@ -3,6 +3,9 @@
 Things that matter in this setup:
 
 ### Cron job invariants (revised 2026-05-23, Phase 204c)
+**Canonical reference moved to `docs/operations/cron.md` (2026-05-25, Phase S3).**
+**Active job snapshot lives at `docs/operations/active-cron-jobs.md`** and is gated by `scripts/test-cron-job-policy.js`.
+Key invariants (kept here for muscle memory):
 - This host has **no Docker daemon**.
 - **`agents.defaults.sandbox.mode` MUST stay `"off"`** in `~/.openclaw/openclaw.json`. Any other value (`"non-main"`, `"all"`) makes cron sub-agent turns demand Docker and fail 100%. Per-job `sessionTarget: 'current'` is necessary but **NOT** sufficient — the gateway sandbox subsystem runs upstream of session targeting.
 - **Gateway restart is required** after changing `agents.defaults.sandbox.mode` — SIGUSR1 soft reload does not pick it up. `kill -KILL <pid>` is safe: supervisord respawns within 5-10s.

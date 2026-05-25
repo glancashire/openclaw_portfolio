@@ -122,4 +122,9 @@ Tidy obsolete/completed work without destroying audit history.
 
 ## Current recommended execution order
 1. Stabilization phases S1-S5 (see `stabilization-master-plan-2026-05-25.md`) — repo truth & test gates, carry-over bug closeout, cron/delivery hardening, runtime/doc hygiene, soak prep.
+   - [x] S1 — repo truth & test gates (commit `62f32fc`)
+   - [x] S2 — carry-over bug closeout (commit `3e3b11c`)
+   - [x] S3 — cron + delivery hardening (commit `590e204`)
+   - [x] S4 — runtime + doc hygiene (in progress, commits `6612e85` plan, root cleanup pending)
+   - [ ] S5 — soak prep (next)
 2. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.
