@@ -1,40 +1,22 @@
 # Health Report: etf
 
-## Immediate status
-- Generated at: 2026-05-23T20:24:20.891Z
-- Health: healthy
-- Severity: low
+## Management summary
+- Generated at: 2026-05-25T14:02:53.085Z
+- Current status: healthy (low)
+- Management summary: Everything important is working normally. No action is needed right now.
+- Next step: No immediate operator action is required.
+- Automatic fixes applied: 2
+- Issues still needing attention: 0
+
+## What matters now
+- No urgent exceptions are open right now.
 - Next action: No immediate operator action is required.
-- Unresolved exceptions: 0
-- Remediated items: 0
-- Failed remediations: 0
 
-## Classified symptoms
-- None.
+## What the system already handled
+- The system already handled 2 issue(s) automatically.
 
-## Unresolved exceptions
-- None.
-
-## Recommended next actions
-- No immediate operator action is required.
-
-## Remediated during this run
-- None.
-
-## Open issues for operator
-- None.
-
-## Recent trends
-- 2026-05-23T13:05:58.832Z: healthy/low (blockers=0)
-- 2026-05-23T14:01:56.229Z: healthy/low (blockers=0)
-- 2026-05-23T14:02:31.925Z: healthy/low (blockers=0)
-- 2026-05-23T16:22:27.005Z: healthy/low (blockers=0)
-- 2026-05-23T16:35:36.022Z: healthy/low (blockers=0)
-- 2026-05-23T16:49:38.885Z: healthy/low (blockers=0)
-- 2026-05-23T20:01:18.083Z: healthy/low (blockers=0)
-
-## Remediation attempts that still need attention
-- None.
+## Health direction
+- Health direction is stable: recent checks stayed healthy or close to healthy, and no new operating risk is building.
 
 ## Remaining status and reference details
 - Generated-state issues: 0

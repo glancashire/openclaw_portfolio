@@ -1,3 +1,5 @@
+> **[HISTORICAL]** This checklist consolidated the older outstanding work; remaining live items have migrated to `ROLLUP_OUTSTANDING_PLAN.md` and `stabilization-master-plan-2026-05-25.md`. Kept for audit only.
+
 # Consolidated Roadmap Checklist
 
 A phased execution plan that consolidates the remaining open work from `spec-outstanding-checklist.md` into a tighter implementation sequence.

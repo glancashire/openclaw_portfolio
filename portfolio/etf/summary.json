@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-23T20:25:50.121Z",
+  "generatedAt": "2026-05-25T14:27:09.371Z",
   "portfolio": "etf",
   "status": {
     "health": "attention_needed",
@@ -11,7 +11,94 @@
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": null,
+  "readiness": {
+    "ok": false,
+    "portfolio": "etf",
+    "generatedAt": "2026-05-25T14:26:48.616Z",
+    "executionMode": "transmitted_live",
+    "armedForMarketOpen": false,
+    "armExpiresAt": "2026-05-22T12:00:00Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": true,
+      "reachable": true,
+      "mode": "native-socket",
+      "fallbackRequired": false,
+      "marketDataMode": "live_or_realtime",
+      "marketDataDetail": "Live/realtime bid/ask/last values are available via approved instrument IE00B5BMR087.",
+      "marketDataProbe": {
+        "conid": "75776072",
+        "symbol": "SXR8",
+        "tickerOrIsin": "IE00B5BMR087",
+        "label": "approved instrument IE00B5BMR087",
+        "source": "approved_instrument"
+      },
+      "reason": "ready",
+      "portalSessionState": "unknown_or_separate",
+      "guidance": "Broker path is healthy.",
+      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
+    },
+    "marketWindow": {
+      "exchange": "EBS",
+      "openNow": false,
+      "reason": "calendar:closed",
+      "source": "calendar_artifact",
+      "nextOpen": "2026-05-26T09:00:00.000Z",
+      "diagnostics": []
+    },
+    "approvalState": {
+      "basketApprovalState": {
+        "approvedCount": 0,
+        "executableCount": 0,
+        "hasApprovedBasket": false,
+        "hasExecutableApprovedBasket": false,
+        "executableBaskets": [],
+        "latestApprovedAt": null,
+        "approvedBaskets": []
+      },
+      "proposedCount": 0,
+      "approvedCount": 0,
+      "basketApprovedCount": 0,
+      "basketExecutableCount": 0,
+      "hasApprovedBasket": false,
+      "hasExecutableApprovedBasket": false,
+      "executableCount": 0,
+      "latestApprovedAt": null,
+      "approvalAgeHours": null,
+      "staleApproval": false,
+      "staleApprovedRows": [],
+      "maxApprovalAgeHours": 24,
+      "ambiguousQueuedCount": 0,
+      "hasAnyApprovedRows": false,
+      "hasExecutableApprovedRows": false,
+      "executableRows": [],
+      "excludedApprovedRows": []
+    },
+    "rows": [],
+    "excludedRows": [],
+    "blockers": [
+      {
+        "code": "not_armed_for_market_open",
+        "message": "Live execution is not armed for the next market-open window."
+      },
+      {
+        "code": "no_approved_rows",
+        "message": "No approved trade rows or approved basket exist for live execution."
+      },
+      {
+        "code": "no_executable_rows",
+        "message": "No executable approved trade rows or approved basket are currently eligible for submission."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "market_closed",
+        "message": "Market is currently closed (calendar:closed). Next open: 2026-05-26T09:00:00.000Z"
+      }
+    ],
+    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight.",
+    "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
+  },
   "holdings": {
     "totalValueChf": 22209.4831212,
     "cashChf": 0,
@@ -23,6 +110,85 @@
     "latestSnapshotDate": "2026-05-23",
     "dailyChangeChf": 0,
     "dailyChangePct": 0
+  },
+  "investorHoldings": {
+    "rows": [
+      {
+        "symbol": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "quantityHeld": 23,
+        "averageBuyPrice": null,
+        "lastTradedPrice": null,
+        "totalValue": 3717.8299998,
+        "gainSincePurchase": null,
+        "gainSincePurchaseChf": null,
+        "gainSincePurchasePct": null,
+        "ytdChf": 17209.48,
+        "ytdPct": 344.2,
+        "valueChf": 3717.8299998,
+        "currency": "CHF",
+        "allocationPct": 0,
+        "targetPct": 0,
+        "driftPct": 0,
+        "availability": {
+          "averageBuyPrice": "missing",
+          "gainSincePurchaseChf": "missing",
+          "ytd": "portfolio_level_only"
+        }
+      },
+      {
+        "symbol": "LU0950668870",
+        "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+        "quantityHeld": 151,
+        "averageBuyPrice": null,
+        "lastTradedPrice": null,
+        "totalValue": 6052.1248017,
+        "gainSincePurchase": null,
+        "gainSincePurchaseChf": null,
+        "gainSincePurchasePct": null,
+        "ytdChf": 17209.48,
+        "ytdPct": 344.2,
+        "valueChf": 6052.1248017,
+        "currency": "EUR",
+        "allocationPct": 0,
+        "targetPct": 0,
+        "driftPct": 0,
+        "availability": {
+          "averageBuyPrice": "missing",
+          "gainSincePurchaseChf": "missing",
+          "ytd": "portfolio_level_only"
+        }
+      },
+      {
+        "symbol": "IE00B5BMR087",
+        "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+        "quantityHeld": 18,
+        "averageBuyPrice": null,
+        "lastTradedPrice": null,
+        "totalValue": 12439.528319699999,
+        "gainSincePurchase": null,
+        "gainSincePurchaseChf": null,
+        "gainSincePurchasePct": null,
+        "ytdChf": 17209.48,
+        "ytdPct": 344.2,
+        "valueChf": 12439.528319699999,
+        "currency": "EUR",
+        "allocationPct": 0,
+        "targetPct": 0,
+        "driftPct": 0,
+        "availability": {
+          "averageBuyPrice": "missing",
+          "gainSincePurchaseChf": "missing",
+          "ytd": "portfolio_level_only"
+        }
+      }
+    ],
+    "totals": {
+      "rowCount": 3,
+      "totalValueChf": 22209.4831212,
+      "totalGainChf": 0,
+      "totalGainPct": 0
+    }
   },
   "approvals": {
     "proposedCount": 0,
@@ -69,9 +235,9 @@
     ]
   },
   "contractIntelligence": {
-    "total": 5,
+    "total": 9,
     "readyCount": 4,
-    "missingConidCount": 1,
+    "missingConidCount": 5,
     "missingSymbolCount": 1,
     "missingVenueCount": 0,
     "items": [
@@ -148,6 +314,78 @@
         }
       },
       {
+        "tickerOrIsin": "LU0950670850",
+        "name": "UBS MSCI United Kingdom UCITS ETF GBP acc",
+        "currency": "GBP",
+        "exchange": "LSE / IBKR-supported venue",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": "UK",
+          "localSymbol": "UBS MSCI United Kingdom UCITS ETF GBP acc",
+          "venue": "LSE / IBKR-supported venue",
+          "venueKey": "unknown::GBP::LSE / IBKR-supported venue",
+          "isin": "LU0950670850"
+        }
+      },
+      {
+        "tickerOrIsin": "IE00B44T3H88",
+        "name": "HSBC MSCI China UCITS ETF USD",
+        "currency": "USD",
+        "exchange": "LSE / IBKR-supported venue",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": "missing",
+          "localSymbol": "HSBC MSCI China UCITS ETF USD",
+          "venue": "LSE / IBKR-supported venue",
+          "venueKey": "unknown::USD::LSE / IBKR-supported venue",
+          "isin": "IE00B44T3H88"
+        }
+      },
+      {
+        "tickerOrIsin": "IE00B5L8K969",
+        "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
+        "currency": "USD",
+        "exchange": "LSE / IBKR-supported venue",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": "missing",
+          "localSymbol": "iShares MSCI EM Asia UCITS ETF (Acc)",
+          "venue": "LSE / IBKR-supported venue",
+          "venueKey": "unknown::USD::LSE / IBKR-supported venue",
+          "isin": "IE00B5L8K969"
+        }
+      },
+      {
+        "tickerOrIsin": "IE00B4L5YX21",
+        "name": "iShares Core MSCI Japan IMI UCITS ETF",
+        "currency": "USD",
+        "exchange": "LSE / IBKR-supported venue",
+        "ready": false,
+        "missingConid": true,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": null,
+          "symbol": "missing",
+          "localSymbol": "iShares Core MSCI Japan IMI UCITS ETF",
+          "venue": "LSE / IBKR-supported venue",
+          "venueKey": "unknown::USD::LSE / IBKR-supported venue",
+          "isin": "IE00B4L5YX21"
+        }
+      },
+      {
         "tickerOrIsin": "CASH-CHF",
         "name": "CHF cash balance",
         "currency": "CHF",
@@ -169,11 +407,25 @@
     "examples": {
       "missingConid": [
         {
-          "tickerOrIsin": "CASH-CHF",
-          "symbol": "missing_symbol",
-          "venue": "IBKR cash balance",
+          "tickerOrIsin": "LU0950670850",
+          "symbol": "UK",
+          "venue": "LSE / IBKR-supported venue",
           "conid": null,
-          "venueKey": "unknown::CHF::IBKR cash balance"
+          "venueKey": "unknown::GBP::LSE / IBKR-supported venue"
+        },
+        {
+          "tickerOrIsin": "IE00B44T3H88",
+          "symbol": "missing",
+          "venue": "LSE / IBKR-supported venue",
+          "conid": null,
+          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
+        },
+        {
+          "tickerOrIsin": "IE00B5L8K969",
+          "symbol": "missing",
+          "venue": "LSE / IBKR-supported venue",
+          "conid": null,
+          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
         }
       ],
       "missingSymbol": [
@@ -210,7 +462,7 @@
         }
       ]
     },
-    "summaryLine": "4/5 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.",
+    "summaryLine": "4/9 approved instrument(s) have complete IBKR contract identity; missing conid: 5, missing symbol: 1, missing venue: 0.",
     "nextAction": "Resolve missing IBKR conids before treating the full approved instrument list as execution-ready."
   },
   "blockers": {
@@ -437,6 +689,50 @@
       "latestProposal": null
     },
     {
+      "tickerOrIsin": "LU0950670850",
+      "name": "UBS MSCI United Kingdom UCITS ETF GBP acc",
+      "assetClass": "Global equities",
+      "targetPct": 0,
+      "minPct": 0,
+      "maxPct": 0,
+      "exchange": "LSE / IBKR-supported venue",
+      "currency": "GBP",
+      "latestProposal": null
+    },
+    {
+      "tickerOrIsin": "IE00B44T3H88",
+      "name": "HSBC MSCI China UCITS ETF USD",
+      "assetClass": "Global equities",
+      "targetPct": 0,
+      "minPct": 0,
+      "maxPct": 0,
+      "exchange": "LSE / IBKR-supported venue",
+      "currency": "USD",
+      "latestProposal": null
+    },
+    {
+      "tickerOrIsin": "IE00B5L8K969",
+      "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
+      "assetClass": "Global equities",
+      "targetPct": 0,
+      "minPct": 0,
+      "maxPct": 0,
+      "exchange": "LSE / IBKR-supported venue",
+      "currency": "USD",
+      "latestProposal": null
+    },
+    {
+      "tickerOrIsin": "IE00B4L5YX21",
+      "name": "iShares Core MSCI Japan IMI UCITS ETF",
+      "assetClass": "Global equities",
+      "targetPct": 0,
+      "minPct": 0,
+      "maxPct": 0,
+      "exchange": "LSE / IBKR-supported venue",
+      "currency": "USD",
+      "latestProposal": null
+    },
+    {
       "tickerOrIsin": "CASH-CHF",
       "name": "CHF cash balance",
       "assetClass": "Bonds / cash-like",
@@ -483,35 +779,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-23 16:24:52.111 UTC",
+      "time": "2026-05-25 14:25:36.203 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 16:24:48.838 UTC",
+      "time": "2026-05-25 14:25:35.844 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 16:17:31.255 UTC",
+      "time": "2026-05-25 14:23:44.684 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 16:17:28.232 UTC",
+      "time": "2026-05-25 14:23:44.324 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-23 16:16:14.081 UTC",
+      "time": "2026-05-25 14:18:25.412 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
@@ -527,10 +823,10 @@
         "info": 2
       },
       "byCategory": {
-        "risk": 11,
-        "market_open_execution": 8,
-        "execution_policy": 79,
-        "execution": 2
+        "execution_policy": 93,
+        "execution": 2,
+        "market_open_execution": 3,
+        "risk": 2
       },
       "blockedTrades": 98,
       "degradedBrokerEvents": 0,

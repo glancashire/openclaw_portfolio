@@ -1,3 +1,5 @@
+> **[HISTORICAL]** This plan is superseded. The 204-212 lanes are closed at the gateway-sandbox / cron-hotfix level. For the current backlog see `ROLLUP_OUTSTANDING_PLAN.md`; for the active stabilization sweep see `stabilization-master-plan-2026-05-25.md`.
+
 # Master Plan — Phases 204–212
 
 _Generated 2026-05-22 ~16:15 UTC. Three operator-requested workstreams (A/B/C) plus emergency hot-fixes that surfaced during reconnaissance._

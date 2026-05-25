@@ -24,7 +24,7 @@ Teach the system when the relevant exchanges for persisted/approved instruments 
 - [x] Readiness integration that consumes the persisted calendar artifact
 - [x] Reporting/diagnostic surfacing of market-calendar coverage/state
 - [x] Cron refresh automation and operator guidance
-- [ ] Full closeout verification and documentation refresh for the calendar lane
+- [x] Full closeout verification and documentation refresh for the calendar lane (2026-05-25; market-calendar parser handled IBKR canonical format, semantic `todayStatus` + `holidays` fields added, regression coverage extended)
 
 ### Key files / lanes
 - `src/execution/marketCalendar.js`
@@ -121,7 +121,5 @@ Tidy obsolete/completed work without destroying audit history.
 ---
 
 ## Current recommended execution order
-1. Finish Phase 166b market-calendar IBKR sync and tests.
-2. Close the next calendar follow-on phase for readiness/reporting integration.
-3. Close the calendar cron/ops phase.
-4. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.
+1. Stabilization phases S1-S5 (see `stabilization-master-plan-2026-05-25.md`) — repo truth & test gates, carry-over bug closeout, cron/delivery hardening, runtime/doc hygiene, soak prep.
+2. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.

@@ -116,7 +116,7 @@ test('evaluateMarketWindow includes source field (heuristic when no calendar)', 
   const portfolioDir = path.resolve(__dirname, '..', 'portfolio', 'etf');
   // Clear any existing calendar artifact if present
   const runtimeRoot = path.resolve(__dirname, '..', 'runtime');
-  const calPath = path.join(runtimeRoot, 'market-calendar', 'etf-market-calendar.json');
+  const calPath = path.join(runtimeRoot, 'market-calendar', 'etf.json');
   const hadCal = fs.existsSync(calPath);
   let backup = null;
   if (hadCal) {
@@ -125,6 +125,7 @@ test('evaluateMarketWindow includes source field (heuristic when no calendar)', 
   }
 
   try {
+    delete require.cache[require.resolve('../src/execution/liveReadinessPreflight')];
     const { evaluateMarketWindow } = require('../src/execution/liveReadinessPreflight');
     const result = evaluateMarketWindow(portfolioDir, { now: new Date() });
     assert(result.source, 'expected source field');

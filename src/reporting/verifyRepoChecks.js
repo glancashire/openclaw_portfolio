@@ -21,6 +21,8 @@ const checks = [
   ['test:observability-doc-contract', ['scripts/test-observability-doc-contract.js']],
   ['test:trading-workflow-doc-contract', ['scripts/test-trading-workflow-doc-contract.js']],
   ['test:transmitted-live-operations-doc-contract', ['scripts/test-transmitted-live-operations-doc-contract.js']],
+  ['test:market-calendar-readiness', ['scripts/test-market-calendar-readiness.js']],
+  ['test:market-calendar-artifact-has-holiday-fields', ['scripts/test-market-calendar-artifact-has-holiday-fields.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
 ];

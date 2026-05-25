@@ -1,6 +1,13 @@
 # Portfolio Manager Progress Report
 
-Last updated: 2026-05-24 UTC
+Last updated: 2026-05-25 UTC
+
+## 2026-05-25 — bug-fix lane and stabilization sweep
+
+- Closed two correctness bugs uncovered during live execution diagnostics: cross-client open-order visibility (resync used `reqOpenOrders` instead of `reqAllOpenOrders`, so GTC orders placed via TWS UI under a different clientId were misreported as `not_found`); and exchange holiday detection (market-calendar parser mishandled IBKR's canonical `YYYYMMDD:HHMM-YYYYMMDD:HHMM` format and lacked semantic `todayStatus`/`holidays` fields, so Whit Monday 2026-05-25 looked like a normal trading day).
+- New regression coverage: `test-resync-classifies-cross-client-presubmitted.js`, `test-market-calendar-holidays.js` (19 assertions), `test-market-calendar-artifact-has-holiday-fields.js`.
+- Fixed pre-existing failure in `test-market-calendar-readiness.js` (wrong artifact filename reference).
+- Started stabilization phases S1-S5 (see `stabilization-master-plan-2026-05-25.md`) to reach an unattended-soak state where the system can gather usage evidence for a week or more.
 
 This report is the short operational summary of where the repository stands now.
 For the structured spec mapping, use `SPEC_PROGRESS.md`.

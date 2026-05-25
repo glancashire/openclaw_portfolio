@@ -1,3 +1,5 @@
+> **[HISTORICAL]** This plan describes the 2026-05-23 reconnaissance and the cron/sandbox hot-fix lane. The actions it called for were applied and the lane was closed by Phase 204c. For the current backlog see `ROLLUP_OUTSTANDING_PLAN.md`; for the active stabilization sweep see `stabilization-master-plan-2026-05-25.md`.
+
 # Master Plan Refinement — 2026-05-23
 
 _Supersedes the "next steps" in `master-plan-204-212.md` (committed 9459030). Adds two critical findings from the 2026-05-23 00:30 UTC reconnaissance._

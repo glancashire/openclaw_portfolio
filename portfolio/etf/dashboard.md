@@ -24,8 +24,8 @@
 4. [execution_block/blocked/high] IE00B5BMR087: Broker rejected the order because the contract identity or venue resolution was not accepted.
 5. [execution_block/blocked/high] IE00BD4TXW66: Broker rejected the order because the contract identity or venue resolution was not accepted.
 6. [execution_block/blocked/high] LU0950668870: Broker rejected the order because the contract identity or venue resolution was not accepted.
-7. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
-8. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
+7. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
+8. [data/contract_identity_gap/medium] 5 approved instrument(s) are missing IBKR conids. Example: LU0950670850.
 
 ## Portfolio Value Snapshot
 - Total value CHF: 22209.4831212
@@ -52,6 +52,10 @@
 | LU0950668870 | 0 | 20 | watch | No active proposal | watch |
 | CH0032912732 | 0 | 12 | watch | No active proposal | watch |
 | CH0130595124 | 0 | 8 | watch | No active proposal | watch |
+| LU0950670850 | 0 | 0 | watch | No active proposal | watch |
+| IE00B44T3H88 | 0 | 0 | watch | No active proposal | watch |
+| IE00B5L8K969 | 0 | 0 | watch | No active proposal | watch |
+| IE00B4L5YX21 | 0 | 0 | watch | No active proposal | watch |
 | CASH-CHF | 9.11 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 
 ## Safety / Risk Diagnostics
@@ -64,7 +68,7 @@
 - none
 
 ## Contract Intelligence Readiness
-- 4/5 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.
+- 4/9 approved instrument(s) have complete IBKR contract identity; missing conid: 5, missing symbol: 1, missing venue: 0.
 - Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.
 
 ## Operator Queue Summary
@@ -85,11 +89,11 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-23 16:24:52.111 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 16:24:48.838 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 16:17:31.255 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 16:17:28.232 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-23 16:16:14.081 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 14:25:36.203 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 14:25:35.844 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 14:23:44.684 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 14:23:44.324 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-25 14:18:25.412 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-23
