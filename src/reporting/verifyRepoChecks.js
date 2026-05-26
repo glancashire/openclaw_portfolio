@@ -24,6 +24,7 @@ const checks = [
   ['test:market-calendar-readiness', ['scripts/test-market-calendar-readiness.js']],
   ['test:market-calendar-artifact-has-holiday-fields', ['scripts/test-market-calendar-artifact-has-holiday-fields.js']],
   ['test:diagnostics-require-paths', ['scripts/test-diagnostics-require-paths.js']],
+  ['test:trade-notify-action-currency-normalization', ['scripts/test-trade-notify-action-currency-normalization.js']],
   ['test:approved-instruments-sentinel-identity', ['scripts/test-approved-instruments-sentinel-identity.js']],
   ['test:cancel-broker-only-orderid', ['scripts/test-cancel-broker-only-orderid.js']],
   ['test:clear-circuit-breaker-audit', ['scripts/test-clear-circuit-breaker-audit.js']],

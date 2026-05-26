@@ -92,16 +92,46 @@ async function runBasketLifecycle({
   const myExecs = executions.filter((e) => orderIdSet.has(String(e.orderId)) && newlyMirroredOrderIds.has(String(e.orderId)));
   log(`Executions to notify: ${myExecs.length} (skipping ${executions.filter((e) => orderIdSet.has(String(e.orderId))).length - myExecs.length} already-notified)`);
 
+  // Build a brokerOrderId -> proposal leg lookup for canonical action / currency.
+  // IBKR executions carry side='BOT'/'SLD' (filled buy/sell) and often drop the
+  // contract currency, so we cannot trust exec.side/exec.currency directly.
+  const proposalLegByOrderId = (() => {
+    try {
+      const proposalPath = path.join(rootDir, 'runtime', 'basket-proposals', portfolio, `${approvalId}.json`);
+      if (!fs.existsSync(proposalPath)) return {};
+      const env = JSON.parse(fs.readFileSync(proposalPath, 'utf8'));
+      const legsArr = Array.isArray(env.legs) ? env.legs : [];
+      const out = {};
+      for (const reconLeg of Object.values(reconciled.legs || {})) {
+        const proposalLeg = legsArr.find((pl) => pl.legId === reconLeg.legId);
+        if (proposalLeg && reconLeg.brokerOrderId != null) {
+          out[String(reconLeg.brokerOrderId)] = proposalLeg;
+        }
+      }
+      return out;
+    } catch (_) { return {}; }
+  })();
+
+  function normalizeExecAction(rawSide, proposalAction) {
+    const s = String(rawSide || '').toUpperCase();
+    if (s === 'BOT' || s === 'BUY') return 'BUY';
+    if (s === 'SLD' || s === 'SELL') return 'SELL';
+    // Fall back to the proposal's canonical action when the broker side is ambiguous.
+    return String(proposalAction || 'BUY').toUpperCase();
+  }
+
   const notifyResults = [];
   for (const exec of myExecs) {
+    const proposalLeg = proposalLegByOrderId[String(exec.orderId)] || null;
     const trade = {
-      symbol: exec.symbol || (exec.contract && exec.contract.symbol) || '?',
-      action: exec.side || exec.action || 'BUY',
+      symbol: exec.symbol || (exec.contract && exec.contract.symbol) || (proposalLeg && proposalLeg.ibkrSymbol) || '?',
+      action: normalizeExecAction(exec.side || exec.action, proposalLeg && proposalLeg.action),
       qty: Number(exec.shares || exec.quantity || 0),
       fillQty: Number(exec.shares || exec.quantity || 0),
       fillPrice: Number(exec.price || 0),
       price: Number(exec.price || 0),
-      currency: exec.currency || 'CHF',
+      currency: exec.currency || (proposalLeg && proposalLeg.currency) || 'CHF',
+      orderId: exec.orderId,
       costChf: Number(exec.shares || exec.quantity || 0) * Number(exec.price || 0),
     };
     try {
