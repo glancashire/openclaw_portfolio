@@ -6,6 +6,10 @@ const { readNetLiqHistory, lastNDays } = require('./historyDigest');
 const { buildSparklineSvg } = require('./sparkline');
 const { effectiveDeliveryPolicy, reportDeliveryStatus } = require('./deliveryPolicy');
 const { sendEmailMessage } = require('./emailDelivery');
+const fs = require('fs');
+const { computeRebalancePlan } = require('../../lib/rebalanceAnalyzer');
+const { parseAllocationTargets, parseHoldings, applyAliases } = require('../../lib/portfolioMarkdown');
+const { assessPortfolio } = require('../../lib/aiAssessment');
 
 function resolveDigestRecipients(policy = {}, env = process.env) {
   const configured = Array.isArray(policy.emailRecipients)
@@ -168,6 +172,86 @@ function renderWorkflowCard(summary = {}, deliveryStatus = {}) {
   });
 }
 
+function tryRender(fn, fallbackComment = '') {
+  try { return fn() || ''; } catch (err) {
+    return `<!-- digest-section error: ${String(err.message).replace(/[<>]/g, '')} -->${fallbackComment}`;
+  }
+}
+
+function buildRebalancePlanForDigest(portfolioDir) {
+  const portfolioPath = path.join(portfolioDir, 'portfolio.md');
+  const holdingsPath  = path.join(portfolioDir, 'holdings.md');
+  if (!fs.existsSync(portfolioPath) || !fs.existsSync(holdingsPath)) return null;
+  const targets = parseAllocationTargets(fs.readFileSync(portfolioPath, 'utf8'));
+  const { holdings: raw, cashChf } = parseHoldings(fs.readFileSync(holdingsPath, 'utf8'));
+  const holdings = applyAliases(raw, targets._aliases);
+  return computeRebalancePlan({
+    holdings, targets, cashChf,
+    fxRates: { EUR: 0.96, USD: 0.88, GBP: 1.15 },
+  });
+}
+
+function renderRebalanceSnapshotCard(plan) {
+  if (!plan || !Array.isArray(plan.legs) || plan.legs.length === 0) return '';
+  const rows = plan.legs.map((l) => {
+    const driftColor = Math.abs(l.driftPct) < 0.5 ? '#6b7280' : l.driftPct > 0 ? '#991b1b' : '#0f766e';
+    const driftCell = `<span style="color:${driftColor};font-weight:600;">${l.driftPct > 0 ? '+' : ''}${l.driftPct.toFixed(2)}pp</span>`;
+    return [
+      escapeHtml(l.symbol),
+      escapeHtml(formatCurrency(l.valueChf, 'CHF')),
+      escapeHtml(`${l.actualPct.toFixed(2)}%`),
+      escapeHtml(`${l.targetPct}%`),
+      driftCell,
+      escapeHtml(formatCurrency(l.gapChf, 'CHF')),
+    ];
+  });
+  const overshoot = plan.scenarios.sell_overshoot;
+  const summaryLine = (overshoot.sellsChf > 0 || overshoot.buysChf > 0)
+    ? `Sell-overshoot scenario: sells CHF ${overshoot.sellsChf}, buys CHF ${overshoot.buysChf}; cash needed CHF ${overshoot.cashNeededChf}; leftover drift ${overshoot.leftoverDriftPp}pp.`
+    : 'No rebalance action above min-trade-size today.';
+  return card({
+    title: 'Drift vs target',
+    tone: 'surface',
+    contentHtml: `
+      ${dataTable({
+        columns: [
+          { label: 'Symbol' },
+          { label: 'Value', align: 'right' },
+          { label: 'Actual %', align: 'right' },
+          { label: 'Target %', align: 'right' },
+          { label: 'Drift', align: 'right' },
+          { label: 'Gap CHF', align: 'right' },
+        ],
+        rows,
+      })}
+      <div style="margin-top:12px;font-size:13px;color:#374151;">${escapeHtml(summaryLine)}</div>
+    `,
+  });
+}
+
+function renderAiAssessmentCard(assessment) {
+  if (!assessment || !assessment.lead) return '';
+  const chips = (assessment.tags || []).map((tag) => {
+    const tone = tag === 'drift_alert' ? 'danger'
+      : tag === 'nav_drawdown' ? 'danger'
+      : tag === 'awaiting_approval' ? 'warn'
+      : tag === 'cash_above_target' ? 'info'
+      : tag === 'cash_below_target' ? 'warn'
+      : 'success';
+    return badge({ label: tag.replace(/_/g, ' '), tone });
+  }).join(' ');
+  const bullets = (assessment.details || []).map((d) => `<li style="margin:4px 0;">${escapeHtml(d.summary)}</li>`).join('');
+  return card({
+    title: 'Assessment',
+    tone: 'info',
+    contentHtml: `
+      <div style="margin-bottom:10px;font-size:15px;line-height:1.55;color:#0f172a;font-weight:600;">${escapeHtml(assessment.lead)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">${chips}</div>
+      <ul style="margin:0;padding-left:18px;color:#475569;font-size:13px;line-height:1.5;">${bullets}</ul>
+    `,
+  });
+}
+
 async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generatedAt = new Date().toISOString(), cronHealth = null }) {
   const portfolioName = path.basename(portfolioDir);
   const summary = await collectPortfolioSummary({ portfolioDir });
@@ -193,6 +277,13 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
       `,
     }),
     renderSparklineCard(portfolioDir),
+    tryRender(() => {
+      const plan = buildRebalancePlanForDigest(portfolioDir);
+      if (!plan) return '';
+      const navHistory = lastNDays(readNetLiqHistory(portfolioDir), 14);
+      const assessment = assessPortfolio({ plan, navHistory, summary });
+      return renderRebalanceSnapshotCard(plan) + renderAiAssessmentCard(assessment);
+    }),
     renderAllocationCard(summary),
     renderInstrumentHealthCard(summary),
     renderCronHealthCard(resolvedCronHealth),

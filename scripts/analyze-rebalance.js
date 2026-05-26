@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { computeRebalancePlan } = require('../lib/rebalanceAnalyzer');
+const { parseAllocationTargets, parseHoldings, applyAliases } = require('../lib/portfolioMarkdown');
 
 const args = parseArgs(process.argv.slice(2));
 const PORTFOLIO = args.portfolio || 'etf';
@@ -84,101 +85,6 @@ function parseArgs(argv) {
     }
   }
   return out;
-}
-
-function parseAllocationTargets(md) {
-  // Source of truth is the "Approved Instruments" table — it has per-instrument target % keyed by ticker.
-  // We pair it with the "Allocation Targets" CASH row.
-  const targets = [];
-  const aliases = {}; // localSymbol -> canonical ibkr_symbol
-  const approvedSection = extractMarkdownSection(md, '## Approved Instruments');
-  const rows = extractTableRows(approvedSection);
-  for (const r of rows) {
-    // columns: Ticker/ISIN, Name, Asset class, Target %, Min %, Max %, Exchange, Currency, Notes
-    if (r.length < 4) continue;
-    const tickerOrIsin = r[0].trim();
-    const targetPct = Number(r[3]);
-    if (!Number.isFinite(targetPct)) continue;
-
-    // ibkr_symbol=X is embedded in Notes (last col). Prefer that as the canonical key.
-    const notes = r[r.length - 1] || '';
-    const m = /ibkr_symbol=([A-Z0-9._-]+)/.exec(notes);
-    const symbol = m ? m[1] : (tickerOrIsin === 'CASH-CHF' ? 'CASH-CHF' : tickerOrIsin);
-
-    // Capture ibkr_local_symbol alias if present (e.g. UBSSLI's local symbol is CHSPI on IBKR).
-    const localM = /ibkr_local_symbol=([A-Z0-9._-]+)/.exec(notes);
-    if (localM && localM[1] !== symbol) {
-      aliases[localM[1]] = symbol;
-    }
-
-    if (targetPct === 0) continue; // skip 0% candidate sleeves
-    targets.push({ symbol, targetPct, minPct: Number(r[4] || 0), maxPct: Number(r[5] || 100) });
-  }
-  targets._aliases = aliases;
-  // Ensure CASH-CHF row from Allocation Targets is included if not already.
-  if (!targets.find((t) => t.symbol === 'CASH-CHF')) {
-    const allocSection = extractMarkdownSection(md, '## Allocation Targets');
-    const allocRows = extractTableRows(allocSection);
-    for (const r of allocRows) {
-      if (/cash/i.test(r[0] || '')) {
-        targets.push({ symbol: 'CASH-CHF', targetPct: Number(r[1]), minPct: Number(r[2] || 0), maxPct: Number(r[3] || 100) });
-        break;
-      }
-    }
-  }
-  return targets;
-}
-
-function parseHoldings(md) {
-  const lastSync = (/Date\/time:\s*(.+)/.exec(md) || [])[1] || null;
-  const totalValueChf = Number((/Total value CHF:\s*([0-9.]+)/.exec(md) || [])[1] || 0);
-  // Settled broker cash, NOT the "Portfolio cash CHF" (which is the untrusted local accounting).
-  const cashChf = Number((/Broker account cash CHF:\s*([0-9.]+)/.exec(md) || [])[1] || 0);
-
-  const section = extractMarkdownSection(md, '## Current Holdings');
-  const rows = extractTableRows(section);
-  const holdings = [];
-  for (const r of rows) {
-    // | Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | ...
-    if (r.length < 8) continue;
-    const rawSymbol = r[1].trim();  // "Name" column is actually the IBKR symbol in current holdings.md
-    const qty = Number(r[3]);
-    const currency = (r[5] || '').trim().toUpperCase();
-    const valueChf = Number(r[7]);
-    if (!rawSymbol || !Number.isFinite(valueChf)) continue;
-    holdings.push({ symbol: rawSymbol, qty, currency, valueChf });
-  }
-  return { holdings, cashChf, totalValueChf, lastSync };
-}
-
-function applyAliases(holdings, aliases) {
-  if (!aliases || Object.keys(aliases).length === 0) return holdings;
-  return holdings.map((h) => aliases[h.symbol] ? { ...h, symbol: aliases[h.symbol], localSymbol: h.symbol } : h);
-}
-
-function extractMarkdownSection(md, heading) {
-  const idx = md.indexOf(heading);
-  if (idx < 0) return '';
-  const after = md.slice(idx + heading.length);
-  // Stop at next top-level "##" heading.
-  const stop = after.search(/\n##\s/);
-  return stop < 0 ? after : after.slice(0, stop);
-}
-
-function extractTableRows(section) {
-  const lines = section.split('\n').filter((l) => l.trim().startsWith('|'));
-  const rows = [];
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i].trim();
-    if (/^\|[\s\-:|]+\|$/.test(line)) continue;       // separator
-    if (/^\| [A-Z][a-z].* \|/.test(line) && i === 0) continue; // header
-    const cells = line.split('|').slice(1, -1).map((c) => c.trim());
-    if (cells.length === 0) continue;
-    // Skip the header row (best-effort: has no numeric data)
-    if (cells.every((c) => /^[A-Za-z ]/.test(c) || c === '')) continue;
-    rows.push(cells);
-  }
-  return rows;
 }
 
 function renderMarkdown(payload) {
