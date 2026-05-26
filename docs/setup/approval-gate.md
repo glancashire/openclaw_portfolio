@@ -67,20 +67,44 @@ These env values are NEVER persisted to the repo and NEVER logged.
   before any transmit path. Not gated separately; the stub is a stronger
   block than the safe-word.
 
+## Operator entry point — `scripts/approve-and-execute.js` (Phase E)
+
+The canonical operator entry point. Usage:
+
+```
+node scripts/approve-and-execute.js \
+  --approval-id=<id> \
+  --secret=<safeword-or-pin> \
+  [--portfolio=etf] \
+  [--scope=basket-execute] \
+  [--root=/path/to/workspace] \
+  [--dry-run]
+```
+
+Behaviour:
+1. Compares `--secret` against `OPENCLAW_APPROVAL_SAFEWORD` and
+   `OPENCLAW_APPROVAL_PIN`. On no-match → exit 2 (`secret_mismatch`),
+   no intent file written, secret NOT echoed.
+2. Calls `writeApprovalIntent` with whichever field matched (only one is
+   written into the artefact).
+3. If `--dry-run`, logs the intent path and exits 0.
+4. Otherwise spawns `scripts/execute-approved-basket-end-to-end.js` with
+   the resolved portfolio and approvalId, forwarding stdio and exit code.
+
+Exit codes:
+- `0` — intent written; runner exited 0 (or dry-run).
+- `1` — missing required arg.
+- `2` — secret_mismatch or gate_unconfigured.
+- `3` — intent write failed.
+- `4+` — runner exit code (forwarded).
+
 ## Tests
 
 - `scripts/test-approval-gate.js` — 18 assertions covering every reason
   code, both pass paths (safe-word only, PIN only, both), perms, log
   hygiene, malformed JSON, and the live-order bypass refusal.
+- `scripts/test-approve-and-execute.js` — 27 subprocess assertions:
+  exit codes, intent-file shape, file perms (0600), and the critical
+  invariant that the secret never appears in stdout/stderr.
 
-Wired into `src/reporting/verifyRepoChecks.js`.
-
-## Follow-up — Phase E
-
-A small `scripts/approve-and-execute.js` wrapper will:
-1. Verify the operator's webchat approval message contains the safe-word
-   or PIN.
-2. Call `writeApprovalIntent` with the matched secret.
-3. Invoke `execute-approved-basket-end-to-end.js`.
-
-That wrapper is the natural successor to this phase.
+Both wired into `src/reporting/verifyRepoChecks.js`.
