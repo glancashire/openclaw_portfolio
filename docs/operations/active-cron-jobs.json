@@ -1,5 +1,5 @@
 {
-  "snapshotAt": "2026-05-25T14:50:00Z",
+  "snapshotAt": "2026-05-26T16:46:00Z",
   "host": "ef6083bf72ed",
   "policy": {
     "agentsDefaultsSandboxMode": "off",
@@ -11,110 +11,216 @@
     {
       "id": "0ddfde6d-5f4b-480b-a733-3d61bd27a3e4",
       "name": "portfolio-etf-daily-sync-and-dashboard",
-      "schedule": { "kind": "cron", "expr": "5 8,17 * * 1-5", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "5 8,17 * * 1-5",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write", "edit"],
-      "delivery": { "mode": "announce", "bestEffort": true }
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write",
+        "edit"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "7dfbbec5-a9bb-4c1c-8d04-cabe4462d358",
       "name": "portfolio-health-monitor-etf",
-      "schedule": { "kind": "cron", "expr": "0 8,14,20 * * *", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8,14,20 * * *",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read"],
-      "delivery": { "mode": "announce", "bestEffort": true }
+      "toolsAllow": [
+        "exec",
+        "read"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "1ec58679-4f19-4526-87e5-2fe9acd5b4ab",
       "name": "daily-rebalance-check",
-      "schedule": { "kind": "cron", "expr": "0 6 * * 1-5", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 6 * * 1-5",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
       "toolsAllow": null,
-      "delivery": { "mode": "announce", "bestEffort": true }
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "a34f51c3-7820-42da-91d3-4df75b53e062",
       "name": "market-calendar-sync",
-      "schedule": { "kind": "cron", "expr": "30 6 * * 1-5", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "30 6 * * 1-5",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read"],
-      "delivery": { "mode": "announce", "bestEffort": true }
-    },
-    {
-      "id": "f7bc978d-176a-4f26-9353-e1d6e1745069",
-      "name": "basket-approval-reminder-tuesday",
-      "schedule": { "kind": "at", "at": "2026-05-26T07:45:00.000Z" },
-      "sessionTarget": "session:agent:main:main",
-      "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write", "edit"],
-      "delivery": { "mode": "announce", "bestEffort": true },
-      "deleteAfterRun": true
+      "toolsAllow": [
+        "exec",
+        "read"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "3aef6007-6311-4693-8efa-9890e408dac2",
       "name": "ibkr-native-gateway-keepalive",
-      "schedule": { "kind": "cron", "expr": "0 8,13 * * *", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8,13 * * *",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read"],
-      "delivery": { "mode": "announce", "bestEffort": true }
-    },
-    {
-      "id": "802c9f45-72ef-4d63-976f-eb3bfa523e11",
-      "name": "rebalance-fill-check-monday",
-      "schedule": { "kind": "at", "at": "2026-05-26T09:30:00.000Z" },
-      "sessionTarget": "current",
-      "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write", "edit"],
-      "delivery": { "mode": "announce", "bestEffort": true },
-      "deleteAfterRun": true
+      "toolsAllow": [
+        "exec",
+        "read"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "eb3fc666-484a-4c83-a4d9-7d9c92b29818",
       "name": "portfolio-etf-weekly-report",
-      "schedule": { "kind": "cron", "expr": "20 17 * * 5", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "20 17 * * 5",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write", "edit"],
-      "delivery": { "mode": "announce", "bestEffort": true }
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write",
+        "edit"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "8b1c0de5-03f9-491c-af00-09b5ac802781",
       "name": "portfolio-etf-monthly-report",
-      "schedule": { "kind": "cron", "expr": "35 17 1 * *", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "35 17 1 * *",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write", "edit"],
-      "delivery": { "mode": "announce", "bestEffort": true }
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write",
+        "edit"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "d350c3c1-4176-404e-b532-1c5dd6fe744b",
       "name": "portfolio-etf-quarterly-report",
-      "schedule": { "kind": "cron", "expr": "50 17 1 1,4,7,10 *", "tz": "UTC" },
+      "schedule": {
+        "kind": "cron",
+        "expr": "50 17 1 1,4,7,10 *",
+        "tz": "UTC"
+      },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write", "edit"],
-      "delivery": { "mode": "announce", "bestEffort": true }
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write",
+        "edit"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     },
     {
       "id": "bf50a351-f593-48e1-a2d1-505ae7551748",
       "name": "soak-self-check-2026-05-30",
-      "schedule": { "kind": "at", "at": "2026-05-30T09:00:00.000Z" },
+      "schedule": {
+        "kind": "at",
+        "at": "2026-05-30T09:00:00.000Z"
+      },
       "sessionTarget": "session:agent:main:main",
       "payloadKind": "agentTurn",
-      "toolsAllow": ["exec", "read", "write"],
-      "delivery": { "mode": "announce", "bestEffort": true },
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      },
       "deleteAfterRun": true
+    },
+    {
+      "id": "8e133b01-cef0-4c20-a6e5-ebd5d5c9de11",
+      "name": "portfolio-etf-daily-digest",
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 21 * * 1-5",
+        "tz": "Europe/Zurich"
+      },
+      "sessionTarget": "session:agent:main:main",
+      "payloadKind": "agentTurn",
+      "toolsAllow": [
+        "exec",
+        "read"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
     }
   ],
   "disabledJobs": [
-    { "name": "UBSPX retry reminder after IBIS open", "reason": "historical, superseded by basket lifecycle" },
-    { "name": "UBSPX retry Telegram reminder after IBIS open", "reason": "isolated + Docker sandbox bug; superseded" },
-    { "name": "submit-orders-at-market-open", "reason": "isolated + Docker sandbox bug; replaced by basket workflow" },
-    { "name": "monitor-trade-fills", "reason": "replaced by basket execution runner + fill check jobs" }
+    {
+      "name": "UBSPX retry reminder after IBIS open",
+      "reason": "historical, superseded by basket lifecycle"
+    },
+    {
+      "name": "UBSPX retry Telegram reminder after IBIS open",
+      "reason": "isolated + Docker sandbox bug; superseded"
+    },
+    {
+      "name": "submit-orders-at-market-open",
+      "reason": "isolated + Docker sandbox bug; replaced by basket workflow"
+    },
+    {
+      "name": "monitor-trade-fills",
+      "reason": "replaced by basket execution runner + fill check jobs"
+    }
   ]
 }

@@ -1,6 +1,6 @@
-# Active cron jobs — snapshot 2026-05-25
+# Active cron jobs — snapshot 2026-05-26
 
-Generated 2026-05-25 (post-Phase S3 audit). Source of truth at snapshot time is
+Generated 2026-05-26 (Phase H follow-up: digest cron registered). Source of truth at snapshot time is
 `cron list`; this file is the human-readable mirror plus the policy gate.
 
 If you change a job (add, remove, toggle, edit schedule, edit delivery), update
@@ -15,13 +15,12 @@ this snapshot AND `docs/operations/active-cron-jobs.json` so the
 | portfolio-health-monitor-etf | `0 8,14,20 * * *` UTC | current | exec/read | announce, bestEffort | Health monitor; lightContext |
 | daily-rebalance-check | `0 6 * * 1-5` UTC | current | (default) | announce, bestEffort | check-rebalance script |
 | market-calendar-sync | `30 6 * * 1-5` UTC | current | exec/read | announce, bestEffort | IBKR contract hours sync |
-| basket-approval-reminder-tuesday | `at 2026-05-26T07:45:00Z` | session:agent:main:main | exec/read/write/edit | announce, bestEffort | One-shot Tue re-propose basket + email |
 | ibkr-native-gateway-keepalive | `0 8,13 * * *` UTC | current | exec/read | announce, bestEffort | Daytime gateway keepalive |
-| rebalance-fill-check-monday | `at 2026-05-26T09:30:00Z` | current | exec/read/write/edit | announce, bestEffort | One-shot; checks rebalance fills |
 | portfolio-etf-weekly-report | `20 17 * * 5` UTC | current | exec/read/write/edit | announce, bestEffort | Friday afternoon report cycle |
 | portfolio-etf-monthly-report | `35 17 1 * *` UTC | current | exec/read/write/edit | announce, bestEffort | First-of-month report cycle |
 | portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` UTC | current | exec/read/write/edit | announce, bestEffort | Quarterly report cycle |
 | soak-self-check-2026-05-30 | `at 2026-05-30T09:00:00Z` | session:agent:main:main | exec/read/write | announce, bestEffort | One-shot soak self-check vs baseline; emails Graham |
+| portfolio-etf-daily-digest | `0 21 * * 1-5` Europe/Zurich | session:agent:main:main | exec/read | announce, bestEffort | Daily portfolio digest with rebalance + AI cards (Phase C/H) |
 
 ## Disabled (kept for audit)
 
@@ -31,10 +30,12 @@ this snapshot AND `docs/operations/active-cron-jobs.json` so the
 | UBSPX retry Telegram reminder after IBIS open | Same as above; was running as isolated and hit the Docker sandbox bug |
 | submit-orders-at-market-open | Historical 2026-05-08; isolated session + Docker sandbox bug; replaced by current basket workflow |
 | monitor-trade-fills | Replaced by basket-execution runner + fill check jobs |
+| basket-approval-reminder-tuesday | One-shot at-job that fired 2026-05-26 07:45 UTC; deleteAfterRun cleared. |
+| rebalance-fill-check-monday | One-shot at-job that fired 2026-05-26 09:30 UTC; deleteAfterRun cleared. |
 
 ## Health snapshot
 
-- All 11 enabled jobs report `consecutiveErrors: 0`.
+- All 10 enabled jobs report `consecutiveErrors: 0`.
 - All enabled jobs use `sessionTarget: "current"` (or sticky `session:agent:main:main`); none are `isolated`.
 - All enabled jobs have `delivery.bestEffort: true` (Telegram announce fails-closed by design on this host; see `docs/operations/cron.md`).
 
