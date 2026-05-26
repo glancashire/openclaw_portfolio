@@ -88,4 +88,46 @@ for (const scriptPath of scripts) {
   });
 }
 
+// ---- patch-marker: dynamic-require + smoke-spawn ----
+const { spawnSync } = require('child_process');
+
+// Build a list of dynamic require() calls per file (anything that doesn't
+// match the simple `require('literal')` form we already checked).
+function extractDynamicRequires(src) {
+  const out = [];
+  const re = /require\s*\(\s*([^)]*?)\)/g;
+  let m;
+  while ((m = re.exec(src)) !== null) {
+    const inner = m[1].trim();
+    // Skip pure string literals: 'x' or "x"
+    if (/^(['"])([^'"]+)\1$/.test(inner)) continue;
+    out.push(inner);
+  }
+  return out;
+}
+
+for (const scriptPath of scripts) {
+  const rel = path.relative(ROOT, scriptPath);
+  const dynamics = extractDynamicRequires(fs.readFileSync(scriptPath, 'utf8'));
+  if (dynamics.length === 0) continue;
+  test(`smoke-spawn ${rel} (has dynamic require(): ${dynamics.length})`, () => {
+    // Run with a 1500ms wall-clock cap. If the process exits inside that
+    // window with a non-zero code AND stderr mentions MODULE_NOT_FOUND, the
+    // top-level require chain is broken. Otherwise (timeout, or exit for
+    // a non-require reason like "no IBKR config") we accept it: the
+    // module graph loaded.
+    const res = spawnSync(process.execPath, [scriptPath], {
+      cwd: ROOT,
+      timeout: 1500,
+      env: { ...process.env, CLAUDE_GUARD_SMOKE: '1' },
+      encoding: 'utf8',
+    });
+    const stderr = res.stderr || '';
+    assert(
+      !stderr.includes('MODULE_NOT_FOUND') && !stderr.includes('Cannot find module'),
+      `${rel}: top-level require chain failed.\nstderr:\n${stderr.slice(0, 800)}`,
+    );
+  });
+}
+
 console.log(JSON.stringify({ ok: true, passed, scripts: scripts.length }));

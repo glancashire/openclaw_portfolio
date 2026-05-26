@@ -90,7 +90,21 @@ async function main() {
       const snap = await client.native.fetchMarketSnapshot([Number(conid)]);
       const row = (snap || []).find((s) => Number(s.conid) === Number(conid)) || (snap && snap[0]) || null;
       if (!row) return null;
-      return { ask: Number(row.ask), bid: Number(row.bid), last: Number(row.last), lastClose: Number(row.close) };
+      // IBKR native snapshot uses numeric tick-type keys: 31=last, 84=bid, 86=ask, 7295=close.
+      // Expose BOTH the adapted shape (ask/bid/last/lastClose) AND the raw
+      // tick-type keys, so quoteQuality.classifyQuoteQuality (which reads
+      // snapshot['31'/'84'/'86'/'7295']) can correctly tier the quote.
+      const last = Number(row['31'] ?? row.last);
+      const bid = Number(row['84'] ?? row.bid);
+      const ask = Number(row['86'] ?? row.ask);
+      const lastClose = Number(row['7295'] ?? row.close ?? row.lastClose);
+      return {
+        ask, bid, last, lastClose,
+        '31': row['31'], '84': row['84'], '86': row['86'], '7295': row['7295'],
+        close: row['7295'] ?? row.close,
+        lastTimestamp: row.lastTimestamp,
+        conid: row.conid,
+      };
     } catch (error) {
       console.error(`quote ${conid} failed: ${error.message}`);
       return null;
