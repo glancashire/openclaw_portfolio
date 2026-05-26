@@ -13,16 +13,18 @@ The digest renders, in order:
    bottom-line recommendation drawn from scenario 2 (sell-overshoot) or
    scenario 1 (no-sell) depending on which actually closes the gap with cash
    on hand.
-3. **AI assessment** *(added 2026-05-26, Phase C)* — two-stage:
+3. **AI assessment** *(added 2026-05-26, Phase C / H)* — two-stage:
    - `lib/aiAssessment.js::assessPortfolio()` produces deterministic tags
      (priority: `drift_alert` > `nav_drawdown` > `awaiting_approval` >
      `cash_above_target` / `cash_below_target` > `nominal`) and a
      rule-based fallback lead.
    - `lib/aiAssessment.js::narrateAssessment()` calls a model via
-     `lib/modelClient.js` (Anthropic preferred via `ANTHROPIC_API_KEY`,
-     OpenAI via `OPENAI_API_KEY`) to turn the structured inputs into a
-     short prose paragraph. On any error or missing key, the rule-based
-     lead is used. Tags + details remain deterministic.
+     `lib/modelClient.js`. Provider auto-selection: **openclaw** CLI
+     (`openclaw capability model run`) preferred — routes through
+     OpenClaw's myclaw-configured upstream, no raw API key needed.
+     Falls back to `ANTHROPIC_API_KEY` then `OPENAI_API_KEY` for
+     environments without the CLI. On any error, the rule-based lead is
+     used. Tags + details remain deterministic.
 4. **History + delivery cards** (existing).
 
 If the rebalance analyzer or assessor throws, the digest still renders the
