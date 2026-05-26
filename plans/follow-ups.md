@@ -14,7 +14,13 @@ Items identified but not acted on, with a note on why and what to do later.
 
 ---
 
-## 2. No Mailgun inbound route for `c3po@mailgun.swift.ch` (medium priority)
+## 2. No Mailgun inbound route for `c3po@mailgun.swift.ch` (medium priority — code-side READY, infra still required)
+**Code-side status (2026-05-26, Phase F):** `lib/mailgunInbound.js` provides signature
+verification, payload extraction, sender allowlist, replay prevention (via Mailgun token,
+24h retention), and a 5-minute timestamp window. See `docs/setup/mailgun-inbound.md` for
+the API contract. 41 unit assertions green.
+
+**Still required (infra, NOT in autonomous scope):**
 **Identified:** 2026-05-26, when Graham was asked to "reply to the email" as an approval path.  
 **Symptom:** Mailgun `events` API returns zero inbound events for that address; there is no configured route in Mailgun's Receiving panel.  
 **Impact:** "Reply to my email" cannot be used as an approval/auth signal until a route is set up.  
@@ -26,7 +32,17 @@ Items identified but not acted on, with a note on why and what to do later.
 
 ---
 
-## 3. Session safe-word not enforced at code level (medium priority)
+## 3. Session safe-word not enforced at code level — RESOLVED (Phase D + E, 2026-05-26)
+
+**Resolved:** `src/execution/approvalGate.js` enforces a JSON intent artefact
+(`runtime/approval-intent/<id>.json`) signed with safe-word/PIN before any
+transmission. `scripts/execute-approved-basket-end-to-end.js` calls
+`requireApprovalIntent` and refuses to proceed without it. The operator entry
+point `scripts/approve-and-execute.js` writes the artefact then spawns the
+runner. Live transmission cannot bypass the gate. See
+`docs/setup/approval-gate.md`. 18+27 unit assertions green.
+
+Original action plan (kept for context):
 **Identified:** 2026-05-26, after saving `memory/feedback_approval_safeword.md`.  
 **Current state:** The safe-word (`shortseller` / PIN `8755`) is honoured by the agent via memory-based recall. There is no code-level gate.  
 **Risk:** A future session that doesn't load `feedback_approval_safeword.md` could approve a basket without verifying the safe-word.  
