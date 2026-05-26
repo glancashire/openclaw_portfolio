@@ -9,7 +9,8 @@ const { sendEmailMessage } = require('./emailDelivery');
 const fs = require('fs');
 const { computeRebalancePlan } = require('../../lib/rebalanceAnalyzer');
 const { parseAllocationTargets, parseHoldings, applyAliases } = require('../../lib/portfolioMarkdown');
-const { assessPortfolio } = require('../../lib/aiAssessment');
+const { assessPortfolio, narrateAssessment } = require('../../lib/aiAssessment');
+const { createModelClient } = require('../../lib/modelClient');
 
 function resolveDigestRecipients(policy = {}, env = process.env) {
   const configured = Array.isArray(policy.emailRecipients)
@@ -252,11 +253,28 @@ function renderAiAssessmentCard(assessment) {
   });
 }
 
-async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generatedAt = new Date().toISOString(), cronHealth = null }) {
+async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generatedAt = new Date().toISOString(), cronHealth = null, modelClient = null }) {
   const portfolioName = path.basename(portfolioDir);
   const summary = await collectPortfolioSummary({ portfolioDir });
   const deliveryStatus = reportDeliveryStatus({ portfolioDir });
   const resolvedCronHealth = cronHealth || fetchCronHealth();
+  const rebalanceContext = await (async () => {
+    try {
+      const plan = buildRebalancePlanForDigest(portfolioDir);
+      if (!plan) return null;
+      const navHistory = lastNDays(readNetLiqHistory(portfolioDir), 14);
+      const baseAssessment = assessPortfolio({ plan, navHistory, summary });
+      const client = modelClient || createModelClient();
+      const narrated = await narrateAssessment({
+        assessment: baseAssessment,
+        context: { portfolio: path.basename(portfolioDir), plan, summary, navHistory },
+        modelClient: client,
+      });
+      return { plan, assessment: narrated };
+    } catch (_err) {
+      return null;
+    }
+  })();
   const metrics = [
     { label: 'Portfolio value', value: formatCurrency(summary.holdings?.totalValueChf, 'CHF'), detail: summary.holdings?.lastSyncAt ? `Last sync ${summary.holdings.lastSyncAt}` : null },
     { label: 'Cash', value: formatCurrency(summary.holdings?.cashChf, 'CHF'), detail: `Base ${summary.holdings?.baseCurrency || 'CHF'}` },
@@ -278,11 +296,8 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
     }),
     renderSparklineCard(portfolioDir),
     tryRender(() => {
-      const plan = buildRebalancePlanForDigest(portfolioDir);
-      if (!plan) return '';
-      const navHistory = lastNDays(readNetLiqHistory(portfolioDir), 14);
-      const assessment = assessPortfolio({ plan, navHistory, summary });
-      return renderRebalanceSnapshotCard(plan) + renderAiAssessmentCard(assessment);
+      if (!rebalanceContext) return '';
+      return renderRebalanceSnapshotCard(rebalanceContext.plan) + renderAiAssessmentCard(rebalanceContext.assessment);
     }),
     renderAllocationCard(summary),
     renderInstrumentHealthCard(summary),

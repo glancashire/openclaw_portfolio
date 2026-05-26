@@ -32,7 +32,7 @@ Items identified but not acted on, with a note on why and what to do later.
 **Risk:** A future session that doesn't load `feedback_approval_safeword.md` could approve a basket without verifying the safe-word.  
 **Action needed:**  
 - Add a lightweight JSON approval-intent schema (e.g. in `src/execution/approvalGate.js`) that requires `{ safeWord, pin, approvalId }` to be present and validated before any runner script is invoked.  
-- Wire the gate into `scripts/execute-approved-basket-end-to-end.js` as a pre-flight step when not running in `--skip-gate` mode.  
+- Wire the gate as a pre-flight step into **every `scripts/execute-*` script**, not just `execute-approved-basket-end-to-end.js`. A `--skip-gate` escape hatch may be allowed for dry-run modes that never transmit.  
 **When to fix:** Phase B of the auth hardening track; worthwhile before the next Tuesday basket cron.
 
 ---

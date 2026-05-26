@@ -13,11 +13,16 @@ The digest renders, in order:
    bottom-line recommendation drawn from scenario 2 (sell-overshoot) or
    scenario 1 (no-sell) depending on which actually closes the gap with cash
    on hand.
-3. **AI assessment** *(added 2026-05-26, Phase C)* — `lib/aiAssessment.js`
-   picks the most load-bearing observation (priority order: `drift_alert` >
-   `nav_drawdown` > `awaiting_approval` > `cash_above_target` /
-   `cash_below_target` > `nominal`) and emits a one-paragraph lead plus a
-   tag chip block. Deterministic rule-based — no model call.
+3. **AI assessment** *(added 2026-05-26, Phase C)* — two-stage:
+   - `lib/aiAssessment.js::assessPortfolio()` produces deterministic tags
+     (priority: `drift_alert` > `nav_drawdown` > `awaiting_approval` >
+     `cash_above_target` / `cash_below_target` > `nominal`) and a
+     rule-based fallback lead.
+   - `lib/aiAssessment.js::narrateAssessment()` calls a model via
+     `lib/modelClient.js` (Anthropic preferred via `ANTHROPIC_API_KEY`,
+     OpenAI via `OPENAI_API_KEY`) to turn the structured inputs into a
+     short prose paragraph. On any error or missing key, the rule-based
+     lead is used. Tags + details remain deterministic.
 4. **History + delivery cards** (existing).
 
 If the rebalance analyzer or assessor throws, the digest still renders the
@@ -29,11 +34,12 @@ other cards (failure mode is covered by
 Recommended cron expression for daily delivery:
 
 ```
-35 17 * * 1-5
+0 21 * * 1-5
 ```
 
-That is **17:35 local (Europe/Zurich) on weekdays**, ≈5 minutes after the
-SIX close and avoiding the :00 / :30 alignment collision with other crons.
+That is **21:00 local (Europe/Zurich) on weekdays**, well after the SIX
+close, US market open, and any same-day rebalance settles. Avoids the
+:30 alignment with the existing 17:35 reporting cron.
 Registration is session-state, not commit-state — register via `CronCreate`
 from a Claude session when ready. The schedule is **not yet registered**.
 
