@@ -36,6 +36,7 @@ const checks = [
   ['test:approval-gate', ['scripts/test-approval-gate.js']],
   ['test:approve-and-execute', ['scripts/test-approve-and-execute.js']],
   ['test:mailgun-inbound', ['scripts/test-mailgun-inbound.js']],
+  ['test:cron-jobs-cache', ['scripts/test-cron-jobs-cache.js']],
   ['test:approved-instruments-sentinel-identity', ['scripts/test-approved-instruments-sentinel-identity.js']],
   ['test:cancel-broker-only-orderid', ['scripts/test-cancel-broker-only-orderid.js']],
   ['test:clear-circuit-breaker-audit', ['scripts/test-clear-circuit-breaker-audit.js']],

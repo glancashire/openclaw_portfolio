@@ -4,12 +4,21 @@ Items identified but not acted on, with a note on why and what to do later.
 
 ---
 
-## 1. `scripts/test-multi-portfolio-overview.js` — 20-second hot path (low priority)
+## 1. `scripts/test-multi-portfolio-overview.js` — slow hot path — PARTIALLY RESOLVED (Phase G, 2026-05-26)
 **Identified:** 2026-05-26, during Phase A cleanup.  
 **Symptom:** The test consistently takes ~20s. When `npm test` ran it, it appeared to hang, causing the full suite to time-out if a short timeout is set.  
 **Root cause (suspected):** A `setTimeout` somewhere in the `generateOverviewArtifacts` / `generateOverviewBoard` pipeline introduces a deliberate delay (possibly a rate-limit backoff or a polling stub).  
 **Impact:** Non-blocking for normal operation. The test does pass.  
 **Action needed:** Trace the 20s delay and stub it out in tests, or split the slow integration assertion into a separate `test:slow` group.  
+**Resolved status:** Phase G added an in-process TTL cache to
+`src/reporting/cronJobsFetcher.js`. The test went from 28s → 15s (and
+from 11s when the `openclaw` CLI is stubbed). Root cause was 4×
+`openclaw cron list --json` spawns at ~2.5s each. Remaining 11s is
+legitimate filesystem walking and HTML rendering across many
+fixtures; not worth fragmenting the test further unless `npm test`
+becomes a strict pre-push gate.
+
+Original action plan (kept for context):
 **When to fix:** Before `npm test` is run as a mandatory pre-push gate.
 
 ---
