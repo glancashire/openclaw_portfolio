@@ -27,6 +27,7 @@ const { saveApprovalEnvelope } = require(path.join(ROOT, 'src/execution/basketAp
 const { executeApprovedBasket } = require(path.join(ROOT, 'src/execution/basketExecutionRunner'));
 const { runBasketLifecycle, loadRunState } = require(path.join(ROOT, 'src/execution/basketLifecycle'));
 const { latestProposalForPortfolio } = require(path.join(ROOT, 'src/execution/basketProposalGenerator'));
+const { requireApprovalIntent } = require(path.join(ROOT, 'src/execution/approvalGate'));
 const { InteractiveBrokersClient } = require(path.join(ROOT, 'src/brokers/interactive-brokers/client'));
 
 function parseArgs(argv) {
@@ -90,6 +91,18 @@ async function main() {
     };
     saveApprovalEnvelope(approvedEnvelope, { rootDir: ROOT });
     log(`Saved approved basket envelope (approvalId=${approvalId}).`);
+
+    try {
+      requireApprovalIntent({
+        approvalId,
+        rootDir: ROOT,
+        scriptName: 'execute-approved-basket-end-to-end',
+        scope: 'basket-execute',
+      });
+    } catch (error) {
+      console.error(`Approval gate denied (${error.reason || error.code || 'unknown'}): ${error.message}`);
+      process.exit(4);
+    }
 
     log('Transmitting via canonical basket runner...');
     try {
