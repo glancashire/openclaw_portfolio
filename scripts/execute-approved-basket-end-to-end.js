@@ -28,6 +28,12 @@ const { executeApprovedBasket } = require(path.join(ROOT, 'src/execution/basketE
 const { runBasketLifecycle, loadRunState } = require(path.join(ROOT, 'src/execution/basketLifecycle'));
 const { latestProposalForPortfolio } = require(path.join(ROOT, 'src/execution/basketProposalGenerator'));
 const { requireApprovalIntent } = require(path.join(ROOT, 'src/execution/approvalGate'));
+const { loadWorkspaceEnv } = require(path.join(ROOT, 'src/shared/env'));
+
+// Hydrate process.env from .env so the approval gate can find
+// OPENCLAW_APPROVAL_SAFEWORD / OPENCLAW_APPROVAL_PIN even when the runner is
+// invoked from a context (cron, manual node call) that doesn't pre-export them.
+loadWorkspaceEnv();
 const { InteractiveBrokersClient } = require(path.join(ROOT, 'src/brokers/interactive-brokers/client'));
 
 function parseArgs(argv) {

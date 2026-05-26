@@ -31,6 +31,7 @@ const { spawn } = require('child_process');
 
 const ROOT_REAL = path.resolve(__dirname, '..');
 const { writeApprovalIntent } = require(path.join(ROOT_REAL, 'src/execution/approvalGate'));
+const { loadWorkspaceEnv } = require(path.join(ROOT_REAL, 'src/shared/env'));
 
 function parseArgs(argv) {
   const out = {};
@@ -53,6 +54,9 @@ function fail(code, msg) {
 function main() {
   const args = parseArgs(process.argv);
   const ROOT = args.root ? path.resolve(args.root) : ROOT_REAL;
+  // Hydrate env from <ROOT>/.env. .env is the operator's secret store on this
+  // host (chmod 600, gitignored). Honors --root so tests can isolate.
+  loadWorkspaceEnv(path.join(ROOT, '.env'));
   const approvalId = String(args['approval-id'] || '').trim();
   const secret     = String(args.secret || '').trim();
   const portfolio  = String(args.portfolio || 'etf').trim();
