@@ -54,6 +54,7 @@ const checks = [
   ['test:self-heal-budget', ['scripts/test-self-heal-budget.js']],
   ['test:approval-queue-grouping', ['scripts/test-approval-queue-grouping.js']],
   ['test:recovery-ladder', ['scripts/test-recovery-ladder.js']],
+  ['test:test-manifest-shape', ['scripts/test-test-manifest-shape.js']],
 ];
 
 module.exports = { checks };

@@ -6,7 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "test": "node scripts/verify-repo.js",
-    "test:all": "node scripts/test-all.js",
+    "test:all": "node scripts/run-all-discovered-tests.js",
+    "test:discover": "node scripts/discover-test-suites.js",
+    "test:safe": "node scripts/run-all-discovered-tests.js --lane=safe",
     "test:full": "npm run test:all && npm run verify",
     "verify": "node scripts/verify-repo.js",
     "test:repo": "node scripts/verify-repo.js",
