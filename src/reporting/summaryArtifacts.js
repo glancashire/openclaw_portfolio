@@ -1158,6 +1158,38 @@ function approvalUrgencyForItem(item = {}) {
   return 'low';
 }
 
+// Phase W8: explanation builders (group-aware, operator-facing).
+function explainActionable(item = {}) {
+  if (item.kind === 'basket_reproposal_pending') {
+    return `Latest reproposal v${item.reproposalVersion} is within the approval window and ready for a single approve.`;
+  }
+  if (item.status === 'basket_approved') {
+    return item.explanation || 'Approved basket is executable now; awaiting transmit.';
+  }
+  if (item.queueType === 'attention') {
+    return item.explanation || item.summary || 'Tripped circuit breaker requires operator attention before approvals proceed.';
+  }
+  if (item.status === 'pending_user_approval') {
+    return 'Fresh proposal within the approval window — awaiting operator approve/reject.';
+  }
+  if (item.status === 'ready_for_review') {
+    return 'Reviewed approval item ready to advance into the next workflow step.';
+  }
+  return item.explanation || item.summary || 'Actionable approval item.';
+}
+
+function explainStale(stale = {}) {
+  const ageHours = Number(stale.approvalAgeHours);
+  const ageText = Number.isFinite(ageHours) ? `${ageHours.toFixed(1)}h` : 'past the staleness threshold';
+  return `Approved ${ageText} ago; market conditions may have changed — refresh approval before live submission.`;
+}
+
+function explainSuperseded(rep = {}, latest = {}) {
+  const latestVersion = latest.version != null ? `v${latest.version}` : 'a newer version';
+  const latestDate = latest.createdAt ? ` created ${latest.createdAt}` : '';
+  return `Superseded by reproposal ${latestVersion}${latestDate}; approve the newer row instead.`;
+}
+
 function buildApprovalsQueue(summaries = [], options = {}) {
   const rootDir = options.rootDir || null;
   const reproposalSurface = rootDir ? require('./reproposalSurface') : null;
@@ -1177,57 +1209,140 @@ function buildApprovalsQueue(summaries = [], options = {}) {
       recommendedOperatorAction: 'Review the approved basket and submit when satisfied with the price bands and market window.',
       queueType: 'approval',
       severity: 'medium',
+      group: 'actionable',
     }] : [];
 
-    // Phase 193 + 194: pending reproposals — surface only latest per parent
-    const reproposalItems = reproposalSurface
-      ? reproposalSurface.listLatestPendingReproposals({ rootDir, portfolio: summary.portfolio })
-          .map((rep) => reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep }))
-      : [];
+    // Phase W8: split reproposals into latest-per-parent (actionable) vs older versions (superseded).
+    let reproposalActionable = [];
+    let reproposalSuperseded = [];
+    if (reproposalSurface) {
+      const all = reproposalSurface.listPendingReproposals({ rootDir, portfolio: summary.portfolio });
+      const latestByParent = new Map();
+      for (const rep of all) {
+        const existing = latestByParent.get(rep.parentApprovalId);
+        if (!existing || rep.version > existing.version) latestByParent.set(rep.parentApprovalId, rep);
+      }
+      for (const rep of all) {
+        const latest = latestByParent.get(rep.parentApprovalId);
+        const item = reproposalSurface.describeReproposalItem({ portfolio: summary.portfolio, reproposal: rep });
+        if (latest && rep === latest) {
+          reproposalActionable.push({ ...item, group: 'actionable' });
+        } else {
+          reproposalSuperseded.push({
+            ...item,
+            group: 'superseded',
+            urgency: 'low',
+            severity: 'low',
+            status: 'superseded',
+            supersededByVersion: latest ? latest.version : null,
+            supersededByApprovalId: latest ? latest.approvalId : null,
+            supersededByCreatedAt: latest ? latest.createdAt : null,
+            summary: `Reproposal v${rep.version} superseded by v${latest ? latest.version : '?'} for parent ${rep.parentApprovalId}.`,
+            explanation: explainSuperseded(rep, latest || {}),
+            effectIfApproved: 'Approving this older version is blocked — it has been replaced; approve the newer reproposal instead.',
+            effectIfIgnored: 'No action needed; the legacy version is retained as context only and will not transmit.',
+            recommendedOperatorAction: latest
+              ? `Approve the newer v${latest.version} reproposal for parent ${rep.parentApprovalId} instead of this row.`
+              : 'Review the newer reproposal for this parent and approve it instead.',
+          });
+        }
+      }
+    }
 
-    // Phase 199: tripped circuit breakers surface above approvals.
+    // Phase 199: tripped circuit breakers surface above approvals (always actionable).
     const breakerItems = circuitBreakerSurface
       ? circuitBreakerSurface.listCircuitBreakerSurfaceItems({ rootDir })
           .filter((item) => item.portfolio === summary.portfolio)
-          .map((item) => ({ ...item, urgency: 'high', queueType: 'attention' }))
+          .map((item) => ({ ...item, urgency: 'high', queueType: 'attention', group: 'actionable' }))
       : [];
+
+    // Phase W8: stale approvals surfaced as their own row-level items.
+    const staleApprovalRows = Array.isArray(summary.approvals?.staleApprovals) ? summary.approvals.staleApprovals : [];
+    const staleItems = staleApprovalRows.map((stale) => ({
+      portfolio: summary.portfolio,
+      urgency: 'high',
+      severity: 'high',
+      status: 'stale_needs_reapproval',
+      queueType: 'approval',
+      group: 'stale',
+      tickerOrIsin: stale.tickerOrIsin || '',
+      action: stale.action || '',
+      approvalAgeHours: stale.approvalAgeHours,
+      summary: `Stale approval: ${(stale.action || '').toUpperCase()} ${stale.tickerOrIsin || ''}${stale.name ? ` (${stale.name})` : ''} approved ${Number.isFinite(Number(stale.approvalAgeHours)) ? `${Number(stale.approvalAgeHours).toFixed(1)}h` : ''} ago.`,
+      explanation: explainStale(stale),
+      effectIfApproved: 'Refreshing the proposal and re-approving the latest row arms it for live submission again.',
+      effectIfIgnored: 'The row stays blocked from live submission until the approval is refreshed.',
+      recommendedOperatorAction: stale.reapproveGuidance || 'Run scripts/trade.js refresh-stale-approvals to regenerate, then approve only the latest refreshed row.',
+      refreshCommand: stale.refreshCommand || null,
+    }));
+
+    const queueApprovalItems = queueItems
+      .filter((item) => ['approval'].includes(item.queueType || queueTypeForItem(item)) || item.kind === 'approval')
+      // Phase W8: stale approvals are surfaced separately as row-level items;
+      // suppress the aggregate queue summary so we don't double-count.
+      .filter((item) => item.status !== 'stale_needs_reapproval')
+      .map((item) => ({
+        portfolio: summary.portfolio,
+        urgency: approvalUrgencyForItem(item),
+        status: item.status,
+        summary: item.summary,
+        explanation: explainActionable({ ...item, queueType: item.queueType || queueTypeForItem(item) }),
+        effectIfApproved: item.status === 'pending_user_approval'
+          ? 'The operator can move this proposal from review into the next staging / execution decision step.'
+          : 'The operator can advance the reviewed item into the next workflow step with fewer manual joins.',
+        effectIfIgnored: 'The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.',
+        recommendedOperatorAction: item.recommendedOperatorAction || 'Review and resolve the approval item explicitly.',
+        queueType: item.queueType || queueTypeForItem(item),
+        severity: item.severity,
+        group: 'actionable',
+      }));
 
     return [
       ...breakerItems,
-      ...reproposalItems,
+      ...reproposalActionable,
       ...basketItems,
-      ...queueItems
-        .filter((item) => ['approval'].includes(item.queueType || queueTypeForItem(item)) || item.kind === 'approval')
-        .map((item) => ({
-          portfolio: summary.portfolio,
-          urgency: approvalUrgencyForItem(item),
-          status: item.status,
-          summary: item.summary,
-          explanation: item.summary,
-          effectIfApproved: item.status === 'pending_user_approval'
-            ? 'The operator can move this proposal from review into the next staging / execution decision step.'
-            : 'The operator can advance the reviewed item into the next workflow step with fewer manual joins.',
-          effectIfIgnored: 'The approval backlog remains open, and the related portfolio workflow stays delayed or ambiguous.',
-          recommendedOperatorAction: item.recommendedOperatorAction || 'Review and resolve the approval item explicitly.',
-          queueType: item.queueType || queueTypeForItem(item),
-          severity: item.severity,
-        }))
+      ...queueApprovalItems,
+      ...staleItems,
+      ...reproposalSuperseded,
     ];
   });
 
+  // Phase W8: sort by group first (actionable -> stale -> superseded), then
+  // preserve the existing urgency / portfolio / summary tiebreakers within a
+  // group so legacy ordering is unchanged for the actionable section.
+  const groupRank = { actionable: 0, stale: 1, superseded: 2 };
+  const urgencyRank = { high: 0, medium: 1, low: 2 };
   items.sort((a, b) => {
-    const urgencyRank = { high: 0, medium: 1, low: 2 };
-    return (urgencyRank[a.urgency] ?? 99) - (urgencyRank[b.urgency] ?? 99)
+    const aGroup = a.group || 'actionable';
+    const bGroup = b.group || 'actionable';
+    return (groupRank[aGroup] ?? 99) - (groupRank[bGroup] ?? 99)
+      || (urgencyRank[a.urgency] ?? 99) - (urgencyRank[b.urgency] ?? 99)
       || String(a.portfolio).localeCompare(String(b.portfolio))
       || String(a.summary).localeCompare(String(b.summary));
   });
 
-  const enrichedItems = items.map((item, index) => ({ rank: index + 1, ...item }));
+  const enrichedItems = items.map((item, index) => ({
+    ...item,
+    rank: index + 1,
+    group: item.group || 'actionable',
+    explanation: item.explanation || explainActionable(item),
+  }));
+
+  // Build per-group summary referencing item ranks (helps consumers render).
+  const groups = { actionable: { count: 0, ranks: [] }, stale: { count: 0, ranks: [] }, superseded: { count: 0, ranks: [] } };
+  for (const item of enrichedItems) {
+    const g = item.group || 'actionable';
+    if (!groups[g]) groups[g] = { count: 0, ranks: [] };
+    groups[g].count += 1;
+    groups[g].ranks.push(item.rank);
+  }
+
   return {
-    schemaVersion: '1.0',
+    schemaVersion: '1.1',
     generatedAt: new Date().toISOString(),
     itemCount: enrichedItems.length,
     items: enrichedItems,
+    groups,
   };
 }
 
@@ -1345,10 +1460,28 @@ function renderApprovalsQueueMarkdown(queue = {}) {
     lines.push(`- Recommended action: ${item.recommendedOperatorAction}`);
     return lines.join('\n');
   };
-  const rows = Array.isArray(queue.items) && queue.items.length
-    ? queue.items.map(renderItem).join('\n\n')
-    : '### Approval 1: none\n- Urgency: low\n- Summary: No pending approval items.\n- Explanation: No approval-gated actions are currently waiting.\n- Effect if approved: No action required.\n- Effect if ignored: No approval backlog remains.\n- Recommended action: Continue normal monitoring.';
-  return `# Approvals Queue\n\n## Summary\n- Generated at: ${queue.generatedAt || 'unknown'}\n- Approval items: ${queue.itemCount || 0}\n\n## Approval Review Queue\n\n${rows}\n`;
+
+  const allItems = Array.isArray(queue.items) ? queue.items : [];
+  if (!allItems.length) {
+    const placeholder = '### Approval 1: none\n- Urgency: low\n- Summary: No pending approval items.\n- Explanation: No approval-gated actions are currently waiting.\n- Effect if approved: No action required.\n- Effect if ignored: No approval backlog remains.\n- Recommended action: Continue normal monitoring.';
+    return `# Approvals Queue\n\n## Summary\n- Generated at: ${queue.generatedAt || 'unknown'}\n- Approval items: ${queue.itemCount || 0}\n\n## Approval Review Queue\n\n${placeholder}\n`;
+  }
+
+  // Phase W8: render three group sections.
+  const groupOrder = [
+    { key: 'actionable', heading: 'Actionable now' },
+    { key: 'stale', heading: 'Stale / needs refresh' },
+    { key: 'superseded', heading: 'Regenerated (superseded)' },
+  ];
+  const sections = groupOrder.map(({ key, heading }) => {
+    const groupItems = allItems.filter((item) => (item.group || 'actionable') === key);
+    const body = groupItems.length
+      ? groupItems.map(renderItem).join('\n\n')
+      : '_(none)_';
+    return `## ${heading}\n\n${body}`;
+  }).join('\n\n');
+
+  return `# Approvals Queue\n\n## Summary\n- Generated at: ${queue.generatedAt || 'unknown'}\n- Approval items: ${queue.itemCount || 0}\n- Actionable: ${queue.groups?.actionable?.count ?? 0}\n- Stale: ${queue.groups?.stale?.count ?? 0}\n- Superseded: ${queue.groups?.superseded?.count ?? 0}\n\n## Approval Review Queue\n\n${sections}\n`;
 }
 
 function collectReportFiles(reportsDir) {

@@ -52,6 +52,7 @@ const checks = [
   ['test:isin-search-contracts', ['scripts/test-isin-search-contracts.js']],
   ['test:trade-health-cli', ['scripts/test-trade-health-cli.js']],
   ['test:self-heal-budget', ['scripts/test-self-heal-budget.js']],
+  ['test:approval-queue-grouping', ['scripts/test-approval-queue-grouping.js']],
 ];
 
 module.exports = { checks };

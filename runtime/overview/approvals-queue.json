@@ -1,6 +1,20 @@
 {
-  "schemaVersion": "1.0",
-  "generatedAt": "2026-05-25T15:22:21.746Z",
+  "schemaVersion": "1.1",
+  "generatedAt": "2026-05-27T10:11:49.797Z",
   "itemCount": 0,
-  "items": []
+  "items": [],
+  "groups": {
+    "actionable": {
+      "count": 0,
+      "ranks": []
+    },
+    "stale": {
+      "count": 0,
+      "ranks": []
+    },
+    "superseded": {
+      "count": 0,
+      "ranks": []
+    }
+  }
 }
