@@ -41,7 +41,7 @@ then move on. No user prompts between waves. This file is the source of truth.
 - [ ] W4 — Roll-up E: 3–5 noisiest runtime files gated by content-hash; regression test
 - [ ] W5 — Spec §1 / Phase S2.5: `cancel-portfolio-order --broker-only` shipped + tested
 - [ ] W6 — Post-MVP #3: Native contract intelligence (4-ISIN sentinel resolved or documented)
-- [ ] W7 — Post-MVP #1: Portfolio health model + bounded self-healing (`trade health` / `trade self-heal --dry-run`)
+- [x] W7 — Post-MVP #1: Portfolio health model + bounded self-healing (`trade health` / `trade self-heal --dry-run`)
 - [ ] W8 — Post-MVP #2: Approval lifecycle UX hardening
 - [ ] W9 — Post-MVP #4: Recovery playbooks as executable guidance
 - [ ] W10 — Post-MVP #5: Automated verification lanes
@@ -66,6 +66,60 @@ Each wave: plan committed → implementation → tests → suite green → commi
 
 _(Newest first. Each wave entry: plan link, commits, test counts, blockers.)_
 
+### 2026-05-27 ~09:35 UTC — W7 done (subagent)
+- Plan: `phase-W7-portfolio-health-model-plan.md` (commit `31d891a`)
+- Impl: `trade-health` + `trade-self-heal --dry-run` operator CLIs, retry budgets &
+  cooldowns enforced via observability event log (commit `ee2ae5c`)
+  - `RETRY_BUDGET` (per-day) + `COOLDOWN_MINUTES` per recipe in `selfHeal.js`
+  - `applyHealRecipes` blocks budget-exhausted/cooldown-active recipes BEFORE invoking
+  - `--apply` records `self_heal_recipe_attempt` events; dry-run never writes
+- Tests: 15 new assertions (8 budget/cooldown + 7 CLI)
+- Post-MVP item #1 closed
+- Pushed to master
+
+### 2026-05-27 ~09:20 UTC — W6 done (subagent)
+- Plan: `phase-W6-native-contract-intelligence-plan.md` (commit `64c2262`)
+- Impl: ISIN-aware search, contract cache, 3/4 ISINs resolved (commit `2dc91a5`)
+  - LU0950670850 → conid 136319312 (UKGBPB/EBS)
+  - IE00B44T3H88 → conid 83570158 (HMCD/LSEETF)
+  - IE00B5L8K969 → conid 78767919 (CEBL/IBIS2, EUR not USD — flagged)
+  - IE00B4L5YX21 → unresolvable (documented)
+- Tests: 9 new assertions (5 cache + 4 ISIN search)
+- Pushed to master
+
+### 2026-05-27 ~08:55 UTC — W5 done (subagent)
+- Plan: `phase-W5-cancel-broker-only-plan.md` (commit `bfd46d8`)
+- Impl: broker-only cancel fallback in `cancelPortfolioOrder()` + `--broker-only` flag (commit `512fd15`)
+- Tests: 7 new assertions (broker-only path mocking all branches)
+- Spec §1 cancel items closed in `spec-outstanding-checklist.md`
+- Pushed to master
+
+### 2026-05-27 ~08:40 UTC — W4 done
+- Plan: `phase-W4-runtime-hash-gating-plan.md` (commit `897302d`)
+- Impl: 18 raw writeFileSync → hash-gated writes in summaryArtifacts + healthReport (commit `6ec4036`)
+- Tests: 8 new assertions
+- Roll-up E closed
+- Pushed to master
+
+### 2026-05-27 ~08:35 UTC — W3 done
+- Plan: `phase-W3-health-synthesis-tighten-plan.md` (commit `38feac7`)
+- Impl: summarizeHealthTrends handles degraded/paused properly (commit `33c4f0b`)
+- Tests: 12 new assertions
+- Roll-up D closed
+- Pushed to master
+
+### 2026-05-27 ~08:25 UTC — W2 done
+- Plan: `phase-W2-cron-policy-consolidation-plan.md` (commit `2018b01`)
+- Impl: host-posture footnote in delivery-status generator, snapshot refresh, freshness guard (commit `4de339d`)
+- Roll-up C closed
+- Pushed to master
+
+### 2026-05-27 ~07:55 UTC — W1 done
+- Plan: `phase-W1-doc-archive-and-rollup-closeout-plan.md` (commit `bc4ac90`)
+- Impl: 7 files moved to `archive/`, 4 doc-reference fixes, Roll-up B + F closed (commit `20b2916`)
+- Tests: 119 pass
+- Pushed to master
+
 ### Pending start: W1 — Roll-up B + F (doc archive + rollup closing pass)
 
 Plan to write next. Will land:
@@ -79,9 +133,7 @@ Plan to write next. Will land:
 
 ## Next
 
-1. Commit this wave-plan file.
-2. Start W1: write `phase-W1-doc-archive-and-rollup-closeout-plan.md`, commit, then implement.
-3. Iterate W1 → W10 without prompting.
+W6 — Native contract intelligence. Then W7–W10.
 
 ### Open questions
 
