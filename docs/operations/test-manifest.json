@@ -9,12 +9,12 @@
     "external"
   ],
   "counts": {
-    "total": 283,
+    "total": 284,
     "safe": 220,
-    "integration": 58,
+    "integration": 59,
     "live-smoke": 3,
     "external": 2,
-    "inVerifyRepoChecks": 50,
+    "inVerifyRepoChecks": 51,
     "quarantined": 4
   },
   "entries": [
@@ -492,8 +492,7 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": true,
-      "quarantineReason": "pre-existing: html payload no longer includes \"Demo summary\" literal (W10 quarantine)"
+      "quarantined": false
     },
     {
       "path": "scripts/test-delivery-posture.js",
@@ -534,6 +533,13 @@
       "path": "scripts/test-effective-config.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": true,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-email-dedup.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": true,
       "quarantined": false
     },
@@ -696,8 +702,7 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": true,
-      "quarantineReason": "pre-existing: assertion against current trend formatting drifts (W10 quarantine)"
+      "quarantined": false
     },
     {
       "path": "scripts/test-health-trend-synthesis.js",
@@ -1278,8 +1283,7 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": true,
-      "quarantineReason": "pre-existing: portfolio fixture drift (W10 quarantine)"
+      "quarantined": false
     },
     {
       "path": "scripts/test-portfolio-execution-gates.js",
@@ -1706,8 +1710,7 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": true,
-      "quarantineReason": "pre-existing: deployment math expects 1000 but gets 2500; behaviour change predates W10 (W10 quarantine)"
+      "quarantined": false
     },
     {
       "path": "scripts/test-test-manifest-shape.js",

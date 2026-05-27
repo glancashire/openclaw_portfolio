@@ -55,6 +55,7 @@ const checks = [
   ['test:approval-queue-grouping', ['scripts/test-approval-queue-grouping.js']],
   ['test:recovery-ladder', ['scripts/test-recovery-ladder.js']],
   ['test:test-manifest-shape', ['scripts/test-test-manifest-shape.js']],
+  ['test:email-dedup', ['scripts/test-email-dedup.js']],
 ];
 
 module.exports = { checks };

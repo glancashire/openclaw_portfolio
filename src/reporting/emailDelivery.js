@@ -1,5 +1,6 @@
 const { loadWorkspaceEnv } = require('../shared/env');
 const { loadConfig: loadMailgunConfig, sendEmail: sendMailgunEmail } = require('../../lib/mailgun');
+const { checkEmailLock, recordEmailSent } = require('./emailDedup');
 
 function getConfiguredRecipient(policy = {}) {
   const recipients = Array.isArray(policy.emailRecipients)
@@ -82,10 +83,31 @@ function emailDeliveryReadiness(policy = {}, status = {}) {
   };
 }
 
-async function sendEmailMessage({ policy = {}, to = null, subject, text, html, attachments = [] }) {
+async function sendEmailMessage({ policy = {}, to = null, subject, text, html, attachments = [], skipDedup = false }) {
   const recipients = to ? [to] : getAllConfiguredRecipients(policy);
   if (!recipients.length) throw new Error('No email recipient configured.');
-  return sendMailgunEmail({ to: recipients.join(','), subject, text, html, attachments });
+
+  // Deduplication guard: prevent duplicate sends within the TTL window
+  if (!skipDedup) {
+    const lock = checkEmailLock(subject);
+    if (lock.alreadySent) {
+      return {
+        id: lock.previousMessageId || null,
+        message: `Deduplicated — already sent at ${lock.sentAt} (category: ${lock.category})`,
+        deduplicated: true,
+      };
+    }
+  }
+
+  const result = await sendMailgunEmail({ to: recipients.join(','), subject, text, html, attachments });
+
+  // Record the send for dedup
+  try {
+    const messageId = result?.id || null;
+    recordEmailSent(subject, { messageId });
+  } catch { /* lock write failure is non-fatal */ }
+
+  return result;
 }
 
 module.exports = {
