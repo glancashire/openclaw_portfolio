@@ -22,3 +22,4 @@ runtime/
 *.log
 *.tmp
 tmp_render_summary_html.js.txt
+runtime/email-locks/
