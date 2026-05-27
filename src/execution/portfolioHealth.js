@@ -62,7 +62,7 @@ function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRow
   };
 }
 
-async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now = new Date(), cronHealth = null }) {
+async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now = new Date(), cronHealth = null, dryRun = true }) {
   const portfolio = path.basename(portfolioDir);
   const tradesPath = path.join(portfolioDir, 'trades.md');
   const brokerReadiness = await getInteractiveBrokersReadiness();
@@ -82,7 +82,7 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now =
   const health = classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRows, retryState, deliveryStatus, fillNotificationState });
   const resolvedCronHealth = cronHealth || fetchCronHealth();
   const classified = classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth: resolvedCronHealth, errorState });
-  const healed = applyHealRecipes(classified, { now });
+  const healed = applyHealRecipes(classified, { now, repoRoot, dryRun });
   const openIssues = buildOpenIssues({ classified, healed });
 
   const actions = [];
@@ -94,7 +94,7 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now =
 
   return {
     ok: true,
-    dryRun: true,
+    dryRun,
     portfolio,
     health,
     classified,

@@ -50,6 +50,8 @@ const checks = [
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
   ['test:contract-cache', ['scripts/test-contract-cache.js']],
   ['test:isin-search-contracts', ['scripts/test-isin-search-contracts.js']],
+  ['test:trade-health-cli', ['scripts/test-trade-health-cli.js']],
+  ['test:self-heal-budget', ['scripts/test-self-heal-budget.js']],
 ];
 
 module.exports = { checks };

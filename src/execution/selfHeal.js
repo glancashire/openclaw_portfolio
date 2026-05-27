@@ -27,6 +27,63 @@ function readObservabilityEvents({ repoRoot = process.cwd() } = {}) {
     .map((line) => JSON.parse(line));
 }
 
+const RETRY_BUDGET = {
+  restart_ibkr_gateway_if_socket_dead: { perDay: 2 },
+  disable_cron_after_N_consecutive_errors: { perDay: 3 },
+};
+
+const COOLDOWN_MINUTES = {
+  restart_ibkr_gateway_if_socket_dead: 30,
+  disable_cron_after_N_consecutive_errors: 60,
+};
+
+function listRecipeAttempts(recipe, { repoRoot = process.cwd(), now = new Date() } = {}) {
+  if (!recipe) return [];
+  const events = readObservabilityEvents({ repoRoot });
+  const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  return events.filter((event) => {
+    if (event.kind !== 'self_heal_recipe_attempt') return false;
+    if (event.recipe !== recipe) return false;
+    const at = new Date(event.at || 0);
+    return at.getTime() >= cutoff.getTime();
+  });
+}
+
+function evaluateRecipeBudget(recipe, { repoRoot = process.cwd(), now = new Date() } = {}) {
+  const budget = RETRY_BUDGET[recipe];
+  const cooldownMinutes = COOLDOWN_MINUTES[recipe];
+  if (!budget && !cooldownMinutes) {
+    return { blocked: null, attempts: 0, lastAttemptAt: null };
+  }
+  const attempts = listRecipeAttempts(recipe, { repoRoot, now });
+  const sorted = attempts.slice().sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+  const lastAttemptAt = sorted[0]?.at || null;
+
+  if (budget && attempts.length >= budget.perDay) {
+    return {
+      blocked: 'retry_budget_exhausted',
+      attempts: attempts.length,
+      lastAttemptAt,
+      budget: budget.perDay,
+      windowHours: 24,
+    };
+  }
+  if (cooldownMinutes && lastAttemptAt) {
+    const elapsedMs = now.getTime() - new Date(lastAttemptAt).getTime();
+    const cooldownMs = cooldownMinutes * 60 * 1000;
+    if (elapsedMs < cooldownMs) {
+      return {
+        blocked: 'cooldown_active',
+        attempts: attempts.length,
+        lastAttemptAt,
+        cooldownMinutes,
+        cooldownRemainingMs: cooldownMs - elapsedMs,
+      };
+    }
+  }
+  return { blocked: null, attempts: attempts.length, lastAttemptAt };
+}
+
 function classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth, errorState }) {
   const classified = [];
   const brokerMessage = String(brokerReadiness?.message || brokerReadiness?.guidance || '').trim();
@@ -148,19 +205,55 @@ function recipeRestartIbkrGateway(item, { now = new Date() } = {}) {
   };
 }
 
-function applyHealRecipes(classified = [], { now = new Date() } = {}) {
+function applyHealRecipes(classified = [], { now = new Date(), repoRoot = process.cwd(), dryRun = true } = {}) {
   return classified
     .filter((item) => item.healable)
     .map((item) => {
-      if (item.recipe === 'disable_cron_after_N_consecutive_errors') return recipeDisableCronAfterErrors(item);
-      if (item.recipe === 'restart_ibkr_gateway_if_socket_dead') return recipeRestartIbkrGateway(item, { now });
-      return {
-        ok: true,
-        kind: item.recipe || item.category,
-        applied: false,
-        blocked: 'no_recipe_implementation',
-        summary: item.recommendedAction,
-      };
+      const recipeKind = item.recipe || item.category;
+      const budget = evaluateRecipeBudget(recipeKind, { repoRoot, now });
+      if (budget.blocked) {
+        return {
+          ok: true,
+          kind: recipeKind,
+          applied: false,
+          blocked: budget.blocked,
+          summary: item.recommendedAction,
+          budget,
+        };
+      }
+
+      let result;
+      if (item.recipe === 'disable_cron_after_N_consecutive_errors') {
+        result = recipeDisableCronAfterErrors(item);
+      } else if (item.recipe === 'restart_ibkr_gateway_if_socket_dead') {
+        result = recipeRestartIbkrGateway(item, { now });
+      } else {
+        result = {
+          ok: true,
+          kind: recipeKind,
+          applied: false,
+          blocked: 'no_recipe_implementation',
+          summary: item.recommendedAction,
+        };
+      }
+      result.budget = budget;
+
+      if (!dryRun) {
+        try {
+          appendObservabilityEvent({
+            at: (now instanceof Date ? now : new Date(now)).toISOString(),
+            kind: 'self_heal_recipe_attempt',
+            recipe: recipeKind,
+            category: item.category,
+            applied: !!result.applied,
+            blocked: result.blocked || null,
+          }, { repoRoot });
+        } catch (_err) {
+          // Observability log must not block heal results.
+        }
+      }
+
+      return result;
     });
 }
 
@@ -183,4 +276,8 @@ module.exports = {
   classifySymptoms,
   applyHealRecipes,
   buildOpenIssues,
+  RETRY_BUDGET,
+  COOLDOWN_MINUTES,
+  listRecipeAttempts,
+  evaluateRecipeBudget,
 };
