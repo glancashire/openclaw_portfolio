@@ -52,22 +52,23 @@ function summarizeHealthTrends(events = [], { limit = 7 } = {}) {
     return acc;
   }, {});
   const latest = recent[recent.length - 1] || null;
-  const blockedCount = Number(counts.blocked || 0);
-  const warningCount = Number(counts.warning || 0) + Number(counts.attention_needed || 0);
+  const blockedCount = Number(counts.blocked || 0) + Number(counts.paused || 0);
+  const degradedCount = Number(counts.degraded || 0) + Number(counts.attention_needed || 0);
   const healthyCount = Number(counts.healthy || 0);
   let direction = 'stable';
   if (!recent.length) direction = 'unknown';
-  else if (latest?.health === 'blocked' || blockedCount >= Math.max(1, Math.ceil(recent.length / 2))) direction = 'worsening';
+  else if (latest?.health === 'blocked' || latest?.health === 'paused' || blockedCount >= Math.max(1, Math.ceil(recent.length / 2))) direction = 'worsening';
   else if (latest?.health === 'healthy' && healthyCount >= Math.max(1, recent.length - 1)) direction = 'stable';
-  else if (latest?.health === 'healthy' && (blockedCount > 0 || warningCount > 0)) direction = 'improving';
-  else if (warningCount > 0) direction = 'watching';
+  else if (latest?.health === 'healthy' && (blockedCount > 0 || degradedCount > 0)) direction = 'improving';
+  else if (degradedCount >= Math.max(1, recent.length - 1)) direction = 'watching';
+  else if (degradedCount > 0 || blockedCount > 0) direction = 'watching';
 
   let summary = 'No recent health-check trend data yet.';
   if (recent.length) {
-    if (direction === 'stable') summary = 'Health direction is stable: recent checks stayed healthy or close to healthy, and no new operating risk is building.';
+    if (direction === 'stable') summary = 'Health direction is stable: recent checks stayed healthy, and no new operating risk is building.';
     else if (direction === 'improving') summary = 'Health direction is improving: earlier issues have eased and the latest posture is healthier than the recent baseline.';
-    else if (direction === 'worsening') summary = `Health direction is worsening: ${blockedCount} of the last ${recent.length} checks showed blocked posture or the latest run is still blocked.`;
-    else if (direction === 'watching') summary = 'Health direction needs watching: the system is running, but recent checks show recurring attention signals that should not be ignored.';
+    else if (direction === 'worsening') summary = `Health direction is worsening: ${blockedCount} of the last ${recent.length} checks showed blocked or paused posture.`;
+    else if (direction === 'watching') summary = `Health direction needs watching: ${degradedCount} of the last ${recent.length} checks show degraded or attention-needed state. No hard blocker, but recurring signals should not be ignored.`;
   }
 
   return {

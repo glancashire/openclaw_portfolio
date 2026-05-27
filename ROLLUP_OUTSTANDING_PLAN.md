@@ -85,8 +85,8 @@ Continue the bounded-health model without turning it into unsafe or opaque autom
 - [x] Health classification/reporting surface
 - [x] Bounded self-heal guidance surface
 - [x] Investor-facing health-report simplification
-- [ ] Further tighten health trend synthesis and escalation messaging if real usage shows confusion
-- [ ] Decide whether any safe auto-remediation steps should move from guidance to explicit operator-approved automation
+- [x] Further tighten health trend synthesis and escalation messaging if real usage shows confusion (done W3: `degraded` now classified as `watching`, summary text accurate)
+- [ ] Decide whether any safe auto-remediation steps should move from guidance to explicit operator-approved automation (deferred: soak evidence needed first)
 
 ---
 
