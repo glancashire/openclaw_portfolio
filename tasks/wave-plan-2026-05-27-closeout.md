@@ -1,6 +1,6 @@
 # Wave plan — Outstanding-work closeout (2026-05-27)
 
-- **Status:** active
+- **Status:** done
 - **Owner:** bb8 (autonomous implementation per Graham's 07:52 UTC directive)
 - **Started:** 2026-05-27
 - **Last updated:** 2026-05-27
@@ -9,7 +9,11 @@
 
 ## Summary
 
-_(Fill in when status = done.)_
+All 10 waves of the outstanding-work closeout executed autonomously in ~3 hours.
+Every rollup item (B–F) is closed, Spec §1 cancel path shipped, and all 5
+post-MVP expansion candidates are implemented with tests and pushed to master.
+The curated gate (`npm test`) passes 56 checks; the discovered lane
+(`npm run test:all --lane=safe`) passes 216/216 runnable tests.
 
 ## Instructions
 
@@ -35,12 +39,12 @@ then move on. No user prompts between waves. This file is the source of truth.
 
 ### Success criteria
 
-- [ ] W1 — Roll-up B + F: historical docs archived; rollup B/F items checked
-- [ ] W2 — Roll-up C: cron policy alignment pass, every job matches `docs/operations/cron.md`
-- [ ] W3 — Roll-up D: tightened escalation/synth wording in health monitor + regression test
-- [ ] W4 — Roll-up E: 3–5 noisiest runtime files gated by content-hash; regression test
-- [ ] W5 — Spec §1 / Phase S2.5: `cancel-portfolio-order --broker-only` shipped + tested
-- [ ] W6 — Post-MVP #3: Native contract intelligence (4-ISIN sentinel resolved or documented)
+- [x] W1 — Roll-up B + F: historical docs archived; rollup B/F items checked
+- [x] W2 — Roll-up C: cron policy alignment pass, every job matches `docs/operations/cron.md`
+- [x] W3 — Roll-up D: tightened escalation/synth wording in health monitor + regression test
+- [x] W4 — Roll-up E: 3–5 noisiest runtime files gated by content-hash; regression test
+- [x] W5 — Spec §1 / Phase S2.5: `cancel-portfolio-order --broker-only` shipped + tested
+- [x] W6 — Post-MVP #3: Native contract intelligence (4-ISIN sentinel resolved or documented)
 - [x] W7 — Post-MVP #1: Portfolio health model + bounded self-healing (`trade health` / `trade self-heal --dry-run`)
 - [x] W8 — Post-MVP #2: Approval lifecycle UX hardening
 - [x] W9 — Post-MVP #4: Recovery playbooks as executable guidance
@@ -193,10 +197,12 @@ All 10 waves of the 2026-05-27 closeout are complete. Possible follow-ups
 (not part of this plan):
 - CI workflow that runs `npm run test:all -- --lane=safe` periodically.
 - Triage the 4 quarantined safe-lane tests in a dedicated task.
+- Asia ETF ISIN currency mismatch (EUR vs USD) needs review before activation.
+- 1 unresolvable ISIN (IE00B4L5YX21) — may need manual IBKR search or alternate ETF.
 
 ### Open questions
 
-_(None — Graham's 07:52 directive answered all open decisions.)_
+_(None.)_
 
 ### Blockers
 
