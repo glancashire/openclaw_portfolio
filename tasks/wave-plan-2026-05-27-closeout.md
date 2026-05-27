@@ -42,7 +42,7 @@ then move on. No user prompts between waves. This file is the source of truth.
 - [ ] W5 — Spec §1 / Phase S2.5: `cancel-portfolio-order --broker-only` shipped + tested
 - [ ] W6 — Post-MVP #3: Native contract intelligence (4-ISIN sentinel resolved or documented)
 - [x] W7 — Post-MVP #1: Portfolio health model + bounded self-healing (`trade health` / `trade self-heal --dry-run`)
-- [ ] W8 — Post-MVP #2: Approval lifecycle UX hardening
+- [x] W8 — Post-MVP #2: Approval lifecycle UX hardening
 - [ ] W9 — Post-MVP #4: Recovery playbooks as executable guidance
 - [ ] W10 — Post-MVP #5: Automated verification lanes
 
@@ -65,6 +65,20 @@ Each wave: plan committed → implementation → tests → suite green → commi
 ## Progress
 
 _(Newest first. Each wave entry: plan link, commits, test counts, blockers.)_
+
+### 2026-05-27 ~10:15 UTC — W8 done (subagent)
+- Plan: `phase-W8-approval-lifecycle-ux-plan.md` (commit `7a3e785`)
+- Impl: grouped approvals queue (actionable / stale / superseded) with
+  per-item operator-facing explanations (commit `1966e24`)
+  - `buildApprovalsQueue`: stale rows surfaced as row-level items;
+    older reproposals tagged superseded with pointer to newer version
+  - Markdown renderer emits three group headings
+  - Schema bumped 1.0 → 1.1; added `groups` summary; `items` still flat
+- Tests: 1 new test (`test-approval-queue-grouping.js`, 9 assertions)
+  wired into verifyRepoChecks; existing basket-first +
+  markdown-annotations + stale-refresh tests unchanged and green
+- Post-MVP item #2 closed
+- Pushed to master
 
 ### 2026-05-27 ~09:35 UTC — W7 done (subagent)
 - Plan: `phase-W7-portfolio-health-model-plan.md` (commit `31d891a`)
