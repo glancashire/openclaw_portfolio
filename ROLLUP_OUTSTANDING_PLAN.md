@@ -125,6 +125,8 @@ Tidy obsolete/completed work without destroying audit history.
    - [x] S1 — repo truth & test gates (commit `62f32fc`)
    - [x] S2 — carry-over bug closeout (commit `3e3b11c`)
    - [x] S3 — cron + delivery hardening (commit `590e204`)
-   - [x] S4 — runtime + doc hygiene (in progress, commits `6612e85` plan, root cleanup pending)
-   - [ ] S5 — soak prep (next)
+   - [x] S4 — runtime + doc hygiene (commit `b242bd0`; root .md count = 22, target was <30)
+   - [x] S5 — soak prep (commit `bd4620e`; soak-readiness doc + baseline + 2026-05-30 self-check cron live, idle)
+2. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.
+3. Post-soak Phases A–H (2026-05-26): live-order guard, rebalance analyzer, daily monitoring digest, code-level approval gate (safe-word + PIN), approve-and-execute wrapper, Mailgun inbound webhook handler (code-only, infra pending), cron-jobs TTL cache, OpenClaw CLI as default model provider — all committed.
 2. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.
