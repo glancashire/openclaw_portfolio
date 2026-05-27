@@ -1598,14 +1598,14 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
   const dailySummaryHtmlPath = path.join(overviewDir, 'daily-summary.html');
   if (writeFiles) {
     fs.mkdirSync(overviewDir, { recursive: true });
-    fs.writeFileSync(portfolioIndexPath, JSON.stringify(portfolioIndex, null, 2) + '\n');
-    fs.writeFileSync(pendingActionsPath, JSON.stringify(pendingActions, null, 2) + '\n');
-    fs.writeFileSync(approvalsQueuePath, JSON.stringify(approvalsQueue, null, 2) + '\n');
-    fs.writeFileSync(approvalsQueueMarkdownPath, approvalsQueueMarkdown);
-    fs.writeFileSync(approvalsQueueHtmlPath, markdownToBasicHtml(approvalsQueueMarkdown));
-    fs.writeFileSync(dailySummaryPath, JSON.stringify(dailySummary, null, 2) + '\n');
-    fs.writeFileSync(dailySummaryMarkdownPath, dailySummaryMarkdown);
-    fs.writeFileSync(dailySummaryHtmlPath, markdownToBasicHtml(dailySummaryMarkdown));
+    writeJsonIfChanged(portfolioIndexPath, portfolioIndex);
+    writeJsonIfChanged(pendingActionsPath, pendingActions);
+    writeJsonIfChanged(approvalsQueuePath, approvalsQueue);
+    writeTextIfChanged(approvalsQueueMarkdownPath, approvalsQueueMarkdown);
+    writeTextIfChanged(approvalsQueueHtmlPath, markdownToBasicHtml(approvalsQueueMarkdown));
+    writeJsonIfChanged(dailySummaryPath, dailySummary);
+    writeTextIfChanged(dailySummaryMarkdownPath, dailySummaryMarkdown);
+    writeTextIfChanged(dailySummaryHtmlPath, markdownToBasicHtml(dailySummaryMarkdown));
   }
   const reportHistory = buildReportHistory(repoRoot, summaries);
   const reportHistoryMarkdown = renderReportHistoryMarkdown(reportHistory);
@@ -1618,12 +1618,12 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
   const deliveryStatusMarkdownPath = path.join(overviewDir, 'delivery-status.md');
   const deliveryStatusHtmlPath = path.join(overviewDir, 'delivery-status.html');
   if (writeFiles) {
-    fs.writeFileSync(reportHistoryPath, JSON.stringify(reportHistory, null, 2) + '\n');
-    fs.writeFileSync(reportHistoryMarkdownPath, reportHistoryMarkdown);
-    fs.writeFileSync(reportHistoryHtmlPath, markdownToBasicHtml(reportHistoryMarkdown));
-    fs.writeFileSync(deliveryStatusPath, JSON.stringify(deliveryOverview, null, 2) + '\n');
-    fs.writeFileSync(deliveryStatusMarkdownPath, deliveryStatusMarkdown);
-    fs.writeFileSync(deliveryStatusHtmlPath, markdownToBasicHtml(deliveryStatusMarkdown));
+    writeJsonIfChanged(reportHistoryPath, reportHistory);
+    writeTextIfChanged(reportHistoryMarkdownPath, reportHistoryMarkdown);
+    writeTextIfChanged(reportHistoryHtmlPath, markdownToBasicHtml(reportHistoryMarkdown));
+    writeJsonIfChanged(deliveryStatusPath, deliveryOverview);
+    writeTextIfChanged(deliveryStatusMarkdownPath, deliveryStatusMarkdown);
+    writeTextIfChanged(deliveryStatusHtmlPath, markdownToBasicHtml(deliveryStatusMarkdown));
   }
   const cockpitHtmlPath = path.join(overviewDir, 'index.html');
   // Phase 206: compute net-liq sparkline from first portfolio with history data.
@@ -1642,7 +1642,7 @@ async function generateOverviewArtifacts({ repoRoot = process.cwd(), writeFiles 
   }
   if (writeFiles) {
     const cockpitHtml = renderCockpitPage({ dailySummary, approvalsQueue, reportHistory, summaries, deliveryOverview, cronHealth, netLiqSparklineSvg });
-    fs.writeFileSync(cockpitHtmlPath, cockpitHtml);
+    writeTextIfChanged(cockpitHtmlPath, cockpitHtml);
   }
   return {
     summaries,

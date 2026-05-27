@@ -1,7 +1,7 @@
 # Roll-up Outstanding Plan
 
 This is the maintained backlog for work that is still relevant now.
-It replaces the need to infer “what remains” from dozens of older historical phase plans.
+It replaces the need to infer "what remains" from dozens of older historical phase plans.
 Historical `phase-*-plan.md` files remain useful as audit/history artifacts, but this file is the current roll-up.
 
 ## How to use this file
@@ -42,7 +42,7 @@ Teach the system when the relevant exchanges for persisted/approved instruments 
 ## B. Documentation truth maintenance and roadmap hygiene
 
 ### Objective
-Keep the repository’s main docs/spec/progress surfaces aligned with the implemented system and stop using stale closure docs as the present-tense status source.
+Keep the repository's main docs/spec/progress surfaces aligned with the implemented system and stop using stale closure docs as the present-tense status source.
 
 ### Status summary
 - [x] Reconcile core progress/plan docs with the implemented product surface
@@ -98,8 +98,8 @@ Keep the repo calm after verification runs and reduce accidental commits of unre
 ### Status summary
 - [x] Working guidance for restoring unrelated runtime/generated churn before commits
 - [x] Conditional/stable artifact writing in many reporting paths
-- [ ] Continue reducing avoidable runtime churn in remaining noisy paths
-- [ ] Document the current “owned artifacts vs ephemeral churn” policy in the best operator/developer-facing location if current notes prove insufficient
+- [x] Continue reducing avoidable runtime churn in remaining noisy paths (W4: replaced 18 raw writeFileSync calls with hash-gated writes in summaryArtifacts.js + healthReport.js)
+- [x] Document the current "owned artifacts vs ephemeral churn" policy in the best operator/developer-facing location if current notes prove insufficient (covered by `docs/operations/repo-map.md` + artifact-policy.md + the hash-gate itself)
 
 ---
 
@@ -121,12 +121,12 @@ Tidy obsolete/completed work without destroying audit history.
 ---
 
 ## Current recommended execution order
-1. Stabilization phases S1-S5 (see `archive/stabilization-master-plan-2026-05-25.md`) — repo truth & test gates, carry-over bug closeout, cron/delivery hardening, runtime/doc hygiene, soak prep.
-   - [x] S1 — repo truth & test gates (commit `62f32fc`)
-   - [x] S2 — carry-over bug closeout (commit `3e3b11c`)
-   - [x] S3 — cron + delivery hardening (commit `590e204`)
-   - [x] S4 — runtime + doc hygiene (commit `b242bd0`; root .md count = 22, target was <30)
-   - [x] S5 — soak prep (commit `bd4620e`; soak-readiness doc + baseline + 2026-05-30 self-check cron live, idle)
+1. Stabilization phases S1-S5 (see `archive/stabilization-master-plan-2026-05-25.md`) - repo truth & test gates, carry-over bug closeout, cron/delivery hardening, runtime/doc hygiene, soak prep.
+   - [x] S1 - repo truth & test gates (commit `62f32fc`)
+   - [x] S2 - carry-over bug closeout (commit `3e3b11c`)
+   - [x] S3 - cron + delivery hardening (commit `590e204`)
+   - [x] S4 - runtime + doc hygiene (commit `b242bd0`; root .md count = 22, target was <30)
+   - [x] S5 - soak prep (commit `bd4620e`; soak-readiness doc + baseline + 2026-05-30 self-check cron live, idle)
 2. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.
-3. Post-soak Phases A–H (2026-05-26): live-order guard, rebalance analyzer, daily monitoring digest, code-level approval gate (safe-word + PIN), approve-and-execute wrapper, Mailgun inbound webhook handler (code-only, infra pending), cron-jobs TTL cache, OpenClaw CLI as default model provider — all committed.
+3. Post-soak Phases A-H (2026-05-26): live-order guard, rebalance analyzer, daily monitoring digest, code-level approval gate (safe-word + PIN), approve-and-execute wrapper, Mailgun inbound webhook handler (code-only, infra pending), cron-jobs TTL cache, OpenClaw CLI as default model provider - all committed.
 2. Revisit doc and artifact hygiene follow-ups only where real usage still shows friction.

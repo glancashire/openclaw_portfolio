@@ -43,6 +43,7 @@ const checks = [
   ['test:cron-job-policy', ['scripts/test-cron-job-policy.js']],
   ['test:repo-root-cleanliness', ['scripts/test-repo-root-cleanliness.js']],
   ['test:health-trend-synthesis', ['scripts/test-health-trend-synthesis.js']],
+  ['test:artifact-hash-gate', ['scripts/test-artifact-hash-gate.js']],
   ['test:soak-baseline-shape', ['scripts/test-soak-baseline-shape.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],

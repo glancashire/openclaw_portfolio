@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { writeJsonIfChanged, writeTextIfChanged } = require('./artifactWriter');
 const path = require('path');
 const { regenerateDashboard } = require('./dashboardGenerator');
 const { generatePortfolioSummaryArtifacts, generateOverviewArtifacts } = require('./summaryArtifacts');
@@ -297,9 +298,9 @@ function writeHealthReportArtifacts(portfolioDir, report) {
   const paths = healthReportPaths(portfolioDir);
   const markdown = buildHealthReportMarkdown(report);
   const html = buildHealthReportHtml(report);
-  fs.writeFileSync(paths.jsonPath, JSON.stringify(report, null, 2));
-  fs.writeFileSync(paths.mdPath, markdown);
-  fs.writeFileSync(paths.htmlPath, html);
+  writeJsonIfChanged(paths.jsonPath, report);
+  writeTextIfChanged(paths.mdPath, markdown);
+  writeTextIfChanged(paths.htmlPath, html);
   return { ...paths, markdown, html };
 }
 
