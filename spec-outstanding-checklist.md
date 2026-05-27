@@ -10,7 +10,7 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 ## 1. Live execution lane
 - [~] Implement explicitly writable-mode order submission path
 - [~] Implement durable order status tracking after submission
-- [~] Implement robust cancel flow in writable mode
+- [x] Implement robust cancel flow in writable mode (W5: `cancel-portfolio-order --broker-only` fallback ships cross-client cancel support)
 - [x] Preserve confirmation workflow before any real buy/sell
 - [x] Handle partial fills / failed submissions / retries safely
 - [x] Strengthen broker-write logging and audit trail

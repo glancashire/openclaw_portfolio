@@ -9,7 +9,7 @@ const { appendHistorySnapshot } = require('../analysis/historyWriter');
 const { regenerateDashboard } = require('../reporting/dashboardGenerator');
 const { syncInteractiveBrokersHoldings } = require('../brokers/interactive-brokers/holdingsSync');
 const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTradeEvent, listOpenBrokerOrderRows, readTradesTable } = require('./tradeState');
-const { recordBrokerError, clearBrokerErrors, brokerErrorStatus } = require('./runtimeState');
+const { recordBrokerError, clearBrokerErrors, brokerErrorStatus, recordBrokerOnlyCancel } = require('./runtimeState');
 const { recordRuntimeEvent } = require('../observability/runtimeEvents');
 const { prepareOrderForSubmission } = require('./orderPreparation');
 
@@ -587,6 +587,81 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
     };
   }
 
+  const portfolioName = path.basename(portfolioDir);
+
+  // Phase W5: broker-only fallback path. Use when an order exists at IBKR but
+  // is NOT in our local trades.md (e.g. placed via a different clientId, or
+  // ours but lost track of due to a crash). Skips the trades.md reconcile;
+  // records a synthetic audit entry instead.
+  if (selector && selector.brokerOnly === true) {
+    const readiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
+    if (!readiness.authenticated || readiness.reachable === false) {
+      return {
+        ok: false,
+        reason: 'policy_blocked',
+        blockers: [`Broker readiness is not healthy: ${readiness.message || 'unknown'}`],
+        policy: { ok: false, live: true, instrument: null, readiness },
+      };
+    }
+    const client = new InteractiveBrokersClient({ portfolio: portfolioName });
+    let statusResult;
+    try {
+      statusResult = await client.getOrderStatus(orderId);
+    } catch (error) {
+      return {
+        ok: false,
+        reason: 'broker_lookup_error',
+        error: error?.message || String(error),
+      };
+    }
+    if (!statusResult || !statusResult.ok || statusResult.source !== 'open_orders') {
+      return {
+        ok: false,
+        reason: 'broker_order_not_open',
+        message: `Order ${orderId} is not in the broker's open-orders list (cross-client visibility via reqAllOpenOrders).`,
+        statusResult,
+      };
+    }
+    const cancelResult = await client.cancelOrder(orderId);
+    if (!cancelResult.ok) {
+      const errorState = recordBrokerError({
+        portfolio: portfolioName,
+        reason: cancelResult.reason || 'broker_only_cancel_error',
+        message: cancelResult.error || cancelResult.message || 'Unable to cancel broker order.',
+      });
+      return {
+        ok: false,
+        reason: cancelResult.reason || 'broker_only_cancel_error',
+        error: cancelResult.error || cancelResult.message || 'Unable to cancel broker order.',
+        cancelResult,
+        errorState,
+      };
+    }
+    clearBrokerErrors(portfolioName);
+    const auditEntry = recordBrokerOnlyCancel({
+      portfolio: portfolioName,
+      orderId,
+      status: cancelResult.cancel?.status || 'cancelled',
+      message: cancelResult.cancel?.message || 'Broker-only cancel requested.',
+      initiator: selector.initiator || 'cancel-portfolio-order',
+    });
+    recordRuntimeEvent({
+      level: 'info',
+      category: 'execution_policy',
+      action: 'broker_only_cancel',
+      portfolio: portfolioName,
+      status: 'ok',
+      summary: `Broker-only cancel for order ${orderId}: ${auditEntry.status}`,
+      details: { orderId, cancelResult, statusResult: { symbol: statusResult.order?.symbol || null, status: statusResult.order?.status || null } },
+    });
+    return {
+      ok: true,
+      brokerOnly: true,
+      cancelResult,
+      audit: auditEntry,
+    };
+  }
+
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
   const holdingsPath = path.join(portfolioDir, 'holdings.md');
   const context = buildPolicyContext({ portfolioPath, holdingsPath });
@@ -632,7 +707,6 @@ async function cancelPortfolioOrder({ portfolioDir, orderId, selector = {}, user
     };
   }
 
-  const portfolioName = path.basename(portfolioDir);
   const client = new InteractiveBrokersClient({ portfolio: portfolioName });
   const cancelResult = await client.cancelOrder(orderId);
   if (!cancelResult.ok) {

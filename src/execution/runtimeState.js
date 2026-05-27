@@ -51,6 +51,27 @@ function brokerErrorStatus(portfolio = 'default', threshold = 3) {
   };
 }
 
+/**
+ * Phase W5: record a synthetic audit entry for a broker-only cancel
+ * (an order that exists at IBKR but was not in local trades.md).
+ * Stored under state.brokerOnlyCancels[portfolio] as an append-only array.
+ */
+function recordBrokerOnlyCancel({ portfolio = 'default', orderId, status = 'cancelled', message = '', initiator = 'cancel-portfolio-order' } = {}) {
+  const state = readExecutionState();
+  state.brokerOnlyCancels ||= {};
+  state.brokerOnlyCancels[portfolio] ||= [];
+  const entry = {
+    orderId: String(orderId),
+    status,
+    message,
+    initiator,
+    at: new Date().toISOString(),
+  };
+  state.brokerOnlyCancels[portfolio].push(entry);
+  writeExecutionState(state);
+  return entry;
+}
+
 module.exports = {
   STATE_PATH,
   readExecutionState,
@@ -58,4 +79,5 @@ module.exports = {
   recordBrokerError,
   clearBrokerErrors,
   brokerErrorStatus,
+  recordBrokerOnlyCancel,
 };
