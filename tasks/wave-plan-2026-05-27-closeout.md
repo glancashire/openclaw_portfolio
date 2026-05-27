@@ -43,7 +43,7 @@ then move on. No user prompts between waves. This file is the source of truth.
 - [ ] W6 — Post-MVP #3: Native contract intelligence (4-ISIN sentinel resolved or documented)
 - [x] W7 — Post-MVP #1: Portfolio health model + bounded self-healing (`trade health` / `trade self-heal --dry-run`)
 - [x] W8 — Post-MVP #2: Approval lifecycle UX hardening
-- [ ] W9 — Post-MVP #4: Recovery playbooks as executable guidance
+- [x] W9 — Post-MVP #4: Recovery playbooks as executable guidance
 - [ ] W10 — Post-MVP #5: Automated verification lanes
 
 Each wave: plan committed → implementation → tests → suite green → commit + push → progress summary → next wave.
@@ -65,6 +65,24 @@ Each wave: plan committed → implementation → tests → suite green → commi
 ## Progress
 
 _(Newest first. Each wave entry: plan link, commits, test counts, blockers.)_
+
+### 2026-05-27 ~10:35 UTC — W9 done (subagent)
+- Plan: `phase-W9-recovery-playbooks-plan.md` (commit `a425698`)
+- Impl: `src/execution/recoveryLadder.js` with four ladders + alias map;
+  classifySymptoms attaches `recoveryLadder` per item; buildSelfHealPlan
+  exposes deduped `recoveryLadders`; trade-health CLI + health report
+  markdown render "Recovery guidance" when openIssues > 0 (commit `12ead31`)
+  - Ladders: ibkr_socket_dead (4 steps), market_data_subscription_gap (4),
+    stale_approval (3), open_runner_backlog (3). Aliases:
+    ibkr_2fa_pending → ibkr_socket_dead; fill_notification_backfill →
+    open_runner_backlog.
+  - Ladders are INFORMATIONAL — they suggest commands, never execute.
+  - All repo-relative scripts referenced by ladders verified to exist.
+- Tests: 25 assertion groups in `test-recovery-ladder.js` (unit + classify
+  integration + plan integration + trade-health render). Wired into
+  verifyRepoChecks.
+- Post-MVP item #4 closed
+- Pushed to master
 
 ### 2026-05-27 ~10:15 UTC — W8 done (subagent)
 - Plan: `phase-W8-approval-lifecycle-ux-plan.md` (commit `7a3e785`)
