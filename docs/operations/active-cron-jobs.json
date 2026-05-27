@@ -1,5 +1,5 @@
 {
-  "snapshotAt": "2026-05-26T16:46:00Z",
+  "snapshotAt": "2026-05-27T08:23:09Z",
   "host": "ef6083bf72ed",
   "policy": {
     "agentsDefaultsSandboxMode": "off",
@@ -9,20 +9,18 @@
   },
   "enabledJobs": [
     {
-      "id": "0ddfde6d-5f4b-480b-a733-3d61bd27a3e4",
-      "name": "portfolio-etf-daily-sync-and-dashboard",
+      "id": "3aef6007-6311-4693-8efa-9890e408dac2",
+      "name": "ibkr-native-gateway-keepalive",
       "schedule": {
         "kind": "cron",
-        "expr": "5 8,17 * * 1-5",
+        "expr": "0 8,13 * * *",
         "tz": "UTC"
       },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
       "toolsAllow": [
         "exec",
-        "read",
-        "write",
-        "edit"
+        "read"
       ],
       "delivery": {
         "mode": "announce",
@@ -49,30 +47,35 @@
       }
     },
     {
-      "id": "1ec58679-4f19-4526-87e5-2fe9acd5b4ab",
-      "name": "daily-rebalance-check",
+      "id": "0ddfde6d-5f4b-480b-a733-3d61bd27a3e4",
+      "name": "portfolio-etf-daily-sync-and-dashboard",
       "schedule": {
         "kind": "cron",
-        "expr": "0 6 * * 1-5",
+        "expr": "5 8,17 * * 1-5",
         "tz": "UTC"
       },
       "sessionTarget": "current",
       "payloadKind": "agentTurn",
-      "toolsAllow": null,
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write",
+        "edit"
+      ],
       "delivery": {
         "mode": "announce",
         "bestEffort": true
       }
     },
     {
-      "id": "a34f51c3-7820-42da-91d3-4df75b53e062",
-      "name": "market-calendar-sync",
+      "id": "8e133b01-cef0-4c20-a6e5-ebd5d5c9de11",
+      "name": "portfolio-etf-daily-digest",
       "schedule": {
         "kind": "cron",
-        "expr": "30 6 * * 1-5",
-        "tz": "UTC"
+        "expr": "0 21 * * 1-5",
+        "tz": "Europe/Zurich"
       },
-      "sessionTarget": "current",
+      "sessionTarget": "session:agent:main:main",
       "payloadKind": "agentTurn",
       "toolsAllow": [
         "exec",
@@ -84,11 +87,27 @@
       }
     },
     {
-      "id": "3aef6007-6311-4693-8efa-9890e408dac2",
-      "name": "ibkr-native-gateway-keepalive",
+      "id": "1ec58679-4f19-4526-87e5-2fe9acd5b4ab",
+      "name": "daily-rebalance-check",
+      "schedule": {
+        "expr": "0 6 * * 1-5",
+        "kind": "cron",
+        "tz": "UTC"
+      },
+      "sessionTarget": "current",
+      "payloadKind": "agentTurn",
+      "toolsAllow": [],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
+    },
+    {
+      "id": "a34f51c3-7820-42da-91d3-4df75b53e062",
+      "name": "market-calendar-sync",
       "schedule": {
         "kind": "cron",
-        "expr": "0 8,13 * * *",
+        "expr": "30 6 * * 1-5",
         "tz": "UTC"
       },
       "sessionTarget": "current",
@@ -117,6 +136,25 @@
         "read",
         "write",
         "edit"
+      ],
+      "delivery": {
+        "mode": "announce",
+        "bestEffort": true
+      }
+    },
+    {
+      "id": "bf50a351-f593-48e1-a2d1-505ae7551748",
+      "name": "soak-self-check-2026-05-30",
+      "schedule": {
+        "kind": "at",
+        "at": "2026-05-30T09:00:00.000Z"
+      },
+      "sessionTarget": "session:agent:main:main",
+      "payloadKind": "agentTurn",
+      "toolsAllow": [
+        "exec",
+        "read",
+        "write"
       ],
       "delivery": {
         "mode": "announce",
@@ -164,63 +202,6 @@
         "mode": "announce",
         "bestEffort": true
       }
-    },
-    {
-      "id": "bf50a351-f593-48e1-a2d1-505ae7551748",
-      "name": "soak-self-check-2026-05-30",
-      "schedule": {
-        "kind": "at",
-        "at": "2026-05-30T09:00:00.000Z"
-      },
-      "sessionTarget": "session:agent:main:main",
-      "payloadKind": "agentTurn",
-      "toolsAllow": [
-        "exec",
-        "read",
-        "write"
-      ],
-      "delivery": {
-        "mode": "announce",
-        "bestEffort": true
-      },
-      "deleteAfterRun": true
-    },
-    {
-      "id": "8e133b01-cef0-4c20-a6e5-ebd5d5c9de11",
-      "name": "portfolio-etf-daily-digest",
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 21 * * 1-5",
-        "tz": "Europe/Zurich"
-      },
-      "sessionTarget": "session:agent:main:main",
-      "payloadKind": "agentTurn",
-      "toolsAllow": [
-        "exec",
-        "read"
-      ],
-      "delivery": {
-        "mode": "announce",
-        "bestEffort": true
-      }
-    }
-  ],
-  "disabledJobs": [
-    {
-      "name": "UBSPX retry reminder after IBIS open",
-      "reason": "historical, superseded by basket lifecycle"
-    },
-    {
-      "name": "UBSPX retry Telegram reminder after IBIS open",
-      "reason": "isolated + Docker sandbox bug; superseded"
-    },
-    {
-      "name": "submit-orders-at-market-open",
-      "reason": "isolated + Docker sandbox bug; replaced by basket workflow"
-    },
-    {
-      "name": "monitor-trade-fills",
-      "reason": "replaced by basket execution runner + fill check jobs"
     }
   ]
 }

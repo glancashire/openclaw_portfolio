@@ -124,4 +124,20 @@ test('the markdown mirror references every enabled job by name', () => {
   }
 });
 
+test('cron snapshot is not older than 90 days (Phase W2)', () => {
+  const snapshotAt = snapshot.snapshotAt;
+  assert(snapshotAt && typeof snapshotAt === 'string', 'snapshot must declare snapshotAt');
+  const captured = Date.parse(snapshotAt);
+  assert(!Number.isNaN(captured), `snapshotAt must be ISO-8601, got ${snapshotAt}`);
+  const ageDays = (Date.now() - captured) / (1000 * 60 * 60 * 24);
+  assert(
+    ageDays < 90,
+    `cron snapshot is ${ageDays.toFixed(0)} days old (>=90); refresh docs/operations/active-cron-jobs.json from \`openclaw cron list --json\``,
+  );
+  if (ageDays > 30) {
+    // Soft warning, does not fail the test.
+    console.warn(`WARN: cron snapshot is ${ageDays.toFixed(0)} days old; consider refreshing.`);
+  }
+});
+
 console.log(JSON.stringify({ ok: true, passed, enabledCount: snapshot.enabledJobs.length }));

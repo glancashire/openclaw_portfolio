@@ -1451,7 +1451,15 @@ function renderDeliveryStatusMarkdown(overview = {}) {
       : '';
     return `### ${p.portfolio}\n- Delivery mode: ${p.deliveryMode}\n- Channels: ${(p.intendedChannels || []).join(', ')}\n- External delivery: ${p.externalDeliveryEnabled ? 'enabled' : 'disabled'}\n- Failure alert mode: ${p.failureAlertMode}\n- Alert targets: ${(p.failureAlertTargets || []).join(', ')}\n- Policy override loaded: ${p.overrideLoaded ? 'yes' : 'no'}\n- Ready: ${p.ready ? 'yes' : 'no'}\n- Pending actions:\n${actions}${brokerBlockSection}`;
   }).join('\n\n');
-  return `# Delivery & Alerting Status\n\n- Generated at: ${overview.generatedAt || 'unknown'}\n- Portfolios: ${overview.portfolioCount || 0}\n- All ready: ${overview.allReady ? 'yes' : 'no'}\n\n## Per-Portfolio Delivery Posture\n\n${portfolioSections}\n`;
+  // Phase W2: surface the host delivery caveat alongside generated state
+  // so operator-facing dashboards make the Telegram fail-closed posture
+  // explicit. See docs/operations/cron.md.
+  const hostFootnote = '\n## Host delivery posture\n\n' +
+    '- Telegram chat channel has no chat-id target on this host; cron `announce` delivery always reports `no route, will fail-closed`.\n' +
+    '- All cron jobs carry `bestEffort:true`, so this delivery failure does **not** corrupt cron state.\n' +
+    '- **Email is the working operator channel.** Reports and digests reach Graham via Mailgun (`lancashire@swift.ch`).\n' +
+    '- Reference: `docs/operations/cron.md`.\n';
+  return `# Delivery & Alerting Status\n\n- Generated at: ${overview.generatedAt || 'unknown'}\n- Portfolios: ${overview.portfolioCount || 0}\n- All ready: ${overview.allReady ? 'yes' : 'no'}\n\n## Per-Portfolio Delivery Posture\n\n${portfolioSections}\n${hostFootnote}`;
 }
 
 function renderCockpitPage({ dailySummary = {}, approvalsQueue = {}, reportHistory = {}, summaries = [], deliveryOverview = {}, cronHealth = null, netLiqSparklineSvg = '' }) {

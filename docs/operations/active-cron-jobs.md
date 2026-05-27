@@ -1,48 +1,28 @@
-# Active cron jobs — snapshot 2026-05-26
+# Active cron jobs — snapshot 2026-05-27
 
-Generated 2026-05-26 (Phase H follow-up: digest cron registered). Source of truth at snapshot time is
-`cron list`; this file is the human-readable mirror plus the policy gate.
+Generated 2026-05-27T08:23:09Z. Gated by `scripts/test-cron-job-policy.js`.
 
-If you change a job (add, remove, toggle, edit schedule, edit delivery), update
-this snapshot AND `docs/operations/active-cron-jobs.json` so the
-`test:cron-job-policy` regression keeps the two in sync.
+## Policy summary
 
-## Enabled
-
-| Job | Schedule | sessionTarget | Tools | Delivery | Notes |
-|---|---|---|---|---|---|
-| portfolio-etf-daily-sync-and-dashboard | `5 8,17 * * 1-5` UTC | current | exec/read/write/edit | announce, bestEffort | Daily holdings sync + dashboard refresh |
-| portfolio-health-monitor-etf | `0 8,14,20 * * *` UTC | current | exec/read | announce, bestEffort | Health monitor; lightContext |
-| daily-rebalance-check | `0 6 * * 1-5` UTC | current | (default) | announce, bestEffort | check-rebalance script |
-| market-calendar-sync | `30 6 * * 1-5` UTC | current | exec/read | announce, bestEffort | IBKR contract hours sync |
-| ibkr-native-gateway-keepalive | `0 8,13 * * *` UTC | current | exec/read | announce, bestEffort | Daytime gateway keepalive |
-| portfolio-etf-weekly-report | `20 17 * * 5` UTC | current | exec/read/write/edit | announce, bestEffort | Friday afternoon report cycle |
-| portfolio-etf-monthly-report | `35 17 1 * *` UTC | current | exec/read/write/edit | announce, bestEffort | First-of-month report cycle |
-| portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` UTC | current | exec/read/write/edit | announce, bestEffort | Quarterly report cycle |
-| soak-self-check-2026-05-30 | `at 2026-05-30T09:00:00Z` | session:agent:main:main | exec/read/write | announce, bestEffort | One-shot soak self-check vs baseline; emails Graham |
-| portfolio-etf-daily-digest | `0 21 * * 1-5` Europe/Zurich | session:agent:main:main | exec/read | announce, bestEffort | Daily portfolio digest with rebalance + AI cards (Phase C/H) |
-
-## Disabled (kept for audit)
-
-| Job | Reason disabled |
+| Property | Value |
 |---|---|
-| UBSPX retry reminder after IBIS open | Historical follow-up from 2026-05-21; superseded by basket lifecycle |
-| UBSPX retry Telegram reminder after IBIS open | Same as above; was running as isolated and hit the Docker sandbox bug |
-| submit-orders-at-market-open | Historical 2026-05-08; isolated session + Docker sandbox bug; replaced by current basket workflow |
-| monitor-trade-fills | Replaced by basket-execution runner + fill check jobs |
-| basket-approval-reminder-tuesday | One-shot at-job that fired 2026-05-26 07:45 UTC; deleteAfterRun cleared. |
-| rebalance-fill-check-monday | One-shot at-job that fired 2026-05-26 09:30 UTC; deleteAfterRun cleared. |
+| agentsDefaultsSandboxMode | `off` |
+| deliveryAnnounceWorks | `False` |
+| deliveryEmailWorks | `True` |
+| telegramChatIdConfigured | `False` |
 
-## Health snapshot
+## Enabled jobs
 
-- All 10 enabled jobs report `consecutiveErrors: 0`.
-- All enabled jobs use `sessionTarget: "current"` (or sticky `session:agent:main:main`); none are `isolated`.
-- All enabled jobs have `delivery.bestEffort: true` (Telegram announce fails-closed by design on this host; see `docs/operations/cron.md`).
+| # | Name | Schedule | Target | Kind | Tools | bestEffort |
+|---|---|---|---|---|---|---|
+| 1 | ibkr-native-gateway-keepalive | `0 8,13 * * *` @ UTC | current | agentTurn | exec, read | True |
+| 2 | portfolio-health-monitor-etf | `0 8,14,20 * * *` @ UTC | current | agentTurn | exec, read | True |
+| 3 | portfolio-etf-daily-sync-and-dashboard | `5 8,17 * * 1-5` @ UTC | current | agentTurn | exec, read, write, edit | True |
+| 4 | portfolio-etf-daily-digest | `0 21 * * 1-5` @ Europe/Zurich | session:agent:main:main | agentTurn | exec, read | True |
+| 5 | daily-rebalance-check | `0 6 * * 1-5` @ UTC | current | agentTurn | - | True |
+| 6 | market-calendar-sync | `30 6 * * 1-5` @ UTC | current | agentTurn | exec, read | True |
+| 7 | portfolio-etf-weekly-report | `20 17 * * 5` @ UTC | current | agentTurn | exec, read, write, edit | True |
+| 8 | soak-self-check-2026-05-30 | `2026-05-30T09:00:00.000Z` @ - | session:agent:main:main | agentTurn | exec, read, write | True |
+| 9 | portfolio-etf-monthly-report | `35 17 1 * *` @ UTC | current | agentTurn | exec, read, write, edit | True |
+| 10 | portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` @ UTC | current | agentTurn | exec, read, write, edit | True |
 
-## How to refresh this snapshot
-
-1. Capture the current state with the `cron` tool action `list`.
-2. Update both `docs/operations/active-cron-jobs.md` (this file) and
-   `docs/operations/active-cron-jobs.json` (machine-readable mirror).
-3. Run `node scripts/test-cron-job-policy.js` to confirm the policy still holds.
-4. Commit both files plus any related job changes.

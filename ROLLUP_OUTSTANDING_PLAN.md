@@ -47,9 +47,9 @@ Keep the repository’s main docs/spec/progress surfaces aligned with the implem
 ### Status summary
 - [x] Reconcile core progress/plan docs with the implemented product surface
 - [x] Add a maintained roll-up backlog document
-- [ ] Refresh broader docs where feature wording still trails the investor-reporting / health / delivery / calendar reality
-- [ ] Decide whether to archive or annotate especially misleading historical top-level roadmap files
-- [ ] Add/extend doc-contract checks if a newly-canonical doc must remain present
+- [x] Refresh broader docs where feature wording still trails the investor-reporting / health / delivery / calendar reality (closed 2026-05-27 W1)
+- [x] Decide whether to archive or annotate especially misleading historical top-level roadmap files (decision: **archive**; moved 2026-05-27 W1)
+- [x] Add/extend doc-contract checks if a newly-canonical doc must remain present (covered by `test-repo-root-cleanliness.js`)
 
 ### Primary files
 - `SPEC_PROGRESS.md`
@@ -70,9 +70,9 @@ Make scheduled reporting and health flows calmer and more reliable on this host,
 - [x] Dashboard digest email surface
 - [x] Health-report email surface
 - [x] Best-effort cron guidance captured in local notes
-- [ ] Consolidate the cron/reporting operational truth into canonical operator docs
-- [ ] Improve host-specific delivery caveat visibility in generated/operator-facing surfaces where helpful
-- [ ] Verify remaining scheduled jobs align with the current operational policy
+- [x] Consolidate the cron/reporting operational truth into canonical operator docs (done: `docs/operations/cron.md` from S3 + `active-cron-jobs.md/json` refreshed W2)
+- [x] Improve host-specific delivery caveat visibility in generated/operator-facing surfaces where helpful (done: W2 added host-posture footnote to `delivery-status.md` generator + snapshot-freshness guard to `test-cron-job-policy.js`)
+- [x] Verify remaining scheduled jobs align with the current operational policy (done: W2 snapshot refresh confirms 10/10 jobs pass all policy checks)
 
 ---
 
@@ -115,13 +115,13 @@ Tidy obsolete/completed work without destroying audit history.
 - Only remove obsolete files when they are clearly redundant and no longer helpful for traceability.
 
 ### Open checklist
-- [ ] Identify any top-level roadmap/checklist files that should be clearly marked historical or superseded
-- [ ] Decide whether to add a short archive note to especially misleading historical summaries
+- [x] Identify any top-level roadmap/checklist files that should be clearly marked historical or superseded (closed 2026-05-27 W1: archived stabilization plans + post-mvp-roadmap)
+- [x] Decide whether to add a short archive note to especially misleading historical summaries (decision: archive folder + repo-map pointer is the canonical breadcrumb; no per-file annotation needed)
 
 ---
 
 ## Current recommended execution order
-1. Stabilization phases S1-S5 (see `stabilization-master-plan-2026-05-25.md`) — repo truth & test gates, carry-over bug closeout, cron/delivery hardening, runtime/doc hygiene, soak prep.
+1. Stabilization phases S1-S5 (see `archive/stabilization-master-plan-2026-05-25.md`) — repo truth & test gates, carry-over bug closeout, cron/delivery hardening, runtime/doc hygiene, soak prep.
    - [x] S1 — repo truth & test gates (commit `62f32fc`)
    - [x] S2 — carry-over bug closeout (commit `3e3b11c`)
    - [x] S3 — cron + delivery hardening (commit `590e204`)
