@@ -534,9 +534,24 @@ function waitForNativeHandshake(api, {
   });
 }
 
+const ISIN_PATTERN = /^[A-Z]{2}[A-Z0-9]{10}$/;
+
+function isIsin(value) {
+  return ISIN_PATTERN.test(String(value || '').trim().toUpperCase());
+}
+
 function buildSearchContracts(query) {
   const symbol = String(query || '').trim().toUpperCase();
+  const isinAttempts = isIsin(symbol)
+    ? [
+      { secType: 'STK', secIdType: 'ISIN', secId: symbol, exchange: 'SMART' },
+      { secType: 'STK', secIdType: 'ISIN', secId: symbol },
+      { secType: 'STK', secIdType: 'ISIN', secId: symbol, exchange: 'LSEETF' },
+      { secType: 'STK', secIdType: 'ISIN', secId: symbol, exchange: 'LSE' },
+    ]
+    : [];
   return [
+    ...isinAttempts,
     { symbol, secType: 'STK', exchange: 'SMART' },
     { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'LSEETF' },
     { symbol, secType: 'STK', exchange: 'SMART', primaryExch: 'LSE' },
@@ -771,6 +786,8 @@ function normalizeError(err, code, reqId) {
 module.exports = {
   InteractiveBrokersNativeClient,
   buildConidContract,
+  buildSearchContracts,
+  isIsin,
   waitForNativeHandshake,
   waitForOpenOrders,
   normalizeContractDetails,

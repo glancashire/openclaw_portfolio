@@ -48,6 +48,8 @@ const checks = [
   ['test:soak-baseline-shape', ['scripts/test-soak-baseline-shape.js']],
   ['test:market-hours', ['tests/test-marketHours.js']],
   ['test:ibkr-readiness', ['tests/test-ibkr-readiness.js']],
+  ['test:contract-cache', ['scripts/test-contract-cache.js']],
+  ['test:isin-search-contracts', ['scripts/test-isin-search-contracts.js']],
 ];
 
 module.exports = { checks };
