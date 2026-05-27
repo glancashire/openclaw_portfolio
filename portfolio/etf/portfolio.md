@@ -52,7 +52,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | LU0950670850 | UBS MSCI United Kingdom UCITS ETF GBP acc | Global equities | 0 | 0 | 0 | EBS / IBKR-supported venue | GBP | Future candidate for UK sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27); ibkr_symbol=UKGBPB; ibkr_conid=136319312; ibkr_primary_exchange=EBS; fx_to_chf=1.15 |
 | IE00B44T3H88 | HSBC MSCI China UCITS ETF USD | Global equities | 0 | 0 | 0 | LSEETF / IBKR-supported venue | USD | Future candidate for China sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27); ibkr_symbol=HMCD; ibkr_conid=83570158; ibkr_primary_exchange=LSEETF; fx_to_chf=0.88 |
 | IE00B5L8K969 | iShares MSCI EM Asia UCITS ETF (Acc) | Global equities | 0 | 0 | 0 | IBIS2 / IBKR-supported venue | EUR | Future candidate for Asia sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27) — IBKR contract is EUR-listed (Xetra/IBIS2), not USD; verify currency expectation before activation; ibkr_symbol=CEBL; ibkr_conid=78767919; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
-| IE00B4L5YX21 | iShares Core MSCI Japan IMI UCITS ETF | Global equities | 0 | 0 | 0 | LSE / IBKR-supported venue | USD | Future candidate for Japan sleeve; physical replication; unresolvable via IBKR API (W6 attempt 2026-05-27 returned no_match); ibkr_symbol=missing; ibkr_conid=missing; fx_to_chf=0.88 |
+| LU1781541252 | Amundi Core MSCI Japan UCITS ETF Acc | Global equities | 0 | 0 | 0 | IBIS2 / Xetra | EUR | Future candidate for Japan sleeve; physical full replication; accumulating; TER 0.12%; AUM €5.4B; replaced IE00B4L5YX21 (unresolvable on IBKR) per operator decision 2026-05-27; ibkr_symbol=LCUJ; ibkr_conid=311572503; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
 | CASH-CHF | CHF cash balance | Bonds / cash-like | 20 | 10 | 30 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF scale. |
 
 ## Candidate Instruments
@@ -61,7 +61,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | LU0950670850 | UK | MSCI UK | UBS MSCI United Kingdom UCITS ETF GBP acc | 0.20% | physical | GBP | needs IBKR verification | Future UK sleeve candidate retained for later use. |
 | IE00B44T3H88 | China | MSCI China | HSBC MSCI China UCITS ETF USD | 0.28% | physical | USD | needs IBKR verification | Broad China exposure; use only after IBKR contract truth is confirmed. |
 | IE00B5L8K969 | Asia | MSCI EM Asia | iShares MSCI EM Asia UCITS ETF (Acc) | 0.20% | physical | USD | needs IBKR verification | Broad emerging Asia exposure; verify conid/symbol before use. |
-| IE00B4L5YX21 | Japan | MSCI Japan IMI | iShares Core MSCI Japan IMI UCITS ETF | 0.12% | sampling | USD | needs IBKR verification | Broad Japan exposure; verify conid/symbol before use. |
+| LU1781541252 | Japan | MSCI Japan | Amundi Core MSCI Japan UCITS ETF Acc | 0.12% | physical (full) | EUR | verified (conid 311572503, IBIS2) | Replaced IE00B4L5YX21 (IBKR-unresolvable). Accumulating, €5.4B AUM. |
 | IE00B53SZB19 | NASDAQ | Nasdaq 100 | iShares Nasdaq 100 UCITS ETF (Acc) | 0.30% | physical | USD | research-only | Best low-TER physical UCITS Nasdaq 100 candidate from the sources checked. |
 | XS2940466316 | Crypto | Bitcoin ETP | iShares Bitcoin ETP | 0.15% temporary / 0.25% standard | physically backed ETP | USD | research-only | Suitable Europe/Switzerland-friendly Bitcoin alternative to US IBIT for future consideration; not UCITS and not in the ETF-only MVP lane. |
 
@@ -69,6 +69,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | Ticker / ISIN | Reason |
 |---|---|
 | IE000XZSV718 | Replaced by UBS Core S&P 500 UCITS ETF USD acc after IBKR execution-path issues on the prior line. |
+| IE00B4L5YX21 | Replaced by LU1781541252 (Amundi Core MSCI Japan) — the iShares Japan IMI ISIN was unresolvable via IBKR native API (W6 2026-05-27). |
 | US46438F1012 | BlackRock iShares Bitcoin Trust is US-specific trust structure; keep excluded from the ETF-only MVP portfolio and prefer the European iShares Bitcoin ETP candidate if crypto exposure is ever approved. |
 
 ## Rebalancing Policy
@@ -116,7 +117,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 ## Notes / Open Questions
 - ETF issuer preferences: prefer UBS and iShares; exclude Invesco.
 - Replacement validated through native IBKR contract details for the UBS Core S&P 500 alternative; use that line for future S&P 500 sleeve proposals.
-- Future instrument consideration list retained: CH0032912732, CH0130595124, LU0950668870, LU0950670850, IE00B5BMR087, IE00B44T3H88, IE00B5L8K969, IE00B4L5YX21, US37950E2596.
+- Future instrument consideration list retained: CH0032912732, CH0130595124, LU0950668870, LU0950670850, IE00B5BMR087, IE00B44T3H88, IE00B5L8K969, LU1781541252, US37950E2596.
 - Already-held instruments note: none
 - Defensive sleeve is intentionally held as CHF cash for this starter-scale MVP portfolio; revisit a CHF money-market or short-duration bond ETF later if portfolio size and trading costs justify it.
 - 2026-05-22 rebalance decision: treat the settled IBKR broker cash balance (CHF 20,841.44 at last holdings sync) as the active defensive sleeve allocation for now, rather than forcing additional buys while the ETF sleeve cash bucket remains zero in portfolio-local accounting.
