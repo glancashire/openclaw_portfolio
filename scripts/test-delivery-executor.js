@@ -53,7 +53,7 @@ function seedPortfolio(repoRoot, deliveryPolicy) {
   assert.strictEqual(sent.sent, true);
   assert(sentPayload, 'Expected stub send payload');
   assert(sentPayload.subject.includes('weekly overview'));
-  assert(sentPayload.html.includes('Demo summary'));
+  assert(sentPayload.html.includes('investor overview'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {

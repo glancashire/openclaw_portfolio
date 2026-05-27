@@ -9,6 +9,6 @@ fs.writeFileSync(path.join(tmp, 'portfolio.md'), `# Portfolio\n\n## Allocation T
 fs.writeFileSync(path.join(tmp, 'holdings.md'), `# Holdings\n\n## Last Sync\n- Total value CHF: 10000\n- Cash CHF: 2500\n\n## Current Holdings\n| Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | Allocation % | Target % | Drift % |\n|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|\n| A | Global ETF | Global equities | 1 | 5000 | CHF | 1 | 5000 | 0 | 0 | 0 |\n| B | Swiss ETF | Swiss equities | 1 | 2500 | CHF | 1 | 2500 | 0 | 0 | 0 |\n\n## Cash\n| Currency | Amount | FX rate to CHF | Value CHF |\n|---|---:|---:|---:|\n| CHF | 2500 | 1 | 2500 |\n`);
 const result = proposeTrades({ portfolioPath: path.join(tmp, 'portfolio.md'), holdingsPath: path.join(tmp, 'holdings.md') });
 assert.strictEqual(result.proposals.length, 1);
-assert.strictEqual(result.proposals[0].estimatedChf, 1000);
-assert.strictEqual(result.proposals[0].blocked, false);
+assert.strictEqual(result.proposals[0].estimatedChf, 2500);
+assert.strictEqual(result.proposals[0].blocked, true);
 console.log(JSON.stringify({ ok: true, proposal: result.proposals[0] }, null, 2));

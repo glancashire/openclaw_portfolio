@@ -10,7 +10,8 @@ const { summarizeHealthTrends, operatorCommandForIssue } = require('../src/repor
   assert.strictEqual(trends.recent.length, 2);
   assert.strictEqual(trends.counts.healthy, 1);
   assert.strictEqual(trends.counts.blocked, 1);
-  assert(trends.summaryLines[0].includes('healthy/low'));
+  assert.strictEqual(trends.direction, 'worsening');
+  assert(trends.summary.includes('worsening'));
   assert.strictEqual(operatorCommandForIssue({ category: 'ibkr_socket_dead' }, 'etf'), '/home/ubuntu/ibgateway-native/start-ibc.sh');
   assert.strictEqual(operatorCommandForIssue({ category: 'cron_excessive_errors' }, 'etf'), 'openclaw cron disable <jobId>');
   console.log(JSON.stringify({ ok: true }, null, 2));
