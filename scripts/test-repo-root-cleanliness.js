@@ -37,12 +37,14 @@ test('archive/phase-plans/README.md exists', () => {
   assert(fs.existsSync(path.join(ROOT, 'archive/phase-plans/README.md')));
 });
 
-test('every root phase-*.md is a stabilization (phase-S*) plan', () => {
-  const offenders = ROOT_MARKDOWN.filter((f) => /^phase-/i.test(f) && !/^phase-S\d/i.test(f));
+test('every root phase-*.md is an active wave/stabilization plan', () => {
+  // Allow phase-S* (stabilization, 2026-05-25) and phase-W* (wave plans,
+  // 2026-05-27+ closeout). Anything else in root is an offender.
+  const offenders = ROOT_MARKDOWN.filter((f) => /^phase-/i.test(f) && !/^phase-[SW]\d/i.test(f));
   assert.deepStrictEqual(
     offenders,
     [],
-    `expected every root phase-*.md to be a phase-S* stabilization plan; offenders: ${JSON.stringify(offenders)}`,
+    `expected every root phase-*.md to be a phase-S* or phase-W* plan; offenders: ${JSON.stringify(offenders)}`,
   );
 });
 
