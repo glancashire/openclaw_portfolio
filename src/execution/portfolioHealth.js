@@ -6,6 +6,7 @@ const { reportDeliveryStatus } = require('../reporting/deliveryPolicy');
 const { loadFillNotificationState } = require('../reporting/fillNotificationState');
 const { fetchCronHealth } = require('../reporting/cronJobsFetcher');
 const { classifySymptoms, applyHealRecipes, buildOpenIssues } = require('./selfHeal');
+const { getRecoveryLadder } = require('./recoveryLadder');
 
 function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRows, retryState, deliveryStatus, fillNotificationState }) {
   const blockers = [];
@@ -92,6 +93,21 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now =
   if ((retryState.queuedRetry || 0) > 0) actions.push({ kind: 'command', command: 'node scripts/trade.js requeue-open portfolio/etf --all', reason: 'Hand retryable rows back to the market-open runner only after recovery.' });
   if ((fillNotificationState.reconciledUnnotifiedFills || []).length > 0) actions.push({ kind: 'command', command: 'node scripts/trade.js delivery portfolio/etf', reason: 'Review reconciled fills pending notification backfill.' });
 
+  // Build a deduped list of recovery ladders for surfaced categories.
+  // Sources: classified symptoms + trade-level blocker codes. Empty ladders are dropped.
+  const ladderCategories = new Set();
+  for (const item of classified) {
+    if (item && item.category) ladderCategories.add(item.category);
+  }
+  for (const blocker of health.blockers || []) {
+    if (blocker && blocker.code) ladderCategories.add(blocker.code);
+  }
+  const recoveryLadders = [];
+  for (const category of ladderCategories) {
+    const ladder = getRecoveryLadder(category);
+    if (ladder.length > 0) recoveryLadders.push({ category, ladder });
+  }
+
   return {
     ok: true,
     dryRun,
@@ -101,6 +117,7 @@ async function buildSelfHealPlan({ portfolioDir, repoRoot = process.cwd(), now =
     healed,
     openIssues,
     actions,
+    recoveryLadders,
   };
 }
 

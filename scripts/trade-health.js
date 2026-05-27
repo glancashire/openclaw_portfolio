@@ -84,6 +84,23 @@ function renderHuman(plan) {
     }
   }
 
+  const ladders = Array.isArray(plan.recoveryLadders) ? plan.recoveryLadders : [];
+  if (plan.openIssues.length > 0 && ladders.length > 0) {
+    lines.push('');
+    lines.push(`Recovery guidance (${ladders.length} ladder${ladders.length === 1 ? '' : 's'}):`);
+    for (const entry of ladders) {
+      lines.push(`  ${entry.category}:`);
+      for (const step of entry.ladder) {
+        lines.push(`    ${step.rank}. ${step.description}`);
+        if (step.command) {
+          lines.push(`       $ ${step.command}`);
+        } else {
+          lines.push('       (manual step — no command)');
+        }
+      }
+    }
+  }
+
   return lines.join('\n');
 }
 

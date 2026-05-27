@@ -150,6 +150,7 @@ function buildHealthReportMarkdown(report) {
   const classified = Array.isArray(report.selfHeal?.classified) ? report.selfHeal.classified : [];
   const openIssues = Array.isArray(report.selfHeal?.openIssues) ? report.selfHeal.openIssues : [];
   const operatorCommands = Array.isArray(report.selfHeal?.operatorCommands) ? report.selfHeal.operatorCommands : [];
+  const recoveryLadders = Array.isArray(report.selfHeal?.recoveryLadders) ? report.selfHeal.recoveryLadders : [];
   const trends = report.trends || { direction: 'unknown', summary: 'No recent health-check trend data yet.' };
   const isHealthy = blockers.length === 0 && failedFixes.length === 0 && openIssues.length === 0;
   const attentionSummary = blockers.length
@@ -162,6 +163,24 @@ function buildHealthReportMarkdown(report) {
   const handledSummary = healed.length
     ? `The system already handled ${healed.length} issue(s) automatically.`
     : 'No automatic fixes were needed this cycle.';
+
+  const recoveryGuidanceLines = [];
+  if (openIssues.length > 0 && recoveryLadders.length > 0) {
+    recoveryGuidanceLines.push('');
+    recoveryGuidanceLines.push('## Recovery guidance');
+    for (const entry of recoveryLadders) {
+      recoveryGuidanceLines.push('');
+      recoveryGuidanceLines.push(`### ${entry.category}`);
+      for (const step of entry.ladder) {
+        recoveryGuidanceLines.push(`${step.rank}. ${step.description}`);
+        if (step.command) {
+          recoveryGuidanceLines.push(`   - Command: \`${step.command}\``);
+        } else {
+          recoveryGuidanceLines.push('   - Manual step (no command)');
+        }
+      }
+    }
+  }
 
   return [
     `# Health Report: ${report.portfolio}`,
@@ -193,6 +212,7 @@ function buildHealthReportMarkdown(report) {
     ...(deliveryPending.length ? deliveryPending.map((item) => `  - ${item}`) : []),
     `- Fill backfill review still open: ${fillBackfillCount}`,
     `- Acknowledged backfilled fills: ${acknowledgedBackfillCount}`,
+    ...recoveryGuidanceLines,
   ].join('\n');
 }
 
@@ -315,6 +335,7 @@ async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySaf
     classified: plan.classified || [],
     openIssues: plan.openIssues || [],
     operatorCommands: (plan.openIssues || []).map((issue) => ({ category: issue.category, command: operatorCommandForIssue(issue, before.portfolio) })),
+    recoveryLadders: Array.isArray(plan.recoveryLadders) ? plan.recoveryLadders : [],
     actions: applySafeFixes ? [...recipeActions, ...(await attemptSafeSelfHeal({ portfolioDir }))] : recipeActions,
   };
   const after = applySafeFixes ? await collectHealthSignals({ portfolioDir, repoRoot }) : before;

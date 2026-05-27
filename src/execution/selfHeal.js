@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { getRecoveryLadder } = require('./recoveryLadder');
 
 function observabilityPaths(repoRoot = process.cwd()) {
   const dir = path.join(repoRoot, 'runtime', 'observability');
@@ -167,6 +168,11 @@ function classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth, errorSt
       recommendedAction: 'Inspect broker error state before clearing the pause.',
       healable: false,
     });
+  }
+
+  // Attach a recovery ladder per symptom (informational only).
+  for (const item of classified) {
+    item.recoveryLadder = getRecoveryLadder(item.category);
   }
 
   return classified;

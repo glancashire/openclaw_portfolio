@@ -53,6 +53,7 @@ const checks = [
   ['test:trade-health-cli', ['scripts/test-trade-health-cli.js']],
   ['test:self-heal-budget', ['scripts/test-self-heal-budget.js']],
   ['test:approval-queue-grouping', ['scripts/test-approval-queue-grouping.js']],
+  ['test:recovery-ladder', ['scripts/test-recovery-ladder.js']],
 ];
 
 module.exports = { checks };
