@@ -1,6 +1,24 @@
 # Portfolio Manager Progress Report
 
-Last updated: 2026-05-25 UTC
+Last updated: 2026-05-28 UTC
+
+## 2026-05-28 — dashboard cash visibility fix
+
+- Fixed cash display bug: three parsers were reading obsolete `Cash CHF:` label instead of `Broker account cash CHF:`. Cash now correctly shows CHF 7,153.88 in dashboard/reports.
+- Added `scripts/show-dashboard.js` for compact console portfolio view.
+- All dashboard tests pass. Committed `b489a8e` and pushed.
+
+## 2026-05-27 — 10-wave closeout sprint
+
+- Executed 10 autonomous waves (W1–W10) closing all Roll-up items (B through F) and Spec §1 live-execution partial items.
+- Key deliverables: doc archive, cron policy consolidation, health trend synthesis, runtime hash-gating (18 write paths), broker-only cancel, native contract intelligence + ISIN resolution, portfolio health model + self-heal, approval UX grouping, recovery playbooks, lane-aware test runner (283 tests).
+- Also: replaced Japan ETF (LU1781541252), fixed 4 quarantined tests, added email dedup guard, fixed duplicate email delivery.
+
+## 2026-05-26 — Phases A–H + stabilization closeout
+
+- Phases A through H all committed and pushed: live-order guard, rebalance analyzer, daily monitoring digest with AI assessment, code-level approval gate (safe-word + PIN), approve-and-execute wrapper, Mailgun inbound handler (code-only), cron TTL cache, OpenClaw CLI as model provider.
+- S1–S5 stabilization all marked done. System entered soak posture.
+- ETF basket Tuesday cron aborted twice due to market-data gaps (SIX L1 subscription + probe path bug).
 
 ## 2026-05-25 — bug-fix lane and stabilization sweep
 

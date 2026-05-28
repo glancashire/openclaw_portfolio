@@ -6,7 +6,7 @@ This file maps the current repository implementation to `SPECIFICATION.md` so pr
 
 - Overall status: the repository has moved well beyond the earlier read-only MVP closure. The active system now includes native IBKR-backed execution/readiness diagnostics, portfolio-aware trade lifecycle handling, structured summary/overview artifacts, investor-facing portfolio/fill/health email reporting, delivery and digest surfaces, bounded self-heal/health guidance, and later stabilization/cleanup work. Historical docs that implied closure around Phase 156 are stale.
 - Strongest areas: Markdown portfolio contracts, validation, guarded execution workflow, native IBKR integration posture, reporting generation, structured runtime/overview artifacts, operator diagnostics, investor-facing email rendering, and verification coverage.
-- Current active implementation lane: stabilization sweep (2026-05-25) — bug-fix lane closed (cross-client open-order visibility + exchange holiday detection); follow-on cleanup phases S1-S5 in progress.
+- Current active implementation lane: post-stabilization operational hardening (2026-05-28). Stabilization S1-S5 complete (2026-05-25); Phases A-H complete (2026-05-26); Wave closeout W1-W10 complete (2026-05-27). Remaining work: execution retry hardening (plans/phase-2..5, phase-next-ubspx), Mailgun infra setup, dashboard/digest UX improvements.
 - Scope posture: Interactive Brokers remains the only supported broker for the active MVP/product lane. ETF-first, CHF-first, approval-gated operation remains the intended guardrail.
 
 ## Progress by specification area
