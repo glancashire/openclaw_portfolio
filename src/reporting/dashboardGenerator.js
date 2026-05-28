@@ -17,13 +17,22 @@ const { loadFillNotificationState } = require('./fillNotificationState');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 
 function parseHoldingsSummary(text) {
-  const get = (label) => {
+  const get = (label, fallback = '0') => {
     const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
-    return m ? m[1].trim() : '0';
+    return m ? m[1].trim() : fallback;
   };
+  // Prefer the broker-account cash figure because it matches the value already rolled into
+  // `Total value CHF` (total = invested + brokerCash). The `Portfolio cash CHF` line is
+  // marked `unknown_untrusted` until a portfolio-local accounting source is wired in, so
+  // surfacing it as the dashboard's cash number falsely shows zero cash. Fall back to the
+  // legacy `Cash CHF` label for older holdings snapshots.
+  const brokerCash = get('Broker account cash CHF', '');
+  const legacyCash = get('Cash CHF', '');
+  const portfolioCash = get('Portfolio cash CHF', '');
+  const cash = brokerCash || legacyCash || portfolioCash || '0';
   return {
     totalValue: get('Total value CHF'),
-    cash: get('Cash CHF'),
+    cash,
     invested: get('Invested value CHF'),
     syncTime: get('Date/time'),
   };

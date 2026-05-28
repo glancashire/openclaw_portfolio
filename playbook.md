@@ -42,3 +42,7 @@ When implementing this repo:
 ## Basket execution runbook
 
 For live basket execution (Phases 184–198), see `docs/basket-execution-runbook.md`. The summary: every round is one `approve` interaction; assistant never edits code between rounds; failed legs auto-generate a fresh reproposal with one new approval gate.
+
+## Console helpers
+
+- **`show dashboard`** → `node scripts/show-dashboard.js [portfolio]` (default `etf`). Compact console view of value/cash/allocation/queue/next step with a sanity check that total = invested + cash. Run after `node scripts/regenerate-dashboard.js portfolio/<name>` if the underlying state changed.

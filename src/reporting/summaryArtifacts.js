@@ -130,13 +130,19 @@ function listBlockedTradeRows(tradesPath) {
 }
 
 function parseHoldingsSummary(text) {
-  const get = (label) => {
+  const get = (label, fallback = '0') => {
     const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
-    return m ? m[1].trim() : '0';
+    return m ? m[1].trim() : fallback;
   };
+  // See dashboardGenerator.parseHoldingsSummary for rationale: prefer broker-account cash,
+  // which is the figure already included in `Total value CHF`.
+  const brokerCash = get('Broker account cash CHF', '');
+  const legacyCash = get('Cash CHF', '');
+  const portfolioCash = get('Portfolio cash CHF', '');
+  const cash = brokerCash || legacyCash || portfolioCash || '0';
   return {
     totalValue: get('Total value CHF'),
-    cash: get('Cash CHF'),
+    cash,
     invested: get('Invested value CHF'),
     syncTime: get('Date/time'),
     source: get('Source'),

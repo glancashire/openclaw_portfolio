@@ -49,11 +49,27 @@ function loadCurrentAllocations(holdingsPath) {
     byAsset.set(assetClass, (byAsset.get(assetClass) || 0) + valueChf);
   }
 
-  const cashSection = extractTableSection(text, 'Cash');
-  const cashRows = parseTableRows(cashSection);
-  const cashChf = cashRows
-    .filter((row) => String(row[0] || '').trim().toUpperCase() === 'CHF')
-    .reduce((sum, row) => sum + parseNumber(row[3] || row[1] || '0'), 0);
+  // Source CHF cash from the holdings summary lines; prefer the broker-account cash
+  // because that's the figure already included in `Total value CHF`. Falls back to the
+  // legacy `Cash CHF` label, then the (possibly untrusted) portfolio cash line.
+  const summaryMatch = (label) => {
+    const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
+    return m ? parseNumber(m[1]) : null;
+  };
+  let cashChf = 0;
+  for (const label of ['Broker account cash CHF', 'Cash CHF', 'Portfolio cash CHF']) {
+    const v = summaryMatch(label);
+    if (v != null && v > 0) { cashChf = v; break; }
+  }
+  // Back-compat: if the older two-column Cash table (Currency | Amount) is present and the
+  // summary lines didn't yield a positive value, parse it.
+  if (cashChf === 0) {
+    const cashSection = extractTableSection(text, 'Cash');
+    const cashRows = parseTableRows(cashSection);
+    cashChf = cashRows
+      .filter((row) => String(row[0] || '').trim().toUpperCase() === 'CHF')
+      .reduce((sum, row) => sum + parseNumber(row[3] || row[1] || '0'), 0);
+  }
   if (cashChf > 0) {
     byAsset.set('Bonds / cash-like', (byAsset.get('Bonds / cash-like') || 0) + cashChf);
   }

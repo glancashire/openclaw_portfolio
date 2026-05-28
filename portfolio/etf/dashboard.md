@@ -11,8 +11,8 @@
 - Pending operator queue items: 8
 
 ## Health Snapshot
-- Strategy status: rebalance_needed
-- Last successful sync: 2026-05-22 15:52:43
+- Strategy status: minor_drift
+- Last successful sync: 2026-05-28 08:10:19
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
@@ -24,26 +24,26 @@
 4. [execution_block/blocked/high] IE00B5BMR087: Broker rejected the order because the contract identity or venue resolution was not accepted.
 5. [execution_block/blocked/high] IE00BD4TXW66: Broker rejected the order because the contract identity or venue resolution was not accepted.
 6. [execution_block/blocked/high] LU0950668870: Broker rejected the order because the contract identity or venue resolution was not accepted.
-7. [data/contract_identity_gap/medium] 4 approved instrument(s) are missing IBKR symbols. Example: IE00B44T3H88.
-8. [data/contract_identity_gap/medium] 5 approved instrument(s) are missing IBKR conids. Example: LU0950670850.
+7. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR conids. Example: CASH-CHF.
+8. [data/contract_identity_gap/medium] 1 approved instrument(s) are missing IBKR symbols. Example: CASH-CHF.
 
 ## Portfolio Value Snapshot
-- Total value CHF: 22209.4831212
-- Cash CHF: 0
-- Invested CHF: 22209.4831212
+- Total value CHF: 51649.979199999994
+- Cash CHF: 7153.88
+- Invested CHF: 44496.0992
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
 - Since last report %: 0
-- Number of holdings: 3
-- Latest snapshot date: 2026-05-23
+- Number of holdings: 4
+- Latest snapshot date: 2026-05-27
 
 ## Allocation Health
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 83.26 | 60 | 23.26 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 16.74 | 20 | -3.26 | on_track | no | within tolerance |
-| Bonds / cash-like | 0 | 20 | -20 | out_of_bounds | yes | outside min/max band |
+| Global equities | 58.22 | 60 | -1.78 | on_track | no | within tolerance |
+| Swiss equities | 27.93 | 20 | 7.93 | drifted | watch | drift threshold breached |
+| Bonds / cash-like | 13.85 | 20 | -6.15 | drifted | watch | drift threshold breached |
 
 ## Instrument Actions Queue
 | Instrument | Current % | Target % | Suggested action | Reason | Approval needed |
@@ -55,8 +55,8 @@
 | LU0950670850 | 0 | 0 | watch | No active proposal | watch |
 | IE00B44T3H88 | 0 | 0 | watch | No active proposal | watch |
 | IE00B5L8K969 | 0 | 0 | watch | No active proposal | watch |
-| IE00B4L5YX21 | 0 | 0 | watch | No active proposal | watch |
-| CASH-CHF | 9.11 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| LU1781541252 | 0 | 0 | watch | No active proposal | watch |
+| CASH-CHF | 3.92 | 20 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 
 ## Safety / Risk Diagnostics
 - Safety status: clear
@@ -68,7 +68,7 @@
 - none
 
 ## Contract Intelligence Readiness
-- 4/9 approved instrument(s) have complete IBKR contract identity; missing conid: 5, missing symbol: 4, missing venue: 0.
+- 8/9 approved instrument(s) have complete IBKR contract identity; missing conid: 1, missing symbol: 1, missing venue: 0.
 - Recommended contract-intelligence action: Resolve missing IBKR conids before treating the full approved instrument list as execution-ready.
 
 ## Operator Queue Summary
@@ -89,14 +89,14 @@
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-25 15:20:49.084 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 15:20:48.724 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 15:13:40.726 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 15:13:40.368 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-25 15:11:18.026 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
+| 2026-05-27 20:52:23.523 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-27 20:52:19.925 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-27 20:52:17.066 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-27 20:51:59.947 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-27 20:51:11.237 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
 
 ## Report / Delivery Status
-- Weekly report: latest history 2026-05-23
+- Weekly report: latest history 2026-05-27
 - Monthly report: email_and_repo
 - Quarterly report: local_operator_review
 - Delivery readiness: ready
@@ -117,15 +117,15 @@ CH0032912732: Broker rejected the order because the contract identity or venue r
 
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 20185.35 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: weekly report cycle snapshot
-- Observability shows 99 recent blocked execution-policy event(s).
+- Whole-share draft sizing leaves CHF 49625.85 unallocated beyond the intentional CHF cash sleeve.
+- Latest history note: evening sync snapshot
+- Observability shows 100 recent blocked execution-policy event(s).
 
 ## Observability Status
 - Runtime event file present: yes
 - Recent runtime events scanned: 100
-- Recent blocked trade events: 99
-- Open-runner first handoff events: 1
+- Recent blocked trade events: 100
+- Open-runner first handoff events: 0
 - Open-runner retry events: 0
 - Recent degraded broker events: 0
 - Recent stale-data events: 0
