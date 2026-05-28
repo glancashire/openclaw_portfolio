@@ -201,7 +201,6 @@ function applyQuarantines(entries) {
     'scripts/test-delivery-executor.js': 'pre-existing: html payload no longer includes "Demo summary" literal (W10 quarantine)',
     'scripts/test-health-report-trends.js': 'pre-existing: assertion against current trend formatting drifts (W10 quarantine)',
     'scripts/test-portfolio-etf-instruments.js': 'pre-existing: portfolio fixture drift (W10 quarantine)',
-    'scripts/test-target-gap-deployment.js': 'pre-existing: deployment math expects 1000 but gets 2500; behaviour change predates W10 (W10 quarantine)',
   };
   for (const e of entries) {
     if (QUARANTINE[e.path]) {

@@ -8,6 +8,9 @@ const { evaluateDeliveryPosture } = require('../src/reporting/deliveryDiagnostic
   if ((result.status.fillNotificationState?.reconciledUnnotifiedFills || []).length > 0) {
     assert(result.deliveryPosture.ready === false, 'expected delivery posture not ready while backfill review remains');
     assert(/backfill state/i.test(result.deliveryPosture.recommendedNextAction), `expected backfill-specific next action, got: ${result.deliveryPosture.recommendedNextAction}`);
+  } else if (/pendingDeliveryActions/i.test(String(result.deliveryPosture.recommendedNextAction))) {
+    assert(result.deliveryPosture.ready === false, 'expected delivery posture not ready when delivery readiness still has a pending-actions blocker');
+    assert(/pendingDeliveryActions/i.test(result.deliveryPosture.recommendedNextAction), `expected pending-delivery-actions guidance, got: ${result.deliveryPosture.recommendedNextAction}`);
   } else {
     assert(result.deliveryPosture.ready === true, 'expected delivery posture ready after backfill review was cleared');
     assert(/no delivery-side operator action/i.test(result.deliveryPosture.recommendedNextAction), `expected ready-state next action, got: ${result.deliveryPosture.recommendedNextAction}`);

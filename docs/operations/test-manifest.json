@@ -15,7 +15,7 @@
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 51,
-    "quarantined": 4
+    "quarantined": 3
   },
   "entries": [
     {
@@ -1748,8 +1748,7 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": true,
-      "quarantineReason": "pre-existing: deployment math expects 1000 but gets 2500; behaviour change predates W10 (W10 quarantine)"
+      "quarantined": false
     },
     {
       "path": "scripts/test-test-manifest-shape.js",
