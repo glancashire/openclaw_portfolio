@@ -159,10 +159,19 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
 
   const hasCashHold = existingTrades.some((trade) => trade.instrument === 'CHF cash balance' || trade.action === 'hold');
   const summary = proposalSummary(latestProposals, totalValue);
+  const hasLiveExecutionHistory = Number(lifecycleSummary?.filled || 0) > 0 || Number(lifecycleSummary?.cancelled || 0) > 0 || Number(lifecycleSummary?.failed || 0) > 0;
+  if (hasLiveExecutionHistory && Number(lifecycleSummary?.proposed || 0) === 0 && Number(lifecycleSummary?.approved || 0) === 0) {
+    return [
+      'Review current allocation versus strategic targets before generating any fresh live basket.',
+      hasCashHold
+        ? 'Keep the defensive CHF cash sleeve near policy and redeploy cash only when there is a deliberate rebalance or diversification reason.'
+        : 'Refresh history snapshots and only open a new live basket when a real drift or cash-deployment reason exists.',
+    ];
+  }
   return [
-    'Review and approve the current dry-run instrument proposals before broker connectivity is enabled.',
+    'Review and approve the current proposal set before creating overlapping execution plans.',
     hasCashHold
-      ? `Keep the defensive sleeve in CHF cash for now, and leave residual tradable cash of CHF ${summary.residualTradableCash} unallocated until live pricing is available.`
+      ? `Keep the defensive sleeve in CHF cash for now, leaving residual tradable cash of CHF ${summary.residualTradableCash} available for the next intentional rebalance.`
       : 'Refresh history snapshots after holdings updates and trade execution.',
   ];
 }
@@ -171,36 +180,48 @@ function readBlockedTradeQueueItems(tradesPath) {
   if (!tradesPath || !fs.existsSync(tradesPath)) return [];
   const { rows } = readTradesTable(tradesPath);
   const latestBlockedByInstrumentAction = new Map();
+  const latestLifecycleByInstrumentAction = new Map();
   const now = Date.now();
   const STALE_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const RESOLVED_STATUSES = new Set(['filled', 'cancelled', 'rejected', 'failed', 'inactive']);
+
   for (const row of rows) {
+    const instrument = String(row['Ticker / ISIN'] || '').trim();
+    const action = String(row.Action || '').trim().toLowerCase();
+    const key = `${instrument}::${action}`;
+    latestLifecycleByInstrumentAction.set(key, row);
+
     const blockCode = String(row['Block code'] || '').trim();
     if (!blockCode) continue;
-    // Age out stale execution blocks older than 7 days
     const dateStr = String(row['Date/time'] || row['Date'] || '').trim();
     if (dateStr) {
       const ts = new Date(dateStr).getTime();
       if (Number.isFinite(ts) && (now - ts) > STALE_AGE_MS) continue;
     }
-    const instrument = String(row['Ticker / ISIN'] || '').trim();
-    const action = String(row.Action || '').trim().toLowerCase();
-    const key = `${instrument}::${action}`;
     latestBlockedByInstrumentAction.set(key, row);
   }
 
-  return Array.from(latestBlockedByInstrumentAction.values()).map((row) => ({
-    queueType: 'execution_block',
-    severity: 'high',
-    status: 'blocked',
-    summary: row['Block reason']
-      ? `${row['Ticker / ISIN'] || 'Trade row'}: ${row['Block reason']}`
-      : `${row['Ticker / ISIN'] || 'Trade row'} is blocked (${row['Block code']}).`,
-    blockCode: String(row['Block code'] || '').trim(),
-    recommendedOperatorAction: String(row['Next action'] || '').trim() || 'Review the broker-derived block and resolve it before retrying.',
-  }));
+  return Array.from(latestBlockedByInstrumentAction.entries())
+    .filter(([key, blockedRow]) => {
+      const latestRow = latestLifecycleByInstrumentAction.get(key);
+      if (!latestRow) return true;
+      if (latestRow === blockedRow) return true;
+      const latestStatus = String(latestRow.Status || latestRow.status || '').trim().toLowerCase();
+      return !RESOLVED_STATUSES.has(latestStatus);
+    })
+    .map(([, row]) => ({
+      queueType: 'execution_block',
+      severity: 'high',
+      status: 'blocked',
+      summary: row['Block reason']
+        ? `${row['Ticker / ISIN'] || 'Trade row'}: ${row['Block reason']}`
+        : `${row['Ticker / ISIN'] || 'Trade row'} is blocked (${row['Block code']}).`,
+      blockCode: String(row['Block code'] || '').trim(),
+      recommendedOperatorAction: String(row['Next action'] || '').trim() || 'Review the broker-derived block and resolve it before retrying.',
+    }));
 }
 
-function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, contractIntelligence = null, recommended = [] }) {
+function buildPendingOperatorActions({ tradesPath = null, holdingsText = '', deliveryStatus = null, brokerReadiness = null, brokerErrorState = null, lifecycleSummary = null, openRunnerRetryState = null, safetyDiagnostics = null, fillNotificationState = null, contractIntelligence = null, recommended = [] }) {
   const actions = [];
   const unnotifiedFillCount = Number(fillNotificationState?.reconciledUnnotifiedFills?.length || 0);
   for (const item of deliveryStatus?.pendingActions || []) {
@@ -214,7 +235,11 @@ function buildPendingOperatorActions({ tradesPath = null, deliveryStatus = null,
   if (brokerErrorState?.stopAutomation) {
     actions.push({ queueType: 'recovery', severity: 'high', status: 'paused', summary: `Broker automation paused after ${brokerErrorState.consecutive} consecutive errors; investigate before resuming.` });
   }
-  actions.push(...readBlockedTradeQueueItems(tradesPath));
+  const inFlightCount = Number(lifecycleSummary?.staged || 0) + Number(lifecycleSummary?.submitted || 0) + Number(lifecycleSummary?.partiallyFilled || 0);
+  actions.push(...readBlockedTradeQueueItems(tradesPath).filter((item) => {
+    if (item.blockCode !== 'contract_resolution_failed') return true;
+    return inFlightCount > 0;
+  }));
   const queuedInitial = Number(openRunnerRetryState?.queuedInitial || 0);
   const queuedRetry = Number(openRunnerRetryState?.queuedRetry || 0);
   if (queuedInitial > 0) {
@@ -513,6 +538,7 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
   const contractIdentity = contractIntelligence || summarizeContractIntelligence(approvedInstruments);
   const pendingActions = buildPendingOperatorActions({
     tradesPath,
+    holdingsText,
     deliveryStatus,
     brokerReadiness,
     brokerErrorState,

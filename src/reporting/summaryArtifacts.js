@@ -239,10 +239,19 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
 
   const hasCashHold = existingTrades.some((trade) => trade.instrument === 'CHF cash balance' || trade.action === 'hold');
   const summary = proposalSummary(latestProposals, totalValue);
+  const hasLiveExecutionHistory = Number(lifecycleSummary?.filled || 0) > 0 || Number(lifecycleSummary?.cancelled || 0) > 0 || Number(lifecycleSummary?.failed || 0) > 0;
+  if (hasLiveExecutionHistory && Number(lifecycleSummary?.proposed || 0) === 0 && Number(lifecycleSummary?.approved || 0) === 0) {
+    return [
+      'Review current allocation versus strategic targets before generating any fresh live basket.',
+      hasCashHold
+        ? 'Keep the defensive CHF cash sleeve near policy and redeploy cash only when there is a deliberate rebalance or diversification reason.'
+        : 'Refresh history snapshots and only open a new live basket when a real drift or cash-deployment reason exists.',
+    ];
+  }
   return [
-    'Review and approve the current dry-run instrument proposals before broker connectivity is enabled.',
+    'Review and approve the current proposal set before creating overlapping execution plans.',
     hasCashHold
-      ? `Keep the defensive sleeve in CHF cash for now, and leave residual tradable cash of CHF ${summary.residualTradableCash} unallocated until live pricing is available.`
+      ? `Keep the defensive sleeve in CHF cash for now, leaving residual tradable cash of CHF ${summary.residualTradableCash} available for the next intentional rebalance.`
       : 'Refresh history snapshots after holdings updates and trade execution.',
   ];
 }

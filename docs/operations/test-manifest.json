@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 287,
-    "safe": 223,
+    "total": 288,
+    "safe": 224,
     "integration": 59,
     "live-smoke": 3,
     "external": 2,
@@ -953,6 +953,13 @@
     },
     {
       "path": "scripts/test-live-readiness-retryable-queued-blocks.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-live-recommendation-hygiene.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

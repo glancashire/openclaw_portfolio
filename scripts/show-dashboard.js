@@ -49,6 +49,9 @@ const cash = num(get('Cash CHF'));
 const invested = num(get('Invested CHF'));
 const dailyChf = num(get('Daily move CHF'));
 const dailyPct = num(get('Daily move %'));
+const totalProfitChf = num(get('Total unrealized profit CHF'));
+const totalProfitPct = num(get('Total unrealized profit %'));
+const coverageLine = get('Cost-basis coverage');
 const holdingCount = get('Number of holdings');
 const sync = get('Date/time', holdings) || get('Last successful sync');
 const health = get('Portfolio status');
@@ -74,6 +77,9 @@ lines.push(`  Invested   ${fmt(invested).padStart(14)}   (${total ? (invested / 
 lines.push(`  Cash       ${fmt(cash).padStart(14)}   (${cashPctOfTotal != null ? cashPctOfTotal.toFixed(2) : '0.00'}%)`);
 if (dailyChf != null || dailyPct != null) {
   lines.push(`  Daily move ${fmt(dailyChf).padStart(14)}   (${pct(dailyPct)})`);
+}
+if (totalProfitChf != null) {
+  lines.push(`  Profit     ${fmt(totalProfitChf).padStart(14)}   (${pct(totalProfitPct)})${coverageLine ? `   ${coverageLine}` : ''}`);
 }
 lines.push(`  Holdings: ${holdingCount || 0}`);
 
@@ -106,6 +112,23 @@ if (holdings) {
         const [, name, cls, qty, px, ccy, fx, chf] = c;
         lines.push(`  ${(name || '').slice(0, 10).padEnd(10)} ${(cls || '').slice(0, 16).padEnd(16)} ${(qty || '').padStart(7)} ${fmt(px).padStart(10)} ${(ccy || '').padEnd(4)} ${(fx || '').padStart(6)} ${fmt(chf).padStart(13)}`);
       }
+    }
+  }
+}
+
+// Profit / Loss (from dashboard.md)
+const pl = section('Profit / Loss');
+if (pl) {
+  const rows = pl.split(/\r?\n/).filter((l) => l.startsWith('|') && !l.includes('---') && !/^\| ?Instrument /i.test(l));
+  if (rows.length) {
+    lines.push('');
+    lines.push('💵 Profit / Loss');
+    lines.push(`  ${'Instrument'.padEnd(46)} ${'Value'.padStart(13)} ${'Cost'.padStart(13)} ${'Profit'.padStart(13)} ${'P/L %'.padStart(8)}  Source`);
+    for (const r of rows) {
+      const c = r.split('|').map((x) => x.trim()).filter(Boolean);
+      const [name, value, cost, profit, profitPct, source] = c;
+      if (!name || name === '—') continue;
+      lines.push(`  ${(name || '').slice(0, 46).padEnd(46)} ${String(value).padStart(13)} ${String(cost).padStart(13)} ${String(profit).padStart(13)} ${String(profitPct).padStart(8)}  ${source || ''}`);
     }
   }
 }
