@@ -461,6 +461,9 @@ async function syncPortfolioOrderStatus({ portfolioDir, orderId, selector = {}, 
         const status = String(hint.status || '').trim().toLowerCase();
         if (!['cancelled', 'canceled'].includes(status)) return false;
         if (matchedQuantity != null && Number(hint.quantity || 0) !== matchedQuantity) return false;
+        const hintAction = String(hint.action || hint.side || hint.orderAction || '').trim().toLowerCase();
+        const selectorAction = String(selector.action || matchedRow?.Action || '').trim().toLowerCase();
+        if (hintAction && selectorAction && hintAction !== selectorAction) return false;
         if (selector.tickerOrIsin) {
           const selectorText = String(selector.tickerOrIsin).trim().toUpperCase();
           const hintSymbol = String(hint.symbol || '').trim().toUpperCase();

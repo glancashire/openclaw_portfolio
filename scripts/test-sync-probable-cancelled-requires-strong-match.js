@@ -21,7 +21,7 @@ Module._load = function(request, parent, isMain) {
             reason: 'not_found',
             orderId: 9113,
             message: 'No exact broker order id match was found, but completed-order hints are available.',
-            hints: { completedOrders: [{ orderId: 0, permId: 1937911602, symbol: 'UBSPX', status: 'Cancelled', quantity: 8 }] },
+            hints: { completedOrders: [{ orderId: 0, permId: 1937911602, symbol: 'UBSPX', status: 'Cancelled', quantity: 8, action: 'BUY' }] },
           };
         }
       },
