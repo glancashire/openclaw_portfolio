@@ -3,6 +3,18 @@ const fs = require('fs');
 const path = require('path');
 const { main, classify, probeNativeData } = require('./ibkr-native-keepalive');
 
+
+const RealDate = Date;
+class FakeDate extends RealDate {
+  constructor(...args) {
+    super(...(args.length ? args : ['2026-05-28T12:00:00Z']));
+  }
+  static now() { return new RealDate('2026-05-28T12:00:00Z').getTime(); }
+  static parse(value) { return RealDate.parse(value); }
+  static UTC(...args) { return RealDate.UTC(...args); }
+}
+global.Date = FakeDate;
+
 (async function run() {
   const tmpDir = path.join(__dirname, '..', 'runtime', 'test-ibkr-keepalive');
   fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -66,4 +78,6 @@ const { main, classify, probeNativeData } = require('./ibkr-native-keepalive');
 })().catch((error) => {
   console.error(error.stack || String(error));
   process.exit(1);
+}).finally(() => {
+  global.Date = RealDate;
 });

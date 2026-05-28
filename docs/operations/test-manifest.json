@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 288,
-    "safe": 224,
+    "total": 289,
+    "safe": 225,
     "integration": 59,
     "live-smoke": 3,
     "external": 2,
@@ -195,6 +195,13 @@
     },
     {
       "path": "scripts/test-basket-reproposal-promoter.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-basket-terminal-evidence-fallback.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

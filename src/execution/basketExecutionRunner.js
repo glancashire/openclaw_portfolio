@@ -155,7 +155,7 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
   return { path: statePath, runState: summarizeRun(state), approvalId, portfolio };
 }
 
-function classifyBrokerOutcome({ orderId, executions = [], completedOrders = [] }) {
+function classifyBrokerOutcome({ orderId, executions = [], completedOrders = [], leg = null }) {
   const idStr = String(orderId);
   const fills = (executions || []).filter((row) => String(row.orderId) === idStr);
   if (fills.length > 0) {
@@ -191,6 +191,25 @@ function classifyBrokerOutcome({ orderId, executions = [], completedOrders = [] 
       cancelledReason: completed.completedStatus || completed.status || 'cancelled',
     };
   }
+  const fallbackCancelled = (completedOrders || []).find((row) => {
+    if (!row || !leg) return false;
+    const status = String(row.status || row.completedStatus || row.state || '').toLowerCase();
+    if (!status.includes('cancel')) return false;
+    const hintSymbol = String(row.symbol || row.contract?.symbol || '').trim().toUpperCase();
+    const legSymbol = String(leg.ibkrSymbol || '').trim().toUpperCase();
+    if (!hintSymbol || !legSymbol || hintSymbol != legSymbol) return false;
+    const hintQty = Number(row.quantity ?? row.qty ?? row.totalQuantity ?? row.order?.totalQuantity ?? NaN);
+    const legQty = Number(leg.quantity ?? NaN);
+    if (Number.isFinite(hintQty) && Number.isFinite(legQty) && hintQty !== legQty) return false;
+    if (Number.isFinite(hintQty) !== Number.isFinite(legQty)) return false;
+    return true;
+  });
+  if (fallbackCancelled) {
+    return {
+      status: 'cancelled',
+      cancelledReason: fallbackCancelled.completedStatus || fallbackCancelled.status || 'cancelled',
+    };
+  }
   return { status: 'unknown' };
 }
 
@@ -200,10 +219,20 @@ function reconcileBasketRunFromBroker({ portfolio, approvalId, rootDir = process
     throw new Error(`Basket run state not found: ${outPath}`);
   }
   const state = JSON.parse(fs.readFileSync(outPath, 'utf8'));
+  let proposalLegs = [];
+  try {
+    const proposalPath = path.join(rootDir, 'runtime', 'basket-proposals', portfolio, `${approvalId}.json`);
+    const approvedPath = path.join(rootDir, 'runtime', 'approved-order-baskets', portfolio, `${approvalId}.json`);
+    const sourcePath = fs.existsSync(proposalPath) ? proposalPath : approvedPath;
+    if (fs.existsSync(sourcePath)) {
+      proposalLegs = JSON.parse(fs.readFileSync(sourcePath, 'utf8')).legs || [];
+    }
+  } catch (_) {}
   for (const leg of Object.values(state.legs || {})) {
     if (!leg.brokerOrderId) continue;
     if (['filled', 'cancelled'].includes(leg.status)) continue;
-    const outcome = classifyBrokerOutcome({ orderId: leg.brokerOrderId, executions, completedOrders });
+    const proposalLeg = proposalLegs.find((entry) => entry.legId === leg.legId) || null;
+    const outcome = classifyBrokerOutcome({ orderId: leg.brokerOrderId, executions, completedOrders, leg: proposalLeg });
     if (outcome.status === 'unknown') continue;
     Object.assign(leg, outcome, { updatedAt: new Date(now).toISOString() });
   }

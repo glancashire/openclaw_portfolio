@@ -11,11 +11,11 @@
 - Live artifact repair should remain idempotent and should not rewrite already terminal legs.
 
 ## Actionable checklist
-- [ ] Inspect existing order-status/probable-cancelled inference helpers and identify the safest reusable heuristics.
-- [ ] Write unit/regression tests for basket-run reconciliation using strong terminal hints (order id, permId, symbol + quantity + action, etc.) and explicit anti-false-positive cases.
-- [ ] Implement the fallback in shared basket reconciliation code, reusing existing normalization where practical.
-- [ ] Re-run targeted basket/trade reconciliation tests, safe lane, and full suite until green.
-- [ ] Apply the improved reconciliation to the stale 5-leg run artifact if broker evidence now supports closure, then verify resulting dashboard/report posture.
+- [x] Inspect existing order-status/probable-cancelled inference helpers and identify the safest reusable heuristics.
+- [x] Write unit/regression tests for basket-run reconciliation using strong terminal hints (order id, permId, symbol + quantity + action, etc.) and explicit anti-false-positive cases.
+- [x] Implement the fallback in shared basket reconciliation code, reusing existing normalization where practical.
+- [x] Re-run targeted basket/trade reconciliation tests, safe lane, and full suite until green.
+- [x] Apply the improved reconciliation to the stale 5-leg run artifact if broker evidence now supports closure, then verify resulting dashboard/report posture. Current live rerun still lacks strong terminal hints for orders `9138` / `9140`, so the artifact remains unchanged.
 - [ ] Commit and push the completed phase.
 
 ## Acceptance criteria
