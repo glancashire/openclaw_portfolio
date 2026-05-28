@@ -129,6 +129,19 @@ function firstAccountId(accounts) {
   return null;
 }
 
+function extractFxRatesToChf(ledger) {
+  const rates = { CHF: 1 };
+  if (!Array.isArray(ledger)) return rates;
+  for (const entry of ledger) {
+    if (!entry || String(entry.tag || '') !== 'ExchangeRate') continue;
+    const currency = String(entry.currency || '').trim().toUpperCase();
+    const value = Number(entry.value);
+    if (!currency || !Number.isFinite(value) || value <= 0) continue;
+    rates[currency] = value;
+  }
+  return rates;
+}
+
 function extractCashChf(ledger) {
   if (!ledger) return { value: 0, basis: 'missing', detail: {} };
 
@@ -166,4 +179,4 @@ function extractCashChf(ledger) {
   return { value: 0, basis: 'missing', detail: {} };
 }
 
-module.exports = { syncInteractiveBrokersHoldings, extractCashChf, enrichPositionsWithMarketSnapshot, preferredSnapshotPrice, snapshotPriceSource };
+module.exports = { syncInteractiveBrokersHoldings, extractCashChf, extractFxRatesToChf, enrichPositionsWithMarketSnapshot, preferredSnapshotPrice, snapshotPriceSource };

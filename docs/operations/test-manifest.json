@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 286,
-    "safe": 222,
+    "total": 287,
+    "safe": 223,
     "integration": 59,
     "live-smoke": 3,
     "external": 2,
@@ -349,6 +349,13 @@
     },
     {
       "path": "scripts/test-contract-intelligence.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-cost-basis.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

@@ -20,7 +20,8 @@ const { summarizeContractIntelligence } = require('./contractIntelligenceStatus'
 const { readTradesTable, summarizeOpenRunnerRetryState, staleApprovalInventory } = require('../execution/tradeState');
 const { classifyTradeRowExecution } = require('../execution/executionClassification');
 const { buildSelfHealPlan } = require('../execution/portfolioHealth');
-const { buildInvestorHoldingsSnapshot } = require('./investorReportingData');
+const { buildInvestorHoldingsSnapshot, parseHoldingsTable } = require('./investorReportingData');
+const { enrichHoldings } = require('./costBasis');
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -449,6 +450,16 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
   const totalValue = Number(summary.totalValue || 0);
   const holdingCount = countHoldingRows(holdingsText);
   const investorHoldings = buildInvestorHoldingsSnapshot({ holdingsText, historyRows: historySeries, approvedInstruments });
+  // Cost-basis enrichment (P2: profit/loss rework).
+  // Source hybrid: trades.md filled-buy legs (incl. "Execution reconciliation:
+  // broker status Filled" notes embedded in inactive rows) -> IBKR AvgCost fallback.
+  const tradesTextForCostBasis = tradesPath && fs.existsSync(tradesPath) ? fs.readFileSync(tradesPath, 'utf8') : '';
+  const rawHoldingRows = parseHoldingsTable(holdingsText);
+  const costBasisEnriched = enrichHoldings({
+    holdingRows: rawHoldingRows,
+    tradesText: tradesTextForCostBasis,
+    approvedInstruments,
+  });
   const blockers = safetyDiagnostics?.blockers || [];
   const tradeStateSummary = summarizeTradeStateRows(tradesPath);
   const blockedTradeRows = listBlockedTradeRows(tradesPath);
@@ -550,6 +561,28 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
             : null,
         };
       })(),
+    },
+    profitLoss: {
+      // Per-instrument unrealized P/L derived from trades.md filled buys with
+      // IBKR AvgCost fallback. Holdings without any cost-basis row carry null
+      // costBasisChf/unrealizedProfitChf rather than zero so consumers can tell
+      // "no data yet" apart from "flat at break-even".
+      rows: costBasisEnriched.rows.map((row) => ({
+        tickerOrIsin: row.tickerOrIsin,
+        symbol: row.symbol || row.tickerOrIsin,
+        name: row.name,
+        currency: row.currency || null,
+        quantity: Number.isFinite(Number(row.quantity)) ? Number(row.quantity) : null,
+        valueChf: Number.isFinite(Number(row.valueChf)) ? Number(row.valueChf) : null,
+        costBasisCurrency: row.costBasisCurrency,
+        costBasisNative: row.costBasisNative,
+        costBasisChf: row.costBasisChf,
+        costBasisSource: row.costBasisSource,
+        avgBuyPrice: row.avgBuyPrice,
+        unrealizedProfitChf: row.unrealizedProfitChf,
+        unrealizedProfitPct: row.unrealizedProfitPct,
+      })),
+      totals: costBasisEnriched.totals,
     },
     approvals: {
       proposedCount: Number(lifecycleSummary?.proposed || 0),

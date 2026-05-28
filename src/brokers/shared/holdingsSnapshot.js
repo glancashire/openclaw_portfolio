@@ -2,9 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const { readApprovedInstruments } = require('../../analysis/approvedInstruments');
 
+function resolvedFxToChf(holding) {
+  const explicit = Number(holding?.fxRateToChf);
+  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  const hint = Number(holding?.matchedFxToChfHint);
+  if (Number.isFinite(hint) && hint > 0) return hint;
+  return String(holding?.currency || 'CHF').toUpperCase() === 'CHF' ? 1 : null;
+}
+
+function resolvedValueChf(holding) {
+  const fx = resolvedFxToChf(holding);
+  const nativeValue = Number(holding?.marketValueNative ?? holding?.marketValue ?? 0);
+  if (Number.isFinite(nativeValue) && Number.isFinite(fx) && fx > 0) {
+    return Number((nativeValue * fx).toFixed(8));
+  }
+  return Number(holding?.marketValue || 0);
+}
+
 function formatHoldingRow(holding) {
-  const fx = holding.currency === 'CHF' ? 1 : '';
-  return `| ${holding.isin || holding.identifier || holding.ticker || ''} | ${holding.name || ''} | ${holding.assetClass || 'Unknown'} | ${holding.quantity || 0} | ${formatHoldingPrice(holding)} | ${holding.currency || 'CHF'} | ${fx} | ${holding.marketValue || 0} | ${holding.allocation || 0} | ${holding.target || 0} | ${holding.drift || 0} |`;
+  const fx = resolvedFxToChf(holding);
+  return `| ${holding.isin || holding.identifier || holding.ticker || ''} | ${holding.name || ''} | ${holding.assetClass || 'Unknown'} | ${holding.quantity || 0} | ${formatHoldingPrice(holding)} | ${holding.currency || 'CHF'} | ${fx ?? ''} | ${resolvedValueChf(holding)} | ${holding.allocation || 0} | ${holding.target || 0} | ${holding.drift || 0} |`;
 }
 
 function formatHoldingPrice(holding) {
@@ -73,29 +90,63 @@ function writeHoldingsSnapshot({ portfolioDir, holdings = [], cashChf = 0, cashB
       ...norm,
       assetClass: matched?.assetClass || holding.assetClass || norm.assetClass || 'Unknown',
       matchedApprovedInstrument: matched?.tickerOrIsin || null,
+      matchedFxToChfHint: matched?.fxToChfHint ?? null,
       unmatchedIgnorable: matched ? false : isIgnorableUnmatchedHolding(norm),
     };
   });
 
-  const invested = normalized.reduce((sum, holding) => sum + Number(holding.marketValue || 0), 0);
-  const hasTrustedPortfolioCash = Number.isFinite(Number(portfolioCashChf));
-  const effectivePortfolioCashChf = hasTrustedPortfolioCash ? Number(portfolioCashChf) : null;
-  const effectivePortfolioCashBasis = hasTrustedPortfolioCash ? (portfolioCashBasis || 'portfolio_override') : (portfolioCashBasis || 'unknown_untrusted');
-  const total = hasTrustedPortfolioCash ? (invested + effectivePortfolioCashChf) : invested;
-  const rows = normalized.length ? normalized.map((holding) => formatHoldingRow(holding)).join('\n') : '';
-  const blockingUnmatched = normalized.filter((h) => h.assetClass === 'Unknown' && !h.unmatchedIgnorable);
-  const allMatched = blockingUnmatched.length === 0;
-  const fallbackCount = normalized.filter((holding) => holding.priceBasis === 'avg_cost_fallback').length;
-  const marketSnapshotCount = normalized.filter((holding) => holding.priceBasis === 'market_snapshot').length;
+  const invested = normalized.reduce((sum, holding) => sum + resolvedValueChf(holding), 0);
+  const total = invested + Number(cashChf || 0);
+  const unmatched = normalized.filter((holding) => !holding.matchedApprovedInstrument && !holding.unmatchedIgnorable);
 
-  const cashDetailLine = cashDetail && typeof cashDetail === 'object'
-    ? `\n- Cash detail (CHF ledger tags): ${Object.entries(cashDetail).filter(([, value]) => Number.isFinite(value)).map(([key, value]) => `${key}=${value}`).join(', ') || 'none'}`
-    : '';
+  const warnings = [
+    'Instrument-level target mapping is not implemented yet.',
+    'All holdings use broker market snapshot pricing or CHF cash.',
+    'Portfolio cash is marked unknown unless sourced from a trusted portfolio-local accounting path.',
+    'Portfolio cash and broker account cash may differ when the portfolio is only one sleeve of a larger broker account.',
+  ];
+  if (normalized.some((holding) => String(holding.currency || 'CHF').toUpperCase() !== 'CHF')) {
+    warnings.push('Non-CHF holdings are converted to CHF in this report using approved-instrument fx_to_chf hints until a richer broker FX feed is threaded into the sync path.');
+  }
 
-  const content = `# Holdings: ${path.basename(portfolioDir)}\n\n## Last Sync\n- Date/time: ${new Date().toISOString().replace('T', ' ').slice(0, 19)}\n- Source: ${source}\n- Broker: ${broker}\n- Base currency: CHF\n- Total value CHF: ${total}\n- Portfolio cash CHF: ${hasTrustedPortfolioCash ? effectivePortfolioCashChf : 'unknown'}\n- Portfolio cash basis: ${effectivePortfolioCashBasis}\n- Broker account cash CHF: ${cashChf}\n- Broker account cash basis: ${cashBasis}\n- Invested value CHF: ${invested}\n\n## Current Holdings\n| Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | Allocation % | Target % | Drift % |\n|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|\n${rows}\n\n## Cash\n| Scope | Currency | Amount | FX rate to CHF | Value CHF | Basis |\n|---|---|---:|---:|---:|---|\n| Portfolio | CHF | ${hasTrustedPortfolioCash ? effectivePortfolioCashChf : 'unknown'} | ${hasTrustedPortfolioCash ? '1' : 'n/a'} | ${hasTrustedPortfolioCash ? effectivePortfolioCashChf : 'unknown'} | ${effectivePortfolioCashBasis} |\n| Broker account | CHF | ${cashChf} | 1 | ${cashChf} | ${cashBasis} |\n\n## Data Quality\n- All holdings matched to approved instruments: ${allMatched ? 'yes' : 'no'}\n- Unmatched holdings: ${allMatched ? 'none' : blockingUnmatched.map((holding) => holding.ticker || holding.isin || holding.identifier || holding.name || 'unknown').join(', ')}\n- Pricing source: ${source}\n- Holdings using market snapshot pricing: ${marketSnapshotCount}\n- Holdings using avg-cost fallback pricing: ${fallbackCount}\n- Warnings:\n - ${normalized.length ? 'Instrument-level target mapping is not implemented yet.' : 'No holdings yet.'}\n - ${fallbackCount > 0 ? 'Some holdings are shown with avg-cost fallback rather than broker market snapshot pricing.' : 'All holdings use broker market snapshot pricing or CHF cash.'}\n - Portfolio cash is marked unknown unless sourced from a trusted portfolio-local accounting path.\n - Portfolio cash and broker account cash may differ when the portfolio is only one sleeve of a larger broker account.${cashDetailLine}\n`;
+  const content = `# Holdings: ${path.basename(portfolioDir)}
+
+## Last Sync
+- Date/time: ${new Date().toISOString().slice(0, 19).replace('T', ' ')}
+- Source: ${source}
+- Broker: ${broker}
+- Base currency: CHF
+- Total value CHF: ${total}
+- Portfolio cash CHF: ${portfolioCashChf == null ? 0 : portfolioCashChf}
+- Portfolio cash basis: ${portfolioCashBasis || 'unknown'}
+- Broker account cash CHF: ${cashChf}
+- Broker account cash basis: ${cashBasis}
+- Invested value CHF: ${invested}
+
+## Current Holdings
+| Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | Allocation % | Target % | Drift % |
+|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|
+${normalized.map(formatHoldingRow).join('\n')}
+
+## Cash
+| Scope | Currency | Amount | FX rate to CHF | Value CHF | Basis |
+|---|---|---:|---:|---:|---|
+| Portfolio | CHF | ${portfolioCashChf == null ? 0 : portfolioCashChf} | 1 | ${portfolioCashChf == null ? 0 : portfolioCashChf} | ${portfolioCashBasis || 'unknown'} |
+| Broker account | CHF | ${cashChf} | 1 | ${cashChf} | ${cashBasis} |
+
+## Data Quality
+- All holdings matched to approved instruments: ${unmatched.length ? 'no' : 'yes'}
+- Unmatched holdings: ${unmatched.length ? unmatched.map((h) => h.ticker || h.identifier || h.name).join(', ') : 'none'}
+- Pricing source: ${source}
+- Holdings using market snapshot pricing: ${normalized.filter((h) => h.priceBasis === 'market_snapshot').length}
+- Holdings using avg-cost fallback pricing: ${normalized.filter((h) => h.priceBasis === 'avg_cost_fallback').length}
+- Warnings:
+${warnings.map((item) => ` - ${item}`).join('\n')}
+${cashDetail ? `- Cash detail (CHF ledger tags): ${Object.entries(cashDetail).map(([key, value]) => `${key}=${value}`).join(', ')}` : ''}
+`;
 
   fs.writeFileSync(outPath, content);
-  return { outPath, total, invested, cashChf, portfolioCashChf: effectivePortfolioCashChf, count: normalized.length };
+  return { outPath, total, invested, cashChf, portfolioCashChf, count: normalized.length };
 }
 
-module.exports = { writeHoldingsSnapshot };
+module.exports = { writeHoldingsSnapshot, formatHoldingRow };

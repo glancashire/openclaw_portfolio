@@ -80,26 +80,77 @@ function renderSparklineCard(portfolioDir) {
 }
 
 function renderAllocationCard(summary = {}) {
-  const rows = (summary.allocation || []).map((row) => [
-    escapeHtml(row.assetClass || '—'),
-    escapeHtml(formatPercent(row.currentPct || 0)),
-    escapeHtml(formatPercent(row.targetPct || 0)),
-    escapeHtml(formatPercent(row.driftPct || 0)),
-    escapeHtml(row.status || 'unknown'),
-  ]);
+  // P2 rework: de-emphasize drift to a tight 3-line summary, but keep the
+  // card structurally present even when allocation data is unavailable so the
+  // digest layout and tests remain stable.
+  const rows = Array.isArray(summary.allocation) ? summary.allocation : [];
+  const offTrack = rows.filter((r) => String(r.status || '').toLowerCase() !== 'on_track');
+  const worst = [...rows]
+    .map((r) => ({ ...r, absDrift: Math.abs(Number(r.driftPct || 0)) }))
+    .sort((a, b) => b.absDrift - a.absDrift)[0];
+  const lines = rows.length
+    ? [
+        `${rows.length} sleeve(s) tracked; ${offTrack.length} off-track.`,
+        worst ? `Largest drift: ${escapeHtml(worst.assetClass || '—')} at ${formatPercent(worst.driftPct || 0)} (status ${escapeHtml(worst.status || 'unknown')}).` : '',
+        offTrack.length
+          ? `Off-track sleeves: ${offTrack.map((r) => `${escapeHtml(r.assetClass || '—')} (${formatPercent(r.driftPct || 0)})`).join(', ')}.`
+          : 'All sleeves currently within band.',
+      ].filter(Boolean)
+    : ['No allocation data available yet.'];
   return card({
-    title: 'Allocation drift',
+    title: 'Allocation drift (summary)',
     tone: 'surface',
-    contentHtml: dataTable({
-      columns: [
-        { label: 'Sleeve' },
-        { label: 'Current', align: 'right' },
-        { label: 'Target', align: 'right' },
-        { label: 'Drift', align: 'right' },
-        { label: 'Status' },
-      ],
-      rows,
-    }),
+    contentHtml: `<div style="font-size:13px;line-height:1.6;color:#374151;">${lines.map((l) => `<div>${l}</div>`).join('')}</div>`,
+  });
+}
+
+function renderProfitLossCard(summary = {}) {
+  const pl = summary.profitLoss || {};
+  const rows = Array.isArray(pl.rows) ? pl.rows : [];
+  const totals = pl.totals || {};
+  if (!rows.length && totals.totalProfitChf == null) return '';
+  const visibleRows = rows.filter((r) => Number(r.valueChf || 0) > 0);
+  const totalValueChf = visibleRows.reduce((s, r) => s + (Number(r.valueChf) || 0), 0)
+    + Number(summary.holdings?.cashChf || 0);
+  const tableRows = visibleRows.map((r) => {
+    const profit = r.unrealizedProfitChf;
+    const profitPct = r.unrealizedProfitPct;
+    const profitColor = profit == null ? '#6b7280' : profit >= 0 ? '#0f766e' : '#991b1b';
+    const profitCell = profit == null
+      ? '<span style="color:#6b7280;">—</span>'
+      : `<span style="color:${profitColor};font-weight:600;">${formatCurrency(profit, 'CHF')}${profitPct != null ? ` (${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}</span>`;
+    return [
+      escapeHtml(r.name || r.symbol || r.tickerOrIsin || '—'),
+      escapeHtml(formatCurrency(r.valueChf, 'CHF')),
+      escapeHtml(r.costBasisChf == null ? '—' : formatCurrency(r.costBasisChf, 'CHF')),
+      profitCell,
+    ];
+  });
+  const totalProfitChf = Number(totals.totalProfitChf || 0);
+  const totalProfitPct = totals.totalProfitPct;
+  const headlineColor = totalProfitChf >= 0 ? '#0f766e' : '#991b1b';
+  const coverageLine = `Cost-basis coverage: ${totals.coveredCount || 0}/${rows.length} holdings (trades.md preferred; IBKR avg cost fallback). Holdings without cost basis show —.`;
+  return card({
+    title: 'Profit / Loss',
+    tone: 'surface',
+    contentHtml: `
+      <div style="font-size:15px;line-height:1.5;color:#0f172a;margin-bottom:8px;">
+        <strong>Total portfolio value (incl. cash):</strong> ${escapeHtml(formatCurrency(totalValueChf, 'CHF'))}
+      </div>
+      <div style="font-size:15px;line-height:1.5;color:${headlineColor};margin-bottom:10px;font-weight:600;">
+        Unrealized profit: ${escapeHtml(formatCurrency(totalProfitChf, 'CHF'))}${totalProfitPct != null ? ` (${totalProfitPct >= 0 ? '+' : ''}${Number(totalProfitPct).toFixed(2)}%)` : ''}
+      </div>
+      ${dataTable({
+        columns: [
+          { label: 'Instrument' },
+          { label: 'Value', align: 'right' },
+          { label: 'Cost basis', align: 'right' },
+          { label: 'Profit', align: 'right' },
+        ],
+        rows: tableRows,
+      })}
+      <div style="margin-top:10px;font-size:12px;color:#6b7280;">${escapeHtml(coverageLine)}</div>
+    `,
   });
 }
 
@@ -275,8 +326,12 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
       return null;
     }
   })();
+  const profitTotalsForMetric = summary.profitLoss?.totals || {};
+  const profitDetail = profitTotalsForMetric.totalProfitChf != null
+    ? `Profit ${formatCurrency(profitTotalsForMetric.totalProfitChf, 'CHF')}${profitTotalsForMetric.totalProfitPct != null ? ` (${profitTotalsForMetric.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotalsForMetric.totalProfitPct).toFixed(2)}%)` : ''}`
+    : (summary.holdings?.lastSyncAt ? `Last sync ${summary.holdings.lastSyncAt}` : null);
   const metrics = [
-    { label: 'Portfolio value', value: formatCurrency(summary.holdings?.totalValueChf, 'CHF'), detail: summary.holdings?.lastSyncAt ? `Last sync ${summary.holdings.lastSyncAt}` : null },
+    { label: 'Portfolio value', value: formatCurrency(summary.holdings?.totalValueChf, 'CHF'), detail: profitDetail },
     { label: 'Cash', value: formatCurrency(summary.holdings?.cashChf, 'CHF'), detail: `Base ${summary.holdings?.baseCurrency || 'CHF'}` },
     { label: 'Pending approvals', value: String(summary.approvals?.pendingApprovalCount || 0), detail: `${summary.approvals?.staleApprovalCount || 0} stale` },
     { label: 'Operator queue', value: String(summary.operatorQueue?.summary?.total || 0), detail: `${summary.blockers?.count || 0} blocker(s)` },
@@ -295,11 +350,13 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
       `,
     }),
     renderSparklineCard(portfolioDir),
+    renderProfitLossCard(summary),
+    renderAllocationCard(summary),
     tryRender(() => {
+      // Drift vs target detail kept but moved below profit/loss; AI narrative still attached.
       if (!rebalanceContext) return '';
       return renderRebalanceSnapshotCard(rebalanceContext.plan) + renderAiAssessmentCard(rebalanceContext.assessment);
     }),
-    renderAllocationCard(summary),
     renderInstrumentHealthCard(summary),
     renderCronHealthCard(resolvedCronHealth),
     renderWorkflowCard(summary, deliveryStatus),
@@ -308,20 +365,34 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
   const html = page({
     eyebrow: 'OpenClaw Portfolio Digest',
     title: `${portfolioName} ${String(frequency).toLowerCase() === 'weekly' ? 'weekly' : 'daily'} portfolio digest`,
-    subtitle: 'A tighter operational snapshot: value, drift, health, cron posture, and what needs attention next.',
+    subtitle: 'Profit/loss, value, health, cron posture, and what needs attention next.',
     accent: '#0f172a',
     bodyHtml,
     footer: 'OpenClaw Portfolio Manager • Digest email',
   });
 
+  const profitTotals = summary.profitLoss?.totals || {};
+  const profitRows = Array.isArray(summary.profitLoss?.rows) ? summary.profitLoss.rows.filter((r) => Number(r.valueChf || 0) > 0) : [];
+  const totalValueInclCashChf = profitRows.reduce((s, r) => s + (Number(r.valueChf) || 0), 0)
+    + Number(summary.holdings?.cashChf || 0);
   const textSections = [
     `${portfolioName} ${frequency} portfolio digest`,
     '',
-    `Portfolio value: ${formatCurrency(summary.holdings?.totalValueChf, 'CHF')}`,
+    `Portfolio value (incl cash): ${formatCurrency(totalValueInclCashChf, 'CHF')}`,
     `Cash: ${formatCurrency(summary.holdings?.cashChf, 'CHF')}`,
+    `Unrealized profit: ${formatCurrency(profitTotals.totalProfitChf, 'CHF')}${profitTotals.totalProfitPct != null ? ` (${profitTotals.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotals.totalProfitPct).toFixed(2)}%)` : ''}`,
     `Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}`,
     `Operator queue: ${summary.operatorQueue?.summary?.total || 0}`,
     `Cron health: ${resolvedCronHealth.healthy || 0}/${resolvedCronHealth.total || 0} healthy, ${resolvedCronHealth.failing || 0} failing`,
+    '',
+    'Holdings (value / profit)',
+    ...profitRows.map((r) => {
+      const name = r.name || r.symbol || r.tickerOrIsin || '?';
+      const value = formatCurrency(r.valueChf, 'CHF');
+      const profit = r.unrealizedProfitChf == null ? '—' : formatCurrency(r.unrealizedProfitChf, 'CHF');
+      const profitPct = r.unrealizedProfitPct == null ? '' : ` (${r.unrealizedProfitPct >= 0 ? '+' : ''}${Number(r.unrealizedProfitPct).toFixed(2)}%)`;
+      return `- ${name}: ${value}  P/L ${profit}${profitPct}`;
+    }),
     '',
     'Open issues / next actions',
     ...((summary.pendingActions || []).slice(0, 8).map((item) => `- ${item}`)),

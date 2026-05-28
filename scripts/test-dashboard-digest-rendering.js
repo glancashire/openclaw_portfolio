@@ -48,7 +48,8 @@ function seed(repoRoot) {
   assert(digest.html.includes('OpenClaw Portfolio Digest'));
   assert(digest.html.includes('Digest summary'));
   assert(digest.html.includes('Portfolio trend'));
-  assert(digest.html.includes('Allocation drift'));
+  assert(digest.html.includes('Allocation drift (summary)'));
+  assert(digest.html.includes('Profit / Loss'));
   assert(digest.html.includes('Instrument health'));
   assert(digest.html.includes('Cron health'));
   assert(digest.html.includes('Open issues and workflow'));
@@ -57,6 +58,8 @@ function seed(repoRoot) {
   assert(digest.html.includes('display:inline-block;vertical-align:top;width:calc(50% - 10px)'));
   assert(digest.html.includes('health-monitor'));
   assert(digest.text.includes('Cron health: 1/2 healthy, 1 failing'));
+  assert(digest.text.includes('Portfolio value (incl cash):'));
+  assert(digest.text.includes('Unrealized profit:'));
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {
   console.error(error.stack || String(error));
