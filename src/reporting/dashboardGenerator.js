@@ -23,7 +23,7 @@ function parseHoldingsSummary(text) {
   };
   // Prefer the broker-account cash figure because it matches the value already rolled into
   // `Total value CHF` (total = invested + brokerCash). The `Portfolio cash CHF` line is
-  // marked `unknown_untrusted` until a portfolio-local accounting source is wired in, so
+  // marked `broker_reported` until a portfolio-local accounting source is wired in, so
   // surfacing it as the dashboard's cash number falsely shows zero cash. Fall back to the
   // legacy `Cash CHF` label for older holdings snapshots.
   const brokerCash = get('Broker account cash CHF', '');
@@ -169,9 +169,17 @@ function readBlockedTradeQueueItems(tradesPath) {
   if (!tradesPath || !fs.existsSync(tradesPath)) return [];
   const { rows } = readTradesTable(tradesPath);
   const latestBlockedByInstrumentAction = new Map();
+  const now = Date.now();
+  const STALE_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
   for (const row of rows) {
     const blockCode = String(row['Block code'] || '').trim();
     if (!blockCode) continue;
+    // Age out stale execution blocks older than 7 days
+    const dateStr = String(row['Date/time'] || row['Date'] || '').trim();
+    if (dateStr) {
+      const ts = new Date(dateStr).getTime();
+      if (Number.isFinite(ts) && (now - ts) > STALE_AGE_MS) continue;
+    }
     const instrument = String(row['Ticker / ISIN'] || '').trim();
     const action = String(row.Action || '').trim().toLowerCase();
     const key = `${instrument}::${action}`;

@@ -33,6 +33,22 @@ function summarizeContractIntelligence(instruments = []) {
 }
 
 function classifyInstrument(instrument = {}) {
+  // Synthetic instruments (e.g. CASH-CHF cash sleeve) don't have IBKR contract identity
+  // and never will. Mark them ready so they don't surface as contract-intelligence gaps.
+  if (instrument && instrument.tickerOrIsin === 'CASH-CHF') {
+    return {
+      tickerOrIsin: instrument.tickerOrIsin,
+      name: instrument.name || '',
+      currency: instrument.currency || 'CHF',
+      exchange: instrument.exchange || '',
+      ready: true,
+      missingConid: false,
+      missingSymbol: false,
+      missingVenue: false,
+      synthetic: true,
+      identity: { conid: null, symbol: 'CASH-CHF', localSymbol: null, venue: null, venueKey: 'synthetic_cash', isin: null },
+    };
+  }
   const normalized = normalizeContractIntelligence({
     contract: {
       conId: instrument.ibkrConid,

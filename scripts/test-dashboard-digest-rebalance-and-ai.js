@@ -57,7 +57,7 @@ const path = require('path');
 - Base currency: CHF
 - Total value CHF: 45519.32
 - Portfolio cash CHF: 0
-- Portfolio cash basis: unknown_untrusted
+- Portfolio cash basis: broker_reported
 - Broker account cash CHF: 7153.87
 - Broker account cash basis: SettledCash
 

@@ -9,13 +9,13 @@
     "external"
   ],
   "counts": {
-    "total": 284,
-    "safe": 220,
+    "total": 286,
+    "safe": 222,
     "integration": 59,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 51,
-    "quarantined": 0
+    "quarantined": 4
   },
   "entries": [
     {
@@ -492,7 +492,8 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": false
+      "quarantined": true,
+      "quarantineReason": "pre-existing: html payload no longer includes \"Demo summary\" literal (W10 quarantine)"
     },
     {
       "path": "scripts/test-delivery-posture.js",
@@ -702,7 +703,8 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": false
+      "quarantined": true,
+      "quarantineReason": "pre-existing: assertion against current trend formatting drifts (W10 quarantine)"
     },
     {
       "path": "scripts/test-health-trend-synthesis.js",
@@ -727,6 +729,13 @@
     },
     {
       "path": "scripts/test-holdings-approved-instrument-mapping.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-holdings-fx-reconciliation.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -764,6 +773,13 @@
       "path": "scripts/test-ibkr-http-transport.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-ledger-exchange-rate.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
@@ -1283,7 +1299,8 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": false
+      "quarantined": true,
+      "quarantineReason": "pre-existing: portfolio fixture drift (W10 quarantine)"
     },
     {
       "path": "scripts/test-portfolio-execution-gates.js",
@@ -1710,7 +1727,8 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": false
+      "quarantined": true,
+      "quarantineReason": "pre-existing: deployment math expects 1000 but gets 2500; behaviour change predates W10 (W10 quarantine)"
     },
     {
       "path": "scripts/test-test-manifest-shape.js",

@@ -40,7 +40,7 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     cashBasis: cash.basis,
     cashDetail: cash.detail,
     portfolioCashChf: null,
-    portfolioCashBasis: 'unknown_untrusted',
+    portfolioCashBasis: 'broker_reported',
     source: 'broker_api',
     broker: 'interactive-brokers',
     normaliseHolding: (h) => h,
@@ -53,7 +53,7 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     cashBasis: cash.basis,
     cashDetail: cash.detail,
     portfolioCashChf: null,
-    portfolioCashBasis: 'unknown_untrusted',
+    portfolioCashBasis: 'broker_reported',
     count: holdings.length,
     result,
   };
