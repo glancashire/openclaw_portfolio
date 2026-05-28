@@ -32,12 +32,19 @@ const {
   const cancelled = classifyBrokerOutcome({
     orderId: 9002,
     executions: [],
-    completedOrders: [{ symbol: 'SPMCHA', status: 'Cancelled', completedStatus: 'PendingCancel' }],
+    completedOrders: [
+      { orderId: 9991, symbol: 'OTHER', status: 'Cancelled', completedStatus: 'ApiCancelled' },
+      { orderId: 9002, symbol: 'SPMCHA', status: 'Cancelled', completedStatus: 'PendingCancel' },
+    ],
   });
   assert.strictEqual(cancelled.status, 'cancelled');
   assert.strictEqual(cancelled.cancelledReason, 'PendingCancel');
 
-  const unknown = classifyBrokerOutcome({ orderId: 9003, executions: [], completedOrders: [] });
+  const unknown = classifyBrokerOutcome({
+    orderId: 9003,
+    executions: [],
+    completedOrders: [{ orderId: 9002, symbol: 'SPMCHA', status: 'Cancelled', completedStatus: 'PendingCancel' }],
+  });
   assert.strictEqual(unknown.status, 'unknown');
 
   // -------- Integration: reconcile a runs artifact --------
@@ -80,7 +87,7 @@ const {
       { orderId: 9101, shares: 16, price: 691.04, execId: 'x-9101' },
     ],
     completedOrders: [
-      { symbol: 'SPMCHA', status: 'Cancelled' },
+      { orderId: 9102, symbol: 'SPMCHA', status: 'Cancelled', completedStatus: 'Cancelled' },
     ],
     now: new Date('2026-05-22T10:50:00Z'),
   });

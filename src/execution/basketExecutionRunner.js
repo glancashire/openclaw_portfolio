@@ -170,9 +170,20 @@ function classifyBrokerOutcome({ orderId, executions = [], completedOrders = [] 
     };
   }
   const completed = (completedOrders || []).find((row) => {
-    if (!row || !row.symbol) return false;
-    const status = String(row.status || row.completedStatus || '').toLowerCase();
-    return status.includes('cancel');
+    if (!row) return false;
+    const status = String(row.status || row.completedStatus || row.state || '').toLowerCase();
+    if (!status.includes('cancel')) return false;
+    const candidateIds = [
+      row.orderId,
+      row.orderID,
+      row.permId,
+      row.permID,
+      row.brokerOrderId,
+      row.order?.orderId,
+      row.order?.orderID,
+    ].filter((value) => value !== undefined && value !== null && String(value).trim() !== '');
+    if (candidateIds.length === 0) return false;
+    return candidateIds.some((value) => String(value) == idStr);
   });
   if (completed) {
     return {
