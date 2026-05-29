@@ -51,3 +51,12 @@
 | 2026-05-28 | execution_staged | 71649.0496 | 44495.1696 | 0 | 0 | 0 | Transmitted live broker order submitted. |
 | 2026-05-28 | execution_staged | 71863.07036595 | 53762.77036595 | 0 | 0 | 0 | Transmitted live broker order submitted. |
 | 2026-05-28 | end_of_day | 72274.24818472001 | 62729.83818472001 | 0 | 0 | 0 | evening sync snapshot |
+| 2026-05-29 | execution_staged | 93080.35432 | 63535.944319999995 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-29 | execution_staged | 93813.42106065 | 73021.22106065 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-29 | execution_filled | 93481.48378721 | 76847.11378721001 | 0 | 0 | 0 | Broker order 9145 status sync: Filled |
+| 2026-05-29 | execution_filled | 93481.48378721 | 76847.11378721001 | 0 | 0 | 0 | Broker order 9146 status sync: Filled |
+| 2026-05-29 | execution_filled | 93481.48378721 | 76847.11378721001 | 0 | 0 | 0 | Broker order 9147 status sync: Filled |
+| 2026-05-29 | execution_staged | 93481.48378721 | 76847.11378721001 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-29 | execution_staged | 93481.48379702 | 76847.11379702 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-29 | execution_filled | 93858.40225302 | 89156.72225302 | 0 | 0 | 0 | Broker order 9150 status sync: Filled |
+| 2026-05-29 | execution_filled | 93858.40225302 | 89156.72225302 | 0 | 0 | 0 | Broker order 9151 status sync: Filled |

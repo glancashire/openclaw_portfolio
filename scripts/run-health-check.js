@@ -18,6 +18,12 @@ async function main() {
   let emailDelivery = { attempted: false, sent: false, reason: 'email_not_requested' };
 
   if (sendEmail) {
+    // Suppress green health report emails — only send when there are issues
+    const severity = String(report.health?.severity || '').toLowerCase();
+    const healthStatus = String(report.health?.health || '').toLowerCase();
+    if (severity === 'none' || healthStatus === 'healthy' || (report.health?.blockerCount === 0 && severity !== 'high' && severity !== 'critical')) {
+      emailDelivery = { attempted: false, sent: false, reason: 'suppressed_green_health', health: report.health?.health, severity };
+    } else {
     const policy = effectiveDeliveryPolicy(portfolioDir);
     const readiness = emailDeliveryReadiness(policy, { pendingActions: [] });
     if (!readiness.enabled) {
@@ -31,6 +37,7 @@ async function main() {
       const result = await sendEmailMessage({ policy, subject, text, html });
       emailDelivery = { attempted: true, sent: true, result, recipients: readiness.recipients, provider: readiness.provider };
     }
+    } // close green-suppression else
   }
 
   console.log(JSON.stringify({

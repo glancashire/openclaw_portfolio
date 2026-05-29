@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-29T08:41:08.330Z",
+  "generatedAt": "2026-05-29T12:45:05.942Z",
   "portfolio": "acceptance-closure",
   "incidentStatus": "action_required",
   "summary": {
@@ -10,7 +10,7 @@
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "stale",
     "blockerCount": 5,
-    "queueItemCount": 6,
+    "queueItemCount": 7,
     "pendingApprovals": 0,
     "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
     "executionWhy": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
@@ -91,6 +91,14 @@
     },
     {
       "step": 6,
+      "priority": "medium",
+      "title": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+      "action": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "fill_notification_state"
+    },
+    {
+      "step": 7,
       "priority": "medium",
       "title": "Dashboard/report freshness is stale relative to source state.",
       "action": "Review report delivery readiness and clear the pending action.",

@@ -49,7 +49,11 @@
    - Action: Resolve the blocking condition before proceeding.
    - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
    - Source: safety_controls
-6. [medium] Dashboard/report freshness is stale relative to source state.
+6. [medium] 6 reconciled fill(s) were detected after the live window and still need notification backfill review.
+   - Action: Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.
+   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
+   - Source: fill_notification_state
+7. [medium] Dashboard/report freshness is stale relative to source state.
    - Action: Review report delivery readiness and clear the pending action.
    - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
    - Source: delivery_policy

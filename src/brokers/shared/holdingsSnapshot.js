@@ -146,6 +146,18 @@ ${cashDetail ? `- Cash detail (CHF ledger tags): ${Object.entries(cashDetail).ma
 `;
 
   fs.writeFileSync(outPath, content);
+
+  // Write avg-cost sidecar for cost-basis enrichment (keyed by conid and symbol)
+  const avgCostMap = {};
+  for (const h of normalized) {
+    const avgCost = Number(h.avgCost);
+    if (!Number.isFinite(avgCost) || avgCost <= 0) continue;
+    const keys = [h.identifier, h.ticker, h.isin, h.localSymbol].filter(Boolean);
+    for (const k of keys) avgCostMap[String(k).toUpperCase()] = avgCost;
+  }
+  const sidecarPath = path.join(portfolioDir, 'holdings-avg-cost.json');
+  fs.writeFileSync(sidecarPath, JSON.stringify(avgCostMap, null, 2));
+
   return { outPath, total, invested, cashChf, portfolioCashChf, count: normalized.length };
 }
 

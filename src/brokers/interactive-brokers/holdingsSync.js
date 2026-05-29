@@ -63,18 +63,17 @@ async function enrichPositionsWithMarketSnapshot(client, positions = []) {
   const conids = [...new Set(positions.map((row) => row?.conid || row?.contract?.conId).filter(Boolean))];
   if (!conids.length) return positions;
 
-  let snapshots = [];
-  try {
-    snapshots = await client.fetchMarketSnapshot(conids);
-  } catch {
-    return positions;
-  }
-
+  // Fetch snapshots individually so one failure doesn't block the rest
   const snapshotByConid = new Map();
-  for (const row of Array.isArray(snapshots) ? snapshots : []) {
-    const conid = String(row?.conid || row?.conId || '').trim();
-    if (!conid) continue;
-    snapshotByConid.set(conid, row);
+  for (const conid of conids) {
+    try {
+      const snaps = await client.fetchMarketSnapshot([conid]);
+      if (Array.isArray(snaps) && snaps.length > 0) {
+        snapshotByConid.set(String(conid), snaps[0]);
+      }
+    } catch {
+      // Skip conids that fail (e.g. FX helper positions)
+    }
   }
 
   return positions.map((position) => {

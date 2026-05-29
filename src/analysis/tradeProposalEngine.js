@@ -27,23 +27,41 @@ function parseTotalValueChf(holdingsPath) {
 
 function parseCashChf(holdingsPath) {
   const text = readText(holdingsPath);
+
+  // Prefer the broker account cash line (matches the dashboard fix from 2026-05-28)
+  const brokerCashMatch = text.match(/- Broker account cash CHF:\s*(.+)/);
+  if (brokerCashMatch) {
+    return parseNumber(brokerCashMatch[1]);
+  }
+
+  // Fallback: legacy "Cash CHF" summary line
   const summaryMatch = text.match(/- Cash CHF:\s*(.+)/);
   if (summaryMatch) {
     return parseNumber(summaryMatch[1]);
   }
 
+  // Fallback: parse the Cash table — prefer "Broker account" row over "Portfolio" row
   const lines = text.split(/\r?\n/);
   const cashTableStart = lines.findIndex((line) => line.trim() === '## Cash');
   if (cashTableStart !== -1) {
+    let brokerRowValue = null;
+    let anyChfValue = null;
     for (let i = cashTableStart + 1; i < lines.length; i++) {
       const line = lines[i];
       if (line.startsWith('## ')) break;
       if (!line.startsWith('|')) continue;
       const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
-      if ((cells[0] || '').toUpperCase() === 'CHF') {
-        return parseNumber(cells[3] || cells[1] || '0');
+      // New format: Scope | Currency | Amount | FX rate | Value CHF | Basis
+      if (/broker\s*account/i.test(cells[0]) && (cells[1] || '').toUpperCase() === 'CHF') {
+        brokerRowValue = parseNumber(cells[4] || cells[2] || '0');
+      }
+      // Legacy format: first cell is currency
+      if ((cells[0] || '').toUpperCase() === 'CHF' && anyChfValue == null) {
+        anyChfValue = parseNumber(cells[3] || cells[1] || '0');
       }
     }
+    if (brokerRowValue != null && brokerRowValue > 0) return brokerRowValue;
+    if (anyChfValue != null) return anyChfValue;
   }
 
   const cashRow = lines.find((line) => /^\|\s*CHF\s*\|/.test(line) && /\|\s*cash\s*\|?\s*$/i.test(line));

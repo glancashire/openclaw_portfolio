@@ -1,6 +1,6 @@
 # Delivery & Alerting Status
 
-- Generated at: 2026-05-29T08:41:09.103Z
+- Generated at: 2026-05-29T12:45:06.715Z
 - Portfolios: 2
 - All ready: no
 
@@ -16,6 +16,7 @@
 - Ready: no
 - Pending actions:
   - Dashboard/report freshness is stale relative to source state.
+  - 6 reconciled fill(s) still need notification backfill review.
 
 ### etf
 - Delivery mode: email_and_repo
@@ -24,11 +25,11 @@
 - Failure alert mode: local_operator_review
 - Alert targets: dashboard, markdown_report, report_cycle_json
 - Policy override loaded: yes
-- Ready: yes
+- Ready: no
 - Pending actions:
-  - None
+  - 6 reconciled fill(s) still need notification backfill review.
 - Broker block context:
-  - Count: 8
+  - Count: 11
   - Top block: [contract_resolution_failed] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)
   - Reason: Broker rejected the order because the contract identity or venue resolution was not accepted.
   - Next action: Verify conid, symbol, exchange, and primary exchange before retrying.

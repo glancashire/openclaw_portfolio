@@ -6,9 +6,20 @@ const fs = require('fs');
 const path = require('path');
 const { appendTradeEvent, readTradesTable } = require('./tradeState');
 
-function legAlreadyMirrored(rows, brokerOrderId) {
+function legAlreadyMirrored(rows, brokerOrderId, instrument) {
   if (!brokerOrderId) return false;
-  return rows.some((row) => String(row['Broker order id'] || '').trim() === String(brokerOrderId));
+  const orderId = String(brokerOrderId);
+  return rows.some((row) => {
+    const rowOrderId = String(row['Broker order id'] || '').trim();
+    if (rowOrderId !== orderId) return false;
+    // If instrument is provided, also match on ticker/ISIN to avoid false positives
+    // from corrupted rows that share the same stale order ID
+    if (instrument) {
+      const rowTicker = String(row['Ticker / ISIN'] || '').trim().toUpperCase();
+      if (rowTicker && rowTicker !== String(instrument).toUpperCase()) return false;
+    }
+    return true;
+  });
 }
 
 function mirrorBasketRunToTrades({ portfolioDir, runState, now = new Date() }) {
@@ -24,7 +35,7 @@ function mirrorBasketRunToTrades({ portfolioDir, runState, now = new Date() }) {
 
   for (const leg of Object.values(runState.legs || {})) {
     if (!['filled', 'cancelled'].includes(leg.status)) continue;
-    if (legAlreadyMirrored(rows, leg.brokerOrderId)) {
+    if (legAlreadyMirrored(rows, leg.brokerOrderId, leg.instrument)) {
       skipped.push({ brokerOrderId: leg.brokerOrderId, reason: 'already_mirrored' });
       continue;
     }

@@ -9,6 +9,8 @@
 - Broker account reference: U25624150
 - Execution mode: transmitted_live
 - Asset scope: ETF only
+- Total capital deposited CHF: 90000
+- Capital deposit history: 2026-04-27 initial 5000, 2026-05-12 top-up 85000
 
 ## Strategy Summary
 Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad equity exposure with a small Swiss tilt and a defensive CHF cash-like sleeve. Sized for approximately CHF 5000 and designed to stay easy to manage.
@@ -45,16 +47,16 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 ## Approved Instruments
 | Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |
 |---|---|---|---:|---:|---:|---|---|---|
-| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 30 | 25 | 35 | Xetra / SMART | EUR | Preferred operational replacement after UBSPX execution failures; physical replication; validated via native IBKR contract details and live quote path on SXR8; ibkr_symbol=SXR8; ibkr_conid=75776072; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
-| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 17 | 12 | 22 | Xetra / IBKR-supported venue | EUR | Adds continental Europe exposure; preferred UBS issuer; physical replication; ibkr_symbol=EMUAA; ibkr_conid=243939970; fx_to_chf=0.96 |
+| IE00B5BMR087 | iShares Core S&P 500 UCITS ETF USD (Acc) | Global equities | 25 | 20 | 35 | Xetra / SMART | EUR | Preferred operational replacement after UBSPX execution failures; physical replication; validated via native IBKR contract details and live quote path on SXR8; ibkr_symbol=SXR8; ibkr_conid=75776072; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
+| LU0950668870 | UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc | Global equities | 14 | 10 | 20 | Xetra / IBKR-supported venue | EUR | Continental Europe exposure; preferred UBS issuer; physical replication; ibkr_symbol=EMUAA; ibkr_conid=243939970; fx_to_chf=0.96 |
 | CH0032912732 | UBS SLI ETF (SMI gleichgewichtet) | Swiss equities | 9 | 6 | 12 | SIX / EBS | CHF | Swiss large-cap sleeve; equal-weight tilt reduces single-name concentration; live broker contract identity previously surfaced as CHSPI during native placement/reconciliation, so conid truth must win over cosmetic ticker alias drift; physical replication; ibkr_symbol=UBSSLI; ibkr_local_symbol=CHSPI; ibkr_conid=150029461; ibkr_primary_exchange=EBS; fx_to_chf=1 |
 | CH0130595124 | UBS SPI Mid ETF (SPI ohne SMI) | Swiss equities | 11 | 8 | 14 | SIX / EBS | CHF | Swiss mid-cap complement; improves breadth of the Swiss sleeve; physical replication; ibkr_symbol=SPMCHA; ibkr_conid=91639399; ibkr_primary_exchange=EBS; fx_to_chf=1 |
-| LU0950670850 | UBS MSCI United Kingdom UCITS ETF GBP acc | Global equities | 0 | 0 | 0 | EBS / IBKR-supported venue | GBP | Future candidate for UK sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27); ibkr_symbol=UKGBPB; ibkr_conid=136319312; ibkr_primary_exchange=EBS; fx_to_chf=1.15 |
-| IE00B44T3H88 | HSBC MSCI China UCITS ETF USD | Global equities | 0 | 0 | 0 | LSEETF / IBKR-supported venue | USD | Future candidate for China sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27); ibkr_symbol=HMCD; ibkr_conid=83570158; ibkr_primary_exchange=LSEETF; fx_to_chf=0.88 |
-| IE00B5L8K969 | iShares MSCI EM Asia UCITS ETF (Acc) | Global equities | 0 | 0 | 0 | IBIS2 / IBKR-supported venue | EUR | Activated as EUR per operator decision 2026-05-28 (W6 native contract intelligence resolved EUR/IBIS2 listing); physical replication; ibkr_symbol=CEBL; ibkr_conid=78767919; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
+| LU0950670850 | UBS MSCI United Kingdom UCITS ETF GBP acc | Global equities | 7 | 4 | 10 | EBS / IBKR-supported venue | GBP | UK large-cap sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27); ibkr_symbol=UKGBPB; ibkr_conid=136319312; ibkr_primary_exchange=EBS; fx_to_chf=1.15 |
+| IE00B44T3H88 | HSBC MSCI China UCITS ETF USD | Global equities | 5 | 2 | 8 | LSEETF / IBKR-supported venue | USD | China sleeve; physical replication; resolved via W6 native contract intelligence (2026-05-27); ibkr_symbol=HMCD; ibkr_conid=83570158; ibkr_primary_exchange=LSEETF; fx_to_chf=0.88 |
+| IE00B5L8K969 | iShares MSCI EM Asia UCITS ETF (Acc) | Global equities | 8 | 5 | 12 | IBIS2 / IBKR-supported venue | EUR | Broad EM Asia sleeve (India, Korea, Taiwan, ASEAN); physical replication; ibkr_symbol=CEBL; ibkr_conid=78767919; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
 | LU1781541252 | Amundi Core MSCI Japan UCITS ETF Acc | Global equities | 6 | 3 | 9 | IBIS2 / Xetra | EUR | Future candidate for Japan sleeve; physical full replication; accumulating; TER 0.12%; AUM €5.4B; replaced IE00B4L5YX21 (unresolvable on IBKR) per operator decision 2026-05-27; ibkr_symbol=LCUJ; ibkr_conid=311572503; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
-| IE000I8KRLL9 | iShares MSCI Global Semiconductors UCITS ETF USD (Acc) | Global equities | 12 | 8 | 15 | IBIS2 / Xetra | EUR | Future candidate for AI/semiconductor sleeve; low-TER broad semiconductor exposure with likely holdings including NVIDIA, TSMC, and ASML; physical replication; TER 0.35%; AUM ~€4.2B; resolved via IBKR native contract search 2026-05-28; ibkr_symbol=SEC0; ibkr_conid=507487999; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
-| CASH-CHF | CHF cash balance | Bonds / cash-like | 15 | 10 | 20 | IBKR cash balance | CHF | Keep defensive sleeve as cash for now to stay simple at CHF scale. |
+| IE000I8KRLL9 | iShares MSCI Global Semiconductors UCITS ETF USD (Acc) | Global equities | 10 | 6 | 14 | IBIS2 / Xetra | EUR | Semiconductor/AI infrastructure sleeve; low-TER broad semiconductor exposure with NVIDIA, TSMC, ASML; physical replication; TER 0.35%; AUM ~€4.2B; ibkr_symbol=SEC0; ibkr_conid=507487999; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
+| CASH-CHF | CHF cash balance | Bonds / cash-like | 5 | 3 | 10 | IBKR cash balance | CHF | Reduced cash target after Asia/UK deployment; keep minimal reserve. |
 
 ## Candidate Instruments
 | Ticker / ISIN | Region | Theme | Name | TER | Replication | Currency | IBKR status | Notes |

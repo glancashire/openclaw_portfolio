@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-29T08:41:09.099Z",
+  "generatedAt": "2026-05-29T12:45:06.705Z",
   "portfolioCount": 2,
-  "totalValueChf": 92962.38,
+  "totalValueChf": 94598.37,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 6,
+      "pendingActions": 7,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -47,51 +47,51 @@
       "portfolio": "etf",
       "status": "attention_needed",
       "strategyStatus": "rebalance_needed",
-      "totalValueChf": 92962.38376,
-      "cashChf": 29544.41,
-      "investedChf": 63417.97376,
-      "lastSyncAt": "2026-05-29 08:06:23",
-      "latestSnapshotDate": "2026-05-28",
+      "totalValueChf": 94598.36653,
+      "cashChf": 4701.68,
+      "investedChf": 89896.68653,
+      "lastSyncAt": "2026-05-29 12:44:09",
+      "latestSnapshotDate": "2026-05-29",
       "pendingApprovals": 0,
       "blockers": 0,
       "pendingActions": 1,
-      "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
+      "recommendedNextStep": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "blockedTradeCount": 8,
+      "blockedTradeCount": 11,
       "topBrokerBlock": {
         "tickerOrIsin": "CH0032912732",
         "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-        "brokerOrderId": "9140"
+        "brokerOrderId": "9149"
       },
       "driftStatuses": [
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": -12.4
+          "driftPct": 9.48
         },
         {
           "assetClass": "Swiss equities",
           "status": "on_track",
-          "driftPct": -4.38
+          "driftPct": 0.55
         },
         {
           "assetClass": "Bonds / cash-like",
           "status": "out_of_bounds",
-          "driftPct": 16.78
+          "driftPct": -10.03
         }
       ],
       "brokerHealth": "healthy",
       "executionPosture": "ready_for_review",
-      "deliveryPosture": "ready",
+      "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 7,
+    "total": 8,
     "blocking": 5,
     "approvals": 0,
     "execution": 0,
@@ -103,11 +103,11 @@
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 1,
+    "workflow": 2,
     "bySeverity": {
       "high": 5,
-      "medium": 1,
-      "low": 1
+      "medium": 3,
+      "low": 0
     }
   }
 }

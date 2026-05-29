@@ -110,6 +110,17 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
       continue;
     }
 
+    // Pre-flight tick validation: ensure limitPrice conforms to IBKR market rules
+    const { tickForPrice, roundToTick } = require('./basketReproposalBuilder');
+    const expectedTick = tickForPrice(leg.limitPrice);
+    const remainder = Math.abs((leg.limitPrice / expectedTick) % 1);
+    const tickValid = remainder < 1e-9 || Math.abs(remainder - 1) < 1e-9;
+    if (!tickValid) {
+      const corrected = roundToTick(leg.limitPrice, expectedTick);
+      leg.limitPrice = corrected;
+      leg._tickCorrected = true;
+    }
+
     const order = prepareOrderForSubmission({
       identifier: leg.conid || leg.instrument,
       conid: leg.conid || null,

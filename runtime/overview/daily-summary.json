@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-29T08:41:09.100Z",
+  "generatedAt": "2026-05-29T12:45:06.707Z",
   "totals": {
     "portfolioCount": 2,
-    "totalCashChf": 29544.41,
+    "totalCashChf": 4701.68,
     "approvalCount": 0,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
   },
   "healthHeadline": "warning",
-  "cashWaitingToDeployChf": 29544.41,
+  "cashWaitingToDeployChf": 4701.68,
   "biggestDrift": {
     "portfolio": "acceptance-closure",
     "assetClass": "Global equities",
@@ -21,16 +21,16 @@
   "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
   "pendingApprovals": 0,
-  "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
-  "biggestDriftWhy": "Bonds / cash-like is 16.78% over target and outside the allowed band around the 15% target.",
+  "recommendedNextStep": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+  "biggestDriftWhy": "Bonds / cash-like is 10.03% under target and outside the allowed band around the 15% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "attention_needed",
-    "cashChf": 29544.41,
+    "cashChf": 4701.68,
     "brokerHealth": "healthy",
-    "deliveryPosture": "ready",
+    "deliveryPosture": "needs_operator_attention",
     "pendingApprovals": 0,
-    "blockedTradeCount": 8,
+    "blockedTradeCount": 11,
     "topBrokerBlock": {
       "tickerOrIsin": "CH0032912732",
       "name": "UBS SLI ETF (SMI gleichgewichtet)",
@@ -38,7 +38,7 @@
       "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
       "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
     },
-    "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
+    "recommendedNextStep": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
     "whyNow": "Broker rejected the order because the contract identity or venue resolution was not accepted."
   }
 }

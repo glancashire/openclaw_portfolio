@@ -4,13 +4,13 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-29T08:40:53.465Z"
+      "lastAt": "2026-05-29T08:59:23.380Z"
     },
     "portfolio": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-29T08:40:57.472Z"
+      "lastAt": "2026-05-29T09:38:43.768Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -28,13 +28,13 @@
       "consecutive": 1,
       "lastReason": "status_error",
       "lastMessage": "temporary issue",
-      "lastAt": "2026-05-29T08:32:17.165Z"
+      "lastAt": "2026-05-29T08:59:42.977Z"
     },
     "etf": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-28T14:02:07.624Z"
+      "lastAt": "2026-05-29T12:16:06.260Z"
     },
     "dryrun-no-write2-tMfst2": {
       "consecutive": 0,
@@ -82,7 +82,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-28T21:27:41.008Z"
+      "lastAt": "2026-05-29T09:38:28.690Z"
     },
     "execution-safety-closure-hRd2yl": {
       "consecutive": 0,
@@ -167,6 +167,12 @@
       "lastReason": null,
       "lastMessage": null,
       "lastAt": "2026-05-28T21:26:36.033Z"
+    },
+    "execution-safety-closure-n3LnvN": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-05-29T09:37:55.175Z"
     }
   },
   "liveExecutionArms": {

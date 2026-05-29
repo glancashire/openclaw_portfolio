@@ -15,6 +15,8 @@ if (!fs.existsSync(dashPath)) {
 
 const text = fs.readFileSync(dashPath, 'utf8');
 const holdings = fs.existsSync(holdPath) ? fs.readFileSync(holdPath, 'utf8') : '';
+const portPath = path.join(__dirname, '..', 'portfolio', portfolio, 'portfolio.md');
+const portText = fs.existsSync(portPath) ? fs.readFileSync(portPath, 'utf8') : '';
 
 const get = (label, src = text) => {
   const m = src.match(new RegExp(`- ${label}:\\s*(.+)`));
@@ -62,6 +64,11 @@ const profitChf    = num(get('Total unrealized profit CHF'));
 const profitPct    = num(get('Total unrealized profit %'));
 const holdingCount = get('Number of holdings');
 
+// ── Capital deposited (from portfolio.md) ─────────────────────────────────────
+const depositedCapital = num(get('Total capital deposited CHF', portText));
+const trueReturnChf = (total != null && depositedCapital != null) ? total - depositedCapital : null;
+const trueReturnPct = (trueReturnChf != null && depositedCapital > 0) ? (trueReturnChf / depositedCapital) * 100 : null;
+
 // ── Operational details (trailer) ────────────────────────────────────────────
 const health          = get('Portfolio status');
 const broker          = get('Broker health');
@@ -74,14 +81,16 @@ const inFlight        = get('In-flight execution rows');
 const lines = [];
 
 // ── Header: portfolio name + total value + all-time return ───────────────────
-lines.push(`📊 ${portfolio.toUpperCase()} Portfolio — CHF ${fmt(total)}   ${pct(profitPct)} all-time`);
+const headlineReturnPct = trueReturnPct != null ? trueReturnPct : profitPct;
+const headlineReturnChf = trueReturnChf != null ? trueReturnChf : profitChf;
+lines.push(`📊 ${portfolio.toUpperCase()} Portfolio — CHF ${fmt(total)}   ${pct(headlineReturnPct)} all-time`);
 lines.push('');
 
 // ── Performance ───────────────────────────────────────────────────────────────
 lines.push('💰 Performance');
 lines.push(`  Today      ${signed(dailyChf).padStart(10)} CHF  (${pct(dailyPct)})`);
 lines.push(`  This week  ${signed(weeklyChf).padStart(10)} CHF  (${pct(weeklyPct)})`);
-lines.push(`  All-time   ${signed(profitChf).padStart(10)} CHF  (${pct(profitPct)})`);
+lines.push(`  All-time   ${signed(headlineReturnChf).padStart(10)} CHF  (${pct(headlineReturnPct)})`);
 lines.push('');
 
 // ── Holdings by value ─────────────────────────────────────────────────────────

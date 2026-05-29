@@ -541,10 +541,17 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
   const totalValue = Number(summary.totalValue || 0);
   // Cost-basis enrichment for the Profit / Loss section.
   const tradesTextForCostBasis = tradesPath && fs.existsSync(tradesPath) ? fs.readFileSync(tradesPath, 'utf8') : '';
+  // Load avg-cost sidecar for cost-basis enrichment (written by holdings sync)
+  const portfolioDirForSidecar = tradesPath ? path.dirname(tradesPath) : null;
+  const avgCostSidecarPath = portfolioDirForSidecar ? path.join(portfolioDirForSidecar, 'holdings-avg-cost.json') : null;
+  const avgCostByKey = avgCostSidecarPath && fs.existsSync(avgCostSidecarPath)
+    ? (() => { try { return JSON.parse(fs.readFileSync(avgCostSidecarPath, 'utf8')); } catch { return null; } })()
+    : null;
   const costBasis = enrichHoldings({
     holdingRows: parseHoldingsTable(holdingsText),
     tradesText: tradesTextForCostBasis,
     approvedInstruments,
+    avgCostByKey,
   });
 
   // Compact holdings table sorted by value (CHF) descending

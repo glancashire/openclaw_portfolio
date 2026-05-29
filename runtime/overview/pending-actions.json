@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-29T08:41:09.100Z",
-  "itemCount": 7,
+  "generatedAt": "2026-05-29T12:45:06.706Z",
+  "itemCount": 8,
   "queueSummary": {
-    "total": 7,
+    "total": 8,
     "blocking": 5,
     "approvals": 0,
     "execution": 0,
@@ -15,11 +15,11 @@
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 1,
+    "workflow": 2,
     "bySeverity": {
       "high": 5,
-      "medium": 1,
-      "low": 1
+      "medium": 3,
+      "low": 0
     }
   },
   "items": [
@@ -97,15 +97,27 @@
     },
     {
       "rank": 7,
-      "queueType": "workflow",
-      "portfolio": "etf",
-      "kind": "workflow",
-      "severity": "low",
-      "status": "recommended",
-      "summary": "Review current allocation versus strategic targets before generating any fresh live basket.",
+      "queueType": "backfill_review",
+      "portfolio": "acceptance-closure",
+      "kind": "delivery",
+      "severity": "medium",
+      "status": "backfill_review",
+      "summary": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
       "blocking": false,
-      "recommendedOperatorAction": "Review current allocation versus strategic targets before generating any fresh live basket.",
-      "source": "recommendation_engine"
+      "recommendedOperatorAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
+      "source": "fill_notification_state"
+    },
+    {
+      "rank": 8,
+      "queueType": "backfill_review",
+      "portfolio": "etf",
+      "kind": "delivery",
+      "severity": "medium",
+      "status": "backfill_review",
+      "summary": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+      "blocking": false,
+      "recommendedOperatorAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
+      "source": "fill_notification_state"
     }
   ]
 }

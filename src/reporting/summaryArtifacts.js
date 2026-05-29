@@ -500,6 +500,51 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
     lifecycleSummary,
   }));
   const materialEvents = buildMaterialEvents(recentEvents);
+function buildGrowthSummary(allocations = []) {
+  if (!allocations.length) return 'No allocation data available to assess balance.';
+  const onTrack = allocations.filter((row) => row.status === 'on_track').length;
+  const watching = allocations.filter((row) => row.status === 'drifted').length;
+  const needsAction = allocations.filter((row) => row.status === 'out_of_bounds').length;
+  if (needsAction > 0) {
+    const worst = allocations
+      .filter((row) => row.status === 'out_of_bounds')
+      .sort((a, b) => Math.abs(Number(b.drift || 0)) - Math.abs(Number(a.drift || 0)))[0];
+    if (worst) {
+      const dir = Number(worst.drift || 0) < 0 ? 'under target' : 'over target';
+      return `${worst.assetClass} is ${Math.abs(Number(worst.drift || 0)).toFixed(1)}% ${dir} and outside the allowed band around the ${Number(worst.target || 0).toFixed(0)}% target — rebalance recommended.`;
+    }
+    return `${needsAction} sleeve(s) need rebalancing.`;
+  }
+  if (watching > 0) {
+    const mostWatched = allocations
+      .filter((row) => row.status === 'drifted')
+      .sort((a, b) => Math.abs(Number(b.drift || 0)) - Math.abs(Number(a.drift || 0)))[0];
+    if (mostWatched) {
+      const dir = Number(mostWatched.drift || 0) < 0 ? 'below' : 'above';
+      return `${mostWatched.assetClass} is ${Math.abs(Number(mostWatched.drift || 0)).toFixed(1)}% ${dir} its ${Number(mostWatched.target || 0).toFixed(0)}% target — watching.`;
+    }
+    return `${watching} sleeve(s) are slightly off target and worth monitoring.`;
+  }
+  return `All ${onTrack} sleeve(s) are close to their targets — the portfolio is balanced.`;
+}
+
+function buildDeploymentOpportunity(holdingsText = '', totalValue = 0) {
+  const summary = parseHoldingsSummary(holdingsText);
+  const cash = Number(summary.cash || 0);
+  const invested = Number(summary.invested || 0);
+  const cashPct = totalValue > 0 ? (cash / totalValue) * 100 : 0;
+  if (cashPct > 20) {
+    return `CHF ${cash.toLocaleString('de-CH')} cash (${cashPct.toFixed(1)}% of portfolio) is sitting idle — consider deploying it.`;
+  }
+  if (cashPct > 10) {
+    return `CHF ${cash.toLocaleString('de-CH')} cash (${cashPct.toFixed(1)}%) has room for deployment.`;
+  }
+  if (cash > 0) {
+    return `A small cash position of CHF ${cash.toLocaleString('de-CH')} is in place.`;
+  }
+  return 'All capital is deployed — no idle cash to put to work.';
+}
+
   const explanationSummary = {
     biggestDrift: allocations.length
       ? explainAllocationRow(allocations.slice().sort((a, b) => Math.abs(Number(b.drift || 0)) - Math.abs(Number(a.drift || 0)))[0])
@@ -507,6 +552,8 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
     noTradePosture: explainNoTradePosture({ latestProposals, brokerReadiness, lifecycleSummary, freshness }),
     executionBlock: explainExecutionBlock({ brokerReadiness, freshness, blockers, lifecycleSummary }),
     approvalBacklog: explainApprovalBacklog(lifecycleSummary, tradeStateSummary, staleApprovals),
+    growthSummary: buildGrowthSummary(allocations),
+    deploymentOpportunity: buildDeploymentOpportunity(holdingsText, totalValue),
   };
 
   const operatorQueueSummary = summarizeOperatorQueue(pendingActions);
@@ -930,14 +977,15 @@ function renderPortfolioSummaryHtml(summary = {}) {
     : '<li>No recent material events.</li>';
 
   const whyList = [
-    `Drift: ${summary.explanations?.biggestDrift || 'No drift explanation available.'}`,
+    `Balance: ${summary.explanations?.growthSummary || summary.explanations?.biggestDrift || 'No balance explanation available.'}`,
+    `Deployment: ${summary.explanations?.deploymentOpportunity || 'No deployment opportunity signal available.'}`,
     `Execution: ${summary.explanations?.executionBlock || 'No execution explanation available.'}`,
     `Approvals: ${summary.explanations?.approvalBacklog || 'No approval explanation available.'}`,
-    `Trade posture: ${summary.explanations?.noTradePosture || 'No trade-posture explanation available.'}`,
   ].map((line) => `<li>${escapeHtml(line)}</li>`).join('');
 
-  const holdingRowsHtml = holdingRows.length
-    ? holdingRows.map((row) => `<tr><td>${escapeHtml(row.tickerOrIsin || '—')}</td><td>${escapeHtml(row.name || '—')}</td><td>${escapeHtml(row.assetClass || '—')}</td><td class="num">${Number(row.quantity || 0).toLocaleString('en-US', { maximumFractionDigits: 6 })}</td><td class="num">CHF ${Number(row.price || 0).toFixed(2)}</td><td class="num">CHF ${Number(row.valueChf || 0).toFixed(2)}</td></tr>`).join('')
+  const sortedHoldingRows = [...holdingRows].sort((a, b) => (Number(b.valueChf) || 0) - (Number(a.valueChf) || 0));
+  const holdingRowsHtml = sortedHoldingRows.length
+    ? sortedHoldingRows.map((row) => `<tr><td>${escapeHtml(row.tickerOrIsin || '—')}</td><td>${escapeHtml(row.name || '—')}</td><td>${escapeHtml(row.assetClass || '—')}</td><td class="num">${Number(row.quantity || 0).toLocaleString('en-US', { maximumFractionDigits: 6 })}</td><td class="num">CHF ${Number(row.price || 0).toFixed(2)}</td><td class="num">CHF ${Number(row.valueChf || 0).toFixed(2)}</td></tr>`).join('')
     : '<tr><td colspan="6">No effective holdings rows available.</td></tr>';
 
   return `<!doctype html>
@@ -1032,7 +1080,7 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
     <section class="card panel-6"><h2>Execution Posture</h2><ul><li>Proposed trades: ${summary.approvals?.proposedCount || 0}</li><li>Approved trades: ${summary.approvals?.approvedCount || 0}</li><li>Fresh actionable approvals: ${summary.approvals?.freshApprovedCount || 0}</li><li>Stale approvals needing reapproval: ${summary.approvals?.staleApprovalCount || 0}</li><li>Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}</li><li>Queued for open runner: ${summary.execution?.tradeState?.queuedForOpenRunner || 0}</li><li>Queued retries: ${summary.execution?.openRunnerRetryState?.queuedRetry || 0}</li><li>Blocked rows: ${summary.execution?.tradeState?.blocked || 0}</li><li>In-flight rows: ${summary.execution?.inFlightCount || 0}</li><li>Failed rows: ${summary.execution?.failedCount || 0}</li></ul></section>
     <section class="card panel-6"><h2>Observability Status</h2><ul><li>Runtime event file present: ${summary.observability?.eventsPresent ? 'yes' : 'no'}</li><li>Recent runtime events scanned: ${summary.observability?.recentSummary?.total || 0}</li><li>Blocked execution-policy events: ${summary.observability?.recentSummary?.blockedTrades || 0}</li><li>Open-runner first handoff events: ${summary.observability?.recentSummary?.openRunnerQueueEvents || 0}</li><li>Open-runner retry events: ${summary.observability?.recentSummary?.openRunnerRetryEvents || 0}</li><li>Degraded broker events: ${summary.observability?.recentSummary?.degradedBrokerEvents || 0}</li><li>Stale-data events: ${summary.observability?.recentSummary?.staleDataEvents || 0}</li></ul></section>
     <section class="card panel-12"><h2>Recommended Next Step</h2><p>${escapeHtml(summary.recommendedNextStep || 'No recommendation available.')}</p></section>
-    <section class="card panel-12"><h2>Allocation health</h2><div class="table-wrap"><table><thead><tr><th>Asset class</th><th class="num">Current %</th><th class="num">Target %</th><th class="num">Drift %</th><th>Status</th></tr></thead><tbody>${allocationTable}</tbody></table></div></section>
+    <section class="card panel-12"><h2>Balance check</h2><div class="table-wrap"><table><thead><tr><th>Asset class</th><th class="num">Current %</th><th class="num">Target %</th><th class="num">Drift %</th><th>Status</th></tr></thead><tbody>${allocationTable}</tbody></table></div></section>
     <section class="card panel-12"><h2>Contract Intelligence Readiness</h2><p>${escapeHtml(summary.contractIntelligence?.summaryLine || 'No contract-intelligence summary available.')}</p><p class="list-subtle">Recommended contract-intelligence action: ${escapeHtml(summary.contractIntelligence?.nextAction || 'No contract-intelligence remediation suggested.')}</p></section>
   </div>
 </div>

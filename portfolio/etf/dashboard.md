@@ -1,80 +1,86 @@
 # Dashboard: etf
 ## Portfolio Value Snapshot
-- Total value CHF: 92962.38376
-- Cash CHF: 29544.41
-- Invested CHF: 63417.97376
+- Total value CHF: 94598.36653
+- Cash CHF: 4701.68
+- Invested CHF: 89896.68653
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
 - Since last report %: 0
-- Number of holdings: 6
-- Latest snapshot date: 2026-05-28
-- Total unrealized profit CHF: 765.64
-- Total unrealized profit %: 1.41
-- Cost-basis coverage: 5/6 holdings (CHF 55097.97 of position value)
+- Number of holdings: 9
+- Latest snapshot date: 2026-05-29
+- Total unrealized profit CHF: 1120.59
+- Total unrealized profit %: 1.26
+- Cost-basis coverage: 9/9 holdings (CHF 89896.69 of position value)
 
 ## Profit / Loss
-- Total unrealized profit CHF: 765.64
-- Total cost basis CHF (covered holdings only): 54332.33
-- Total unrealized profit %: 1.41%
+- Total unrealized profit CHF: 1120.59
+- Total cost basis CHF (covered holdings only): 88776.1
+- Total unrealized profit %: 1.26%
 - Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 
 | Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
 |---|---:|---:|---:|---:|---|
-| SPMCHA | 8'320.00 | — (no cost basis yet) | — | — | none |
-| SEC0 | 9'180.94 | 8'961.87 | 219.07 | +2.44% | trades.md |
-| LCUJ | 3'074.37 | 3'032.37 | 42.00 | +1.39% | trades.md |
-| CHSPI | 6'200.08 | 6'156.32 | 43.76 | +0.71% | trades.md |
-| EMUAA | 12'449.89 | 12'218.73 | 231.16 | +1.89% | trades.md |
-| SXR8 | 24'192.69 | 23'963.04 | 229.65 | +0.96% | trades.md |
+| SPMCHA | 8'320.00 | 8'262.29 | 57.71 | +0.70% | IBKR avg cost |
+| UKGBPB | 6'445.56 | 6'447.64 | -2.08 | -0.03% | IBKR avg cost |
+| HMCD | 4'662.07 | 4'667.01 | -4.94 | -0.11% | IBKR avg cost |
+| CEBL | 7'395.70 | 7'430.50 | -34.80 | -0.47% | trades.md |
+| SEC0 | 9'196.94 | 8'967.07 | 229.87 | +2.56% | IBKR avg cost |
+| LCUJ | 5'548.53 | 5'518.94 | 29.59 | +0.54% | IBKR avg cost |
+| CHSPI | 11'120.72 | 11'147.11 | -26.39 | -0.24% | trades.md |
+| EMUAA | 13'033.14 | 12'586.60 | 446.54 | +3.55% | trades.md |
+| SXR8 | 24'174.03 | 23'748.94 | 425.09 | +1.79% | trades.md |
 ## Holdings
 Holdings sorted by CHF value (descending).
 
 | Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
-| SXR8 | 24'192.69 | +229.65 | +0.96% | 26.0% |
-| EMUAA | 12'449.89 | +231.16 | +1.89% | 13.4% |
-| SEC0 | 9'180.94 | +219.07 | +2.44% | 9.9% |
-| SPMCHA | 8'320.00 | — | — | 8.9% |
-| CHSPI | 6'200.08 | +43.76 | +0.71% | 6.7% |
-| LCUJ | 3'074.37 | +42.00 | +1.39% | 3.3% |
+| SXR8 | 24'174.03 | +425.09 | +1.79% | 25.6% |
+| EMUAA | 13'033.14 | +446.54 | +3.55% | 13.8% |
+| CHSPI | 11'120.72 | -26.39 | -0.24% | 11.8% |
+| SEC0 | 9'196.94 | +229.87 | +2.56% | 9.7% |
+| SPMCHA | 8'320.00 | +57.71 | +0.70% | 8.8% |
+| CEBL | 7'395.70 | -34.80 | -0.47% | 7.8% |
+| UKGBPB | 6'445.56 | -2.08 | -0.03% | 6.8% |
+| LCUJ | 5'548.53 | +29.59 | +0.54% | 5.9% |
+| HMCD | 4'662.07 | -4.94 | -0.11% | 4.9% |
 ## Instrument Actions Queue
 Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 
 | Instrument | Current % | Target % | Suggested action | Reason | Approval needed |
 |---|---:|---:|---|---|---|
-| IE00B5BMR087 | 0 | 30 | deploy | Target is 30% — no active buy planned. Cash available for deployment. | watch |
-| LU0950668870 | 0 | 17 | deploy | Target is 17% — no active buy planned. Cash available for deployment. | watch |
+| IE00B5BMR087 | 0 | 25 | deploy | Target is 25% — no active buy planned. Cash available for deployment. | watch |
+| LU0950668870 | 0 | 14 | deploy | Target is 14% — no active buy planned. Cash available for deployment. | watch |
 | CH0032912732 | 0 | 9 | deploy | Target is 9% — no active buy planned. Cash available for deployment. | watch |
 | CH0130595124 | 0 | 11 | deploy | Target is 11% — no active buy planned. Cash available for deployment. | watch |
-| LU0950670850 | 0 | 0 | watch | No active proposal | watch |
-| IE00B44T3H88 | 0 | 0 | watch | No active proposal | watch |
-| IE00B5L8K969 | 0 | 0 | watch | No active proposal | watch |
+| LU0950670850 | 0 | 7 | deploy | Target is 7% — no active buy planned. Cash available for deployment. | watch |
+| IE00B44T3H88 | 0 | 5 | deploy | Target is 5% — no active buy planned. Cash available for deployment. | watch |
+| IE00B5L8K969 | 0 | 8 | deploy | Target is 8% — no active buy planned. Cash available for deployment. | watch |
 | LU1781541252 | 0 | 6 | deploy | Target is 6% — no active buy planned. Cash available for deployment. | watch |
-| IE000I8KRLL9 | 0 | 12 | deploy | Target is 12% — no active buy planned. Cash available for deployment. | watch |
-| CASH-CHF | 2.18 | 15 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| IE000I8KRLL9 | 0 | 10 | deploy | Target is 10% — no active buy planned. Cash available for deployment. | watch |
+| CASH-CHF | 2.14 | 5 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 ## Balance Check
 Allocation drift is tracked as a constraint; see below. All sleeves within target bands is the goal.
 
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 52.6 | 65 | -12.4 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 15.62 | 20 | -4.38 | on_track | no | within tolerance |
-| Bonds / cash-like | 31.78 | 15 | 16.78 | out_of_bounds | yes | outside min/max band |
+| Global equities | 74.48 | 65 | 9.48 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 20.55 | 20 | 0.55 | on_track | no | within tolerance |
+| Bonds / cash-like | 4.97 | 15 | -10.03 | out_of_bounds | yes | outside min/max band |
 ## Pending Operator Actions
-1. [workflow/recommended/low] Portfolio is performing as intended. Hold current positions and review after the next market session.
+1. [delivery/backfill_review/medium] 6 reconciled fill(s) were detected after the live window and still need notification backfill review.
 ## Immediate Status
 - Portfolio status: attention_needed
 - Top blocker: none currently surfaced
-- Next action: Portfolio is performing as intended. Hold current positions and review after the next market session.
+- Next action: 6 reconciled fill(s) were detected after the live window and still need notification backfill review.
 - Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
 - Execution posture: ready_for_review
-- Delivery posture: ready
+- Delivery posture: needs_operator_attention
 - Active blockers: 0
 - Pending operator queue items: 1
 ## Health Snapshot
 - Strategy status: rebalance_needed
-- Last successful sync: 2026-05-29 08:06:23
+- Last successful sync: 2026-05-29 12:44:09
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
@@ -99,29 +105,29 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
 - Recovery items: 0
-- Delivery items: 0
+- Delivery items: 1
 - Data items: 0
 - Warning items: 0
-- Workflow items: 1
+- Workflow items: 0
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-29 08:40:53.265 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
-| 2026-05-29 08:40:52.886 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-29 08:32:47.158 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-05-29 08:32:43.861 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-05-29 08:32:41.245 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-29 09:37:48.922 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-29 09:37:45.639 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-29 09:37:41.045 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-29 09:37:24.661 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-29 09:00:14.243 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
 ## Report / Delivery Status
-- Weekly report: latest history 2026-05-28
+- Weekly report: latest history 2026-05-29
 - Monthly report: email_and_repo
 - Quarterly report: local_operator_review
-- Delivery readiness: ready
+- Delivery readiness: needs_operator_attention
 - Failure alert readiness: local_operator_review
 - Notified fills: 5
-- Reconciled fills pending notification backfill: 0
+- Reconciled fills pending notification backfill: 6
 - Acknowledged backfilled fills: 1
 ## Recommended Next Step
-Portfolio is performing as intended. Hold current positions and review after the next market session.
+6 reconciled fill(s) were detected after the live window and still need notification backfill review.
 ## Status Labels
 - Pending approvals queue count: 0
 - In-flight execution rows: 0
@@ -130,8 +136,9 @@ Portfolio is performing as intended. Hold current positions and review after the
   - Continue normal monitoring and refresh the portfolio workflow after the next material state change.
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 90938.25 unallocated beyond the intentional CHF cash sleeve.
-- Latest history note: evening sync snapshot
+- Whole-share draft sizing leaves CHF 92574.24 unallocated beyond the intentional CHF cash sleeve.
+- Latest history note: Broker order 9151 status sync: Filled
+- 6 reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.
 - Observability shows 100 recent blocked execution-policy event(s).
 ## Observability Status
 - Runtime event file present: yes
@@ -148,19 +155,19 @@ Portfolio is performing as intended. Hold current positions and review after the
 - Staged: 0
 - Submitted: 0
 - Partially filled: 0
-- Filled: 4
+- Filled: 2
 - Cancelled: 0
 - Failed: 0
 - Planned-only entries: 1
-- Rows with broker order id: 9
+- Rows with broker order id: 11
 ## Execution Plan
-- CASH-CHF: target 15% | intended CHF 2024.13 | executable CHF 2024.13 | gap CHF 0
+- CASH-CHF: target 5% | intended CHF 2024.13 | executable CHF 2024.13 | gap CHF 0
 - Totals: intended CHF 2024.13 | executable CHF 2024.13 | gap CHF 0
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
 |---|---|---|---:|---|
-| 2026-05-28 14:02:14 | buy | IE000I8KRLL9 | 0 | filled |
-| 2026-05-28 14:02:07 | buy | iShares MSCI Global Semiconductors UCITS ETF USD (Acc) | 9335.28 | submitted |
-| 2026-05-28 13:17:17 | buy | LU1781541252 | 0 | filled |
-| 2026-05-28 13:17:17 | buy | LU0950668870 | 0 | filled |
-| 2026-05-28 13:17:17 | buy | IE00B5BMR087 | 0 | filled |
+| 2026-05-29 12:15:33 | buy | UBS SLI ETF (SMI gleichgewichtet) | 4908 | filled |
+| 2026-05-29 12:15:32 | buy | iShares MSCI EM Asia UCITS ETF (Acc) | 7700.95 | filled |
+| 2026-05-29 10:13:12 | buy | UBS SLI ETF (SMI gleichgewichtet) | 4912.2 | inactive |
+| 2026-05-29 10:13:10 | buy | iShares MSCI EM Asia UCITS ETF (Acc) | 7706.75 | inactive |
+| 2026-05-29 10:07:44 | buy | HSBC MSCI China UCITS ETF USD | 5299.56 | inactive |
