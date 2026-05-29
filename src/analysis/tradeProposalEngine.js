@@ -146,17 +146,17 @@ function buildProposal({ row, estimatedChf, totalValueChf, minimumTradeSizeChf, 
   const driftAfter = Number((allocationAfter - Number(row.target || 0)).toFixed(2));
   const belowMinimum = minimumTradeSizeChf > 0 && estimatedChf < minimumTradeSizeChf;
   const rationaleBits = [forcedByBounds
-    ? `Allocation for ${row.assetClass} is outside configured min/max bounds.`
-    : `Underweight ${row.assetClass} exceeds configured rebalance threshold.`];
+    ? `${row.assetClass} is outside configured min/max bounds — rebalance needed.`
+    : `${row.assetClass} has room to grow toward its target allocation.`];
   if (preferCashBeforeSelling) rationaleBits.push('Using available cash before considering sells.');
   if (belowMinimum) rationaleBits.push(`Suggested size remains below the configured CHF ${minimumTradeSizeChf} minimum trade size.`);
   if (cashDragBlocked) rationaleBits.push(`Proposal still leaves cash drag at ${remainingCashPct}% of portfolio value.`);
-  if (turnoverBlocked) rationaleBits.push('Proposal does not materially improve drift enough to justify turnover.');
+  if (turnoverBlocked) rationaleBits.push('Proposal does not materially improve the position enough to justify turnover.');
 
   const blockedReasons = [];
   if (belowMinimum) blockedReasons.push(`Below minimum trade size of CHF ${minimumTradeSizeChf}.`);
   if (cashDragBlocked) blockedReasons.push(`Cash drag remains above policy after proposed trades (${remainingCashPct}%).`);
-  if (turnoverBlocked) blockedReasons.push('Proposal would create avoidable turnover without material drift improvement.');
+  if (turnoverBlocked) blockedReasons.push('Proposal would create avoidable turnover without material position improvement.');
 
   return {
     status: 'proposed',
@@ -208,7 +208,7 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
       minTradeSize: policy.minimumTradeSizeChf,
       rebalancingPolicy: policy,
       proposals: [],
-      notes: ['All underweight asset classes are within the configured rebalance threshold and min/max bounds.'],
+      notes: ['All asset classes are within target bands — no deployment opportunities exceed the configured threshold.'],
     };
   }
 
@@ -252,7 +252,7 @@ function proposeTrades({ portfolioPath, holdingsPath }) {
   if (policy.preferCashBeforeSelling) notes.push('Used available CHF cash before considering any sell-driven rebalance moves.');
   if (proposals.some((proposal) => proposal.forcedByBounds)) notes.push('Included asset classes that are outside configured min/max allocation bounds.');
   if (proposals.some((proposal) => /Cash drag remains above policy/i.test(proposal.blockedReason || ''))) notes.push('Available cash still exceeds the configured post-deployment cash-drag limit.');
-  if (proposals.some((proposal) => /avoidable turnover/i.test(proposal.blockedReason || ''))) notes.push('Suppressed avoidable turnover where proposals did not materially improve drift.');
+  if (proposals.some((proposal) => /avoidable turnover/i.test(proposal.blockedReason || ''))) notes.push('Suppressed avoidable turnover where proposals did not materially improve position sizing.');
   if (blockedCount > 0 && !notes.some((note) => /minimum trade size/i.test(note))) notes.push(`${blockedCount} proposal(s) remain blocked by policy checks.`);
   if (proposals.length > 0 && blockedCount === 0 && policy.avoidUnnecessaryTrades) notes.push('Only materially useful threshold or min/max-breach proposals were retained to avoid unnecessary trades.');
 
