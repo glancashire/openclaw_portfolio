@@ -179,7 +179,7 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
 
   if (!existingTrades.length) {
     return [
-      'Generate initial dry-run instrument proposals from the current cash balance.',
+      'Generate initial deployment proposals from the current cash balance.',
       'Refresh history snapshots after holdings updates and trade execution.',
     ];
   }
@@ -207,7 +207,7 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
   return [
     'Review and approve the current proposal set before creating overlapping execution plans.',
     hasCashHold
-      ? `Keep the defensive sleeve in CHF cash for now, leaving residual tradable cash of CHF ${summary.residualTradableCash} available for the next intentional rebalance.`
+      ? `Keep the defensive sleeve in CHF cash for now, leaving residual tradable cash of CHF ${summary.residualTradableCash} available for the next deployment opportunity.`
       : 'Refresh history snapshots after holdings updates and trade execution.',
   ];
 }

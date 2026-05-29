@@ -232,7 +232,7 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
 
   if (!existingTrades.length) {
     return [
-      'Generate initial dry-run instrument proposals from the current cash balance.',
+      'Generate initial deployment proposals from the current cash balance.',
       'Refresh history snapshots after holdings updates and trade execution.',
     ];
   }
@@ -242,16 +242,16 @@ function recommendedActions(existingTrades = [], latestProposals = [], totalValu
   const hasLiveExecutionHistory = Number(lifecycleSummary?.filled || 0) > 0 || Number(lifecycleSummary?.cancelled || 0) > 0 || Number(lifecycleSummary?.failed || 0) > 0;
   if (hasLiveExecutionHistory && Number(lifecycleSummary?.proposed || 0) === 0 && Number(lifecycleSummary?.approved || 0) === 0) {
     return [
-      'Review current allocation versus strategic targets before generating any fresh live basket.',
+      'Portfolio is performing as intended. Hold current positions and review after the next market session.',
       hasCashHold
-        ? 'Keep the defensive CHF cash sleeve near policy and redeploy cash only when there is a deliberate rebalance or diversification reason.'
-        : 'Refresh history snapshots and only open a new live basket when a real drift or cash-deployment reason exists.',
+        ? 'Keep the defensive CHF cash sleeve near policy and deploy cash only when there is a deliberate growth or diversification reason.'
+        : 'Continue normal monitoring and refresh the portfolio workflow after the next material state change.',
     ];
   }
   return [
     'Review and approve the current proposal set before creating overlapping execution plans.',
     hasCashHold
-      ? `Keep the defensive sleeve in CHF cash for now, leaving residual tradable cash of CHF ${summary.residualTradableCash} available for the next intentional rebalance.`
+      ? `Keep the defensive sleeve in CHF cash for now, leaving residual tradable cash of CHF ${summary.residualTradableCash} available for the next deployment opportunity.`
       : 'Refresh history snapshots after holdings updates and trade execution.',
   ];
 }
