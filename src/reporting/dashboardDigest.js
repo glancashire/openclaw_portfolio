@@ -57,11 +57,93 @@ function summarizeInstrumentHealth(summary = {}) {
   });
 }
 
+function renderValueHeadlineCard(summary = {}, portfolioDir) {
+  const plTotals = summary.profitLoss?.totals || {};
+  const holdings = summary.holdings || {};
+  const totalValueChf = Number(holdings.totalValueChf || 0);
+  const cashChf = Number(holdings.cashChf || 0);
+  const totalProfitChf = Number(plTotals.totalProfitChf || 0);
+  const totalProfitPct = plTotals.totalProfitPct;
+
+  // Daily and weekly change from net liq history
+  const series = lastNDays(readNetLiqHistory(portfolioDir), 30);
+  const values = series.map((row) => Number(row.totalChf || 0)).filter(Number.isFinite);
+  let dailyChangeChf = null;
+  let weeklyChangeChf = null;
+  if (values.length >= 2) {
+    dailyChangeChf = Number((values[values.length - 1] - values[values.length - 2]).toFixed(2));
+    if (values.length >= 8) {
+      weeklyChangeChf = Number((values[values.length - 1] - values[values.length - 7]).toFixed(2));
+    } else if (values.length > 1) {
+      weeklyChangeChf = Number((values[values.length - 1] - values[0]).toFixed(2));
+    }
+  }
+
+  const profitLine = totalProfitChf !== 0 || totalProfitPct != null
+    ? `<span style="color:${totalProfitChf >= 0 ? '#0f766e' : '#991b1b'};font-weight:600;">
+        ${totalProfitChf > 0 ? '+' : ''}${formatCurrency(totalProfitChf, 'CHF')}${totalProfitPct != null ? ` (${totalProfitPct >= 0 ? '+' : ''}${Number(totalProfitPct).toFixed(2)}%)` : ''} all-time profit
+       </span>`
+    : '';
+
+  const dailyLine = dailyChangeChf != null
+    ? `<span style="color:${dailyChangeChf >= 0 ? '#166534' : '#991b1b'};margin-left:16px;">
+        ${dailyChangeChf >= 0 ? '+' : ''}${formatCurrency(dailyChangeChf, 'CHF')} today
+       </span>`
+    : '';
+
+  const weeklyLine = weeklyChangeChf != null
+    ? `<span style="color:${weeklyChangeChf >= 0 ? '#166534' : '#991b1b'};margin-left:16px;">
+        ${weeklyChangeChf >= 0 ? '+' : ''}${formatCurrency(weeklyChangeChf, 'CHF')} this week
+       </span>`
+    : '';
+
+  const cashLine = cashChf > 0
+    ? `<div style="margin-top:6px;font-size:13px;color:#374151;">
+        <strong>${formatCurrency(cashChf, 'CHF')}</strong> cash — available for deployment
+       </div>`
+    : '';
+
+  return card({
+    title: 'Portfolio performance',
+    tone: 'info',
+    contentHtml: `
+      <div style="font-size:18px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:6px;">
+        ${formatCurrency(totalValueChf, 'CHF')} current value${dailyLine}${weeklyLine}
+      </div>
+      ${profitLine ? `<div style="font-size:14px;margin-bottom:2px;">${profitLine}</div>` : ''}
+      ${cashLine}
+    `,
+  });
+}
+
+function renderSparklineCard(portfolioDir) {
+  const series = lastNDays(readNetLiqHistory(portfolioDir), 30);
+  const values = series.map((row) => Number(row.totalChf || 0)).filter(Number.isFinite);
+  const current = values.length ? values[values.length - 1] : null;
+  const previous = values.length > 1 ? values[0] : null;
+  const delta = Number.isFinite(current) && Number.isFinite(previous) ? Number((current - previous).toFixed(2)) : null;
+  const spark = buildSparklineSvg(values, { width: 720, height: 120, strokeColor: '#2563eb', fillColor: 'rgba(37, 99, 235, 0.12)', strokeWidth: 2 });
+  return card({
+    title: 'Portfolio trend',
+    tone: 'surface',
+    contentHtml: `
+      <div style="margin-bottom:10px;color:#475569;font-size:13px;line-height:1.5;">Last ${series.length || 0} end-of-day snapshot(s).</div>
+      <div style="padding:8px 0 4px;">${spark}</div>
+      <div style="margin-top:12px;font-size:14px;color:#111827;">
+        <strong>${Number.isFinite(current) ? formatCurrency(current, 'CHF') : '—'}</strong>
+        <span style="color:#6b7280;"> current net liq</span>
+        ${Number.isFinite(delta) ? `<span style="margin-left:10px;color:${delta >= 0 ? '#166534' : '#991b1b'};">${delta >= 0 ? '+' : ''}${formatCurrency(delta, 'CHF')} vs earliest point</span>` : ''}
+      </div>
+    `,
+  });
+}
+
 function renderTopMoversCard(summary = {}) {
   const pl = summary.profitLoss || {};
   const rows = Array.isArray(pl.rows) ? pl.rows.filter((r) => Number(r.valueChf || 0) > 0) : [];
   if (!rows.length) return '';
-  const sorted = rows.slice().sort((a, b) => (b.unrealizedProfitChf ?? 0) - (a.unrealizedProfitChf ?? 0));
+  // Sort by absolute value contribution (unrealized profit CHF) so biggest moves come first
+  const sorted = rows.slice().sort((a, b) => Math.abs(b.unrealizedProfitChf ?? 0) - Math.abs(a.unrealizedProfitChf ?? 0));
   const gainers = sorted.filter((r) => (r.unrealizedProfitChf ?? 0) > 0).slice(0, 3);
   const losers  = sorted.filter((r) => (r.unrealizedProfitChf ?? 0) < 0).slice(0, 3);
   if (!gainers.length && !losers.length) return '';
@@ -98,41 +180,15 @@ function renderTopMoversCard(summary = {}) {
   });
 }
 
-function renderSparklineCard(portfolioDir) {
-  const series = lastNDays(readNetLiqHistory(portfolioDir), 30);
-  const values = series.map((row) => Number(row.totalChf || 0)).filter(Number.isFinite);
-  const current = values.length ? values[values.length - 1] : null;
-  const previous = values.length > 1 ? values[0] : null;
-  const delta = Number.isFinite(current) && Number.isFinite(previous) ? Number((current - previous).toFixed(2)) : null;
-  const spark = buildSparklineSvg(values, { width: 720, height: 120, strokeColor: '#2563eb', fillColor: 'rgba(37, 99, 235, 0.12)', strokeWidth: 2 });
-  return card({
-    title: 'Portfolio trend',
-    tone: 'surface',
-    contentHtml: `
-      <div style="margin-bottom:10px;color:#475569;font-size:13px;line-height:1.5;">Last ${series.length || 0} end-of-day snapshot(s).</div>
-      <div style="padding:8px 0 4px;">${spark}</div>
-      <div style="margin-top:12px;font-size:14px;color:#111827;">
-        <strong>${Number.isFinite(current) ? formatCurrency(current, 'CHF') : '—'}</strong>
-        <span style="color:#6b7280;"> current net liq</span>
-        ${Number.isFinite(delta) ? `<span style="margin-left:10px;color:${delta >= 0 ? '#166534' : '#991b1b'};">${delta >= 0 ? '+' : ''}${formatCurrency(delta, 'CHF')} vs earliest point</span>` : ''}
-      </div>
-    `,
-  });
-}
-
-function renderAllocationCard(summary = {}) {
+function renderAllocationHealthLine(summary = {}) {
   const rows = Array.isArray(summary.allocation) ? summary.allocation : [];
   const offTrack = rows.filter((r) => String(r.status || '').toLowerCase() !== 'on_track');
   if (!rows.length) return '';
   const allOnTrack = offTrack.length === 0;
-  const line = allOnTrack
-    ? 'All sleeves within target bands.'
-    : `${offTrack.length}/${rows.length} sleeve(s) off-track: ${offTrack.map((r) => `${escapeHtml(r.assetClass || '—')} (${formatPercent(r.driftPct || 0)})`).join(', ')}.`;
-  return card({
-    title: 'Allocation',
-    tone: 'surface',
-    contentHtml: `<div style="font-size:13px;line-height:1.6;color:#374151;">${line}</div>`,
-  });
+  if (allOnTrack) {
+    return '<div style="margin-top:10px;font-size:13px;color:#166534;font-weight:600;">✓ All sleeves within target bands</div>';
+  }
+  return `<div style="margin-top:10px;font-size:13px;color:#92400e;font-weight:600;">⚠ ${offTrack.length}/${rows.length} sleeve(s) off-track: ${offTrack.map((r) => `${escapeHtml(r.assetClass || '—')} (${formatPercent(r.driftPct || 0)})`).join(', ')}</div>`;
 }
 
 function renderProfitLossCard(summary = {}) {
@@ -357,35 +413,16 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
       return null;
     }
   })();
-  const profitTotalsForMetric = summary.profitLoss?.totals || {};
-  const profitDetail = profitTotalsForMetric.totalProfitChf != null
-    ? `Profit ${formatCurrency(profitTotalsForMetric.totalProfitChf, 'CHF')}${profitTotalsForMetric.totalProfitPct != null ? ` (${profitTotalsForMetric.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotalsForMetric.totalProfitPct).toFixed(2)}%)` : ''}`
-    : (summary.holdings?.lastSyncAt ? `Last sync ${summary.holdings.lastSyncAt}` : null);
-  const metrics = [
-    { label: 'Portfolio value', value: formatCurrency(summary.holdings?.totalValueChf, 'CHF'), detail: profitDetail },
-    { label: 'Cash', value: formatCurrency(summary.holdings?.cashChf, 'CHF'), detail: `Base ${summary.holdings?.baseCurrency || 'CHF'}` },
-    { label: 'Pending approvals', value: String(summary.approvals?.pendingApprovalCount || 0), detail: `${summary.approvals?.staleApprovalCount || 0} stale` },
-    { label: 'Operator queue', value: String(summary.operatorQueue?.summary?.total || 0), detail: `${summary.blockers?.count || 0} blocker(s)` },
-  ];
+  // Allocation health line — compact, inline after value headline
+  const allocationHealthHtml = renderAllocationHealthLine(summary);
   const bodyHtml = [
-    card({
-      title: 'Digest summary',
-      tone: 'info',
-      contentHtml: `
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-          ${badge({ label: String(summary.status?.health || 'unknown').replace(/_/g, ' '), tone: summary.status?.health === 'healthy' ? 'success' : summary.status?.health === 'blocked' ? 'danger' : 'warn' })}
-          ${badge({ label: String(summary.status?.executionPosture || 'unknown').replace(/_/g, ' '), tone: String(summary.status?.executionPosture || '').includes('ready') ? 'success' : 'warn' })}
-          ${badge({ label: String(frequency).toLowerCase() === 'weekly' ? 'weekly digest' : 'daily digest', tone: 'info' })}
-        </div>
-        ${metricGrid(metrics)}
-      `,
-    }),
-    renderProfitLossCard(summary),
+    renderValueHeadlineCard(summary, portfolioDir),
     renderTopMoversCard(summary),
     renderSparklineCard(portfolioDir),
-    renderAllocationCard(summary),
+    renderProfitLossCard(summary),
+    allocationHealthHtml,
     tryRender(() => {
-      // Drift vs target detail kept but moved below profit/loss; AI narrative still attached.
+      // Drift vs target detail shown but below the fold
       if (!rebalanceContext) return '';
       return renderRebalanceSnapshotCard(rebalanceContext.plan) + renderAiAssessmentCard(rebalanceContext.assessment);
     }),

@@ -1,71 +1,62 @@
-# Phase Plan: Layer 3 — Digest Email
+# Phase V1-L3: Value-focused Digest Email
 
-## Objectives
-
-Restructure `dashboardDigest.js` to lead with value/profit, add top movers section, and make allocation a compact footnote.
+## Goal
+Restructure `src/reporting/dashboardDigest.js` to lead with value/profit, de-emphasize drift, and frame recommendations as opportunities.
 
 ## Changes
 
-### 1. New card order in `buildDashboardDigest`
+### New card order
+1. **Headline card** — portfolio value, daily/weekly change, profit (all-time), cash
+2. **Top movers** — top 3 gainers + top 3 losers by P/L CHF
+3. **Sparkline** — 30-day portfolio trend
+4. **Profit/Loss** — per-holding table with cost basis and P/L
+5. **Allocation health** — compact one-line footer (not a dedicated card)
+6. **Drift vs target** — still shown but below the fold
+7. **AI Assessment** — tags + narrative (after value content)
+8. **Instrument health** — kept
+9. **Cron health** — kept
+10. **Next steps** — kept
 
-Current order:
-1. Digest summary (badges + metrics)
-2. Sparkline
-3. Profit/Loss
-4. Allocation card
-5. Rebalance snapshot + AI
-6. Instrument health
-7. Cron health
-8. Workflow
+### Specific changes to buildDashboardDigest
+- Replace the "Digest summary" card (status badges + metric grid) with a **value headline card** that shows:
+  - Portfolio value (CHF)
+  - Daily change (from net liq history vs previous day)
+  - Weekly change (from net liq history vs 7 days ago)
+  - All-time profit (from profit totals)
+  - Cash available for deployment
+- Move allocation to a compact line (not a card): `"All sleeves within target bands ✓"` or warning text if off-track
+- De-emphasize the "Drift vs target" card title or make it a smaller section
+- The AI assessment card stays after value sections
+- The text section should also lead with value
 
-**New order:**
-1. Digest summary — enhance to show daily/weekly change prominently
-2. Profit/Loss — leads
-3. **Top movers** (new) — top 3 gainers and top 3 losers with values
-4. Sparkline
-5. Allocation — compact footnote ("All sleeves within band ✓" or similar)
-6. Rebalance snapshot + AI (moved lower)
-7. Instrument health
-8. Cron health
-9. Next actions (renamed from "Open issues and workflow", more value-oriented)
+### Value headline card structure
+```
+┌─────────────────────────────────────────────────────────┐
+│ Portfolio performance                                    │
+│ CHF 72'274 current value  [+0.25% this week]            │
+│ +135.21 CHF all-time profit                              │
+│ CHF 9'544 cash — available for deployment               │
+└─────────────────────────────────────────────────────────┘
+```
 
-### 2. New `renderTopMoversCard()` function
+### Allocation de-emphasis
+- Remove the `renderAllocationCard` card from the body
+- Instead, add a single line after the value headline: either "All sleeves within target bands ✓" or a brief note if something needs attention
+- Drift data is still computed and available in `renderRebalanceSnapshotCard`, just not leading
 
-- Sort holdings by unrealized profit CHF descending
-- Show top 3 gainers and top 3 losers
-- Each row: ticker, value CHF, P/L CHF, P/L %
-- If all positive or all negative, show only the relevant side
+### Top movers (already partially implemented)
+- Already renders gainers/losers — keep but move to position 2
+- May need to sort by absolute value contribution (not just unrealized profit CHF)
 
-### 3. Compact allocation footnote
+## Files to change
+- `src/reporting/dashboardDigest.js` — main restructure
 
-- Instead of a full card, a single line after the top movers: "🎯 Allocation: all sleeves within band" (✓) or similar
-- Or keep as a card but make it much more compact (1-2 lines max)
+## Tests
+- No specific digest tests exist in `tests/` — no test changes needed
+- General pre-commit and npm test should pass (spot check)
 
-### 4. Workflow card renamed to "Next steps"
-
-- Show only the recommended next step, not all pending actions
-- Value-oriented framing
-
-## Risks
-
-- Digest email tests may assert exact card ordering — check
-- Any new cards affect the email HTML structure
-
-## Checklist
-
-- [ ] Read digest tests (if any)
-- [ ] Add `renderTopMoversCard()` function
-- [ ] Update card order in `buildDashboardDigest`
-- [ ] Make allocation card compact (1-2 line footnote or compact card)
-- [ ] Update workflow card → "Next steps" with value language
-- [ ] Run `bash .githooks/pre-commit`
-- [ ] Run `npm test`
-- [ ] Commit: `Phase V1-L3: value-first digest email`
-- [ ] Push
-
-## Acceptance Criteria
-
-- Digest leads with portfolio value, daily/weekly change, and profit
-- Top movers section appears in the digest body
-- Allocation appears as a compact footnote (not a full card)
-- Recommendations framed as opportunities
+## Acceptance
+- Email digest leads with portfolio value and profit, not allocation
+- Top movers visible immediately
+- Allocation reduced to a one-line health check
+- No changes to underlying data gathering
