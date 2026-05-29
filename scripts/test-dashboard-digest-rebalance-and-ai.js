@@ -139,7 +139,7 @@ const path = require('path');
     cronHealth: { healthy: 5, failing: 0, total: 5, items: [] },
   });
   // Should NOT crash; should still render other cards.
-  assert(/Digest summary/.test(result2.html), 'digest summary must remain when analyzer input is corrupt');
+  assert(/Portfolio performance/.test(result2.html), 'portfolio performance headline must remain when analyzer input is corrupt');
   // Rebalance/assessment cards should be absent or commented-out.
   const hasErrorComment = /digest-section error/.test(result2.html);
   const noRebalanceCard = !/Drift vs target/.test(result2.html);
