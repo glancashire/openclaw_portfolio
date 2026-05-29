@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Compact, console-friendly dashboard view for chat use ("show dashboard").
+// Value-first console dashboard view for chat use ("show dashboard").
 // Usage: node scripts/show-dashboard.js [portfolio]   (default: etf)
 const fs = require('fs');
 const path = require('path');
@@ -34,6 +34,11 @@ const pct = (v) => {
   if (n == null) return String(v ?? '-');
   return `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
 };
+const signed = (v) => {
+  const n = num(v);
+  if (n == null) return String(v ?? '-');
+  return `${n >= 0 ? '+' : ''}${fmt(n)}`;
+};
 
 function section(name) {
   const re = new RegExp(`## ${name}\\s*\\n([\\s\\S]*?)(?=\\n## |$)`);
@@ -44,131 +49,153 @@ function tableRows(body) {
   return body.split(/\r?\n/).filter((l) => l.startsWith('|') && !l.includes('---') && !/^\| ?(Sleeve|Instrument|Date|Time|Ticker|Scope) /i.test(l));
 }
 
-const total = num(get('Total value CHF'));
-const cash = num(get('Cash CHF'));
-const invested = num(get('Invested CHF'));
-const dailyChf = num(get('Daily move CHF'));
-const dailyPct = num(get('Daily move %'));
-const totalProfitChf = num(get('Total unrealized profit CHF'));
-const totalProfitPct = num(get('Total unrealized profit %'));
-const coverageLine = get('Cost-basis coverage');
+// ── Core numbers ──────────────────────────────────────────────────────────────
+const total        = num(get('Total value CHF'));
+const cash         = num(get('Cash CHF'));
+const invested     = num(get('Invested CHF'));
+const dailyChf     = num(get('Daily move CHF'));
+const dailyPct     = num(get('Daily move %'));
+const weeklyChf    = num(get('Since last report CHF'));
+const weeklyPct    = num(get('Since last report %'));
+const profitChf    = num(get('Total unrealized profit CHF'));
+const profitPct    = num(get('Total unrealized profit %'));
 const holdingCount = get('Number of holdings');
-const sync = get('Date/time', holdings) || get('Last successful sync');
-const health = get('Portfolio status');
-const strategy = get('Strategy status');
-const broker = get('Broker health');
-const execPosture = get('Execution posture');
-const nextAction = get('Next action');
-const blockers = get('Active blockers');
-const queue = get('Pending operator queue items');
-const pendingApprovals = get('Pending approvals');
-const inFlight = get('In-flight execution rows');
-const cashPctOfTotal = total && cash != null ? (cash / total * 100) : null;
+const sync         = get('Date/time', holdings) || get('Last successful sync');
 
+// ── Operational details (trailer) ────────────────────────────────────────────
+const health        = get('Portfolio status');
+const broker        = get('Broker health');
+const execPosture   = get('Execution posture');
+const blockers      = get('Active blockers');
+const pendingApprovals = get('Pending approvals');
+const inFlight      = get('In-flight execution rows');
+const nextAction    = get('Next action');
+
+// ── Build lines ───────────────────────────────────────────────────────────────
 const lines = [];
-lines.push(`📊 Dashboard — ${portfolio.toUpperCase()}   (synced ${sync || 'unknown'})`);
+
+// Header: portfolio + all-time profit
+const profitTag = profitChf != null
+  ? `(all-time ${signed(profitChf)} CHF / ${pct(profitPct)})`
+  : '';
+lines.push(`📊 ${portfolio.toUpperCase()} — CHF ${fmt(total)}  ${profitTag}`);
 lines.push('');
-lines.push(`Status: ${health || '?'} · strategy: ${strategy || '?'} · broker: ${broker ? (broker.length > 80 ? broker.slice(0, 77) + '…' : broker) : '?'}`);
-lines.push(`Execution: ${execPosture || '?'} · blockers: ${blockers || 0} · queue: ${queue || 0} · pending approvals: ${pendingApprovals || 0} · in-flight: ${inFlight || 0}`);
-lines.push('');
-lines.push('💰 Value (CHF)');
-lines.push(`  Total      ${fmt(total).padStart(14)}`);
-lines.push(`  Invested   ${fmt(invested).padStart(14)}   (${total ? (invested / total * 100).toFixed(2) : '0.00'}%)`);
-lines.push(`  Cash       ${fmt(cash).padStart(14)}   (${cashPctOfTotal != null ? cashPctOfTotal.toFixed(2) : '0.00'}%)`);
+
+// ── Performance ───────────────────────────────────────────────────────────────
+lines.push('💰 Performance');
 if (dailyChf != null || dailyPct != null) {
-  lines.push(`  Daily move ${fmt(dailyChf).padStart(14)}   (${pct(dailyPct)})`);
+  lines.push(`  Today     ${signed(dailyChf).padStart(10)} CHF  (${pct(dailyPct)})`);
 }
-if (totalProfitChf != null) {
-  lines.push(`  Profit     ${fmt(totalProfitChf).padStart(14)}   (${pct(totalProfitPct)})${coverageLine ? `   ${coverageLine}` : ''}`);
+if (weeklyChf != null || weeklyPct != null) {
+  lines.push(`  This week ${signed(weeklyChf).padStart(10)} CHF  (${pct(weeklyPct)})`);
+}
+if (profitChf != null) {
+  lines.push(`  All-time  ${signed(profitChf).padStart(10)} CHF  (${pct(profitPct)})`);
 }
 lines.push(`  Holdings: ${holdingCount || 0}`);
+lines.push('');
 
-// Cash breakdown from holdings.md
-if (holdings) {
-  const cashTable = holdings.match(/## Cash\s*\n([\s\S]*?)(?=\n## |$)/);
-  if (cashTable) {
-    const rows = cashTable[1].split(/\r?\n/).filter((l) => l.startsWith('|') && !l.includes('---') && !/Scope \| Currency/.test(l));
-    if (rows.length) {
-      lines.push('');
-      lines.push('💵 Cash detail');
-      for (const r of rows) {
-        const cells = r.split('|').map((c) => c.trim()).filter(Boolean);
-        // Scope | Currency | Amount | FX | Value CHF | Basis
-        const [scope, ccy, amount, , valueChf, basis] = cells;
-        lines.push(`  ${(scope || '?').padEnd(16)} ${ccy || '?'} ${fmt(amount).padStart(12)}  →  CHF ${fmt(valueChf).padStart(10)}  [${basis || '?'}]`);
-      }
-    }
-  }
-  // Holdings detail
-  const holdTable = holdings.match(/## Current Holdings\s*\n([\s\S]*?)(?=\n## |$)/);
-  if (holdTable) {
-    const rows = holdTable[1].split(/\r?\n/).filter((l) => l.startsWith('|') && !l.includes('---') && !/Ticker \/ ISIN/.test(l));
-    if (rows.length) {
-      lines.push('');
-      lines.push('📈 Holdings');
-      lines.push(`  ${'Ticker'.padEnd(10)} ${'Class'.padEnd(16)} ${'Qty'.padStart(7)} ${'Px'.padStart(10)} ${'Ccy'.padEnd(4)} ${'FX'.padStart(6)} ${'CHF Value'.padStart(13)}`);
-      for (const r of rows) {
-        const c = r.split('|').map((x) => x.trim()).filter(Boolean);
-        const [, name, cls, qty, px, ccy, fx, chf] = c;
-        lines.push(`  ${(name || '').slice(0, 10).padEnd(10)} ${(cls || '').slice(0, 16).padEnd(16)} ${(qty || '').padStart(7)} ${fmt(px).padStart(10)} ${(ccy || '').padEnd(4)} ${(fx || '').padStart(6)} ${fmt(chf).padStart(13)}`);
-      }
-    }
-  }
-}
-
-// Profit / Loss (from dashboard.md)
-const pl = section('Profit / Loss');
-if (pl) {
-  const rows = pl.split(/\r?\n/).filter((l) => l.startsWith('|') && !l.includes('---') && !/^\| ?Instrument /i.test(l));
-  if (rows.length) {
-    lines.push('');
-    lines.push('💵 Profit / Loss');
-    lines.push(`  ${'Instrument'.padEnd(46)} ${'Value'.padStart(13)} ${'Cost'.padStart(13)} ${'Profit'.padStart(13)} ${'P/L %'.padStart(8)}  Source`);
-    for (const r of rows) {
+// ── Holdings by value ─────────────────────────────────────────────────────────
+const holdTable = section('Profit / Loss');
+if (holdTable) {
+  const rows = holdTable
+    .split(/\r?\n/)
+    .filter((l) => l.startsWith('|') && !l.includes('---') && !/^\| ?Instrument /i.test(l))
+    .map((r) => {
       const c = r.split('|').map((x) => x.trim()).filter(Boolean);
-      const [name, value, cost, profit, profitPct, source] = c;
-      if (!name || name === '—') continue;
-      lines.push(`  ${(name || '').slice(0, 46).padEnd(46)} ${String(value).padStart(13)} ${String(cost).padStart(13)} ${String(profit).padStart(13)} ${String(profitPct).padStart(8)}  ${source || ''}`);
+      // Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source
+      return {
+        name:     c[0] || '',
+        value:    num(c[1]?.replace(/'/g, '')),
+        profitChf: num(c[3]?.replace(/'/g, '')),
+        profitPct: num(c[4]?.replace(/'/g, '').replace('%', '').replace('+', '')),
+      };
+    })
+    .filter((r) => r.name && r.name !== '—');
+
+  if (rows.length) {
+    lines.push('📈 Holdings (by value)');
+    // Collect CHF values for weight calculation
+    const totalValue = rows.reduce((s, r) => s + (r.value ?? 0), 0);
+
+    // Sort by CHF value descending
+    rows.sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+
+    // Find top gainer and top loser
+    const gainers = rows.filter(r => (r.profitChf ?? 0) > 0);
+    const losers  = rows.filter(r => (r.profitChf ?? 0) < 0);
+    const topGainer = gainers.length ? gainers.reduce((a, b) => (a.profitChf ?? 0) > (b.profitChf ?? 0) ? a : b) : null;
+    const topLoser  = losers.length  ? losers.reduce((a, b) => (a.profitChf ?? 0) < (b.profitChf ?? 0) ? a : b) : null;
+
+    // Header
+    lines.push(`  ${'Ticker'.padEnd(8)} ${'CHF'.padStart(10)} ${'Wt'.padStart(6)}  ${'P/L CHF'.padStart(10)}  ${'P/L %'.padStart(7)}   Note`);
+
+    for (const r of rows) {
+      const w = totalValue ? ((r.value ?? 0) / totalValue * 100).toFixed(1) : '0.0';
+      const plChfStr  = r.profitChf != null ? signed(r.profitChf).padStart(10) : '          —';
+      const plPctStr  = r.profitPct != null ? `${pct(r.profitPct)}`.padStart(7) : '       —';
+      let note = '';
+      if (r === topGainer && topGainer !== topLoser) note = '★ top gainer';
+      else if (r === topLoser && topLoser !== topGainer) note = '▼ top loss';
+      lines.push(`  ${r.name.slice(0, 8).padEnd(8)} ${fmt(r.value).padStart(10)} ${String(w + '%').padStart(6)}  ${plChfStr}  ${plPctStr}  ${note}`);
     }
+    lines.push('');
   }
 }
 
-// Allocation
+// ── Cash deployment ───────────────────────────────────────────────────────────
+const cashPct = total && cash != null ? (cash / total * 100) : null;
+if (cash != null) {
+  lines.push(`💵 Cash: CHF ${fmt(cash)} (${cashPct != null ? cashPct.toFixed(1) + '%' : '?'}) — available for deployment`);
+  lines.push('');
+}
+
+// ── Allocation health ─────────────────────────────────────────────────────────
 const alloc = section('Allocation Health');
 if (alloc) {
-  lines.push('');
-  lines.push('🎯 Allocation vs target');
-  for (const r of tableRows(alloc)) {
-    const c = r.split('|').map((x) => x.trim()).filter(Boolean);
-    // Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason
-    const [sleeve, cur, tgt, drift, band, action] = c;
-    const flag = band === 'on_track' ? '✓' : band === 'drifted' ? '~' : '!';
-    lines.push(`  ${flag} ${(sleeve || '').padEnd(20)} ${String(cur).padStart(6)}% / ${String(tgt).padStart(3)}%  drift ${String(drift).padStart(6)}%  ${band || ''}${action && action !== 'no' ? `  → ${action}` : ''}`);
-  }
-}
-
-// Pending operator actions (top 5)
-const pa = section('Pending Operator Actions');
-if (pa && !/^\s*$/.test(pa)) {
-  const items = pa.split(/\r?\n/).filter((l) => /^\d+\./.test(l)).slice(0, 5);
-  if (items.length) {
-    lines.push('');
-    lines.push('⚠️  Top operator actions');
-    for (const it of items) {
-      const trimmed = it.length > 140 ? it.slice(0, 137) + '…' : it;
-      lines.push(`  ${trimmed}`);
+  const rows = tableRows(alloc);
+  const onTrack = rows.filter(r => r.includes('on_track')).length;
+  const totalSleeves = rows.length;
+  if (rows.length) {
+    const status = onTrack === totalSleeves ? '✓' : '~';
+    const label  = onTrack === totalSleeves
+      ? 'Balance: all sleeves on track'
+      : `Balance: ${onTrack}/${totalSleeves} sleeves on track`;
+    lines.push(`🎯 ${label}`);
+    // Show short status for each sleeve
+    const sleeveLines = [];
+    for (const r of rows) {
+      const c = r.split('|').map((x) => x.trim()).filter(Boolean);
+      const [sleeve, cur, tgt, drift, band] = c;
+      const flag = band === 'on_track' ? '✓' : band === 'drifted' ? '~' : '!';
+      sleeveLines.push(`${flag} ${sleeve} ${cur}/${tgt}`);
     }
+    lines.push(`  ${sleeveLines.join(' · ')}`);
+    lines.push('');
   }
 }
 
-// Recommendation
+// ── Recommendation ────────────────────────────────────────────────────────────
 const rec = section('Recommended Next Step');
 if (rec) {
-  lines.push('');
   lines.push(`👉 Next: ${rec.length > 240 ? rec.slice(0, 237) + '…' : rec}`);
 }
 
-// Sanity check
+// ── Operational trailer ───────────────────────────────────────────────────────
+const items = [];
+if (health)     items.push(`status: ${health}`);
+if (broker)     items.push(`broker: ${(broker.length > 80 ? broker.slice(0, 77) + '…' : broker)}`);
+if (execPosture) items.push(`exec: ${execPosture}`);
+if (blockers && blockers !== '0') items.push(`⚠️ blocks: ${blockers}`);
+if (pendingApprovals && pendingApprovals !== '0') items.push(`approvals: ${pendingApprovals}`);
+if (inFlight && inFlight !== '0') items.push(`in-flight: ${inFlight}`);
+
+if (items.length) {
+  lines.push('');
+  lines.push(`Op: ${items.join(' · ')}`);
+}
+
+// ── Sanity check ──────────────────────────────────────────────────────────────
 if (total != null && invested != null && cash != null) {
   const diff = Math.abs(total - (invested + cash));
   if (diff > 0.5) {
