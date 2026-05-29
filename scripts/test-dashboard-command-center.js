@@ -67,9 +67,11 @@ function main() {
   const requiredSections = [
     '## Immediate Status',
     '## Health Snapshot',
+    '## Profit / Loss',
+    '## Holdings',
     '## Pending Operator Actions',
     '## Portfolio Value Snapshot',
-    '## Allocation Health',
+    '## Balance Check',
     '## Instrument Actions Queue',
     '## Safety / Risk Diagnostics',
     '## Recent Material Events',
