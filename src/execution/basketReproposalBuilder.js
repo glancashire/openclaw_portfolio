@@ -18,7 +18,10 @@ function isSwissIsin(isin) {
  */
 function roundToTick(price, tick) {
   if (!Number.isFinite(price) || !Number.isFinite(tick) || tick <= 0) return price;
-  return Math.ceil((price - 1e-9) / tick) * tick;
+  const raw = Math.ceil((price - 1e-9) / tick) * tick;
+  // Eliminate floating-point artifacts by rounding to the tick's decimal precision
+  const decimals = Math.max(0, -Math.floor(Math.log10(tick) - 1e-9));
+  return Number(raw.toFixed(decimals));
 }
 
 /** Decide a bumped limit price for a reproposal.
@@ -44,7 +47,53 @@ function computeBumpedLimitPrice({ ask, lastClose, previousLimit, tick }) {
   return Number(rounded.toFixed(4));
 }
 
-function pickTick(leg) {
+/**
+ * IBKR market rule 1874 price increments (covers IBIS2, EBS, and most European ETF venues).
+ * Source: reqMarketRule(1874) — verified 2026-05-29.
+ */
+const MARKET_RULE_1874 = [
+  { lowEdge: 0, increment: 0.0001 },
+  { lowEdge: 0.1, increment: 0.0001 },
+  { lowEdge: 0.2, increment: 0.0001 },
+  { lowEdge: 0.5, increment: 0.0001 },
+  { lowEdge: 1, increment: 0.0002 },
+  { lowEdge: 2, increment: 0.0005 },
+  { lowEdge: 5, increment: 0.001 },
+  { lowEdge: 10, increment: 0.002 },
+  { lowEdge: 20, increment: 0.005 },
+  { lowEdge: 50, increment: 0.01 },
+  { lowEdge: 100, increment: 0.02 },
+  { lowEdge: 200, increment: 0.05 },
+  { lowEdge: 500, increment: 0.1 },
+  { lowEdge: 1000, increment: 0.2 },
+  { lowEdge: 2000, increment: 0.5 },
+  { lowEdge: 5000, increment: 1 },
+  { lowEdge: 10000, increment: 2 },
+  { lowEdge: 20000, increment: 5 },
+  { lowEdge: 50000, increment: 10 },
+];
+
+/**
+ * Look up the tick size for a given price using IBKR market rule 1874.
+ * Walks the table in reverse to find the applicable price band.
+ */
+function tickForPrice(price) {
+  if (!Number.isFinite(price) || price <= 0) return 0.01;
+  for (let i = MARKET_RULE_1874.length - 1; i >= 0; i--) {
+    if (price >= MARKET_RULE_1874[i].lowEdge) return MARKET_RULE_1874[i].increment;
+  }
+  return 0.0001;
+}
+
+/**
+ * Pick the appropriate tick size for a leg.
+ * @param {object} leg - Must include instrument, currency. Optionally price for price-aware lookup.
+ * @param {number} [price] - Reference price for price-dependent tick lookup.
+ */
+function pickTick(leg, price) {
+  // If a price is provided, use the IBKR market rule table (covers all European ETF venues)
+  if (Number.isFinite(price) && price > 0) return tickForPrice(price);
+  // Legacy fallback when no price is available
   if (isSwissIsin(leg.instrument)) return 0.05;
   if ((leg.currency || '').toUpperCase() === 'EUR') return 0.01;
   return 0.01;
@@ -111,7 +160,8 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
     try { quote = quoteFn ? await quoteFn(conid) : null; } catch (error) { quote = { error: error.message }; }
     const ask = Number(quote?.ask);
     const lastClose = Number(quote?.lastClose ?? quote?.last ?? quote?.close);
-    const tick = pickTick({ instrument: leg.instrument, currency: orig.currency });
+    const refPrice = Number.isFinite(ask) && ask > 0 ? ask : (Number.isFinite(lastClose) && lastClose > 0 ? lastClose : previousLimit);
+    const tick = pickTick({ instrument: leg.instrument, currency: orig.currency }, refPrice);
     const previousLimit = Number(orig.limitPrice);
     const bumped = computeBumpedLimitPrice({ ask, lastClose, previousLimit, tick });
     if (!Number.isFinite(bumped)) {
@@ -180,4 +230,6 @@ module.exports = {
   roundToTick,
   isSwissIsin,
   pickTick,
+  tickForPrice,
+  MARKET_RULE_1874,
 };

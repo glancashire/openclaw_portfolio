@@ -118,7 +118,7 @@ async function generateBasketProposal({
     const referencePrice = Number.isFinite(ask) && ask > 0 ? ask : (Number.isFinite(lastClose) && lastClose > 0 ? lastClose : null);
     if (!Number.isFinite(referencePrice)) continue;
     const bps = Number.isFinite(ask) && ask > 0 ? markupAskBps : markupCloseBps;
-    const tick = pickTick({ instrument: target.isin, currency: target.currency });
+    const tick = pickTick({ instrument: target.isin, currency: target.currency }, referencePrice);
     const limitNative = roundToTick(referencePrice * (1 + bps / 10000), tick);
 
     // Convert gap (CHF) into native currency to size the qty.

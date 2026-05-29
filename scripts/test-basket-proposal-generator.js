@@ -54,15 +54,16 @@ const PORTFOLIO_MD = `# Portfolio: ETF
   const sxr8Leg = result.envelope.legs.find((l) => l.ibkrSymbol === 'SXR8');
   assert(sxr8Leg, 'SXR8 leg missing');
   assert(sxr8Leg.limitPrice > 691.18, `SXR8 limit must exceed ask 691.18, got ${sxr8Leg.limitPrice}`);
-  // EUR tick 0.01
-  assert.strictEqual(Math.round(sxr8Leg.limitPrice * 100) / 100, sxr8Leg.limitPrice, 'SXR8 limit must be on 0.01 EUR tick');
+  // IBKR market rule 1874: price 500-1000 → tick 0.1
+  const sxr8TickRemainder = Math.round(sxr8Leg.limitPrice * 10) % 1;
+  assert.strictEqual(sxr8TickRemainder, 0, `SXR8 limit ${sxr8Leg.limitPrice} must be on 0.1 EUR tick (market rule 1874, 500-1000 band)`);
 
   const sliLeg = result.envelope.legs.find((l) => l.ibkrSymbol === 'UBSSLI');
   assert(sliLeg, 'UBSSLI leg missing');
   assert(sliLeg.limitPrice > 161.40, 'UBSSLI limit must exceed close 161.40');
-  // Swiss tick 0.05
-  const sliTickRemainder = Math.round(sliLeg.limitPrice * 100) % 5;
-  assert.strictEqual(sliTickRemainder, 0, `UBSSLI limit ${sliLeg.limitPrice} must be on 0.05 CHF tick`);
+  // IBKR market rule 1874: price 100-200 → tick 0.02
+  const sliTickRemainder = Math.round(sliLeg.limitPrice * 100) % 2;
+  assert.strictEqual(sliTickRemainder, 0, `UBSSLI limit ${sliLeg.limitPrice} must be on 0.02 CHF tick (market rule 1874, 100-200 band)`);
 
   // Swiss sleeve split: SLI gets 12%, SPI gets 8%, both must be present
   const swissLegs = result.envelope.legs.filter((l) => l.currency === 'CHF');
