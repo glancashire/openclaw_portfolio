@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-25T15:22:21.744Z",
+  "generatedAt": "2026-05-29T08:41:09.097Z",
   "portfolio": "etf",
   "status": {
     "health": "attention_needed",
@@ -14,7 +14,7 @@
   "readiness": {
     "ok": false,
     "portfolio": "etf",
-    "generatedAt": "2026-05-25T15:22:01.116Z",
+    "generatedAt": "2026-05-29T08:41:07.015Z",
     "executionMode": "transmitted_live",
     "armedForMarketOpen": false,
     "armExpiresAt": "2026-05-22T12:00:00Z",
@@ -41,9 +41,9 @@
     "marketWindow": {
       "exchange": "EBS",
       "openNow": false,
-      "reason": "calendar:closed",
+      "reason": "calendar:before_open",
       "source": "calendar_artifact",
-      "nextOpen": "2026-05-26T09:00:00.000Z",
+      "nextOpen": "2026-06-01T09:00:00.000Z",
       "diagnostics": []
     },
     "approvalState": {
@@ -93,39 +93,108 @@
     "warnings": [
       {
         "code": "market_closed",
-        "message": "Market is currently closed (calendar:closed). Next open: 2026-05-26T09:00:00.000Z"
+        "message": "Market is currently closed (calendar:before_open). Next open: 2026-06-01T09:00:00.000Z"
       }
     ],
     "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight.",
     "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
   },
   "holdings": {
-    "totalValueChf": 22209.4831212,
-    "cashChf": 0,
-    "investedChf": 22209.4831212,
-    "holdingCount": 3,
+    "totalValueChf": 92962.38376,
+    "cashChf": 29544.41,
+    "investedChf": 63417.97376,
+    "holdingCount": 6,
     "baseCurrency": "CHF",
-    "lastSyncAt": "2026-05-22 15:52:43",
+    "lastSyncAt": "2026-05-29 08:06:23",
     "source": "broker_api",
-    "latestSnapshotDate": "2026-05-23",
+    "latestSnapshotDate": "2026-05-28",
     "dailyChangeChf": 0,
     "dailyChangePct": 0
   },
   "investorHoldings": {
     "rows": [
       {
-        "symbol": "CH0032912732",
-        "name": "UBS SLI ETF (SMI gleichgewichtet)",
-        "quantityHeld": 23,
+        "symbol": "CH0130595124",
+        "name": "UBS SPI Mid ETF (SPI ohne SMI)",
+        "quantityHeld": 64,
         "averageBuyPrice": null,
-        "lastTradedPrice": null,
-        "totalValue": 3717.8299998,
+        "lastTradedPrice": 130,
+        "totalValue": 8320,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 17209.48,
-        "ytdPct": 344.2,
-        "valueChf": 3717.8299998,
+        "ytdChf": 67274.25,
+        "ytdPct": 1345.5,
+        "valueChf": 8320,
+        "currency": "CHF",
+        "allocationPct": 0,
+        "targetPct": 0,
+        "driftPct": 0,
+        "availability": {
+          "averageBuyPrice": "missing",
+          "gainSincePurchaseChf": "missing",
+          "ytd": "portfolio_level_only"
+        }
+      },
+      {
+        "symbol": "IE000I8KRLL9",
+        "name": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
+        "quantityHeld": 521,
+        "averageBuyPrice": null,
+        "lastTradedPrice": 18.356,
+        "totalValue": 9180.93696,
+        "gainSincePurchase": null,
+        "gainSincePurchaseChf": null,
+        "gainSincePurchasePct": null,
+        "ytdChf": 67274.25,
+        "ytdPct": 1345.5,
+        "valueChf": 9180.93696,
+        "currency": "EUR",
+        "allocationPct": 0,
+        "targetPct": 0,
+        "driftPct": 0,
+        "availability": {
+          "averageBuyPrice": "missing",
+          "gainSincePurchaseChf": "missing",
+          "ytd": "portfolio_level_only"
+        }
+      },
+      {
+        "symbol": "LU1781541252",
+        "name": "Amundi Core MSCI Japan UCITS ETF Acc",
+        "quantityHeld": 145,
+        "averageBuyPrice": null,
+        "lastTradedPrice": 22.086,
+        "totalValue": 3074.3712,
+        "gainSincePurchase": null,
+        "gainSincePurchaseChf": null,
+        "gainSincePurchasePct": null,
+        "ytdChf": 67274.25,
+        "ytdPct": 1345.5,
+        "valueChf": 3074.3712,
+        "currency": "EUR",
+        "allocationPct": 0,
+        "targetPct": 0,
+        "driftPct": 0,
+        "availability": {
+          "averageBuyPrice": "missing",
+          "gainSincePurchaseChf": "missing",
+          "ytd": "portfolio_level_only"
+        }
+      },
+      {
+        "symbol": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "quantityHeld": 38,
+        "averageBuyPrice": null,
+        "lastTradedPrice": 163.16,
+        "totalValue": 6200.08,
+        "gainSincePurchase": null,
+        "gainSincePurchaseChf": null,
+        "gainSincePurchasePct": null,
+        "ytdChf": 67274.25,
+        "ytdPct": 1345.5,
+        "valueChf": 6200.08,
         "currency": "CHF",
         "allocationPct": 0,
         "targetPct": 0,
@@ -139,16 +208,16 @@
       {
         "symbol": "LU0950668870",
         "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
-        "quantityHeld": 151,
+        "quantityHeld": 316,
         "averageBuyPrice": null,
-        "lastTradedPrice": null,
-        "totalValue": 6052.1248017,
+        "lastTradedPrice": 41.04,
+        "totalValue": 12449.8944,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 17209.48,
-        "ytdPct": 344.2,
-        "valueChf": 6052.1248017,
+        "ytdChf": 67274.25,
+        "ytdPct": 1345.5,
+        "valueChf": 12449.8944,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -162,16 +231,16 @@
       {
         "symbol": "IE00B5BMR087",
         "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
-        "quantityHeld": 18,
+        "quantityHeld": 36,
         "averageBuyPrice": null,
-        "lastTradedPrice": null,
-        "totalValue": 12439.528319699999,
+        "lastTradedPrice": 700.02,
+        "totalValue": 24192.6912,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 17209.48,
-        "ytdPct": 344.2,
-        "valueChf": 12439.528319699999,
+        "ytdChf": 67274.25,
+        "ytdPct": 1345.5,
+        "valueChf": 24192.6912,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -184,10 +253,111 @@
       }
     ],
     "totals": {
-      "rowCount": 3,
-      "totalValueChf": 22209.4831212,
+      "rowCount": 6,
+      "totalValueChf": 63417.97376,
       "totalGainChf": 0,
       "totalGainPct": 0
+    }
+  },
+  "profitLoss": {
+    "rows": [
+      {
+        "tickerOrIsin": "91639399",
+        "symbol": "91639399",
+        "name": "SPMCHA",
+        "currency": "CHF",
+        "quantity": 64,
+        "valueChf": 8320,
+        "costBasisCurrency": null,
+        "costBasisNative": null,
+        "costBasisChf": null,
+        "costBasisSource": null,
+        "avgBuyPrice": null,
+        "unrealizedProfitChf": null,
+        "unrealizedProfitPct": null
+      },
+      {
+        "tickerOrIsin": "507487999",
+        "symbol": "507487999",
+        "name": "SEC0",
+        "currency": "EUR",
+        "quantity": 521,
+        "valueChf": 9180.93696,
+        "costBasisCurrency": "EUR",
+        "costBasisNative": 9335.278,
+        "costBasisChf": 8961.87,
+        "costBasisSource": "trades_md",
+        "avgBuyPrice": 17.918,
+        "unrealizedProfitChf": 219.07,
+        "unrealizedProfitPct": 2.44
+      },
+      {
+        "tickerOrIsin": "311572503",
+        "symbol": "311572503",
+        "name": "LCUJ",
+        "currency": "EUR",
+        "quantity": 145,
+        "valueChf": 3074.3712,
+        "costBasisCurrency": "EUR",
+        "costBasisNative": 3158.7235,
+        "costBasisChf": 3032.37,
+        "costBasisSource": "trades_md",
+        "avgBuyPrice": 21.7843,
+        "unrealizedProfitChf": 42,
+        "unrealizedProfitPct": 1.39
+      },
+      {
+        "tickerOrIsin": "150029461",
+        "symbol": "150029461",
+        "name": "CHSPI",
+        "currency": "CHF",
+        "quantity": 38,
+        "valueChf": 6200.08,
+        "costBasisCurrency": "CHF",
+        "costBasisNative": 6156.3154,
+        "costBasisChf": 6156.32,
+        "costBasisSource": "trades_md",
+        "avgBuyPrice": 162.0083,
+        "unrealizedProfitChf": 43.76,
+        "unrealizedProfitPct": 0.71
+      },
+      {
+        "tickerOrIsin": "243939970",
+        "symbol": "243939970",
+        "name": "EMUAA",
+        "currency": "EUR",
+        "quantity": 316,
+        "valueChf": 12449.8944,
+        "costBasisCurrency": "EUR",
+        "costBasisNative": 12727.8464,
+        "costBasisChf": 12218.73,
+        "costBasisSource": "trades_md",
+        "avgBuyPrice": 40.277995,
+        "unrealizedProfitChf": 231.16,
+        "unrealizedProfitPct": 1.89
+      },
+      {
+        "tickerOrIsin": "75776072",
+        "symbol": "75776072",
+        "name": "SXR8",
+        "currency": "EUR",
+        "quantity": 36,
+        "valueChf": 24192.6912,
+        "costBasisCurrency": "EUR",
+        "costBasisNative": 24961.5,
+        "costBasisChf": 23963.04,
+        "costBasisSource": "trades_md",
+        "avgBuyPrice": 693.375,
+        "unrealizedProfitChf": 229.65,
+        "unrealizedProfitPct": 0.96
+      }
+    ],
+    "totals": {
+      "totalProfitChf": 765.64,
+      "totalCostBasisChf": 54332.33,
+      "coveredValueChf": 55097.97,
+      "coveredCount": 5,
+      "totalProfitPct": 1.41
     }
   },
   "approvals": {
@@ -227,18 +397,18 @@
         "kind": "workflow",
         "severity": "low",
         "status": "recommended",
-        "summary": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+        "summary": "Review current allocation versus strategic targets before generating any fresh live basket.",
         "blocking": false,
-        "recommendedOperatorAction": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+        "recommendedOperatorAction": "Review current allocation versus strategic targets before generating any fresh live basket.",
         "source": "recommendation_engine"
       }
     ]
   },
   "contractIntelligence": {
-    "total": 9,
-    "readyCount": 4,
-    "missingConidCount": 5,
-    "missingSymbolCount": 4,
+    "total": 10,
+    "readyCount": 10,
+    "missingConidCount": 0,
+    "missingSymbolCount": 0,
     "missingVenueCount": 0,
     "items": [
       {
@@ -317,17 +487,17 @@
         "tickerOrIsin": "LU0950670850",
         "name": "UBS MSCI United Kingdom UCITS ETF GBP acc",
         "currency": "GBP",
-        "exchange": "LSE / IBKR-supported venue",
-        "ready": false,
-        "missingConid": true,
+        "exchange": "EBS / IBKR-supported venue",
+        "ready": true,
+        "missingConid": false,
         "missingSymbol": false,
         "missingVenue": false,
         "identity": {
-          "conid": null,
-          "symbol": "UK",
+          "conid": 136319312,
+          "symbol": "UKGBPB",
           "localSymbol": "UBS MSCI United Kingdom UCITS ETF GBP acc",
-          "venue": "LSE / IBKR-supported venue",
-          "venueKey": "unknown::GBP::LSE / IBKR-supported venue",
+          "venue": "EBS / IBKR-supported venue",
+          "venueKey": "unknown::GBP::EBS / IBKR-supported venue",
           "isin": "LU0950670850"
         }
       },
@@ -335,54 +505,72 @@
         "tickerOrIsin": "IE00B44T3H88",
         "name": "HSBC MSCI China UCITS ETF USD",
         "currency": "USD",
-        "exchange": "LSE / IBKR-supported venue",
-        "ready": false,
-        "missingConid": true,
-        "missingSymbol": true,
+        "exchange": "LSEETF / IBKR-supported venue",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
         "missingVenue": false,
         "identity": {
-          "conid": null,
-          "symbol": null,
+          "conid": 83570158,
+          "symbol": "HMCD",
           "localSymbol": "HSBC MSCI China UCITS ETF USD",
-          "venue": "LSE / IBKR-supported venue",
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue",
+          "venue": "LSEETF / IBKR-supported venue",
+          "venueKey": "unknown::USD::LSEETF / IBKR-supported venue",
           "isin": "IE00B44T3H88"
         }
       },
       {
         "tickerOrIsin": "IE00B5L8K969",
         "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
-        "currency": "USD",
-        "exchange": "LSE / IBKR-supported venue",
-        "ready": false,
-        "missingConid": true,
-        "missingSymbol": true,
+        "currency": "EUR",
+        "exchange": "IBIS2 / IBKR-supported venue",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
         "missingVenue": false,
         "identity": {
-          "conid": null,
-          "symbol": null,
+          "conid": 78767919,
+          "symbol": "CEBL",
           "localSymbol": "iShares MSCI EM Asia UCITS ETF (Acc)",
-          "venue": "LSE / IBKR-supported venue",
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue",
+          "venue": "IBIS2 / IBKR-supported venue",
+          "venueKey": "unknown::EUR::IBIS2 / IBKR-supported venue",
           "isin": "IE00B5L8K969"
         }
       },
       {
-        "tickerOrIsin": "IE00B4L5YX21",
-        "name": "iShares Core MSCI Japan IMI UCITS ETF",
-        "currency": "USD",
-        "exchange": "LSE / IBKR-supported venue",
-        "ready": false,
-        "missingConid": true,
-        "missingSymbol": true,
+        "tickerOrIsin": "LU1781541252",
+        "name": "Amundi Core MSCI Japan UCITS ETF Acc",
+        "currency": "EUR",
+        "exchange": "IBIS2 / Xetra",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
         "missingVenue": false,
         "identity": {
-          "conid": null,
-          "symbol": null,
-          "localSymbol": "iShares Core MSCI Japan IMI UCITS ETF",
-          "venue": "LSE / IBKR-supported venue",
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue",
-          "isin": "IE00B4L5YX21"
+          "conid": 311572503,
+          "symbol": "LCUJ",
+          "localSymbol": "Amundi Core MSCI Japan UCITS ETF Acc",
+          "venue": "IBIS2 / Xetra",
+          "venueKey": "unknown::EUR::IBIS2 / Xetra",
+          "isin": "LU1781541252"
+        }
+      },
+      {
+        "tickerOrIsin": "IE000I8KRLL9",
+        "name": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
+        "currency": "EUR",
+        "exchange": "IBIS2 / Xetra",
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
+        "missingVenue": false,
+        "identity": {
+          "conid": 507487999,
+          "symbol": "SEC0",
+          "localSymbol": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
+          "venue": "IBIS2 / Xetra",
+          "venueKey": "unknown::EUR::IBIS2 / Xetra",
+          "isin": "IE000I8KRLL9"
         }
       },
       {
@@ -390,67 +578,24 @@
         "name": "CHF cash balance",
         "currency": "CHF",
         "exchange": "IBKR cash balance",
-        "ready": false,
-        "missingConid": true,
-        "missingSymbol": true,
+        "ready": true,
+        "missingConid": false,
+        "missingSymbol": false,
         "missingVenue": false,
+        "synthetic": true,
         "identity": {
           "conid": null,
-          "symbol": null,
-          "localSymbol": "CHF cash balance",
-          "venue": "IBKR cash balance",
-          "venueKey": "unknown::CHF::IBKR cash balance",
-          "isin": "CASH-CHF"
+          "symbol": "CASH-CHF",
+          "localSymbol": null,
+          "venue": null,
+          "venueKey": "synthetic_cash",
+          "isin": null
         }
       }
     ],
     "examples": {
-      "missingConid": [
-        {
-          "tickerOrIsin": "LU0950670850",
-          "symbol": "UK",
-          "venue": "LSE / IBKR-supported venue",
-          "conid": null,
-          "venueKey": "unknown::GBP::LSE / IBKR-supported venue"
-        },
-        {
-          "tickerOrIsin": "IE00B44T3H88",
-          "symbol": "missing_symbol",
-          "venue": "LSE / IBKR-supported venue",
-          "conid": null,
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
-        },
-        {
-          "tickerOrIsin": "IE00B5L8K969",
-          "symbol": "missing_symbol",
-          "venue": "LSE / IBKR-supported venue",
-          "conid": null,
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
-        }
-      ],
-      "missingSymbol": [
-        {
-          "tickerOrIsin": "IE00B44T3H88",
-          "symbol": "missing_symbol",
-          "venue": "LSE / IBKR-supported venue",
-          "conid": null,
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
-        },
-        {
-          "tickerOrIsin": "IE00B5L8K969",
-          "symbol": "missing_symbol",
-          "venue": "LSE / IBKR-supported venue",
-          "conid": null,
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
-        },
-        {
-          "tickerOrIsin": "IE00B4L5YX21",
-          "symbol": "missing_symbol",
-          "venue": "LSE / IBKR-supported venue",
-          "conid": null,
-          "venueKey": "unknown::USD::LSE / IBKR-supported venue"
-        }
-      ],
+      "missingConid": [],
+      "missingSymbol": [],
       "missingVenue": [],
       "ready": [
         {
@@ -476,8 +621,8 @@
         }
       ]
     },
-    "summaryLine": "4/9 approved instrument(s) have complete IBKR contract identity; missing conid: 5, missing symbol: 4, missing venue: 0.",
-    "nextAction": "Resolve missing IBKR conids before treating the full approved instrument list as execution-ready."
+    "summaryLine": "10/10 approved instrument(s) have complete IBKR contract identity; missing conid: 0, missing symbol: 0, missing venue: 0.",
+    "nextAction": "No contract-intelligence remediation is currently required."
   },
   "blockers": {
     "count": 0,
@@ -491,35 +636,37 @@
       "staged": 0,
       "submitted": 0,
       "partiallyFilled": 0,
-      "filled": 0,
+      "filled": 4,
       "cancelled": 0,
       "failed": 0,
-      "inactive": 6,
+      "inactive": 5,
       "simulated": 0,
       "planned": 1,
-      "withBrokerOrderId": 6
+      "withBrokerOrderId": 9
     },
     "tradeState": {
       "queuedForOpenRunner": 0,
-      "blocked": 34,
+      "blocked": 39,
       "blockedByCode": {
-        "contract_resolution_failed": 33,
+        "contract_resolution_failed": 38,
         "hold_action": 1
       },
       "staleNeedsReapproval": 0,
       "canonicalStates": {
-        "blocked_hard": 34
+        "blocked_hard": 39,
+        "filled": 4,
+        "broker_submitted": 1
       }
     },
     "blockedRows": [
       {
-        "dateTime": "2026-05-22 11:00:07",
+        "dateTime": "2026-05-28 13:17:06",
         "tickerOrIsin": "CH0032912732",
-        "name": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9129",
+        "brokerOrderId": "9140",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
@@ -532,20 +679,20 @@
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9129",
+        "brokerOrderId": "9140",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
         "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
-        "dateTime": "2026-05-22 11:00:07",
+        "dateTime": "2026-05-28 13:17:05",
         "tickerOrIsin": "LU0950668870",
-        "name": "LU0950668870",
+        "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9129",
+        "brokerOrderId": "9140",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
@@ -558,20 +705,20 @@
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9129",
+        "brokerOrderId": "9140",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
         "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
       },
       {
-        "dateTime": "2026-05-22 11:00:07",
+        "dateTime": "2026-05-28 13:17:03",
         "tickerOrIsin": "IE00B5BMR087",
-        "name": "IE00B5BMR087",
+        "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9129",
+        "brokerOrderId": "9140",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
@@ -584,7 +731,33 @@
         "action": "buy",
         "status": "inactive",
         "approval": "broker_inactive",
-        "brokerOrderId": "9129",
+        "brokerOrderId": "9140",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
+        "blockedAt": "",
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
+      },
+      {
+        "dateTime": "2026-05-28 13:17:09",
+        "tickerOrIsin": "LU1781541252",
+        "name": "Amundi Core MSCI Japan UCITS ETF Acc",
+        "action": "buy",
+        "status": "inactive",
+        "approval": "broker_inactive",
+        "brokerOrderId": "9140",
+        "blockCode": "contract_resolution_failed",
+        "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
+        "blockedAt": "",
+        "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
+      },
+      {
+        "dateTime": "2026-05-28 13:17:10",
+        "tickerOrIsin": "IE00B5L8K969",
+        "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
+        "action": "buy",
+        "status": "inactive",
+        "approval": "broker_inactive",
+        "brokerOrderId": "9140",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "blockedAt": "",
@@ -606,11 +779,11 @@
           "status": "planned",
           "quantity": 0,
           "limitPrice": 0,
-          "targetPct": 20,
+          "targetPct": 15,
           "intendedChf": 2024.13,
-          "intendedPct": 9.11,
+          "intendedPct": 2.18,
           "executableChf": 2024.13,
-          "executablePct": 9.11,
+          "executablePct": 2.18,
           "executionGapChf": 0,
           "approval": "blocked_by_min_trade_size",
           "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 39.82%; drift before -20%; drift after 19.82%; drift corrected 0.18%; expected cost CHF 2024.13; funding source cash; Planning entry only; no broker order required for the cash sleeve."
@@ -625,35 +798,35 @@
     "proposalTotals": {
       "plannedCashSleeve": 2024.13,
       "executableBuys": 0,
-      "residualTradableCash": 20185.35
+      "residualTradableCash": 90938.25
     }
   },
   "allocation": [
     {
       "assetClass": "Global equities",
-      "currentPct": 83.26,
-      "targetPct": 60,
-      "driftPct": 23.26,
-      "minPct": 50,
+      "currentPct": 52.6,
+      "targetPct": 65,
+      "driftPct": -12.4,
+      "minPct": 60,
       "maxPct": 70,
       "status": "out_of_bounds"
     },
     {
       "assetClass": "Swiss equities",
-      "currentPct": 16.74,
+      "currentPct": 15.62,
       "targetPct": 20,
-      "driftPct": -3.26,
-      "minPct": 10,
-      "maxPct": 30,
+      "driftPct": -4.38,
+      "minPct": 15,
+      "maxPct": 25,
       "status": "on_track"
     },
     {
       "assetClass": "Bonds / cash-like",
-      "currentPct": 0,
-      "targetPct": 20,
-      "driftPct": -20,
+      "currentPct": 31.78,
+      "targetPct": 15,
+      "driftPct": 16.78,
       "minPct": 10,
-      "maxPct": 30,
+      "maxPct": 20,
       "status": "out_of_bounds"
     }
   ],
@@ -662,9 +835,9 @@
       "tickerOrIsin": "IE00B5BMR087",
       "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
       "assetClass": "Global equities",
-      "targetPct": 40,
-      "minPct": 30,
-      "maxPct": 50,
+      "targetPct": 30,
+      "minPct": 25,
+      "maxPct": 35,
       "exchange": "Xetra / SMART",
       "currency": "EUR",
       "latestProposal": null
@@ -673,9 +846,9 @@
       "tickerOrIsin": "LU0950668870",
       "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
       "assetClass": "Global equities",
-      "targetPct": 20,
-      "minPct": 10,
-      "maxPct": 30,
+      "targetPct": 17,
+      "minPct": 12,
+      "maxPct": 22,
       "exchange": "Xetra / IBKR-supported venue",
       "currency": "EUR",
       "latestProposal": null
@@ -684,9 +857,9 @@
       "tickerOrIsin": "CH0032912732",
       "name": "UBS SLI ETF (SMI gleichgewichtet)",
       "assetClass": "Swiss equities",
-      "targetPct": 12,
-      "minPct": 8,
-      "maxPct": 16,
+      "targetPct": 9,
+      "minPct": 6,
+      "maxPct": 12,
       "exchange": "SIX / EBS",
       "currency": "CHF",
       "latestProposal": null
@@ -695,9 +868,9 @@
       "tickerOrIsin": "CH0130595124",
       "name": "UBS SPI Mid ETF (SPI ohne SMI)",
       "assetClass": "Swiss equities",
-      "targetPct": 8,
-      "minPct": 4,
-      "maxPct": 12,
+      "targetPct": 11,
+      "minPct": 8,
+      "maxPct": 14,
       "exchange": "SIX / EBS",
       "currency": "CHF",
       "latestProposal": null
@@ -709,7 +882,7 @@
       "targetPct": 0,
       "minPct": 0,
       "maxPct": 0,
-      "exchange": "LSE / IBKR-supported venue",
+      "exchange": "EBS / IBKR-supported venue",
       "currency": "GBP",
       "latestProposal": null
     },
@@ -720,7 +893,7 @@
       "targetPct": 0,
       "minPct": 0,
       "maxPct": 0,
-      "exchange": "LSE / IBKR-supported venue",
+      "exchange": "LSEETF / IBKR-supported venue",
       "currency": "USD",
       "latestProposal": null
     },
@@ -731,28 +904,39 @@
       "targetPct": 0,
       "minPct": 0,
       "maxPct": 0,
-      "exchange": "LSE / IBKR-supported venue",
-      "currency": "USD",
+      "exchange": "IBIS2 / IBKR-supported venue",
+      "currency": "EUR",
       "latestProposal": null
     },
     {
-      "tickerOrIsin": "IE00B4L5YX21",
-      "name": "iShares Core MSCI Japan IMI UCITS ETF",
+      "tickerOrIsin": "LU1781541252",
+      "name": "Amundi Core MSCI Japan UCITS ETF Acc",
       "assetClass": "Global equities",
-      "targetPct": 0,
-      "minPct": 0,
-      "maxPct": 0,
-      "exchange": "LSE / IBKR-supported venue",
-      "currency": "USD",
+      "targetPct": 6,
+      "minPct": 3,
+      "maxPct": 9,
+      "exchange": "IBIS2 / Xetra",
+      "currency": "EUR",
+      "latestProposal": null
+    },
+    {
+      "tickerOrIsin": "IE000I8KRLL9",
+      "name": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
+      "assetClass": "Global equities",
+      "targetPct": 12,
+      "minPct": 8,
+      "maxPct": 15,
+      "exchange": "IBIS2 / Xetra",
+      "currency": "EUR",
       "latestProposal": null
     },
     {
       "tickerOrIsin": "CASH-CHF",
       "name": "CHF cash balance",
       "assetClass": "Bonds / cash-like",
-      "targetPct": 20,
+      "targetPct": 15,
       "minPct": 10,
-      "maxPct": 30,
+      "maxPct": 20,
       "exchange": "IBKR cash balance",
       "currency": "CHF",
       "latestProposal": {
@@ -765,9 +949,9 @@
     }
   ],
   "pendingActions": [
-    "Review and approve the current dry-run instrument proposals before broker connectivity is enabled."
+    "Review current allocation versus strategic targets before generating any fresh live basket."
   ],
-  "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+  "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
   "selfHealPlan": {
     "ok": true,
     "dryRun": true,
@@ -783,48 +967,49 @@
     "classified": [],
     "healed": [],
     "openIssues": [],
-    "actions": []
+    "actions": [],
+    "recoveryLadders": []
   },
   "explanations": {
-    "biggestDrift": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
+    "biggestDrift": "Bonds / cash-like is 16.78% over target and outside the allowed band around the 15% target.",
     "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
     "executionBlock": "No explicit execution block is currently surfaced.",
-    "approvalBacklog": "34 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
+    "approvalBacklog": "39 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-25 15:20:49.084 UTC",
+      "time": "2026-05-29 08:40:53.265 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 15:20:48.724 UTC",
+      "time": "2026-05-29 08:40:52.886 UTC",
       "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 15:13:40.726 UTC",
-      "eventType": "live_execution_blocked",
+      "time": "2026-05-29 08:32:47.158 UTC",
+      "eventType": "safety_controls_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 15:13:40.368 UTC",
-      "eventType": "draft_execution_blocked",
+      "time": "2026-05-29 08:32:43.861 UTC",
+      "eventType": "safety_controls_blocked",
       "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments.",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-25 15:11:18.026 UTC",
-      "eventType": "live_execution_blocked",
+      "time": "2026-05-29 08:32:41.245 UTC",
+      "eventType": "safety_controls_blocked",
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade.",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
@@ -833,19 +1018,16 @@
     "recentSummary": {
       "total": 100,
       "byLevel": {
-        "info": 1,
-        "warn": 99
+        "warn": 100
       },
       "byCategory": {
-        "execution": 1,
-        "execution_policy": 94,
-        "market_open_execution": 3,
-        "risk": 2
+        "execution_policy": 28,
+        "risk": 72
       },
-      "blockedTrades": 99,
+      "blockedTrades": 100,
       "degradedBrokerEvents": 0,
       "staleDataEvents": 0,
-      "openRunnerQueueEvents": 1,
+      "openRunnerQueueEvents": 0,
       "openRunnerRetryEvents": 0
     }
   },
@@ -859,83 +1041,83 @@
     "brokerAutomationPaused": false,
     "consecutiveBrokerErrors": 0,
     "lastBrokerErrorReason": null,
-    "lastBrokerErrorAt": "2026-05-22T12:59:21.154Z"
+    "lastBrokerErrorAt": "2026-05-28T14:02:07.624Z"
   },
   "recentTrades": [
     {
-      "date": "2026-05-22 12:59:21",
-      "status": "inactive",
+      "date": "2026-05-28 14:02:14",
+      "status": "filled",
       "action": "buy",
-      "tickerOrIsin": "CH0130595124",
-      "instrument": "UBS SPI Mid ETF (SPI ohne SMI)",
-      "quantity": "19",
-      "limitPrice": "130.15",
-      "estimatedChf": "2427.44",
-      "amount": "2427.44",
-      "actualChf": "0",
-      "reason": "Portfolio-approved transmitted live broker order submitted.; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9129"
-    },
-    {
-      "date": "2026-05-22 12:38:13",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "CH0130595124",
-      "instrument": "UBS SPI Mid ETF (SPI ohne SMI)",
-      "quantity": "19",
-      "limitPrice": "129.5",
-      "estimatedChf": "2441.5",
-      "amount": "2441.5",
-      "actualChf": "0",
-      "reason": "Portfolio-approved transmitted live broker order submitted.; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9129"
-    },
-    {
-      "date": "2026-05-22 11:00:07",
-      "status": "inactive",
-      "action": "buy",
-      "tickerOrIsin": "CH0032912732",
-      "instrument": "CH0032912732",
-      "quantity": "7",
-      "limitPrice": "161.88",
+      "tickerOrIsin": "IE000I8KRLL9",
+      "instrument": "IE000I8KRLL9",
+      "quantity": "521",
+      "limitPrice": "17.918",
       "estimatedChf": "0",
       "amount": "0",
-      "actualChf": "0",
-      "reason": "basket fill; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9129"
+      "actualChf": "8968.52",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9141"
     },
     {
-      "date": "2026-05-22 11:00:07",
-      "status": "inactive",
+      "date": "2026-05-28 14:02:07",
+      "status": "submitted",
+      "action": "buy",
+      "tickerOrIsin": "IE000I8KRLL9",
+      "instrument": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
+      "quantity": "521",
+      "limitPrice": "18.07",
+      "estimatedChf": "9335.28",
+      "amount": "9335.28",
+      "actualChf": "0",
+      "reason": "Portfolio-approved transmitted live broker order submitted.; allocation before n/a%; target 0%; allocation after n/a%; drift before n/a%; drift after n/a%; drift corrected n/a%; expected cost CHF 9335.28; funding source available_cash; Transmitted live order path used; confirm broker acknowledgement and reconcile status promptly.",
+      "approval": "submitted_to_broker",
+      "brokerOrderId": "9141"
+    },
+    {
+      "date": "2026-05-28 13:17:17",
+      "status": "filled",
+      "action": "buy",
+      "tickerOrIsin": "LU1781541252",
+      "instrument": "LU1781541252",
+      "quantity": "145",
+      "limitPrice": "21.7843",
+      "estimatedChf": "0",
+      "amount": "0",
+      "actualChf": "3158.72",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9139"
+    },
+    {
+      "date": "2026-05-28 13:17:17",
+      "status": "filled",
       "action": "buy",
       "tickerOrIsin": "LU0950668870",
       "instrument": "LU0950668870",
-      "quantity": "6",
-      "limitPrice": "40.7408",
+      "quantity": "62",
+      "limitPrice": "41.0008",
       "estimatedChf": "0",
       "amount": "0",
-      "actualChf": "0",
-      "reason": "basket fill; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9129"
+      "actualChf": "2542.05",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9137"
     },
     {
-      "date": "2026-05-22 11:00:07",
-      "status": "inactive",
+      "date": "2026-05-28 13:17:17",
+      "status": "filled",
       "action": "buy",
       "tickerOrIsin": "IE00B5BMR087",
       "instrument": "IE00B5BMR087",
-      "quantity": "16",
-      "limitPrice": "691.04",
+      "quantity": "6",
+      "limitPrice": "695.44",
       "estimatedChf": "0",
       "amount": "0",
-      "actualChf": "0",
-      "reason": "basket fill; Broker order acknowledged but marked Inactive. Order rejected - reason:Available settled cash converted to base: 9381.22 CHF Cash needed for this order and other pending orders: <br>11268.94 CHF; Broker order acknowledged but marked Inactive. The price does not conform to the minimum price variation for this contract.",
-      "approval": "broker_inactive",
-      "brokerOrderId": "9129"
+      "actualChf": "4172.64",
+      "reason": "basket fill",
+      "approval": "basket_approved",
+      "brokerOrderId": "9136"
     }
   ]
 }

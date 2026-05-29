@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-25T15:22:21.749Z",
+  "generatedAt": "2026-05-29T08:41:09.103Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -58,20 +58,20 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-05-23",
+        "latestHistoryDate": "2026-05-28",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 6,
+          "blockedTradeCount": 8,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
-            "name": "CH0032912732",
+            "name": "UBS SLI ETF (SMI gleichgewichtet)",
             "blockCode": "contract_resolution_failed",
             "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
             "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-            "brokerOrderId": "9129"
+            "brokerOrderId": "9140"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."

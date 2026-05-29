@@ -137,7 +137,7 @@ if (cash != null) {
 }
 
 // ── Allocation: compact health check ─────────────────────────────────────────
-const alloc = section('Allocation Health');
+const alloc = section('Balance Check');
 if (alloc) {
   const rows = tableRows(alloc);
   const onTrack = rows.filter((r) => r.includes('on_track')).length;

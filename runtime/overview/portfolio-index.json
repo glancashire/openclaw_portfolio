@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-25T15:22:21.746Z",
+  "generatedAt": "2026-05-29T08:41:09.099Z",
   "portfolioCount": 2,
-  "totalValueChf": 22209.48,
+  "totalValueChf": 92962.38,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -47,41 +47,41 @@
       "portfolio": "etf",
       "status": "attention_needed",
       "strategyStatus": "rebalance_needed",
-      "totalValueChf": 22209.4831212,
-      "cashChf": 0,
-      "investedChf": 22209.4831212,
-      "lastSyncAt": "2026-05-22 15:52:43",
-      "latestSnapshotDate": "2026-05-23",
+      "totalValueChf": 92962.38376,
+      "cashChf": 29544.41,
+      "investedChf": 63417.97376,
+      "lastSyncAt": "2026-05-29 08:06:23",
+      "latestSnapshotDate": "2026-05-28",
       "pendingApprovals": 0,
       "blockers": 0,
       "pendingActions": 1,
-      "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "blockedTradeCount": 6,
+      "blockedTradeCount": 8,
       "topBrokerBlock": {
         "tickerOrIsin": "CH0032912732",
-        "name": "CH0032912732",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-        "brokerOrderId": "9129"
+        "brokerOrderId": "9140"
       },
       "driftStatuses": [
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 23.26
+          "driftPct": -12.4
         },
         {
           "assetClass": "Swiss equities",
           "status": "on_track",
-          "driftPct": -3.26
+          "driftPct": -4.38
         },
         {
           "assetClass": "Bonds / cash-like",
           "status": "out_of_bounds",
-          "driftPct": -20
+          "driftPct": 16.78
         }
       ],
       "brokerHealth": "healthy",

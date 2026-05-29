@@ -19,6 +19,8 @@ assert.strictEqual(segments[0].start, '0900');
 assert.strictEqual(segments[0].end, '1745');
 assert.strictEqual(segments[1].closed, true);
 
+const beforeTrades = fs.readFileSync(path.join(portfolioDir, 'trades.md'), 'utf8');
+
 const diagnostics = buildExecutableOrderDiagnostics({
   portfolioDir,
   contractDetailsByTicker: {
@@ -41,4 +43,6 @@ assert.strictEqual(diagnostics[0].preparedOrder.exchange, 'SMART');
 assert.strictEqual(diagnostics[0].preparedOrder.symbol, 'UBSPX');
 assert.strictEqual(diagnostics[0].contractDetails.primaryExchange, 'IBIS');
 assert.strictEqual(diagnostics[0].contractDetails.liquidHoursSegments[0].start, '0900');
+const afterTrades = fs.readFileSync(path.join(portfolioDir, 'trades.md'), 'utf8');
+assert.strictEqual(afterTrades, beforeTrades, 'diagnostics helper must not mutate trades.md');
 console.log(JSON.stringify({ ok: true }, null, 2));

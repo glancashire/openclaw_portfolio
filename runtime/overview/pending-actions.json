@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-25T15:22:21.746Z",
+  "generatedAt": "2026-05-29T08:41:09.100Z",
   "itemCount": 7,
   "queueSummary": {
     "total": 7,
@@ -102,9 +102,9 @@
       "kind": "workflow",
       "severity": "low",
       "status": "recommended",
-      "summary": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "summary": "Review current allocation versus strategic targets before generating any fresh live basket.",
       "blocking": false,
-      "recommendedOperatorAction": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+      "recommendedOperatorAction": "Review current allocation versus strategic targets before generating any fresh live basket.",
       "source": "recommendation_engine"
     }
   ]

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-05-25T15:17:33.294Z",
+  "generatedAt": "2026-05-29T08:00:28.278Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-25T15:17:05.196Z",
+    "generatedAt": "2026-05-29T08:00:19.811Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -29,7 +29,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-22T12:59:21.154Z",
+      "lastAt": "2026-05-28T14:02:07.624Z",
       "stopAutomation": false,
       "threshold": 3
     },
@@ -58,13 +58,13 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-05-23",
+      "latestHistoryDate": "2026-05-28",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779721925319.5776,
-        "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
-        "newestSourceMtimeMs": 1779703444339.7163
+        "dashboardMtimeMs": 1780041486491.0063,
+        "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/holdings.md",
+        "newestSourceMtimeMs": 1780002868176.9868
       },
       "lifecycleSummary": {
         "proposed": 0,
@@ -73,19 +73,19 @@
         "staged": 0,
         "submitted": 0,
         "partiallyFilled": 0,
-        "filled": 0,
+        "filled": 4,
         "cancelled": 0,
         "failed": 0,
-        "inactive": 6,
+        "inactive": 5,
         "simulated": 0,
         "planned": 1,
-        "withBrokerOrderId": 6
+        "withBrokerOrderId": 9
       },
       "brokerErrorState": {
         "consecutive": 0,
         "lastReason": null,
         "lastMessage": null,
-        "lastAt": "2026-05-22T12:59:21.154Z",
+        "lastAt": "2026-05-28T14:02:07.624Z",
         "stopAutomation": false,
         "threshold": 3
       },
@@ -107,7 +107,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-25T15:17:05.195Z",
+      "generatedAt": "2026-05-29T08:00:19.809Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -159,13 +159,13 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-05-23",
+        "latestHistoryDate": "2026-05-28",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779721925319.5776,
-          "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
-          "newestSourceMtimeMs": 1779703444339.7163
+          "dashboardMtimeMs": 1780041486491.0063,
+          "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/holdings.md",
+          "newestSourceMtimeMs": 1780002868176.9868
         },
         "lifecycleSummary": {
           "proposed": 0,
@@ -174,19 +174,19 @@
           "staged": 0,
           "submitted": 0,
           "partiallyFilled": 0,
-          "filled": 0,
+          "filled": 4,
           "cancelled": 0,
           "failed": 0,
-          "inactive": 6,
+          "inactive": 5,
           "simulated": 0,
           "planned": 1,
-          "withBrokerOrderId": 6
+          "withBrokerOrderId": 9
         },
         "brokerErrorState": {
           "consecutive": 0,
           "lastReason": null,
           "lastMessage": null,
-          "lastAt": "2026-05-22T12:59:21.154Z",
+          "lastAt": "2026-05-28T14:02:07.624Z",
           "stopAutomation": false,
           "threshold": 3
         },
@@ -224,20 +224,20 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-05-23",
+        "latestHistoryDate": "2026-05-28",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 6,
+          "blockedTradeCount": 8,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
-            "name": "CH0032912732",
+            "name": "UBS SLI ETF (SMI gleichgewichtet)",
             "blockCode": "contract_resolution_failed",
             "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
             "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-            "brokerOrderId": "9129"
+            "brokerOrderId": "9140"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."
@@ -268,7 +268,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-05-25T15:17:33.293Z",
+    "generatedAt": "2026-05-29T08:00:28.278Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -293,7 +293,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-05-22T12:59:21.154Z",
+      "lastAt": "2026-05-28T14:02:07.624Z",
       "stopAutomation": false,
       "threshold": 3
     },
@@ -322,13 +322,13 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-05-23",
+      "latestHistoryDate": "2026-05-28",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1779722228652.3005,
-        "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
-        "newestSourceMtimeMs": 1779703444339.7163
+        "dashboardMtimeMs": 1780041620919.679,
+        "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/holdings.md",
+        "newestSourceMtimeMs": 1780002868176.9868
       },
       "lifecycleSummary": {
         "proposed": 0,
@@ -337,19 +337,19 @@
         "staged": 0,
         "submitted": 0,
         "partiallyFilled": 0,
-        "filled": 0,
+        "filled": 4,
         "cancelled": 0,
         "failed": 0,
-        "inactive": 6,
+        "inactive": 5,
         "simulated": 0,
         "planned": 1,
-        "withBrokerOrderId": 6
+        "withBrokerOrderId": 9
       },
       "brokerErrorState": {
         "consecutive": 0,
         "lastReason": null,
         "lastMessage": null,
-        "lastAt": "2026-05-22T12:59:21.154Z",
+        "lastAt": "2026-05-28T14:02:07.624Z",
         "stopAutomation": false,
         "threshold": 3
       },
@@ -371,7 +371,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-05-25T15:17:33.292Z",
+      "generatedAt": "2026-05-29T08:00:28.277Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -423,13 +423,13 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-05-23",
+        "latestHistoryDate": "2026-05-28",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1779722228652.3005,
-          "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/portfolio.md",
-          "newestSourceMtimeMs": 1779703444339.7163
+          "dashboardMtimeMs": 1780041620919.679,
+          "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/holdings.md",
+          "newestSourceMtimeMs": 1780002868176.9868
         },
         "lifecycleSummary": {
           "proposed": 0,
@@ -438,19 +438,19 @@
           "staged": 0,
           "submitted": 0,
           "partiallyFilled": 0,
-          "filled": 0,
+          "filled": 4,
           "cancelled": 0,
           "failed": 0,
-          "inactive": 6,
+          "inactive": 5,
           "simulated": 0,
           "planned": 1,
-          "withBrokerOrderId": 6
+          "withBrokerOrderId": 9
         },
         "brokerErrorState": {
           "consecutive": 0,
           "lastReason": null,
           "lastMessage": null,
-          "lastAt": "2026-05-22T12:59:21.154Z",
+          "lastAt": "2026-05-28T14:02:07.624Z",
           "stopAutomation": false,
           "threshold": 3
         },
@@ -488,20 +488,20 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-05-23",
+        "latestHistoryDate": "2026-05-28",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 6,
+          "blockedTradeCount": 8,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
-            "name": "CH0032912732",
+            "name": "UBS SLI ETF (SMI gleichgewichtet)",
             "blockCode": "contract_resolution_failed",
             "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
             "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-            "brokerOrderId": "9129"
+            "brokerOrderId": "9140"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."
@@ -544,6 +544,7 @@
     "classified": [],
     "openIssues": [],
     "operatorCommands": [],
+    "recoveryLadders": [],
     "actions": [
       {
         "kind": "regenerate_dashboard",
@@ -563,29 +564,21 @@
   "trends": {
     "recent": [
       {
-        "at": "2026-05-24T13:05:36.132Z",
+        "at": "2026-05-27T08:04:16.505Z",
         "kind": "health_check",
         "portfolio": "etf",
-        "health": "healthy",
+        "health": "degraded",
         "severity": "low",
-        "blockerCount": 0,
+        "blockerCount": 1,
         "classified": [],
-        "healed": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
         "openIssues": []
       },
       {
-        "at": "2026-05-24T13:37:01.376Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "healthy",
-        "severity": "low",
-        "blockerCount": 0,
-        "classified": [],
-        "healed": [],
-        "openIssues": []
-      },
-      {
-        "at": "2026-05-24T14:02:44.591Z",
+        "at": "2026-05-27T14:00:31.900Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "healthy",
@@ -599,7 +592,21 @@
         "openIssues": []
       },
       {
-        "at": "2026-05-24T20:02:15.226Z",
+        "at": "2026-05-27T20:00:12.251Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": []
+      },
+      {
+        "at": "2026-05-28T08:00:28.402Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "healthy",
@@ -613,7 +620,7 @@
         "openIssues": []
       },
       {
-        "at": "2026-05-25T14:00:39.084Z",
+        "at": "2026-05-28T08:02:02.511Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "healthy",
@@ -627,7 +634,7 @@
         "openIssues": []
       },
       {
-        "at": "2026-05-25T14:02:53.086Z",
+        "at": "2026-05-28T14:00:30.998Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "healthy",
@@ -641,7 +648,7 @@
         "openIssues": []
       },
       {
-        "at": "2026-05-25T14:56:21.603Z",
+        "at": "2026-05-28T20:00:20.481Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "healthy",
@@ -656,9 +663,11 @@
       }
     ],
     "counts": {
-      "healthy": 7
+      "degraded": 1,
+      "healthy": 5,
+      "blocked": 1
     },
-    "direction": "stable",
-    "summary": "Health direction is stable: recent checks stayed healthy or close to healthy, and no new operating risk is building."
+    "direction": "improving",
+    "summary": "Health direction is improving: earlier issues have eased and the latest posture is healthier than the recent baseline."
   }
 }

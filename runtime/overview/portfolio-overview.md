@@ -1,11 +1,11 @@
 # Multi-Portfolio Overview
 
 ## Summary
-- Generated at: 2026-05-25T15:22:21.746Z
+- Generated at: 2026-05-29T08:41:09.099Z
 - Portfolios discovered: 2
 - Active portfolios: 1
 - Demo-like portfolios: 1
-- Total value CHF: 22209.48
+- Total value CHF: 92962.38
 - Healthy portfolios: 0
 - Warning / attention portfolios: 2
 - Blocked portfolios: 0
@@ -16,7 +16,7 @@
 | Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |
 |---|---|---:|---|---|---:|---:|---:|---:|---:|---|
 | acceptance-closure | demo_like | 0 | warning | 3 out_of_bounds | 5 | 0 | 6 | 0 | 0 | Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked. |
-| etf | active | 22209.4831212 | attention_needed | 2 out_of_bounds | 0 | 0 | 1 | 0 | 0 | [contract_resolution_failed CH0032912732] Verify conid, symbol, exchange, and primary exchange before retrying. |
+| etf | active | 92962.38376 | attention_needed | 2 out_of_bounds | 0 | 0 | 1 | 0 | 0 | [contract_resolution_failed CH0032912732] Verify conid, symbol, exchange, and primary exchange before retrying. |
 
 ## Operator Queue Summary
 - Total queue items: 7
@@ -40,7 +40,7 @@
 4. [blocker/high/blocked] acceptance-closure: Missing concrete risk limit: Max single issuer allocation. — Resolve the blocking condition before proceeding.
 5. [blocker/high/blocked] acceptance-closure: Portfolio still has open questions; trade execution must remain blocked. — Resolve the blocking condition before proceeding.
 6. [delivery/medium/pending] acceptance-closure: Dashboard/report freshness is stale relative to source state. — Review report delivery readiness and clear the pending action.
-7. [workflow/low/recommended] etf: Review and approve the current dry-run instrument proposals before broker connectivity is enabled. — Review and approve the current dry-run instrument proposals before broker connectivity is enabled.
+7. [workflow/low/recommended] etf: Review current allocation versus strategic targets before generating any fresh live basket. — Review current allocation versus strategic targets before generating any fresh live basket.
 
 ## Notes
 - This board is generated from Phase 29 structured summary artifacts rather than by re-deriving state directly from Markdown.

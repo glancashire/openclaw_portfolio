@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-25T15:22:21.746Z",
+  "generatedAt": "2026-05-29T08:41:09.100Z",
   "totals": {
     "portfolioCount": 2,
-    "totalCashChf": 0,
+    "totalCashChf": 29544.41,
     "approvalCount": 0,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
   },
   "healthHeadline": "warning",
-  "cashWaitingToDeployChf": 0,
+  "cashWaitingToDeployChf": 29544.41,
   "biggestDrift": {
     "portfolio": "acceptance-closure",
     "assetClass": "Global equities",
@@ -21,24 +21,24 @@
   "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
   "pendingApprovals": 0,
-  "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
-  "biggestDriftWhy": "Global equities is 23.26% over target and outside the allowed band around the 60% target.",
+  "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
+  "biggestDriftWhy": "Bonds / cash-like is 16.78% over target and outside the allowed band around the 15% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "attention_needed",
-    "cashChf": 0,
+    "cashChf": 29544.41,
     "brokerHealth": "healthy",
     "deliveryPosture": "ready",
     "pendingApprovals": 0,
-    "blockedTradeCount": 6,
+    "blockedTradeCount": 8,
     "topBrokerBlock": {
       "tickerOrIsin": "CH0032912732",
-      "name": "CH0032912732",
+      "name": "UBS SLI ETF (SMI gleichgewichtet)",
       "blockCode": "contract_resolution_failed",
       "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
       "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
     },
-    "recommendedNextStep": "Review and approve the current dry-run instrument proposals before broker connectivity is enabled.",
+    "recommendedNextStep": "Review current allocation versus strategic targets before generating any fresh live basket.",
     "whyNow": "Broker rejected the order because the contract identity or venue resolution was not accepted."
   }
 }

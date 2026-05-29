@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { prepareOrderForSubmission } = require('../src/execution/orderPreparation');
+const { prepareOrderForSubmission, prepareExecutableRowOrder } = require('../src/execution/orderPreparation');
 
 const instrument = {
   tickerOrIsin: 'IE00BD4TXW66',
@@ -44,5 +44,14 @@ assert.strictEqual(generic.symbol, 'EMUAA');
 assert.strictEqual(generic.exchange, 'SMART');
 assert.strictEqual(generic.tif, 'DAY');
 assert.strictEqual(generic.outsideRth, undefined);
+
+const tradeRow = { action: 'buy', quantity: '8', limitPrice: '122.845', tickerOrIsin: 'IE00BD4TXW66' };
+const rowSnapshot = JSON.stringify(tradeRow);
+const preparedFromRow = prepareExecutableRowOrder(tradeRow, [instrument], { nowMs: Date.parse('2026-05-21T06:59:00Z') });
+assert.strictEqual(preparedFromRow.instrument.ibkrSymbol, 'UBSPX');
+assert.strictEqual(preparedFromRow.preparedOrder.symbol, 'UBSPX');
+assert.strictEqual(preparedFromRow.preparedOrder.primaryExchange, 'IBIS');
+assert.strictEqual(preparedFromRow.preparedOrder.goodAfterTime, '20260521 09:00:00 MET');
+assert.strictEqual(JSON.stringify(tradeRow), rowSnapshot, 'prepareExecutableRowOrder should not mutate the source row');
 
 console.log(JSON.stringify({ ok: true }, null, 2));

@@ -47,3 +47,7 @@
 | 2026-05-22 | execution_staged | 9874.789999999999 | 9874.789999999999 | 0 | 0 | 0 | Transmitted live broker order submitted. |
 | 2026-05-22 | execution_staged | 22209.4831212 | 22209.4831212 | 0 | 0 | 0 | Transmitted live broker order submitted. |
 | 2026-05-23 | end_of_day | 22209.4831212 | 22209.4831212 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-05-27 | end_of_day | 52673.1976946 | 45519.3176946 | 0 | 0 | 0 | evening sync snapshot |
+| 2026-05-28 | execution_staged | 71649.0496 | 44495.1696 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-28 | execution_staged | 71863.07036595 | 53762.77036595 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-05-28 | end_of_day | 72274.24818472001 | 62729.83818472001 | 0 | 0 | 0 | evening sync snapshot |

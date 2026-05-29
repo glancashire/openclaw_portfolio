@@ -3,6 +3,12 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { buildDashboardDigest } = require('../src/reporting/dashboardDigest');
+const { createModelClient } = require('../lib/modelClient');
+
+// Mock modelClient to prevent real network calls in tests
+const noopModelClient = {
+  complete: async () => ({ content: [{ text: 'Mock assessment.' }] }),
+};
 
 function seed(repoRoot) {
   const portfolioDir = path.join(repoRoot, 'portfolio', 'demo');
@@ -18,7 +24,7 @@ function seed(repoRoot) {
     pendingActionThresholds: { staleDashboard: false, failedTrades: 99, inFlightOrders: 99, brokerAutomationPaused: false },
   }, null, 2));
   fs.writeFileSync(path.join(repoRoot, 'runtime', 'fill-notifications-state.json'), JSON.stringify({ notifiedFills: [], reconciledUnnotifiedFills: [], acknowledgedBackfilledFills: [] }, null, 2));
-  fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), '# Portfolio: demo\n\n## Approved Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |\n|---|---|---|---:|---:|---:|---|---|---|\n| DEMO | Demo ETF | Equity | 60 | 50 | 70 | SIX | CHF | core |\n| CASH-CHF | CHF cash balance | Cash | 40 | 30 | 50 | CASH | CHF | reserve |\n');
+  fs.writeFileSync(path.join(portfolioDir, 'portfolio.md'), '# Portfolio: demo\n\n## Allocation Targets\n| Sleeve | Target % | Min % | Max % | Notes |\n|---|---:|---:|---:|---|\n| Equity | 60 | 50 | 70 | core |\n| Cash | 40 | 30 | 50 | reserve |\n\n## Approved Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Min % | Max % | Exchange | Currency | Notes |\n|---|---|---|---:|---:|---:|---|---|---|\n| DEMO | Demo ETF | Equity | 60 | 50 | 70 | SIX | CHF | core |\n| CASH-CHF | CHF cash balance | Cash | 40 | 30 | 50 | CASH | CHF | reserve |\n');
   fs.writeFileSync(path.join(portfolioDir, 'holdings.md'), '# Holdings\n- Date/time: 2026-05-23 06:00:00\n- Source: broker\n- Broker: ibkr\n- Base currency: CHF\n- Total value CHF: 10000\n- Cash CHF: 4000\n- Invested value CHF: 6000\n\n## Current Holdings\n| Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate | Market value CHF | Allocation % | Target % | Drift % |\n|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|\n| DEMO | Demo ETF | Equity | 10 | 600 | CHF | 1 | 6000 | 60 | 60 | 0 |\n| CASH-CHF | CHF cash balance | Cash | 4000 | 1 | CHF | 1 | 4000 | 40 | 40 | 0 |\n');
   fs.writeFileSync(path.join(portfolioDir, 'trades.md'), '# Trades\n\n## Trade Log\n\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|\n| 2026-05-23 06:10:00 | proposed | buy | DEMO | Demo ETF | 1 | 600 | 600 | 0 | rebalance | pending |  |  |  | review |\n');
   fs.writeFileSync(path.join(portfolioDir, 'history.md'), '# History\n\n## Daily Valuation History\n| Date | Snapshot | Total value CHF | Invested CHF | Cash CHF | Daily change CHF | Daily change % | Notes |\n|---|---|---:|---:|---:|---:|---:|---|\n| 2026-05-20 | end_of_day | 9800 | 5800 | 4000 | 0 | 0 | ok |\n| 2026-05-21 | end_of_day | 9900 | 5900 | 4000 | 100 | 1.0 | ok |\n| 2026-05-22 | end_of_day | 9950 | 5950 | 4000 | 50 | 0.5 | ok |\n| 2026-05-23 | end_of_day | 10000 | 6000 | 4000 | 50 | 0.5 | ok |\n');
@@ -33,6 +39,7 @@ function seed(repoRoot) {
     portfolioDir,
     frequency: 'weekly',
     generatedAt: '2026-05-23T17:00:00Z',
+    modelClient: noopModelClient,
     cronHealth: {
       total: 2,
       healthy: 1,
@@ -48,11 +55,11 @@ function seed(repoRoot) {
   assert(digest.html.includes('OpenClaw Portfolio Digest'));
   assert(digest.html.includes('Digest summary'));
   assert(digest.html.includes('Portfolio trend'));
-  assert(digest.html.includes('Allocation drift (summary)'));
+  assert(digest.html.includes('Allocation'));
   assert(digest.html.includes('Profit / Loss'));
   assert(digest.html.includes('Instrument health'));
   assert(digest.html.includes('Cron health'));
-  assert(digest.html.includes('Open issues and workflow'));
+  assert(digest.html.includes('Next steps'));
   assert(digest.html.includes('max-width:720px'));
   assert(digest.html.includes('linear-gradient(135deg'));
   assert(digest.html.includes('display:inline-block;vertical-align:top;width:calc(50% - 10px)'));

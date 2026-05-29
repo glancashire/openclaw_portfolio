@@ -1,6 +1,6 @@
 # Delivery & Alerting Status
 
-- Generated at: 2026-05-25T15:22:21.749Z
+- Generated at: 2026-05-29T08:41:09.103Z
 - Portfolios: 2
 - All ready: no
 
@@ -28,7 +28,14 @@
 - Pending actions:
   - None
 - Broker block context:
-  - Count: 6
-  - Top block: [contract_resolution_failed] CH0032912732 — CH0032912732
+  - Count: 8
+  - Top block: [contract_resolution_failed] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)
   - Reason: Broker rejected the order because the contract identity or venue resolution was not accepted.
   - Next action: Verify conid, symbol, exchange, and primary exchange before retrying.
+
+## Host delivery posture
+
+- Telegram chat channel has no chat-id target on this host; cron `announce` delivery always reports `no route, will fail-closed`.
+- All cron jobs carry `bestEffort:true`, so this delivery failure does **not** corrupt cron state.
+- **Email is the working operator channel.** Reports and digests reach Graham via Mailgun (`lancashire@swift.ch`).
+- Reference: `docs/operations/cron.md`.

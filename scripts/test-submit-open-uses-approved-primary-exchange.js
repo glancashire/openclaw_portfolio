@@ -15,5 +15,5 @@ fs.writeFileSync(path.join(portfolioDir, 'trades.md'), `# Trades\n\n## Trade Log
 
 const source = fs.readFileSync(path.resolve(root, 'scripts/submit-orders-at-open.js'), 'utf8');
 assert(!source.includes("instrument?.exchange?.includes('EBS') ? 'EBS' : undefined"), 'submit-orders-at-open.js should no longer derive primaryExchange from EBS-only heuristic');
-assert(source.includes("prepareOrderForSubmission"), 'submit-orders-at-open.js should route executable orders through shared order preparation');
+assert(source.includes("prepareExecutableRowOrder"), 'submit-orders-at-open.js should route executable rows through the shared row-preparation helper');
 console.log(JSON.stringify({ ok: true }, null, 2));

@@ -57,6 +57,47 @@ function summarizeInstrumentHealth(summary = {}) {
   });
 }
 
+function renderTopMoversCard(summary = {}) {
+  const pl = summary.profitLoss || {};
+  const rows = Array.isArray(pl.rows) ? pl.rows.filter((r) => Number(r.valueChf || 0) > 0) : [];
+  if (!rows.length) return '';
+  const sorted = rows.slice().sort((a, b) => (b.unrealizedProfitChf ?? 0) - (a.unrealizedProfitChf ?? 0));
+  const gainers = sorted.filter((r) => (r.unrealizedProfitChf ?? 0) > 0).slice(0, 3);
+  const losers  = sorted.filter((r) => (r.unrealizedProfitChf ?? 0) < 0).slice(0, 3);
+  if (!gainers.length && !losers.length) return '';
+
+  const formatRow = (r) => {
+    const name = r.name || r.symbol || r.tickerOrIsin || '—';
+    const value = formatCurrency(r.valueChf, 'CHF');
+    const plChf = r.unrealizedProfitChf == null ? '—' : formatCurrency(r.unrealizedProfitChf, 'CHF');
+    const plPct = r.unrealizedProfitPct == null ? '' : ` (${r.unrealizedProfitPct >= 0 ? '+' : ''}${Number(r.unrealizedProfitPct).toFixed(2)}%)`;
+    return [escapeHtml(name), escapeHtml(value), escapeHtml(plChf), escapeHtml(plPct)];
+  };
+
+  const tableRows = [];
+  if (gainers.length) {
+    gainers.forEach((r) => tableRows.push([...formatRow(r), '▲ gainer']));
+  }
+  if (losers.length) {
+    losers.forEach((r) => tableRows.push([...formatRow(r), '▼ loser']));
+  }
+
+  return card({
+    title: 'Top movers',
+    tone: 'surface',
+    contentHtml: dataTable({
+      columns: [
+        { label: 'Instrument' },
+        { label: 'Value', align: 'right' },
+        { label: 'P/L CHF', align: 'right' },
+        { label: 'P/L %', align: 'right' },
+        { label: '' },
+      ],
+      rows: tableRows,
+    }),
+  });
+}
+
 function renderSparklineCard(portfolioDir) {
   const series = lastNDays(readNetLiqHistory(portfolioDir), 30);
   const values = series.map((row) => Number(row.totalChf || 0)).filter(Number.isFinite);
@@ -80,27 +121,17 @@ function renderSparklineCard(portfolioDir) {
 }
 
 function renderAllocationCard(summary = {}) {
-  // P2 rework: de-emphasize drift to a tight 3-line summary, but keep the
-  // card structurally present even when allocation data is unavailable so the
-  // digest layout and tests remain stable.
   const rows = Array.isArray(summary.allocation) ? summary.allocation : [];
   const offTrack = rows.filter((r) => String(r.status || '').toLowerCase() !== 'on_track');
-  const worst = [...rows]
-    .map((r) => ({ ...r, absDrift: Math.abs(Number(r.driftPct || 0)) }))
-    .sort((a, b) => b.absDrift - a.absDrift)[0];
-  const lines = rows.length
-    ? [
-        `${rows.length} sleeve(s) tracked; ${offTrack.length} off-track.`,
-        worst ? `Largest drift: ${escapeHtml(worst.assetClass || '—')} at ${formatPercent(worst.driftPct || 0)} (status ${escapeHtml(worst.status || 'unknown')}).` : '',
-        offTrack.length
-          ? `Off-track sleeves: ${offTrack.map((r) => `${escapeHtml(r.assetClass || '—')} (${formatPercent(r.driftPct || 0)})`).join(', ')}.`
-          : 'All sleeves currently within band.',
-      ].filter(Boolean)
-    : ['No allocation data available yet.'];
+  if (!rows.length) return '';
+  const allOnTrack = offTrack.length === 0;
+  const line = allOnTrack
+    ? 'All sleeves within target bands.'
+    : `${offTrack.length}/${rows.length} sleeve(s) off-track: ${offTrack.map((r) => `${escapeHtml(r.assetClass || '—')} (${formatPercent(r.driftPct || 0)})`).join(', ')}.`;
   return card({
-    title: 'Allocation drift (summary)',
+    title: 'Allocation',
     tone: 'surface',
-    contentHtml: `<div style="font-size:13px;line-height:1.6;color:#374151;">${lines.map((l) => `<div>${l}</div>`).join('')}</div>`,
+    contentHtml: `<div style="font-size:13px;line-height:1.6;color:#374151;">${line}</div>`,
   });
 }
 
@@ -218,7 +249,7 @@ function renderWorkflowCard(summary = {}, deliveryStatus = {}) {
     if (!items.includes(item)) items.push(item);
   }
   return card({
-    title: 'Open issues and workflow',
+    title: 'Next steps',
     tone: 'warn',
     contentHtml: bulletList(items),
   });
@@ -349,8 +380,9 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
         ${metricGrid(metrics)}
       `,
     }),
-    renderSparklineCard(portfolioDir),
     renderProfitLossCard(summary),
+    renderTopMoversCard(summary),
+    renderSparklineCard(portfolioDir),
     renderAllocationCard(summary),
     tryRender(() => {
       // Drift vs target detail kept but moved below profit/loss; AI narrative still attached.

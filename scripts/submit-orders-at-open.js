@@ -15,7 +15,7 @@ const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing
 const { calculateSmartLimit, analyzeQuoteTrend, shouldBlockForTrend, evaluateMarketOpenBlock } = require('../src/execution/marketOpenPolicy');
 const { buildExecutableOrderDiagnostics } = require('../src/execution/executionDiagnostics');
 const { recordRuntimeEvent } = require('../src/observability/runtimeEvents');
-const { prepareOrderForSubmission } = require('../src/execution/orderPreparation');
+const { prepareExecutableRowOrder } = require('../src/execution/orderPreparation');
 const { resolveVenueAwareMarketWindow } = require('../src/execution/venueAwareMarketWindow');
 
 const cliArgs = process.argv.slice(2);
@@ -124,16 +124,7 @@ function buildExecutableOrders() {
   const rows = listExecutableTradeRows(tradesPath);
   const instruments = readApprovedInstruments(portfolioPath);
   return rows.map((row) => {
-    const instrument = instruments.find((item) => String(item.tickerOrIsin || '').trim() === String(row.tickerOrIsin || '').trim() || String(item.ibkrSymbol || '').trim().toUpperCase() === String(row.tickerOrIsin || '').trim().toUpperCase());
-    const prepared = prepareOrderForSubmission({
-      action: String(row.action || '').toUpperCase(),
-      quantity: Number(row.quantity || 0),
-      limitPrice: Number(row.limitPrice || 0),
-      symbol: instrument?.ibkrSymbol || row.tickerOrIsin,
-      conid: instrument?.ibkrConid || null,
-      currency: instrument?.currency || 'CHF',
-      exchange: 'SMART',
-    }, instrument);
+    const { preparedOrder: prepared } = prepareExecutableRowOrder(row, instruments);
     return {
       row,
       symbol: prepared.symbol,
