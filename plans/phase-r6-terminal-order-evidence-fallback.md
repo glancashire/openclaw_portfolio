@@ -16,7 +16,7 @@
 - [x] Implement the fallback in shared basket reconciliation code, reusing existing normalization where practical.
 - [x] Re-run targeted basket/trade reconciliation tests, safe lane, and full suite until green.
 - [x] Apply the improved reconciliation to the stale 5-leg run artifact if broker evidence now supports closure, then verify resulting dashboard/report posture. Current live rerun still lacks strong terminal hints for orders `9138` / `9140`, so the artifact remains unchanged.
-- [ ] Commit and push the completed phase.
+- [x] Commit and push the completed phase.
 
 ## Acceptance criteria
 - Basket-run reconciliation can move a stale `submitted` leg to a terminal state when strong broker hints exist even if one exact surface is missing.
