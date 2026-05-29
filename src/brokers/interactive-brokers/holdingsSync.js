@@ -1,7 +1,9 @@
+const fs = require('fs');
 const path = require('path');
 const { writeHoldingsSnapshot } = require('../shared/holdingsSnapshot');
 const { InteractiveBrokersClient } = require('./client');
 const { normaliseHolding } = require('./types');
+const { readApprovedInstruments } = require('../../analysis/approvedInstruments');
 
 async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
@@ -33,6 +35,60 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
         })
     : [];
   const cash = extractCashChf(ledger);
+  const liveFxRates = extractFxRatesToChf(ledger);
+
+  // Use IBKR NetLiquidation as authoritative CHF total, then scale the
+  // per-currency static hints (from portfolio.md) so the computed total
+  // matches IBKR's live-FX-converted value exactly.
+  const netLiq = Number(cash.detail?.NetLiquidation);
+  if (Number.isFinite(netLiq) && netLiq > 0 && holdings.length > 0) {
+    const byCurrency = {};
+    for (const h of holdings) {
+      const ccy = String(h.currency || 'CHF').toUpperCase();
+      if (!byCurrency[ccy]) byCurrency[ccy] = { nativeTotal: 0, holdings: [] };
+      const nativeValue = (h.price || 0) * (h.quantity || 0);
+      byCurrency[ccy].nativeTotal += nativeValue;
+      byCurrency[ccy].holdings.push(h);
+    }
+    const chfInvested = (byCurrency.CHF?.nativeTotal || 0);
+    const foreignChfBudget = netLiq - cash.value - chfInvested;
+    if (foreignChfBudget > 0) {
+      // Use per-currency hints from portfolio.md as seed rates
+      const portfolioPath = path.join(portfolioDir, 'portfolio.md');
+      const approvedInstruments = fs.existsSync(portfolioPath) ? readApprovedInstruments(portfolioPath) : [];
+      const fxHintsByCurrency = {};
+      for (const inst of approvedInstruments) {
+        const ccy = String(inst.currency || 'CHF').toUpperCase();
+        if (ccy !== 'CHF' && !fxHintsByCurrency[ccy] && inst.fxToChfHint > 0) {
+          fxHintsByCurrency[ccy] = inst.fxToChfHint;
+        }
+      }
+      let staticChfTotal = 0;
+      for (const [ccy, group] of Object.entries(byCurrency)) {
+        if (ccy === 'CHF') continue;
+        const seedRate = liveFxRates[ccy] || fxHintsByCurrency[ccy] || 1;
+        group.seedRate = seedRate;
+        staticChfTotal += group.nativeTotal * seedRate;
+      }
+      // Single correction factor preserves relative ratios between currencies
+      const scaleFactor = staticChfTotal > 0 ? foreignChfBudget / staticChfTotal : 1;
+      for (const [ccy, group] of Object.entries(byCurrency)) {
+        if (ccy === 'CHF') continue;
+        const effectiveRate = Number((group.seedRate * scaleFactor).toFixed(6));
+        for (const h of group.holdings) h.fxRateToChf = effectiveRate;
+      }
+    }
+    if (byCurrency.CHF) {
+      for (const h of byCurrency.CHF.holdings) h.fxRateToChf = 1;
+    }
+  } else {
+    // Fallback: use static rates from ledger if available
+    for (const h of holdings) {
+      const ccy = String(h.currency || 'CHF').toUpperCase();
+      if (liveFxRates[ccy] != null) h.fxRateToChf = liveFxRates[ccy];
+    }
+  }
+
   const result = writeHoldingsSnapshot({
     portfolioDir,
     holdings,

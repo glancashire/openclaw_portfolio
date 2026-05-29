@@ -1,49 +1,49 @@
 # Dashboard: etf
 ## Portfolio Value Snapshot
-- Total value CHF: 94598.36653
+- Total value CHF: 90491.2276831
 - Cash CHF: 4701.68
-- Invested CHF: 89896.68653
+- Invested CHF: 85789.54768310001
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
 - Since last report %: 0
 - Number of holdings: 9
 - Latest snapshot date: 2026-05-29
-- Total unrealized profit CHF: 1120.59
-- Total unrealized profit %: 1.26
-- Cost-basis coverage: 9/9 holdings (CHF 89896.69 of position value)
+- Total unrealized profit CHF: -1479.93
+- Total unrealized profit %: -1.7
+- Cost-basis coverage: 9/9 holdings (CHF 85789.55 of position value)
 
 ## Profit / Loss
-- Total unrealized profit CHF: 1120.59
-- Total cost basis CHF (covered holdings only): 88776.1
-- Total unrealized profit %: 1.26%
+- Total unrealized profit CHF: -1479.93
+- Total cost basis CHF (covered holdings only): 87269.48
+- Total unrealized profit %: -1.7%
 - Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 
 | Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
 |---|---:|---:|---:|---:|---|
-| SPMCHA | 8'320.00 | 8'262.29 | 57.71 | +0.70% | IBKR avg cost |
-| UKGBPB | 6'445.56 | 6'447.64 | -2.08 | -0.03% | IBKR avg cost |
-| HMCD | 4'662.07 | 4'667.01 | -4.94 | -0.11% | IBKR avg cost |
-| CEBL | 7'395.70 | 7'430.50 | -34.80 | -0.47% | trades.md |
-| SEC0 | 9'196.94 | 8'967.07 | 229.87 | +2.56% | IBKR avg cost |
-| LCUJ | 5'548.53 | 5'518.94 | 29.59 | +0.54% | IBKR avg cost |
-| CHSPI | 11'120.72 | 11'147.11 | -26.39 | -0.24% | trades.md |
-| EMUAA | 13'033.14 | 12'586.60 | 446.54 | +3.55% | trades.md |
-| SXR8 | 24'174.03 | 23'748.94 | 425.09 | +1.79% | trades.md |
+| SPMCHA | 8'336.64 | 8'262.29 | 74.35 | +0.90% | IBKR avg cost |
+| UKGBPB | 6'066.23 | 6'068.19 | -1.96 | -0.03% | IBKR avg cost |
+| HMCD | 4'386.25 | 4'392.35 | -6.10 | -0.14% | IBKR avg cost |
+| CEBL | 6'976.17 | 7'430.50 | -454.33 | -6.11% | trades.md |
+| SEC0 | 8'698.06 | 8'439.35 | 258.71 | +3.07% | IBKR avg cost |
+| LCUJ | 5'201.64 | 5'194.15 | 7.49 | +0.14% | IBKR avg cost |
+| CHSPI | 11'124.80 | 11'147.11 | -22.31 | -0.20% | trades.md |
+| EMUAA | 12'212.62 | 12'586.60 | -373.98 | -2.97% | trades.md |
+| SXR8 | 22'787.14 | 23'748.94 | -961.80 | -4.05% | trades.md |
 ## Holdings
 Holdings sorted by CHF value (descending).
 
 | Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
-| SXR8 | 24'174.03 | +425.09 | +1.79% | 25.6% |
-| EMUAA | 13'033.14 | +446.54 | +3.55% | 13.8% |
-| CHSPI | 11'120.72 | -26.39 | -0.24% | 11.8% |
-| SEC0 | 9'196.94 | +229.87 | +2.56% | 9.7% |
-| SPMCHA | 8'320.00 | +57.71 | +0.70% | 8.8% |
-| CEBL | 7'395.70 | -34.80 | -0.47% | 7.8% |
-| UKGBPB | 6'445.56 | -2.08 | -0.03% | 6.8% |
-| LCUJ | 5'548.53 | +29.59 | +0.54% | 5.9% |
-| HMCD | 4'662.07 | -4.94 | -0.11% | 4.9% |
+| SXR8 | 22'787.14 | -961.80 | -4.05% | 25.2% |
+| EMUAA | 12'212.62 | -373.98 | -2.97% | 13.5% |
+| CHSPI | 11'124.80 | -22.31 | -0.20% | 12.3% |
+| SEC0 | 8'698.06 | +258.71 | +3.07% | 9.6% |
+| SPMCHA | 8'336.64 | +74.35 | +0.90% | 9.2% |
+| CEBL | 6'976.17 | -454.33 | -6.11% | 7.7% |
+| UKGBPB | 6'066.23 | -1.96 | -0.03% | 6.7% |
+| LCUJ | 5'201.64 | +7.49 | +0.14% | 5.7% |
+| HMCD | 4'386.25 | -6.10 | -0.14% | 4.8% |
 ## Instrument Actions Queue
 Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 
@@ -58,29 +58,29 @@ Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 | IE00B5L8K969 | 0 | 8 | deploy | Target is 8% — no active buy planned. Cash available for deployment. | watch |
 | LU1781541252 | 0 | 6 | deploy | Target is 6% — no active buy planned. Cash available for deployment. | watch |
 | IE000I8KRLL9 | 0 | 10 | deploy | Target is 10% — no active buy planned. Cash available for deployment. | watch |
-| CASH-CHF | 2.14 | 5 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| CASH-CHF | 2.24 | 5 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 ## Balance Check
 Allocation drift is tracked as a constraint; see below. All sleeves within target bands is the goal.
 
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 74.48 | 65 | 9.48 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 20.55 | 20 | 0.55 | on_track | no | within tolerance |
-| Bonds / cash-like | 4.97 | 15 | -10.03 | out_of_bounds | yes | outside min/max band |
+| Global equities | 73.3 | 65 | 8.3 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 21.51 | 20 | 1.51 | on_track | no | within tolerance |
+| Bonds / cash-like | 5.2 | 15 | -9.8 | out_of_bounds | yes | outside min/max band |
 ## Pending Operator Actions
-1. [delivery/backfill_review/medium] 6 reconciled fill(s) were detected after the live window and still need notification backfill review.
+1. [workflow/recommended/low] Portfolio is performing as intended. Hold current positions and review after the next market session.
 ## Immediate Status
 - Portfolio status: attention_needed
 - Top blocker: none currently surfaced
-- Next action: 6 reconciled fill(s) were detected after the live window and still need notification backfill review.
+- Next action: Portfolio is performing as intended. Hold current positions and review after the next market session.
 - Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
 - Execution posture: ready_for_review
-- Delivery posture: needs_operator_attention
+- Delivery posture: ready
 - Active blockers: 0
 - Pending operator queue items: 1
 ## Health Snapshot
 - Strategy status: rebalance_needed
-- Last successful sync: 2026-05-29 12:44:09
+- Last successful sync: 2026-05-29 14:21:42
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
@@ -105,10 +105,10 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
 - Recovery items: 0
-- Delivery items: 1
+- Delivery items: 0
 - Data items: 0
 - Warning items: 0
-- Workflow items: 0
+- Workflow items: 1
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
@@ -121,13 +121,13 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Weekly report: latest history 2026-05-29
 - Monthly report: email_and_repo
 - Quarterly report: local_operator_review
-- Delivery readiness: needs_operator_attention
+- Delivery readiness: ready
 - Failure alert readiness: local_operator_review
-- Notified fills: 5
-- Reconciled fills pending notification backfill: 6
+- Notified fills: 11
+- Reconciled fills pending notification backfill: 0
 - Acknowledged backfilled fills: 1
 ## Recommended Next Step
-6 reconciled fill(s) were detected after the live window and still need notification backfill review.
+Portfolio is performing as intended. Hold current positions and review after the next market session.
 ## Status Labels
 - Pending approvals queue count: 0
 - In-flight execution rows: 0
@@ -136,9 +136,8 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
   - Continue normal monitoring and refresh the portfolio workflow after the next material state change.
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 92574.24 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 88467.1 unallocated beyond the intentional CHF cash sleeve.
 - Latest history note: Broker order 9151 status sync: Filled
-- 6 reconciled fill(s) were detected without a confirmed sent notification; review notification backfill state.
 - Observability shows 100 recent blocked execution-policy event(s).
 ## Observability Status
 - Runtime event file present: yes
