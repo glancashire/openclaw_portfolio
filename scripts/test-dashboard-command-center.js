@@ -64,15 +64,18 @@ function main() {
     ],
   });
 
+  // Section order: Portfolio Value → Profit/Loss → Holdings → Instrument Actions →
+  // Balance Check → Pending Operator Actions → Immediate Status → Health Snapshot
+  // → Safety → Recent Events → Report/Delivery → Recommended Next Step
   const requiredSections = [
-    '## Immediate Status',
-    '## Health Snapshot',
+    '## Portfolio Value Snapshot',
     '## Profit / Loss',
     '## Holdings',
-    '## Pending Operator Actions',
-    '## Portfolio Value Snapshot',
-    '## Balance Check',
     '## Instrument Actions Queue',
+    '## Balance Check',
+    '## Pending Operator Actions',
+    '## Immediate Status',
+    '## Health Snapshot',
     '## Safety / Risk Diagnostics',
     '## Recent Material Events',
     '## Report / Delivery Status',
@@ -83,7 +86,12 @@ function main() {
     assert(dashboard.includes(section), `Expected section ${section}`);
   }
 
-  assert(dashboard.indexOf('## Immediate Status') < dashboard.indexOf('## Portfolio Value Snapshot'), 'Expected immediate status before value snapshot');
+  assert(dashboard.indexOf('## Portfolio Value Snapshot') < dashboard.indexOf('## Profit / Loss'), 'Expected portfolio value before profit/loss');
+  assert(dashboard.indexOf('## Profit / Loss') < dashboard.indexOf('## Holdings'), 'Expected profit/loss before holdings');
+  assert(dashboard.indexOf('## Balance Check') < dashboard.indexOf('## Pending Operator Actions'), 'Expected balance check before pending operator actions');
+  assert(dashboard.indexOf('## Pending Operator Actions') < dashboard.indexOf('## Immediate Status'), 'Expected pending operator actions before immediate status');
+  assert(dashboard.indexOf('## Immediate Status') < dashboard.indexOf('## Health Snapshot'), 'Expected immediate status before health snapshot');
+  assert(dashboard.indexOf('## Health Snapshot') < dashboard.indexOf('## Safety / Risk Diagnostics'), 'Expected health snapshot before safety diagnostics');
   assert(/Portfolio status: warning/i.test(dashboard), 'Expected health label');
   assert(/Top blocker: gateway unavailable/i.test(dashboard), 'Expected broker fallback top blocker near top');
   assert(/Next action: Restore native connectivity first\. Detail: connect ECONNREFUSED 127\.0\.0\.1:4001/i.test(dashboard), 'Expected broker-driven next action near top');
