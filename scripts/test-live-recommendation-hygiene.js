@@ -7,10 +7,10 @@ const summaryArtifacts = require('../src/reporting/summaryArtifacts');
 
 function extractRecommendedActions(modulePath) {
   const source = fs.readFileSync(modulePath, 'utf8');
-  const match = source.match(/function recommendedActions\(existingTrades = \[\], latestProposals = \[\], totalValue = 0, brokerReadiness = null, lifecycleSummary = null\) \{([\s\S]*?)\n\}/);
+  const match = source.match(/function recommendedActions\(existingTrades = \[\], latestProposals = \[\], totalValue = 0, brokerReadiness = null, lifecycleSummary = null(?:, allocations = \[\])?\) \{([\s\S]*?)\n\}/);
   if (!match) throw new Error(`recommendedActions not found in ${modulePath}`);
   // eslint-disable-next-line no-new-func
-  return new Function('proposalSummary', `return function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0, brokerReadiness = null, lifecycleSummary = null) {${match[1]}\n}`)(
+  return new Function('proposalSummary', `return function recommendedActions(existingTrades = [], latestProposals = [], totalValue = 0, brokerReadiness = null, lifecycleSummary = null, allocations = []) {${match[1]}\n}`)(
     (latestProposals, totalValue) => {
       const plannedCashSleeve = latestProposals
         .filter((proposal) => String(proposal.action || '').toLowerCase() === 'hold')
