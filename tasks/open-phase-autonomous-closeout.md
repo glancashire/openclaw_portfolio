@@ -13,11 +13,13 @@ Success criteria:
 - The remaining real open phase(s) are planned, verified, completed, committed, and pushed.
 - Phase docs/overview are updated to reflect reality.
 - Full verification evidence is captured where feasible.
+- Open decisions are surfaced early, not buried at the end.
 
 Constraints:
 - Do not disturb Graham-owned WIP.
 - Do not commit generated runtime/report artifacts unless the phase explicitly targets them.
 - Work around the dirty working tree safely.
+- Do not run trade/approval scripts while working open-phase closeout.
 
 ## Progress
 
@@ -31,10 +33,14 @@ Constraints:
 - 2026-05-30: Focused phase verification passed (`test-order-preparation`, `test-submit-open-uses-approved-primary-exchange`, `test-execution-diagnostics-helper`, `test-target-gap-deployment`, `test-sync-probable-cancelled-requires-strong-match`, `test-basket-terminal-evidence-fallback`).
 - 2026-05-30: Safe-lane rerun surfaced an unrelated real regression in `basketReproposalBuilder` (`ReferenceError: previousLimit before initialization`). Fixed by moving `previousLimit` initialization ahead of its first use.
 - 2026-05-30: Rewrote `OPEN_PHASES_OVERVIEW.md` and `PHASE_OVERVIEW.md` to reflect actual git truth instead of stale open-phase assumptions.
+- 2026-05-30: Added the open-phases dashboard card to the overview reporting pipeline, added tests, passed safe lane, and pushed `ca34ead`.
+- 2026-05-30: User requested native IBKR gateway recovery first, then autonomous phase execution. Started `/home/ubuntu/ibgateway-native/start-ibc.sh`; IBC reached the `Second Factor Authentication` dialog successfully on display `:99`, so the launcher path is healthy but final readiness is waiting on login/2FA completion before port `127.0.0.1:4001` opens.
+- 2026-05-30: Surfaced early decision to keep source/docs/tests-only commits unless a phase explicitly targets generated artifacts; proceeding on that basis.
 
 ## Next
 
-1. Poll the safe-lane and full-suite verification runs to completion.
-2. If either still fails, fix the regression and rerun until green.
-3. Commit/push the dashboard/docs/verification closeout as source/docs-only changes.
-4. Mark next-3 and Spec §1 complete if verification supports it.
+1. Phase A: reconcile residual stale-open references and define the canonical remaining-open-work source.
+2. Commit the Phase A plan before implementation.
+3. Implement/tests/verify/commit/push Phase A.
+4. Continue into Spec §1 roll-up closure and decision-package phases.
+5. Recheck IBKR readiness after the operator completes second-factor approval on `:99`.
