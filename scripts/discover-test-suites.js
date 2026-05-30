@@ -32,6 +32,12 @@ const OVERRIDES = {
   'scripts/test-mailgun-inbound.js': { lane: 'safe', reason: 'unit test of inbound parser, no network' },
   'scripts/test-trade-notification-email.js': { lane: 'external', reason: 'sends real trade notification email' },
   'scripts/test-trade-notify-action-currency-normalization.js': { lane: 'safe', reason: 'pure formatter unit test' },
+  // Heavy reporting/fixture tests: no external network, but they exercise full
+  // filesystem-backed generation paths and can exceed the cheap safe-lane budget.
+  'scripts/test-dashboard-digest-rebalance-and-ai.js': { lane: 'integration', reason: 'builds reporting artifacts from seeded repo fixtures' },
+  'scripts/test-dashboard-digest-rendering.js': { lane: 'integration', reason: 'builds digest output from seeded repo fixtures' },
+  'scripts/test-dashboard-digest-with-model.js': { lane: 'integration', reason: 'builds digest output with stubbed model over seeded repo fixtures' },
+  'scripts/test-multi-portfolio-overview.js': { lane: 'integration', reason: 'generates overview artifacts from seeded repo/runtime fixtures' },
   // Broker auth / socket smoke tests.
   'scripts/test-interactive-brokers-auth.js': { lane: 'live-smoke', reason: 'authenticates against live IBKR gateway' },
   'scripts/test-interactive-brokers-native-socket.js': { lane: 'live-smoke', reason: 'opens TCP socket to IBKR gateway' },

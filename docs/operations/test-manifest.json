@@ -10,8 +10,8 @@
   ],
   "counts": {
     "total": 290,
-    "safe": 226,
-    "integration": 59,
+    "safe": 222,
+    "integration": 63,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 51,
@@ -426,22 +426,22 @@
     },
     {
       "path": "scripts/test-dashboard-digest-rebalance-and-ai.js",
-      "lane": "safe",
-      "reason": "pure assert-style unit test",
+      "lane": "integration",
+      "reason": "builds reporting artifacts from seeded repo fixtures",
       "inVerifyRepoChecks": true,
       "quarantined": false
     },
     {
       "path": "scripts/test-dashboard-digest-rendering.js",
-      "lane": "safe",
-      "reason": "pure assert-style unit test",
+      "lane": "integration",
+      "reason": "builds digest output from seeded repo fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
     {
       "path": "scripts/test-dashboard-digest-with-model.js",
-      "lane": "safe",
-      "reason": "pure assert-style unit test",
+      "lane": "integration",
+      "reason": "builds digest output with stubbed model over seeded repo fixtures",
       "inVerifyRepoChecks": true,
       "quarantined": false
     },
@@ -1128,8 +1128,8 @@
     },
     {
       "path": "scripts/test-multi-portfolio-overview.js",
-      "lane": "safe",
-      "reason": "pure assert-style unit test",
+      "lane": "integration",
+      "reason": "generates overview artifacts from seeded repo/runtime fixtures",
       "inVerifyRepoChecks": true,
       "quarantined": false
     },

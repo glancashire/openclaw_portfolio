@@ -44,3 +44,13 @@ Constraints:
 3. Implement/tests/verify/commit/push Phase A.
 4. Continue into Spec §1 roll-up closure and decision-package phases.
 5. Recheck IBKR readiness after the operator completes second-factor approval on `:99`.
+
+## Current status
+- Phase E safe-lane timeout hardening is complete: the issue was manifest lane misclassification, not a product regression.
+- Reclassified heavy reporting/fixture tests from `safe` to `integration` in `scripts/discover-test-suites.js`, regenerated `docs/operations/test-manifest.json`, and revalidated the lane contract.
+- Verification after the fix is green:
+  - `node scripts/test-test-manifest-shape.js`
+  - `npm run test:all -- --lane=safe` → 219 passed, 0 failed, 3 quarantined
+  - `npm test` / `node scripts/verify-repo.js` → green
+- Remaining non-code open items are external/operator or parked-WIP: Mailgun infra activation, direct editable Control UI repo discovery, and Graham-owned FX cash reconciliation.
+
