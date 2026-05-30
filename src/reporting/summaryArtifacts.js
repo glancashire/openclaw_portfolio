@@ -153,6 +153,13 @@ function parseHoldingsSummary(text) {
   };
 }
 
+function parsePortfolioDepositedCapital(portfolioText = '') {
+  const match = String(portfolioText || '').match(/- Total capital deposited CHF:\s*(.+)/);
+  if (!match) return null;
+  const value = Number(String(match[1] || '').trim().replace(/[,' ]/g, ''));
+  return Number.isFinite(value) ? value : null;
+}
+
 function countHoldingRows(text) {
   const lines = text.split(/\r?\n/);
   const start = lines.findIndex((line) => line.trim() === '## Current Holdings');
@@ -458,6 +465,10 @@ function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerR
 async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = null, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [], readiness = null, selfHealPlan = null, contractIntelligence = null, historySeries = [] }) {
   const summary = parseHoldingsSummary(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
+  const portfolioDir = tradesPath ? path.dirname(tradesPath) : path.join(process.cwd(), 'portfolio', portfolioName);
+  const portfolioPath = path.join(portfolioDir, 'portfolio.md');
+  const portfolioText = fs.existsSync(portfolioPath) ? fs.readFileSync(portfolioPath, 'utf8') : '';
+  const depositedCapitalChf = parsePortfolioDepositedCapital(portfolioText);
   const holdingCount = countHoldingRows(holdingsText);
   const investorHoldings = buildInvestorHoldingsSnapshot({ holdingsText, historyRows: historySeries, approvedInstruments });
   // Cost-basis enrichment (P2: profit/loss rework).
@@ -606,6 +617,9 @@ function buildDeploymentOpportunity(holdingsText = '', totalValue = 0) {
       latestSnapshotDate: latestSnapshot?.date || null,
       dailyChangeChf: Number(latestSnapshot?.dailyChange || 0),
       dailyChangePct: Number(latestSnapshot?.dailyChangePct || 0),
+      depositedCapitalChf,
+      accountProfitChf: depositedCapitalChf != null ? Number((totalValue - depositedCapitalChf).toFixed(2)) : null,
+      accountProfitPct: depositedCapitalChf > 0 ? Number((((totalValue - depositedCapitalChf) / depositedCapitalChf) * 100).toFixed(2)) : null,
     },
     investorHoldings: {
       rows: investorHoldings.rows,

@@ -19,6 +19,13 @@ const { parseHoldingsTable } = require('./investorReportingData');
 const { buildProfitLossSummary } = require('./costBasis');
 const { resolveHoldingQuotes } = require('./quoteResolution');
 
+function parsePortfolioDepositedCapital(portfolioText = '') {
+  const m = String(portfolioText || '').match(/- Total capital deposited CHF:\s*(.+)/);
+  if (!m) return null;
+  const n = Number(String(m[1] || '').trim().replace(/[,' ]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
 function parseHoldingsSummary(text) {
   const get = (label, fallback = '0') => {
     const m = text.match(new RegExp(`- ${label}:\\s*(.+)`));
