@@ -276,3 +276,35 @@ Install Python tzdata in the environment used by the IBKR skill, or harden the C
 - See Also: ERR-20260521-002
 
 ---
+## [ERR-20260530-001] ibkr-native-gateway-transient-exit
+
+**Logged**: 2026-05-30T13:17:20Z
+**Priority**: medium
+**Status**: pending
+**Area**: infra
+
+### Summary
+Native IBKR gateway was previously down after an earlier successful login; live restart showed the gateway can come back cleanly and reach authenticated API state.
+
+### Error
+```
+IBC returned exit status 1
+autorestart file not found: full authentication will be required
+Gateway finished
+```
+
+### Context
+- Checked native gateway around 2026-05-30 13:14 UTC and found no listeners on ports 4001 or 7462.
+- Live restart via /home/ubuntu/ibgateway-native/start-ibc.sh succeeded.
+- Current evidence shows Xvfb on :99, IBC launcher running, Java gateway process running, and ports 7462 and 4001 listening.
+- Logs show second-factor dialog opened, closed, then `Login has completed`.
+- Older headless DISPLAY errors in the shared log are historical noise and not the current blocker.
+
+### Suggested Fix
+Investigate why the prior gateway session exited after being up earlier in the day. Likely candidates: IBKR session lifecycle/autorestart behavior, session invalidation, or a transient auth/session condition rather than Java/Xvfb misconfiguration.
+
+### Metadata
+- Reproducible: unknown
+- Related Files: /home/ubuntu/ibgateway-native/start-ibc.sh, /home/ubuntu/ibgateway-native/logs/ibgateway-ibc.out, /home/ubuntu/ibgateway-native/logs/ibgateway-native.out
+
+---
