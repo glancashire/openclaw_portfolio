@@ -106,7 +106,7 @@ function reproposalDir(rootDir, portfolio) {
 function nextVersion(rootDir, portfolio, approvalId) {
   const dir = reproposalDir(rootDir, portfolio);
   if (!fs.existsSync(dir)) return 1;
-  const re = new RegExp(`^${approvalId.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}-reproposal-(\\d+)\\.json$`);
+  const re = new RegExp(`^${approvalId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-reproposal-(\\d+)\\.json$`);
   let max = 0;
   for (const name of fs.readdirSync(dir)) {
     const m = name.match(re);
@@ -160,9 +160,9 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
     try { quote = quoteFn ? await quoteFn(conid) : null; } catch (error) { quote = { error: error.message }; }
     const ask = Number(quote?.ask);
     const lastClose = Number(quote?.lastClose ?? quote?.last ?? quote?.close);
+    const previousLimit = Number(orig.limitPrice);
     const refPrice = Number.isFinite(ask) && ask > 0 ? ask : (Number.isFinite(lastClose) && lastClose > 0 ? lastClose : previousLimit);
     const tick = pickTick({ instrument: leg.instrument, currency: orig.currency }, refPrice);
-    const previousLimit = Number(orig.limitPrice);
     const bumped = computeBumpedLimitPrice({ ask, lastClose, previousLimit, tick });
     if (!Number.isFinite(bumped)) {
       reproposalLegs.push({ ...orig, status: 'needs_manual_review', reason: 'no_quote_available' });

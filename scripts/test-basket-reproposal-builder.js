@@ -82,6 +82,7 @@ const {
     rootDir: dir,
     now: '2026-05-22T11:00:00Z',
   });
+  assert.doesNotThrow(() => JSON.parse(fs.readFileSync(result.path, 'utf8')), 'reproposal build should not hit a previousLimit initialization error');
   assert.strictEqual(result.skipped, false);
   assert.strictEqual(result.version, 1);
   assert(fs.existsSync(result.path), 'reproposal file should exist');
