@@ -8,9 +8,9 @@ async function main() {
 
   const result = await sendEmail({
     to,
-    subject: 'C3PO Mailgun test',
-    text: 'This is a Mailgun test from C3PO via OpenClaw.',
-    html: '<p>This is a <strong>Mailgun test</strong> from C3PO via OpenClaw.</p>',
+    subject: 'OpenClaw Mailgun test',
+    text: 'This is a Mailgun test from OpenClaw portfolio manager.',
+    html: '<p>This is a <strong>Mailgun test</strong> from OpenClaw portfolio manager.</p>',
   });
 
   console.log(JSON.stringify(result, null, 2));

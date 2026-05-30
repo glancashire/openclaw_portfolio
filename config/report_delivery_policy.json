@@ -13,7 +13,7 @@
     "brokerAutomationPaused": true
   },
   "notes": [
-    "This repository only validates reporting delivery posture locally by default.",
-    "Do not add real outbound delivery here without explicit operator approval and a separate side-effect review."
+    "This repository can be configured for real outbound delivery and currently includes a live recipient configuration.",
+    "Any recipient or outbound-delivery change still requires explicit operator approval and a separate side-effect review."
   ]
 }

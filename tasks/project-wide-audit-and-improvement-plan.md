@@ -19,8 +19,11 @@ Audit the entire project from engineering, QA, support, docs, operations, produc
 
 ## Progress
 - 2026-05-30: Created harvester for the project-wide audit and improvement pass.
+- 2026-05-30: Gathered code-heavy audit findings across engineering, QA, operations, product, support, documentation, OpenClaw/config, and Spitex-domain-transfer perspectives.
+- 2026-05-30: Applied safe cleanup fixes: removed stale Mailgun test naming drift, replaced fixed `/tmp/answers.json` package-script usage with a unique-temp wrapper script, and reconciled report-delivery policy notes with actual configured recipient posture.
+- 2026-05-30: Wrote `docs/project-audit-2026-05-30.md` and `docs/project-improvement-roadmap.md` to capture implemented state, risks, opportunities, removal candidates, and an implementation-ready roadmap.
 
 ## Next
-1. Inspect repo shape, current phase/task docs, and likely hotspots for hard-coded/problematic patterns.
-2. Delegate a code-reading audit batch to a subagent to gather grounded findings by area.
-3. Fix any clearly safe high-confidence issues found during the audit, then write the consolidated documentation/spec/improvement plan.
+1. Start implementing Phase 2 (configuration and environment hardening): central config matrix, pure env-read helper, and loopback-only TLS-relaxation guard coverage.
+2. Start implementing Phase 4 (test governance): domain coverage accounting for the default verification gate and externalized lane/quarantine policy.
+3. Start implementing Phase 7 (cron health / guided remediation realism): surface cron-fetch degradation explicitly and add a cron-health self-check lane.
