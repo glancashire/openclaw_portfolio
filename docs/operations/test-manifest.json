@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 290,
-    "safe": 222,
+    "total": 293,
+    "safe": 225,
     "integration": 63,
     "live-smoke": 3,
     "external": 2,
@@ -93,6 +93,13 @@
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": true,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-approved-instruments-metadata.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
       "quarantined": false
     },
     {
@@ -1380,6 +1387,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-profit-loss-surface-consistency.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-proposal-distribution-underweight.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -1395,6 +1409,13 @@
     },
     {
       "path": "scripts/test-quote-quality-classifier.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-quote-resolution.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

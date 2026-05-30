@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-30T10:23:34.065Z",
+  "generatedAt": "2026-05-30T18:38:00.135Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
@@ -11,7 +11,92 @@
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": null,
+  "readiness": {
+    "ok": false,
+    "portfolio": "etf",
+    "generatedAt": "2026-05-30T18:38:00.016Z",
+    "executionMode": "transmitted_live",
+    "armedForMarketOpen": false,
+    "armExpiresAt": "2026-05-22T12:00:00Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "guidance": "Restore native connectivity first. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+    },
+    "marketWindow": {
+      "exchange": "EBS",
+      "openNow": false,
+      "reason": "calendar:closed",
+      "source": "calendar_artifact",
+      "nextOpen": "2026-06-01T09:00:00.000Z",
+      "diagnostics": []
+    },
+    "approvalState": {
+      "basketApprovalState": {
+        "approvedCount": 0,
+        "executableCount": 0,
+        "hasApprovedBasket": false,
+        "hasExecutableApprovedBasket": false,
+        "executableBaskets": [],
+        "latestApprovedAt": null,
+        "approvedBaskets": []
+      },
+      "proposedCount": 0,
+      "approvedCount": 0,
+      "basketApprovedCount": 0,
+      "basketExecutableCount": 0,
+      "hasApprovedBasket": false,
+      "hasExecutableApprovedBasket": false,
+      "executableCount": 0,
+      "latestApprovedAt": null,
+      "approvalAgeHours": null,
+      "staleApproval": false,
+      "staleApprovedRows": [],
+      "maxApprovalAgeHours": 24,
+      "ambiguousQueuedCount": 0,
+      "hasAnyApprovedRows": false,
+      "hasExecutableApprovedRows": false,
+      "executableRows": [],
+      "excludedApprovedRows": []
+    },
+    "rows": [],
+    "excludedRows": [],
+    "blockers": [
+      {
+        "code": "not_armed_for_market_open",
+        "message": "Live execution is not armed for the next market-open window."
+      },
+      {
+        "code": "broker_unready",
+        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      },
+      {
+        "code": "no_approved_rows",
+        "message": "No approved trade rows or approved basket exist for live execution."
+      },
+      {
+        "code": "no_executable_rows",
+        "message": "No executable approved trade rows or approved basket are currently eligible for submission."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "market_closed",
+        "message": "Market is currently closed (calendar:closed). Next open: 2026-06-01T09:00:00.000Z"
+      }
+    ],
+    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight.",
+    "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
+  },
   "holdings": {
     "totalValueChf": 90390.18983012001,
     "cashChf": 4701.68,
@@ -22,7 +107,10 @@
     "source": "broker_api",
     "latestSnapshotDate": "2026-05-29",
     "dailyChangeChf": 0,
-    "dailyChangePct": 0
+    "dailyChangePct": 0,
+    "depositedCapitalChf": 90000,
+    "accountProfitChf": 390.19,
+    "accountProfitPct": 0.43
   },
   "investorHoldings": {
     "rows": [
@@ -249,14 +337,16 @@
         "name": "SPMCHA",
         "currency": "CHF",
         "quantity": 64,
-        "valueChf": 8339.2,
-        "costBasisCurrency": null,
-        "costBasisNative": null,
-        "costBasisChf": null,
-        "costBasisSource": null,
-        "avgBuyPrice": null,
-        "unrealizedProfitChf": null,
-        "unrealizedProfitPct": null
+        "valueChf": 8350.72,
+        "costBasisChf": 8262.29,
+        "costBasisSource": "ibkr_avg_cost",
+        "unrealizedProfitChf": 88.43,
+        "unrealizedProfitPct": 1.07,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for SPMCHA.SW.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "136319312",
@@ -264,14 +354,16 @@
         "name": "UKGBPB",
         "currency": "GBP",
         "quantity": 131,
-        "valueChf": 6067.28433102,
-        "costBasisCurrency": null,
-        "costBasisNative": null,
-        "costBasisChf": null,
-        "costBasisSource": null,
-        "avgBuyPrice": null,
-        "unrealizedProfitChf": null,
-        "unrealizedProfitPct": null
+        "valueChf": 6067.28,
+        "costBasisChf": 6069.24,
+        "costBasisSource": "ibkr_avg_cost",
+        "unrealizedProfitChf": -1.96,
+        "unrealizedProfitPct": -0.03,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for UKGBPB.SW.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "83570158",
@@ -279,14 +371,16 @@
         "name": "HMCD",
         "currency": "USD",
         "quantity": 701,
-        "valueChf": 4411.69240586,
-        "costBasisCurrency": null,
-        "costBasisNative": null,
-        "costBasisChf": null,
-        "costBasisSource": null,
-        "avgBuyPrice": null,
-        "unrealizedProfitChf": null,
-        "unrealizedProfitPct": null
+        "valueChf": 4411.69,
+        "costBasisChf": 4393.11,
+        "costBasisSource": "ibkr_avg_cost",
+        "unrealizedProfitChf": 18.58,
+        "unrealizedProfitPct": 0.42,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for HMCD.L.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "78767919",
@@ -294,14 +388,16 @@
         "name": "CEBL",
         "currency": "EUR",
         "quantity": 29,
-        "valueChf": 6948.558021,
-        "costBasisCurrency": "EUR",
-        "costBasisNative": 7740.1,
+        "valueChf": 6952.49,
         "costBasisChf": 7430.5,
         "costBasisSource": "trades_md",
-        "avgBuyPrice": 266.9,
-        "unrealizedProfitChf": -481.94,
-        "unrealizedProfitPct": -6.49
+        "unrealizedProfitChf": -478.01,
+        "unrealizedProfitPct": -6.43,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for CEBL.DE.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "507487999",
@@ -309,14 +405,16 @@
         "name": "SEC0",
         "currency": "EUR",
         "quantity": 521,
-        "valueChf": 8641.18910844,
-        "costBasisCurrency": null,
-        "costBasisNative": null,
-        "costBasisChf": null,
-        "costBasisSource": null,
-        "avgBuyPrice": null,
-        "unrealizedProfitChf": null,
-        "unrealizedProfitPct": null
+        "valueChf": 8608.23,
+        "costBasisChf": 8440.81,
+        "costBasisSource": "ibkr_avg_cost",
+        "unrealizedProfitChf": 167.42,
+        "unrealizedProfitPct": 1.98,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for SEC0.DE.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "311572503",
@@ -324,14 +422,16 @@
         "name": "LCUJ",
         "currency": "EUR",
         "quantity": 262,
-        "valueChf": 5201.5934724,
-        "costBasisCurrency": null,
-        "costBasisNative": null,
-        "costBasisChf": null,
-        "costBasisSource": null,
-        "avgBuyPrice": null,
-        "unrealizedProfitChf": null,
-        "unrealizedProfitPct": null
+        "valueChf": 5201.59,
+        "costBasisChf": 5195.05,
+        "costBasisSource": "ibkr_avg_cost",
+        "unrealizedProfitChf": 6.54,
+        "unrealizedProfitPct": 0.13,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for LCUJ.DE.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "150029461",
@@ -340,13 +440,15 @@
         "currency": "CHF",
         "quantity": 68,
         "valueChf": 11097.6,
-        "costBasisCurrency": "CHF",
-        "costBasisNative": 11147.1083,
         "costBasisChf": 11147.11,
         "costBasisSource": "trades_md",
-        "avgBuyPrice": 163.928063,
         "unrealizedProfitChf": -49.51,
-        "unrealizedProfitPct": -0.44
+        "unrealizedProfitPct": -0.44,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for CHSPI.SW.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "243939970",
@@ -354,14 +456,16 @@
         "name": "EMUAA",
         "currency": "EUR",
         "quantity": 329,
-        "valueChf": 12222.1731954,
-        "costBasisCurrency": "EUR",
-        "costBasisNative": 13111.0435,
+        "valueChf": 12208.79,
         "costBasisChf": 12586.6,
         "costBasisSource": "trades_md",
-        "avgBuyPrice": 39.851196,
-        "unrealizedProfitChf": -364.43,
-        "unrealizedProfitPct": -2.9
+        "unrealizedProfitChf": -377.81,
+        "unrealizedProfitPct": -3,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for EMUAA.SW.",
+        "quoteTrusted": true
       },
       {
         "tickerOrIsin": "75776072",
@@ -369,22 +473,114 @@
         "name": "SXR8",
         "currency": "EUR",
         "quantity": 36,
-        "valueChf": 22759.219296,
-        "costBasisCurrency": "EUR",
-        "costBasisNative": 24738.48,
+        "valueChf": 22736.45,
         "costBasisChf": 23748.94,
         "costBasisSource": "trades_md",
-        "avgBuyPrice": 687.18,
-        "unrealizedProfitChf": -989.72,
-        "unrealizedProfitPct": -4.17
+        "unrealizedProfitChf": -1012.49,
+        "unrealizedProfitPct": -4.26,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-05-29T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for SXR8.DE.",
+        "quoteTrusted": true
       }
     ],
     "totals": {
-      "totalProfitChf": -1885.6,
-      "totalCostBasisChf": 54913.15,
-      "coveredValueChf": 53027.55,
-      "coveredCount": 4,
-      "totalProfitPct": -3.43
+      "totalProfitChf": -1638.81,
+      "totalCostBasisChf": 87273.65,
+      "coveredValueChf": 85634.84,
+      "coveredCount": 9,
+      "totalProfitPct": -1.88
+    },
+    "index": {
+      "byIsin": {},
+      "byKey": {},
+      "legs": [
+        {
+          "date": "2026-05-13 13:57:43",
+          "isin": "LU0950668870",
+          "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+          "action": "buy",
+          "filledQty": 23,
+          "avgPriceNative": 39.52,
+          "actualChf": null,
+          "estimatedChf": 909.65,
+          "brokerOrderId": "9149",
+          "source": "execution_reconciliation"
+        },
+        {
+          "date": "2026-05-13 14:27:32",
+          "isin": "LU0950668870",
+          "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+          "action": "buy",
+          "filledQty": 50,
+          "avgPriceNative": 39.575,
+          "actualChf": null,
+          "estimatedChf": 1899.6,
+          "brokerOrderId": "9149",
+          "source": "execution_reconciliation"
+        },
+        {
+          "date": "2026-05-20 15:19:40",
+          "isin": "CH0032912732",
+          "name": "UBS SLI ETF (SMI gleichgewichtet)",
+          "action": "buy",
+          "filledQty": 8,
+          "avgPriceNative": 162.0083,
+          "actualChf": null,
+          "estimatedChf": 1296.48,
+          "brokerOrderId": "9149",
+          "source": "execution_reconciliation"
+        },
+        {
+          "date": "2026-05-20 15:20:11",
+          "isin": "LU0950668870",
+          "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+          "action": "buy",
+          "filledQty": 32,
+          "avgPriceNative": 40.5208,
+          "actualChf": null,
+          "estimatedChf": 1297.92,
+          "brokerOrderId": "9149",
+          "source": "execution_reconciliation"
+        },
+        {
+          "date": "2026-05-21 14:41:06",
+          "isin": "IE00B5BMR087",
+          "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+          "action": "buy",
+          "filledQty": 2,
+          "avgPriceNative": 687.18,
+          "actualChf": null,
+          "estimatedChf": 1322.4,
+          "brokerOrderId": "9149",
+          "source": "execution_reconciliation"
+        },
+        {
+          "date": "2026-05-29 12:15:32",
+          "isin": "IE00B5L8K969",
+          "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
+          "action": "buy",
+          "filledQty": 29,
+          "avgPriceNative": 266.9,
+          "actualChf": 7700.95,
+          "estimatedChf": 7700.95,
+          "brokerOrderId": "9150",
+          "source": "status_filled"
+        },
+        {
+          "date": "2026-05-29 12:15:33",
+          "isin": "CH0032912732",
+          "name": "UBS SLI ETF (SMI gleichgewichtet)",
+          "action": "buy",
+          "filledQty": 30,
+          "avgPriceNative": 164.44,
+          "actualChf": 4908,
+          "estimatedChf": 4908,
+          "brokerOrderId": "9151",
+          "source": "status_filled"
+        }
+      ]
     }
   },
   "approvals": {
@@ -1159,38 +1355,38 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-30 10:05:20.095 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-30 10:05:17.467 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-30 10:05:15.648 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-30 10:04:59.860 UTC",
-      "eventType": "safety_controls_blocked",
-      "severity": "warn",
-      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-05-30 10:04:48.666 UTC",
+      "time": "2026-05-30 18:37:50.845 UTC",
       "eventType": "live_execution_blocked",
       "severity": "warn",
       "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-30 18:37:50.843 UTC",
+      "eventType": "draft_execution_blocked",
+      "severity": "warn",
+      "summary": "Requested instrument is not in Approved Instruments.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-30 18:28:26.317 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-30 18:28:23.574 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-05-30 18:28:21.768 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
@@ -1202,8 +1398,8 @@
         "warn": 100
       },
       "byCategory": {
-        "risk": 72,
-        "execution_policy": 28
+        "execution_policy": 28,
+        "risk": 72
       },
       "blockedTrades": 100,
       "degradedBrokerEvents": 0,

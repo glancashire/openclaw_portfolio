@@ -73,6 +73,7 @@ function readApprovedInstruments(portfolioPath) {
       ibkrSymbol: cleanIdentity(metadata.ibkr_symbol || metadata.symbol),
       ibkrLocalSymbol: cleanIdentity(metadata.ibkr_local_symbol || metadata.local_symbol),
       ibkrPrimaryExchange: cleanIdentity(metadata.ibkr_primary_exchange || metadata.primary_exchange),
+      externalQuoteSymbol: cleanIdentity(metadata.external_quote_symbol || metadata.external_symbol || metadata.quote_symbol),
       fxToChfHint: metadata.fx_to_chf ? Number(metadata.fx_to_chf) : null,
     };
   });

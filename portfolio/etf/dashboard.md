@@ -9,38 +9,38 @@
 - Since last report %: 0
 - Number of holdings: 9
 - Latest snapshot date: 2026-05-29
-- Total unrealized profit CHF: -1585.15
-- Total unrealized profit %: -1.82
-- Cost-basis coverage: 9/9 holdings (CHF 85688.51 of position value)
+- Total unrealized profit CHF: -1638.81
+- Total unrealized profit %: -1.88
+- Cost-basis coverage: 9/9 holdings (CHF 85634.84 of position value)
 
 ## Profit / Loss
-- Total unrealized profit CHF: -1585.15
+- Total unrealized profit CHF: -1638.81
 - Total cost basis CHF (covered holdings only): 87273.65
-- Total unrealized profit %: -1.82%
+- Total unrealized profit %: -1.88%
 - Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 
 | Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
 |---|---:|---:|---:|---:|---|
-| SPMCHA | 8'339.20 | 8'262.29 | 76.91 | +0.93% | IBKR avg cost |
+| SPMCHA | 8'350.72 | 8'262.29 | 88.43 | +1.07% | IBKR avg cost |
 | UKGBPB | 6'067.28 | 6'069.24 | -1.96 | -0.03% | IBKR avg cost |
 | HMCD | 4'411.69 | 4'393.11 | 18.58 | +0.42% | IBKR avg cost |
-| CEBL | 6'948.56 | 7'430.50 | -481.94 | -6.49% | trades.md |
-| SEC0 | 8'641.19 | 8'440.81 | 200.38 | +2.37% | IBKR avg cost |
+| CEBL | 6'952.49 | 7'430.50 | -478.01 | -6.43% | trades.md |
+| SEC0 | 8'608.23 | 8'440.81 | 167.42 | +1.98% | IBKR avg cost |
 | LCUJ | 5'201.59 | 5'195.05 | 6.54 | +0.13% | IBKR avg cost |
 | CHSPI | 11'097.60 | 11'147.11 | -49.51 | -0.44% | trades.md |
-| EMUAA | 12'222.17 | 12'586.60 | -364.43 | -2.90% | trades.md |
-| SXR8 | 22'759.22 | 23'748.94 | -989.72 | -4.17% | trades.md |
+| EMUAA | 12'208.79 | 12'586.60 | -377.81 | -3.00% | trades.md |
+| SXR8 | 22'736.45 | 23'748.94 | -1'012.49 | -4.26% | trades.md |
 ## Holdings
 Holdings sorted by CHF value (descending).
 
 | Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
-| SXR8 | 22'759.22 | -989.72 | -4.17% | 25.2% |
-| EMUAA | 12'222.17 | -364.43 | -2.90% | 13.5% |
+| SXR8 | 22'736.45 | -1'012.49 | -4.26% | 25.2% |
+| EMUAA | 12'208.79 | -377.81 | -3.00% | 13.5% |
 | CHSPI | 11'097.60 | -49.51 | -0.44% | 12.3% |
-| SEC0 | 8'641.19 | +200.38 | +2.37% | 9.6% |
-| SPMCHA | 8'339.20 | +76.91 | +0.93% | 9.2% |
-| CEBL | 6'948.56 | -481.94 | -6.49% | 7.7% |
+| SEC0 | 8'608.23 | +167.42 | +1.98% | 9.5% |
+| SPMCHA | 8'350.72 | +88.43 | +1.07% | 9.2% |
+| CEBL | 6'952.49 | -478.01 | -6.43% | 7.7% |
 | UKGBPB | 6'067.28 | -1.96 | -0.03% | 6.7% |
 | LCUJ | 5'201.59 | +6.54 | +0.13% | 5.8% |
 | HMCD | 4'411.69 | +18.58 | +0.42% | 4.9% |
@@ -112,11 +112,11 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-05-30 10:04:48.666 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
-| 2026-05-30 10:04:48.663 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-05-30 10:03:01.803 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-05-30 10:02:48.017 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-05-30 10:02:42.705 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-30 18:37:50.845 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
+| 2026-05-30 18:37:50.843 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-05-30 18:28:26.317 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-30 18:28:23.574 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-05-30 18:28:21.768 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
 ## Report / Delivery Status
 - Weekly report: latest history 2026-05-29
 - Monthly report: email_and_repo
