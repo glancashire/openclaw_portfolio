@@ -1,8 +1,12 @@
 # Open phase autonomous closeout
 
-- Status: active
+- Status: done
 - Last updated: 2026-05-30
 - Owner: bb8
+
+## Summary
+
+Completed the autonomous open-phase closeout: reconciled stale phase docs with git truth, landed the open-phases dashboard card, fixed the reporting/P&L consistency bug at the real root cause, revalidated the safe lane and full repo gates, and closed the remaining visible implementation work. What remains is explicitly non-code: decisions, external infra, blocked source discovery, and Graham-owned WIP.
 
 ## Instructions
 
@@ -44,11 +48,7 @@ Constraints:
 
 ## Next
 
-1. Verify the Phase H doc-closeout edits against the repo gates.
-2. Stage only the Phase H plan/docs/harvester updates.
-3. Commit and push the final open-work reconciliation.
-4. Confirm whether any non-blocked implementation lane still exists after doc truth is restored.
-5. If none remains, mark this harvester done with a concise final summary.
+None. No remaining non-blocked implementation lane is visible in the accessible repo. Future work depends on operator decisions, external infrastructure, Graham-owned WIP, or locating the editable Control UI source.
 
 ## Current status
 - Phase E safe-lane timeout hardening is complete: the issue was manifest lane misclassification, not a product regression.
