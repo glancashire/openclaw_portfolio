@@ -90,6 +90,20 @@ Continue the bounded-health model without turning it into unsafe or opaque autom
 
 ---
 
+## D2. Spec §1 engineering closeout
+
+### Objective
+Keep Spec §1 closed for engineering scope while leaving operational and decision-only follow-up work visible without misclassifying it as unfinished core implementation.
+
+### Status summary
+- [x] Writable live execution path implemented
+- [x] Durable reconciliation/status tracking implemented
+- [x] Retry hardening / proposal timing / audit / preparation follow-ons landed
+- [x] Documentation truth reconciled to git reality (2026-05-30)
+- [x] Spec §1 treated as complete for engineering scope; remaining work is operational or infrastructural
+
+---
+
 ## E. Runtime/generated artifact hygiene
 
 ### Objective

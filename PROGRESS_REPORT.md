@@ -74,11 +74,11 @@ Recent work materially expanded the user-facing product surface with:
 
 ## Current top open work
 
-The highest-signal open lane is now the market-calendar program:
-1. persist exchange-hours intelligence for approved instruments
-2. sync IBKR contract hours into that artifact
-3. integrate the artifact into readiness/reporting surfaces conservatively
-4. keep it refreshed through cron without making the system brittle
+The highest-signal open work is now mostly operational rather than unfinished core engineering:
+1. decide whether any bounded self-heal actions should be promoted beyond guidance
+2. complete Mailgun inbound infrastructure if email-reply approval flow is needed
+3. keep native IBKR login/2FA readiness healthy
+4. embed the open-phases dashboard card directly in the real Control UI only if the editable app source becomes available
 
 That work is being tracked in `ROLLUP_OUTSTANDING_PLAN.md` and the `phase-166*` plan series.
 
