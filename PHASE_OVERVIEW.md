@@ -61,67 +61,83 @@
 |-------|---------|--------|
 | F | Market-hours-aware broker wording | ✅ `fd21fd9` |
 | G | Fallback quote + unrealized P/L consistency | ✅ `c37090b` |
+| I/J/K/L | Quote fallback, identity, account P&L, explicit overrides, IBKR accounting snapshot | ✅ `67229ae`, `dc1eb42` |
+| N | Truth reconciliation | 🚧 in progress |
 
-### Follow-ups
+### Audit / Roadmap Track
+
+| Phase | Summary | Status |
+|-------|---------|--------|
+| 1 | Safe hygiene and truth maintenance | ✅ `3d8a58f` |
+| 2 | Configuration and environment hardening | 🟡 ready |
+| 3 | CLI and orchestration refactor | ⚪ queued |
+| 4 | Test governance and coverage transparency | 🟡 ready |
+| 5 | Artifact hygiene and dead-code retirement | ⚪ queued |
+| 6 | Operator UX and support simplification | ⚪ queued |
+| 7 | Reliability and self-heal realism | 🟡 ready |
+| 8 | Product and usage reporting | ⚪ queued |
+
+### Follow-ups / External lanes
 
 | # | Summary | Status |
 |---|---------|--------|
-| 1 | test-multi-portfolio-overview slow (28s→15s) | 🟡 partially resolved (acceptable) |
 | 2 | Mailgun inbound route infra setup | 🔴 open (code ready, infra not) |
-| 3 | Session safe-word enforcement | ✅ resolved |
-| 4 | ib_insync tzdata traceback | ✅ resolved |
-
-### Spec Outstanding Checklist
-
-| Section | Status |
-|---------|--------|
-| §1 Live execution lane | 🟡 decision-ready closeout |
-| §2 Approval-gated execution | ✅ |
-| §3 Order lifecycle hardening | ✅ |
-| §4 Strategy validation & blocking | ✅ |
-| §5 ETF suggestion workflow | ✅ |
-| §6 Portfolio creation | ✅ |
-| §7 History & dashboard refresh | ✅ |
-| §8 Rebalancing engine | ✅ |
-| §9 Reporting completeness | ✅ |
-| §10 Scheduling / automation | ✅ |
-| §11 Broker adapter | ✅ |
-| §12 End-to-end acceptance | ✅ |
-| §13 Expanded roadmap/reporting | ✅ |
+| UI | Control UI direct embedding | 🔴 blocked on source access |
+| FX | FX cash reconciliation | 🟡 parked (Graham WIP) |
 
 ---
 
 ## Detailed Open Work
 
-### 🟡 Roll-up D — Auto-Remediation Decision
+### 🟡 Phase 2 — Configuration and environment hardening
 
-**Status:** Deferred pending soak evidence
+**Status:** ready
 
-#### Open item
-- [ ] Decide whether any safe auto-remediation steps should move from guidance to explicit operator-approved automation
+#### Remaining
+- [ ] add `docs/config-matrix.md`
+- [ ] introduce pure `readWorkspaceEnv()` alongside mutating loader
+- [ ] add tests proving loopback-only TLS relaxations never apply to non-local hosts
+- [ ] centralize IBKR host/port/baseUrl defaults and document them once
+
+### 🟡 Phase 4 — Test governance and coverage transparency
+
+**Status:** ready
+
+#### Remaining
+- [ ] generate a coverage-by-domain manifest from discovered tests
+- [ ] add `docs/test-governance.md`
+- [ ] move quarantine/override policy to versioned data files
+- [ ] evaluate a generated-artifact idempotence lane
+
+### 🟡 Phase 7 — Reliability and guided-remediation realism
+
+**Status:** ready
+
+#### Remaining
+- [ ] add cron-fetch degradation visibility to overview/reporting artifacts
+- [ ] add a cron-health self-check lane/job
+- [ ] keep remediation surfaces conservative and truthful
+- [ ] clarify “self-heal” wording if actual automated healing remains intentionally narrow
+
+### ⚪ Phase 5 — Artifact hygiene and dead-code retirement
+
+**Status:** queued after the ready hardening phases
+
+#### Remaining
+- [ ] classify debug scripts into keep/move/remove
+- [ ] determine whether obsolete compatibility helpers can be retired
+- [ ] separate supported operator helpers from debug-only tooling more cleanly
+- [ ] improve generated/live artifact hygiene boundaries
 
 ### 🔴 Follow-up #2 — Mailgun Inbound Route (Infra)
 
-**Status:** Code ready, infra not set up
+**Status:** code ready, infra not set up
 
 #### Remaining
 - [ ] Create Mailgun receiving route
 - [ ] Set `mailgun.inboundWebhookSecret` in gateway config
 - [ ] Expose public webhook endpoint/tunnel
 - [ ] Run signed inbound integration test
-
-### 🟡 Spec §1 — Live Execution Lane
-
-**Status:** Decision-ready closeout
-
-#### Remaining
-- [ ] Decide whether engineering scope is now complete
-- [ ] If yes, update canonical spec-tracking surfaces to mark §1 closed
-- [ ] If no, name the non-engineering closure criteria explicitly
-
-#### Engineering truth as of 2026-05-30
-- Session-aware retry ergonomics and reporting consistency work are landed.
-- Remaining uncertainty is no longer implementation depth; it is whether surrounding non-engineering expectations are being bundled into §1 closure.
 
 ### 🔴 Follow-up — Control UI Direct Embedding
 

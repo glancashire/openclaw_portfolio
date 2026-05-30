@@ -1,27 +1,29 @@
-# Open Phases Overview — 2026-05-30 08:05 UTC
+# Open Phases Overview — 2026-05-30 18:40 UTC
 
 > Filtered to **non-fully-complete** work only.
-> Rebuilt from **git history + current verification state**, because the previous overview had drifted behind the actual implementation commits.
+> Rebuilt from **git history + current verification state** so the open-work view matches the actual repo truth.
 
 ---
 
 ## Visual roadmap
 
 ```text
-Done backlog ────────────────────────────────────────────────────────────────┐
+Done engineering backlog ───────────────────────────────────────────────────┐
                                                                             │
 Open now                                                                    ▼
 
-Roll-up D auto-remediation decision     [WAITING]    ██░░░░░░░░
+Phase 2 config/env hardening            [READY]      ██████████
+Phase 4 test governance                 [READY]      ██████████
+Phase 7 cron/remediation realism        [READY]      ██████████
+Phase 5 artifact hygiene                [READY]      ██████████
 Mailgun inbound infra                   [WAITING]    ██░░░░░░░░
-Spec §1 engineering closeout decision   [DECIDE]     ████████░░
-FX cash reconciliation (Graham WIP)     [PARKED]     ██░░░░░░░░
 Control UI direct embedding             [BLOCKED]    ██████░░░░
+FX cash reconciliation (Graham WIP)     [PARKED]     ██░░░░░░░░
 ```
 
 Legend:
-- `WAITING` = blocked on a decision/external access
-- `DECIDE` = implementation is landed; remaining work is an explicit closure decision
+- `READY` = active autonomous implementation lane from the roadmap
+- `WAITING` = blocked on external access
 - `PARKED` = intentionally not taken over
 - `BLOCKED` = implementation target exists conceptually, but the editable surface is unavailable
 
@@ -30,102 +32,105 @@ Legend:
 ## Executive summary
 
 ### Latest closeout update
-- **Phase G is now complete in git** (`c37090b`). Dashboard/report unrealized P/L now uses one authoritative shared calculation across surfaces, with matching coverage counts and explicit quote-provenance/degraded-state handling.
-- The still-unimplemented idea of a fully robust external last-close adapter is now classified as **deferred technical debt**, not active blocking open work, because the current reporting path is truthful, consistent, and safe without relying on fragile live web quote fetches.
+- **Reporting/accounting/quote hardening is complete in git.**
+  - Phase G cross-surface unrealized P/L consistency: `c37090b`
+  - Phase H open-work doc closeout: `b8381c9`
+  - Phase I/J/K/L reporting lane closeout across explicit quote overrides, account-vs-holdings P/L, and read-only IBKR accounting snapshot support: `67229ae` + `dc1eb42`
+- EMUAA now resolves through the explicit `external_quote_symbol` override path (`EMUAA.SW`) and uses the conservative Yahoo last-close fallback when available.
+- Dashboard/reporting surfaces now distinguish:
+  - **Holdings unrealized P/L**
+  - **Account P/L vs deposited capital**
 
-### Git-truth corrections applied
-- **R6 is already complete in git** (`5dc2723`, following implementation commit `b72519f`).
-- **next-1 is already complete in git** (`8f0dfce`).
-- **next-2 is already complete in git** (`b398c85`).
-- **phase 5 is already complete in git** (`2159330`).
-- The prior open-phase overview was stale and overstated the remaining engineering backlog.
-
-### Active implementation lane
-The remaining work is now mostly **truth maintenance, explicit closure decisions, and blocked external lanes** rather than unfinished execution-hardening code.
+### Spec truth
+- **Spec §1 engineering scope is complete.** Canonical spec trackers (`SPEC_PROGRESS.md`, `spec-outstanding-checklist.md`) already mark the live execution lane as complete.
+- Remaining open work is now **roadmap hardening / operational follow-through**, not unfinished core execution/reporting engineering.
 
 ### Actual remaining non-complete items
-1. **Roll-up D decision** (not an implementation gap)
-2. **Mailgun inbound infra** (external access gap)
-3. **Spec §1 engineering closeout decision** after doc alignment
-4. **FX cash reconciliation** remains Graham-owned WIP and untouched
-5. **Control UI direct embedding** remains blocked until the editable app source is available
-
-### Explicitly not open implementation work
-- A more ambitious external quote adapter remains a possible future enhancement, but it is **not** required for current closeout because Phase G already fixed the real product bug: inconsistent cross-surface unrealized P/L and unclear degraded quote posture.
+1. **Phase 2 — Configuration and environment hardening**
+2. **Phase 4 — Test governance and coverage transparency**
+3. **Phase 7 — Cron health / guided remediation realism**
+4. **Phase 5 — Artifact hygiene and dead-code retirement**
+5. **Mailgun inbound infra** (external access gap)
+6. **Control UI direct embedding** (blocked until editable app source is available)
+7. **FX cash reconciliation** remains Graham-owned WIP and untouched
 
 ---
 
 ## Detailed open-phase checklist
 
+### Phase 2 — Configuration and environment hardening
+**Status:** READY FOR IMPLEMENTATION
+
+#### Objectives
+- centralize configuration contracts
+- reduce hidden hard-coded defaults
+- separate pure config loading from mutating environment bootstrap
+- document the config matrix once
+
+#### Still open
+- [ ] add `docs/config-matrix.md`
+- [ ] introduce pure env-read helper beside mutating loader
+- [ ] add loopback-only TLS-relaxation guard coverage
+- [ ] centralize and document IBKR connection defaults
+
 ---
 
-## Roll-up D — auto-remediation promotion
-**Status:** WAITING ON DECISION
+### Phase 4 — Test governance and coverage transparency
+**Status:** READY FOR IMPLEMENTATION
 
-### Completed
-- [x] Guidance/self-heal posture exists
-- [x] Health/reporting surfaces are in place
-
-### Still open
-- [ ] Decide whether any self-heal action should graduate from guidance to operator-approved automation
-
-### Recommendation
-- **Defer** until more soak evidence exists
+#### Still open
+- [ ] generate coverage-by-domain manifest from discovered tests
+- [ ] add `docs/test-governance.md`
+- [ ] externalize lane/quarantine policy into versioned data
+- [ ] consider generated-artifact idempotence lane
 
 ---
 
-## Follow-up #2 — Mailgun inbound infra
+### Phase 7 — Cron health / guided remediation realism
+**Status:** READY FOR IMPLEMENTATION
+
+#### Still open
+- [ ] surface cron-fetch degradation explicitly in overview/reporting artifacts
+- [ ] add a cron-health self-check lane/job
+- [ ] keep self-heal guidance conservative and truthful
+- [ ] rename or clarify “self-heal” wording if automation stays intentionally narrow
+
+---
+
+### Phase 5 — Artifact hygiene and dead-code retirement
+**Status:** READY AFTER PHASES 2/4/7
+
+#### Still open
+- [ ] classify debug scripts into keep/move/remove
+- [ ] determine whether legacy helpers like `scripts/execute-trades.js` can be retired
+- [ ] separate supported operator helpers from debug-only tooling more clearly
+- [ ] improve generated/live artifact hygiene boundaries
+
+---
+
+### Follow-up #2 — Mailgun inbound infra
 **Status:** WAITING ON EXTERNAL ACCESS
 
-### Completed
-- [x] Inbound code path exists
-- [x] Tests exist
-
-### Still open
+#### Still open
 - [ ] Create Mailgun receiving route
 - [ ] Expose public webhook endpoint/tunnel
 - [ ] Set webhook secret in gateway config
 - [ ] Run signed inbound integration test
 
-### Recommendation
-- **Park** unless email-reply approval flow is needed immediately
+---
+
+### Follow-up — Control UI direct embedding
+**Status:** BLOCKED ON EDITABLE APP SOURCE
+
+#### Still open
+- [ ] Locate the actual editable `openclaw-control-ui` source/worktree
+- [ ] If found, port the already-landed open-phases card into the real dashboard surface
+- [ ] Run that repo's build/test gates
 
 ---
 
-## Spec §1 — live execution lane closeout
-**Status:** DECISION READY
-
-### Completed
-- [x] Live execution path exists and has been used successfully
-- [x] R6 landed terminal-evidence fallback
-- [x] next-1 / next-2 / next-3 / phase 5 landed in git
-- [x] Verification/doc reconciliation for the retry-hardening lane landed
-
-### Still open
-- [ ] Decide whether Spec §1 should now be marked fully complete for engineering scope
-- [ ] If yes, update the remaining canonical spec-tracking surfaces to remove stale partial-status language
-- [ ] If no, explicitly name the non-engineering criteria still being bundled into Spec §1 closure
-
----
-
-## FX cash reconciliation (Graham WIP)
+### FX cash reconciliation (Graham WIP)
 **Status:** PARKED / NOT IN AUTONOMOUS SCOPE
 
-### Completed
-- [x] Known overlapping WIP lane identified
-
-### Still open
+#### Still open
 - [ ] Graham-owned changes remain untouched
-
----
-
-## Suggested next execution order
-
-```text
-1. Reconcile stale spec/open-work docs
-2. Make the Spec §1 engineering closeout decision explicit
-3. Leave Roll-up D waiting for decision
-4. Leave Mailgun inbound infra waiting for external access
-5. Leave FX cash reconciliation parked
-6. Embed directly into Control UI only if editable app source becomes available
-```
