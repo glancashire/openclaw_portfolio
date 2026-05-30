@@ -5,7 +5,7 @@ const { appendTradeEvent, markTradeApproved, reconcileOrderStatus, readTradesTab
 const { appendHistorySnapshot } = require('../src/analysis/historyWriter');
 const { generateDashboard } = require('../src/reporting/dashboardGenerator');
 
-function main() {
+async function main() {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'portfolio-demo-'));
   const holdingsText = `# Holdings: demo\n\n## Last Sync\n- Date/time: 2026-05-03 20:30:00\n- Source: broker_api\n- Broker: interactive-brokers\n- Base currency: CHF\n- Total value CHF: 5000\n- Cash CHF: 5000\n- Invested value CHF: 0\n\n## Current Holdings\n| Ticker / ISIN | Name | Asset class | Quantity | Price | Currency | FX rate to CHF | Value CHF | Allocation % | Target % | Drift % |\n|---|---|---|---:|---:|---|---:|---:|---:|---:|---:|\n\n## Cash\n| Currency | Amount | FX rate to CHF | Value CHF |\n|---|---:|---:|---:|\n| CHF | 5000 | 1 | 5000 |\n\n## Data Quality\n- All holdings matched to approved instruments: yes\n- Unmatched holdings: none\n- Pricing source: broker_api\n`;
   const tradesPath = path.join(tempDir, 'trades.md');
@@ -37,7 +37,7 @@ function main() {
   reconcileOrderStatus(tradesPath, { orderId: '321', tickerOrIsin: 'LU0950668870' }, { orderId: 321, status: 'Filled', filled: 10, remaining: 0, avgFillPrice: 38.45, lastFillPrice: 38.5, executedAt: '2026-05-03T20:33:00Z', execId: 'demo-fill-1', estimatedValue: 384.5 });
   appendHistorySnapshot(historyPath, holdingsPath, 'execution_status', 'Demo trade filled.', { executionStatus: 'filled' });
 
-  const dashboard = generateDashboard({
+  const dashboard = await generateDashboard({
     portfolioName: 'demo',
     holdingsText,
     allocations: [],
@@ -67,4 +67,4 @@ function main() {
   }, null, 2));
 }
 
-main();
+main().catch((error) => { console.error(error); process.exit(1); });

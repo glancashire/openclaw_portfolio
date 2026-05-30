@@ -47,14 +47,26 @@ function parseQueueItems(deliveryStatus = null) {
 
 function buildInvestorMetrics(summary = null) {
   const holdings = summary?.holdings || {};
+  const profitLossTotals = summary?.profitLoss?.totals || {};
   const totalValueChf = Number(holdings.totalValueChf);
   const investedChf = Number(holdings.investedChf);
   const cashChf = Number(holdings.cashChf);
   const dailyChangeChf = Number(holdings.dailyChangeChf);
-  const sincePurchaseChf = Number.isFinite(totalValueChf) && Number.isFinite(investedChf)
-    ? Number((totalValueChf - investedChf).toFixed(2))
+  const coveredCostBasisChf = Number(profitLossTotals.totalCostBasisChf);
+  const coveredProfitChf = Number(profitLossTotals.totalProfitChf);
+  const holdingCount = Number(holdings.holdingCount || 0);
+  const coveredHoldingCount = Number(profitLossTotals.coveredCount || 0);
+  const sincePurchaseChf = Number.isFinite(coveredProfitChf)
+    ? coveredProfitChf
     : null;
-  const sincePurchasePct = sincePurchaseChf === null ? null : safePercent(sincePurchaseChf, investedChf);
+  const sincePurchasePct = Number.isFinite(coveredProfitChf) && Number.isFinite(coveredCostBasisChf) && coveredCostBasisChf > 0
+    ? safePercent(coveredProfitChf, coveredCostBasisChf)
+    : null;
+  const sincePurchaseAvailability = sincePurchaseChf === null
+    ? 'missing'
+    : coveredHoldingCount === holdingCount
+      ? 'complete'
+      : 'partial';
 
   return {
     totalValueChf,
@@ -64,7 +76,10 @@ function buildInvestorMetrics(summary = null) {
     dailyChangePct: Number.isFinite(Number(holdings.dailyChangePct)) ? Number(holdings.dailyChangePct) : null,
     sincePurchaseChf,
     sincePurchasePct,
-    holdingCount: Number(holdings.holdingCount || 0),
+    sincePurchaseAvailability,
+    holdingCount,
+    coveredHoldingCount,
+    coveredCostBasisChf: Number.isFinite(coveredCostBasisChf) ? coveredCostBasisChf : null,
     latestSnapshotDate: holdings.latestSnapshotDate || null,
     lastSyncAt: holdings.lastSyncAt || null,
     baseCurrency: holdings.baseCurrency || 'CHF',
@@ -86,7 +101,10 @@ function buildManagementSummary({ portfolioName, period, summary = null, topBloc
   if (Number.isFinite(metrics.sincePurchaseChf)) {
     const performanceWord = metrics.sincePurchaseChf >= 0 ? 'up' : 'down';
     const pctPart = Number.isFinite(metrics.sincePurchasePct) ? ` (${formatPercent(metrics.sincePurchasePct)})` : '';
-    clauses.push(`${performanceWord} ${formatSignedCurrency(metrics.sincePurchaseChf, 'CHF')} since purchase${pctPart}`);
+    const coveragePart = metrics.sincePurchaseAvailability === 'partial'
+      ? ` based on ${metrics.coveredHoldingCount}/${metrics.holdingCount} holdings with cost basis`
+      : '';
+    clauses.push(`${performanceWord} ${formatSignedCurrency(metrics.sincePurchaseChf, 'CHF')} since purchase${pctPart}${coveragePart}`);
   }
 
   if (status.health) clauses.push(`posture: ${String(status.health).replace(/_/g, ' ')}`);
@@ -108,7 +126,9 @@ function buildHeadlineMetrics(summary = null) {
     {
       label: 'Gain since purchase',
       value: metrics.sincePurchaseChf === null ? '—' : formatSignedCurrency(metrics.sincePurchaseChf, 'CHF'),
-      detail: Number.isFinite(metrics.sincePurchasePct) ? formatPercent(metrics.sincePurchasePct) : 'Cost basis unavailable',
+      detail: Number.isFinite(metrics.sincePurchasePct)
+        ? `${formatPercent(metrics.sincePurchasePct)}${metrics.sincePurchaseAvailability === 'partial' ? ` • ${metrics.coveredHoldingCount}/${metrics.holdingCount} covered` : ''}`
+        : 'Cost basis unavailable',
     },
     {
       label: 'Invested capital',
@@ -218,6 +238,7 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
     `- Portfolio value (CHF): ${formatCurrency(metrics.totalValueChf, 'CHF')}`,
     `- Gain since purchase (CHF): ${metrics.sincePurchaseChf === null ? '—' : formatSignedCurrency(metrics.sincePurchaseChf, 'CHF')}`,
     `- Gain since purchase (%): ${Number.isFinite(metrics.sincePurchasePct) ? formatPercent(metrics.sincePurchasePct) : '—'}`,
+    `- Gain coverage: ${metrics.sincePurchaseAvailability === 'missing' ? 'cost basis unavailable' : metrics.sincePurchaseAvailability === 'partial' ? `${metrics.coveredHoldingCount}/${metrics.holdingCount} holdings with cost basis` : 'all holdings covered'}`,
     `- Invested capital (CHF): ${formatCurrency(metrics.investedChf, 'CHF')}`,
     `- Cash balance (CHF): ${formatCurrency(metrics.cashChf, 'CHF')}`,
     '',

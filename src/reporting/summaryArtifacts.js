@@ -21,7 +21,8 @@ const { readTradesTable, summarizeOpenRunnerRetryState, staleApprovalInventory }
 const { classifyTradeRowExecution } = require('../execution/executionClassification');
 const { buildSelfHealPlan } = require('../execution/portfolioHealth');
 const { buildInvestorHoldingsSnapshot, parseHoldingsTable } = require('./investorReportingData');
-const { enrichHoldings } = require('./costBasis');
+const { buildProfitLossSummary } = require('./costBasis');
+const { resolveHoldingQuotes } = require('./quoteResolution');
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -454,7 +455,7 @@ function buildPendingActionItems({ portfolioName, deliveryStatus = null, brokerR
   });
 }
 
-function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = null, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [], readiness = null, selfHealPlan = null, contractIntelligence = null, historySeries = [] }) {
+async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = null, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, recentEvents = [], readiness = null, selfHealPlan = null, contractIntelligence = null, historySeries = [] }) {
   const summary = parseHoldingsSummary(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
   const holdingCount = countHoldingRows(holdingsText);
@@ -464,10 +465,22 @@ function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, holdings
   // broker status Filled" notes embedded in inactive rows) -> IBKR AvgCost fallback.
   const tradesTextForCostBasis = tradesPath && fs.existsSync(tradesPath) ? fs.readFileSync(tradesPath, 'utf8') : '';
   const rawHoldingRows = parseHoldingsTable(holdingsText);
-  const costBasisEnriched = enrichHoldings({
+  const portfolioDirForSidecar = tradesPath ? path.dirname(tradesPath) : null;
+  const avgCostSidecarPath = portfolioDirForSidecar ? path.join(portfolioDirForSidecar, 'holdings-avg-cost.json') : null;
+  const avgCostByKey = avgCostSidecarPath && fs.existsSync(avgCostSidecarPath)
+    ? (() => { try { return JSON.parse(fs.readFileSync(avgCostSidecarPath, 'utf8')); } catch { return null; } })()
+    : null;
+  const resolvedQuotes = await resolveHoldingQuotes({
     holdingRows: rawHoldingRows,
+    approvedInstruments,
+    portfolio: portfolioName,
+    brokerReadiness,
+  });
+  const profitLoss = buildProfitLossSummary({
+    holdingRows: resolvedQuotes.rows.map((row) => ({ ...row, valueChf: row.resolvedValueChf ?? row.valueChf })),
     tradesText: tradesTextForCostBasis,
     approvedInstruments,
+    avgCostByKey,
   });
   const blockers = safetyDiagnostics?.blockers || [];
   const tradeStateSummary = summarizeTradeStateRows(tradesPath);
@@ -618,28 +631,7 @@ function buildDeploymentOpportunity(holdingsText = '', totalValue = 0) {
         };
       })(),
     },
-    profitLoss: {
-      // Per-instrument unrealized P/L derived from trades.md filled buys with
-      // IBKR AvgCost fallback. Holdings without any cost-basis row carry null
-      // costBasisChf/unrealizedProfitChf rather than zero so consumers can tell
-      // "no data yet" apart from "flat at break-even".
-      rows: costBasisEnriched.rows.map((row) => ({
-        tickerOrIsin: row.tickerOrIsin,
-        symbol: row.symbol || row.tickerOrIsin,
-        name: row.name,
-        currency: row.currency || null,
-        quantity: Number.isFinite(Number(row.quantity)) ? Number(row.quantity) : null,
-        valueChf: Number.isFinite(Number(row.valueChf)) ? Number(row.valueChf) : null,
-        costBasisCurrency: row.costBasisCurrency,
-        costBasisNative: row.costBasisNative,
-        costBasisChf: row.costBasisChf,
-        costBasisSource: row.costBasisSource,
-        avgBuyPrice: row.avgBuyPrice,
-        unrealizedProfitChf: row.unrealizedProfitChf,
-        unrealizedProfitPct: row.unrealizedProfitPct,
-      })),
-      totals: costBasisEnriched.totals,
-    },
+    profitLoss,
     approvals: {
       proposedCount: Number(lifecycleSummary?.proposed || 0),
       approvedCount: Number(lifecycleSummary?.approved || 0),
@@ -750,7 +742,7 @@ async function collectPortfolioSummary({ portfolioDir, readiness = null }) {
   const freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   const deliveryStatus = reportDeliveryStatus({ portfolioDir });
   const selfHealPlan = await buildSelfHealPlan({ portfolioDir });
-  return buildPortfolioSummaryModel({
+  return await buildPortfolioSummaryModel({
     portfolioName,
     tradesPath,
     holdingsText,
@@ -912,8 +904,21 @@ function renderPortfolioSummaryHtml(summary = {}) {
   const totalValue = Number(summary.holdings?.totalValueChf || 0);
   const invested = Number(summary.holdings?.investedChf || 0);
   const cash = Number(summary.holdings?.cashChf || 0);
-  const gain = Number((totalValue - invested).toFixed(2));
-  const gainPct = invested > 0 ? Number(((gain / invested) * 100).toFixed(1)) : 0;
+  const profitLossTotals = summary.profitLoss?.totals || {};
+  const coveredGain = Number(profitLossTotals.totalProfitChf);
+  const coveredGainPct = Number(profitLossTotals.totalProfitPct);
+  const coveredHoldingCount = Number(profitLossTotals.coveredCount || 0);
+  const totalHoldingCount = Number(summary.holdings?.holdingCount || 0);
+  const hasCoveredGain = Number.isFinite(coveredGain);
+  const gain = hasCoveredGain ? Number(coveredGain.toFixed(2)) : null;
+  const gainPct = hasCoveredGain && Number.isFinite(coveredGainPct)
+    ? Number(coveredGainPct.toFixed(1))
+    : null;
+  const gainCoverageDetail = !hasCoveredGain
+    ? 'Cost basis unavailable'
+    : coveredHoldingCount < totalHoldingCount
+      ? `${coveredHoldingCount}/${totalHoldingCount} holdings covered`
+      : 'All holdings covered';
   const pendingCount = Number(summary.operatorQueue?.summary?.total || 0);
   const topBlocker = summary.blockers?.items?.[0]?.message || 'No active blocker currently surfaced.';
   const liveReadinessLabel = summary.readiness ? (summary.readiness.ok ? 'ready' : 'blocked') : 'not-evaluated';
@@ -1058,7 +1063,7 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
     <div class="badge-row">
       <span class="badge">Total value CHF ${totalValue.toFixed(2)}</span>
       <span class="badge">Invested CHF ${invested.toFixed(2)}</span>
-      <span class="badge">Gain since purchase CHF ${gain.toFixed(2)} (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)</span>
+      <span class="badge">Gain since purchase ${hasCoveredGain ? `CHF ${gain.toFixed(2)}${gainPct === null ? '' : ` (${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%)`}` : 'unavailable'}${gainCoverageDetail ? ` • ${escapeHtml(gainCoverageDetail)}` : ''}</span>
       <span class="badge">Cash CHF ${cash.toFixed(2)}</span>
       <span class="badge">Pending actions ${pendingCount}</span>
     </div>
@@ -1066,7 +1071,7 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
   <div class="grid">
     <section class="kpi-grid">
       <div class="kpi"><div class="kpi-label">Portfolio value</div><div class="kpi-value">CHF ${totalValue.toFixed(2)}</div><div class="kpi-detail">Latest snapshot ${escapeHtml(summary.holdings?.latestSnapshotDate || 'unknown')}</div></div>
-      <div class="kpi"><div class="kpi-label">Gain since purchase</div><div class="kpi-value ${gain >= 0 ? 'tone-positive' : 'tone-negative'}">CHF ${gain.toFixed(2)}</div><div class="kpi-detail">${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%</div></div>
+      <div class="kpi"><div class="kpi-label">Gain since purchase</div><div class="kpi-value ${!hasCoveredGain ? '' : gain >= 0 ? 'tone-positive' : 'tone-negative'}">${hasCoveredGain ? `CHF ${gain.toFixed(2)}` : '—'}</div><div class="kpi-detail">${hasCoveredGain ? (gainPct === null ? gainCoverageDetail : `${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}% • ${escapeHtml(gainCoverageDetail)}`) : 'Cost basis unavailable'}</div></div>
       <div class="kpi"><div class="kpi-label">Cash balance</div><div class="kpi-value">CHF ${cash.toFixed(2)}</div><div class="kpi-detail">Holdings ${Number(summary.holdings?.holdingCount || 0)}</div></div>
       <div class="kpi"><div class="kpi-label">Top blocker</div><div class="kpi-value" style="font-size:1.05rem;line-height:1.35;">${escapeHtml(topBlocker)}</div><div class="kpi-detail">Broker health ${escapeHtml(summary.status?.brokerHealth || 'unknown')}</div></div>
     </section>

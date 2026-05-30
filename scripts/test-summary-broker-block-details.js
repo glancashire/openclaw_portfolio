@@ -8,12 +8,12 @@ const {
   renderRecoveryChecklistMarkdown,
 } = require('../src/reporting/summaryArtifacts');
 
-(function main() {
+(async function main() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'summary-broker-block-'));
   const tradesPath = path.join(tmpDir, 'trades.md');
   fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| 2026-05-11 09:40:00 | inactive | buy | IE000XZSV718 | SPYL | 105 | 15.5 | 1560.83 | 0 | live submit | broker_inactive | 9105 | exchange_closed_at_submit | Broker rejected the order because the target exchange was closed at submission time. | 2026-05-11 09:40:02 | Retry during the venue trading session or hand the row back to the market-open runner. |\n`);
 
-  const summary = buildPortfolioSummaryModel({
+  const summary = await buildPortfolioSummaryModel({
     portfolioName: 'etf',
     tradesPath,
     holdingsText: `# Holdings\n- Date/time: 2026-05-11 10:00:00\n- Source: manual\n- Broker: interactive-brokers\n- Base currency: CHF\n- Total value CHF: 10000\n- Cash CHF: 1000\n- Invested value CHF: 9000\n\n## Current Holdings\n| Ticker / ISIN | Name | Quantity | Market price | Market value CHF | Weight % | Notes |\n|---|---|---:|---:|---:|---:|---|\n| TEST | Test Holding | 1 | 1 | 1 | 0.01 | note |\n`,
@@ -55,4 +55,7 @@ const {
     blockedRows: summary.execution.blockedRows,
     activeBrokerBlocks: recovery.activeBrokerBlocks,
   }, null, 2));
-})();
+})().catch((error) => {
+  console.error(error?.stack || error?.message || String(error));
+  process.exit(1);
+});

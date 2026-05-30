@@ -51,8 +51,8 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportHtml.includes('display:inline-block;vertical-align:top;width:calc(50% - 10px)'));
   assert(reportHtml.includes('linear-gradient(135deg'));
   assert(reportHtml.includes('CHF 5&#39;327.03') || reportHtml.includes('CHF 5,327.03'));
-  assert(reportHtml.includes('+CHF 116.64'));
-  assert(reportHtml.includes('+2.2%'));
+  assert(reportHtml.includes('Cost basis unavailable'));
+  assert(!reportHtml.includes('+2.2%'));
   assert(reportHtml.includes('Immediate priorities'));
   assert(reportHtml.includes('What matters now'));
   assert(reportHtml.includes('Status snapshot'));
@@ -68,8 +68,8 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportText.includes('Management summary'));
   assert(reportText.includes('Headline metrics'));
   assert(reportText.includes('Portfolio value (CHF): CHF'));
-  assert(reportText.includes('Gain since purchase (CHF): +CHF 116.64'));
-  assert(reportText.includes('Gain since purchase (%): +2.2%'));
+  assert(reportText.includes('Gain since purchase (CHF): —'));
+  assert(reportText.includes('Gain since purchase (%): —'));
   assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
   assert(reportText.includes('What matters now: Restore broker connectivity first.'));
   assert(reportText.includes('Next action: Restore broker connectivity first.'));

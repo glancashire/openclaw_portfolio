@@ -272,6 +272,32 @@ function enrichHoldings({ holdingRows = [], tradesText = '', approvedInstruments
   return { rows: enriched, totals, index };
 }
 
+
+function buildProfitLossSummary({ holdingRows = [], tradesText = '', approvedInstruments = [], avgCostByKey = null } = {}) {
+  const enriched = enrichHoldings({ holdingRows, tradesText, approvedInstruments, avgCostByKey });
+  return {
+    rows: enriched.rows.map((row) => ({
+      tickerOrIsin: row.tickerOrIsin || row.symbol || '',
+      symbol: row.symbol || row.tickerOrIsin || '',
+      name: row.name || '',
+      currency: row.currency || 'CHF',
+      quantity: Number(row.quantity || 0),
+      valueChf: Number(row.valueChf || 0),
+      costBasisChf: row.costBasisChf,
+      costBasisSource: row.costBasisSource,
+      unrealizedProfitChf: row.unrealizedProfitChf,
+      unrealizedProfitPct: row.unrealizedProfitPct,
+      quoteSource: row.quoteSource || null,
+      quoteQuality: row.quoteQuality || null,
+      quoteAsOf: row.quoteAsOf || null,
+      quoteNote: row.quoteNote || null,
+      quoteTrusted: row.quoteTrusted === true,
+    })),
+    totals: enriched.totals,
+    index: enriched.index,
+  };
+}
+
 module.exports = {
   parseTradeRows,
   extractFilledLegs,
@@ -280,4 +306,5 @@ module.exports = {
   lookupCostBasis,
   enrichHoldingWithCostBasis,
   enrichHoldings,
+  buildProfitLossSummary,
 };

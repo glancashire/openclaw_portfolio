@@ -36,14 +36,17 @@ Constraints:
 - 2026-05-30: Added the open-phases dashboard card to the overview reporting pipeline, added tests, passed safe lane, and pushed `ca34ead`.
 - 2026-05-30: User requested native IBKR gateway recovery first, then autonomous phase execution. Started `/home/ubuntu/ibgateway-native/start-ibc.sh`; IBC reached the `Second Factor Authentication` dialog successfully on display `:99`, so the launcher path is healthy but final readiness is waiting on login/2FA completion before port `127.0.0.1:4001` opens.
 - 2026-05-30: Surfaced early decision to keep source/docs/tests-only commits unless a phase explicitly targets generated artifacts; proceeding on that basis.
+- 2026-05-30: Phase G root cause resolved: dashboard and summary were both using `buildProfitLossSummary()` but only the dashboard path supplied `holdings-avg-cost.json` sidecar fallback data. Updated `collectPortfolioSummary()` / `buildPortfolioSummaryModel()` to load the same avg-cost sidecar input so cross-surface unrealized P/L totals and coverage counts match.
+- 2026-05-30: Hardened regression tests around Phase G closeout: normalized numeric comparison in `test-profit-loss-surface-consistency.js` and updated `test-summary-broker-block-details.js` to await the async summary model builder after quote-resolution wiring made summary construction async.
+- 2026-05-30: Revalidated Phase G on the safe lane after fixing the one induced regression in `test-summary-broker-block-details.js`; safe lane is green again at 221 passed, 0 failed, 3 quarantined.
 
 ## Next
 
-1. Phase A: reconcile residual stale-open references and define the canonical remaining-open-work source.
-2. Commit the Phase A plan before implementation.
-3. Implement/tests/verify/commit/push Phase A.
-4. Continue into Spec §1 roll-up closure and decision-package phases.
-5. Recheck IBKR readiness after the operator completes second-factor approval on `:99`.
+1. Run the broader verification gate (`npm test`) for Phase G closeout.
+2. Stage only the Phase G source/plan/test files plus harvester updates.
+3. Commit and push the Phase G closeout.
+4. Reconcile remaining open-phase docs to mark Phase G complete and distinguish true blockers from finished engineering.
+5. Recheck whether any non-blocked implementation phase remains beyond docs/closeout hygiene.
 
 ## Current status
 - Phase E safe-lane timeout hardening is complete: the issue was manifest lane misclassification, not a product regression.

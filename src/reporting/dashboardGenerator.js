@@ -16,7 +16,8 @@ const { writeTextIfChanged } = require('./artifactWriter');
 const { loadFillNotificationState } = require('./fillNotificationState');
 const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution/tradeState');
 const { parseHoldingsTable } = require('./investorReportingData');
-const { enrichHoldings } = require('./costBasis');
+const { buildProfitLossSummary } = require('./costBasis');
+const { resolveHoldingQuotes } = require('./quoteResolution');
 
 function parseHoldingsSummary(text) {
   const get = (label, fallback = '0') => {
@@ -535,7 +536,7 @@ function formatProfitLossRows(rows = []) {
   }).join('\n');
 }
 
-function generateDashboard({ portfolioName, tradesPath = '', holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [], contractIntelligence = null }) {
+async function generateDashboard({ portfolioName, tradesPath = '', holdingsText, allocations = [], approvedInstruments = [], existingTrades = [], latestProposals = [], executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, latestSnapshot = null, brokerReadiness = null, lifecycleSummary = null, openRunnerRetryState = null, freshness = null, brokerErrorState = null, deliveryStatus = null, observability = null, safetyDiagnostics = null, fillNotificationState = null, recentEvents = [], contractIntelligence = null }) {
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
@@ -547,15 +548,21 @@ function generateDashboard({ portfolioName, tradesPath = '', holdingsText, alloc
   const avgCostByKey = avgCostSidecarPath && fs.existsSync(avgCostSidecarPath)
     ? (() => { try { return JSON.parse(fs.readFileSync(avgCostSidecarPath, 'utf8')); } catch { return null; } })()
     : null;
-  const costBasis = enrichHoldings({
+  const resolvedQuotes = await resolveHoldingQuotes({
     holdingRows: parseHoldingsTable(holdingsText),
+    approvedInstruments,
+    portfolio: portfolioName,
+    brokerReadiness,
+  });
+  const profitLoss = buildProfitLossSummary({
+    holdingRows: resolvedQuotes.rows.map((row) => ({ ...row, valueChf: row.resolvedValueChf ?? row.valueChf })),
     tradesText: tradesTextForCostBasis,
     approvedInstruments,
     avgCostByKey,
   });
 
   // Compact holdings table sorted by value (CHF) descending
-  const holdingsRows = costBasis.rows.slice().sort((a, b) => (b.valueChf ?? 0) - (a.valueChf ?? 0));
+  const holdingsRows = profitLoss.rows.slice().sort((a, b) => (b.valueChf ?? 0) - (a.valueChf ?? 0));
   const holdingsTable = holdingsRows.length
     ? `| Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
@@ -667,27 +674,27 @@ ${holdingsRows.map((r) => {
 `,
     `- Latest snapshot date: ${latestDate}
 `,
-    `- Total unrealized profit CHF: ${costBasis.totals.totalProfitChf}
+    `- Total unrealized profit CHF: ${profitLoss.totals.totalProfitChf}
 `,
-    `- Total unrealized profit %: ${costBasis.totals.totalProfitPct == null ? 'unknown (no cost-basis coverage yet)' : costBasis.totals.totalProfitPct}
+    `- Total unrealized profit %: ${profitLoss.totals.totalProfitPct == null ? 'unknown (no cost-basis coverage yet)' : profitLoss.totals.totalProfitPct}
 `,
-    `- Cost-basis coverage: ${costBasis.totals.coveredCount}/${costBasis.rows.length} holdings (CHF ${costBasis.totals.coveredValueChf} of position value)
+    `- Cost-basis coverage: ${profitLoss.totals.coveredCount}/${profitLoss.rows.length} holdings (CHF ${profitLoss.totals.coveredValueChf} of position value)
 `,
     `
 ## Profit / Loss
 `,
-    `- Total unrealized profit CHF: ${costBasis.totals.totalProfitChf}
+    `- Total unrealized profit CHF: ${profitLoss.totals.totalProfitChf}
 `,
-    `- Total cost basis CHF (covered holdings only): ${costBasis.totals.totalCostBasisChf}
+    `- Total cost basis CHF (covered holdings only): ${profitLoss.totals.totalCostBasisChf}
 `,
-    `- Total unrealized profit %: ${costBasis.totals.totalProfitPct == null ? 'unknown' : costBasis.totals.totalProfitPct + '%'}
+    `- Total unrealized profit %: ${profitLoss.totals.totalProfitPct == null ? 'unknown' : profitLoss.totals.totalProfitPct + '%'}
 `,
     `- Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 `,
     `
 | Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
 |---|---:|---:|---:|---:|---|
-${formatProfitLossRows(costBasis.rows)}
+${formatProfitLossRows(profitLoss.rows)}
 `,
     `## Holdings
 `,
@@ -838,7 +845,7 @@ async function regenerateDashboard(portfolioDir) {
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   let freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   let deliveryStatus = reportDeliveryStatus({ portfolioDir });
-  let dashboard = generateDashboard({
+  let dashboard = await generateDashboard({
     portfolioName,
     tradesPath,
     holdingsText,
@@ -863,7 +870,7 @@ async function regenerateDashboard(portfolioDir) {
   writeTextIfChanged(dashboardPath, dashboard);
   freshness = fileFreshnessSummary({ dashboardPath, sourcePaths });
   deliveryStatus = reportDeliveryStatus({ portfolioDir });
-  dashboard = generateDashboard({
+  dashboard = await generateDashboard({
     portfolioName,
     tradesPath,
     holdingsText,

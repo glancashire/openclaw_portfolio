@@ -7,7 +7,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function main() {
+async function main() {
   const pending = buildPendingOperatorActions({
     deliveryStatus: { pendingActions: ['Delivery readiness needs review.'] },
     brokerReadiness: { fallbackRequired: true, message: 'IBKR unavailable' },
@@ -34,7 +34,7 @@ function main() {
   });
   assert(recommendation === pending[0], 'Expected pending queue to drive best next step');
 
-  const dashboard = generateDashboard({
+  const dashboard = await generateDashboard({
     portfolioName: 'demo',
     holdingsText: `## Last Sync\n- Date/time: 2026-05-03 10:00:00\n- Total value CHF: 5000\n- Cash CHF: 5000\n- Invested value CHF: 0`,
     allocations: [
@@ -105,4 +105,4 @@ function main() {
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
 
-main();
+main().catch((error) => { console.error(error); process.exit(1); });
