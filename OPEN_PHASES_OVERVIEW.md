@@ -12,18 +12,18 @@ Done backlog ──────────────────────�
                                                                             │
 Open now                                                                    ▼
 
-next-3 session-aware retry ergonomics   [VERIFYING]  ████████░░
 Roll-up D auto-remediation decision     [WAITING]    ██░░░░░░░░
 Mailgun inbound infra                   [WAITING]    ██░░░░░░░░
-Spec §1 closeout                        [PARTIAL]    ████████░░
+Spec §1 engineering closeout decision   [DECIDE]     ████████░░
 FX cash reconciliation (Graham WIP)     [PARKED]     ██░░░░░░░░
+Control UI direct embedding             [BLOCKED]    ██████░░░░
 ```
 
 Legend:
-- `VERIFYING` = code landed; final validation / doc closeout in progress
 - `WAITING` = blocked on a decision/external access
-- `PARTIAL` = umbrella item with implementation mostly complete but closeout still open
+- `DECIDE` = implementation is landed; remaining work is an explicit closure decision
 - `PARKED` = intentionally not taken over
+- `BLOCKED` = implementation target exists conceptually, but the editable surface is unavailable
 
 ---
 
@@ -37,57 +37,18 @@ Legend:
 - The prior open-phase overview was stale and overstated the remaining engineering backlog.
 
 ### Active implementation lane
-1. **next-3 — session-aware retry ergonomics**
-   - Shared order-preparation helper exists.
-   - Diagnostics and market-open submission paths use it.
-   - Focused verification is green.
-   - Broader verification is being rerun to support formal closeout.
+The remaining work is now mostly **truth maintenance, explicit closure decisions, and blocked external lanes** rather than unfinished execution-hardening code.
 
 ### Actual remaining non-complete items
-1. **next-3 verification + doc closeout**
-2. **Roll-up D decision** (not an implementation gap)
-3. **Mailgun inbound infra** (external access gap)
-4. **Spec §1 closeout** after verification/docs are fully aligned
-5. **FX cash reconciliation** remains Graham-owned WIP and untouched
+1. **Roll-up D decision** (not an implementation gap)
+2. **Mailgun inbound infra** (external access gap)
+3. **Spec §1 engineering closeout decision** after doc alignment
+4. **FX cash reconciliation** remains Graham-owned WIP and untouched
+5. **Control UI direct embedding** remains blocked until the editable app source is available
 
 ---
 
 ## Detailed open-phase checklist
-
----
-
-## next-3 — Session-aware retry ergonomics
-**Plan:** `plans/phase-next-3-session-aware-retry-ergonomics.md`
-**Status:** VERIFYING
-**Plan commit:** `f4160fc`
-
-### Goal
-Make executable-row → prepared-order conversion explicit and reusable, while preserving timing-policy behavior and side-effect-free dry-run/diagnostic flows.
-
-### Completed
-- [x] Shared helper exists in `src/execution/orderPreparation.js`
-- [x] Diagnostics path uses shared helper
-- [x] Market-open submission path uses shared helper
-- [x] Focused helper/regression coverage exists:
-  - `scripts/test-order-preparation.js`
-  - `scripts/test-submit-open-uses-approved-primary-exchange.js`
-  - `scripts/test-execution-diagnostics-helper.js`
-
-### Started
-- [x] Focused verification rerun completed green
-- [x] Safe-lane rerun started
-- [x] Full `npm test` rerun started
-- [x] Documentation reconciliation in progress
-
-### Still open
-- [ ] Capture final safe-lane result
-- [ ] Capture final `npm test` result
-- [ ] If both are green, commit/push doc closeout and mark phase complete
-
-### Risks / traps
-- Shared preparation logic must not mutate source rows
-- Timing defaults must remain intact for venue-aware retry cases
-- Closeout should not disturb Graham-owned WIP
 
 ---
 
@@ -125,18 +86,18 @@ Make executable-row → prepared-order conversion explicit and reusable, while p
 ---
 
 ## Spec §1 — live execution lane closeout
-**Status:** PARTIAL
+**Status:** DECISION READY
 
 ### Completed
 - [x] Live execution path exists and has been used successfully
 - [x] R6 landed terminal-evidence fallback
-- [x] next-1 / next-2 / phase 5 landed in git
-- [x] next-3 implementation appears landed
+- [x] next-1 / next-2 / next-3 / phase 5 landed in git
+- [x] Verification/doc reconciliation for the retry-hardening lane landed
 
 ### Still open
-- [ ] Finish verification/documentation closeout for next-3
-- [ ] Reconcile phase overview docs with git truth
-- [ ] Then mark Spec §1 closeout complete if no new regressions appear
+- [ ] Decide whether Spec §1 should now be marked fully complete for engineering scope
+- [ ] If yes, update the remaining canonical spec-tracking surfaces to remove stale partial-status language
+- [ ] If no, explicitly name the non-engineering criteria still being bundled into Spec §1 closure
 
 ---
 
@@ -154,9 +115,10 @@ Make executable-row → prepared-order conversion explicit and reusable, while p
 ## Suggested next execution order
 
 ```text
-1. Finish next-3 verification
-2. Commit/push doc closeout
-3. Reassess Spec §1 closure status
-4. Leave Roll-up D waiting for decision
-5. Leave Mailgun inbound infra waiting for external access
+1. Reconcile stale spec/open-work docs
+2. Make the Spec §1 engineering closeout decision explicit
+3. Leave Roll-up D waiting for decision
+4. Leave Mailgun inbound infra waiting for external access
+5. Leave FX cash reconciliation parked
+6. Embed directly into Control UI only if editable app source becomes available
 ```

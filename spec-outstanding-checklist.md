@@ -8,8 +8,8 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] complete
 
 ## 1. Live execution lane
-- [~] Implement explicitly writable-mode order submission path
-- [~] Implement durable order status tracking after submission
+- [x] Implement explicitly writable-mode order submission path
+- [x] Implement durable order status tracking after submission
 - [x] Implement robust cancel flow in writable mode (W5: `cancel-portfolio-order --broker-only` fallback ships cross-client cancel support)
 - [x] Preserve confirmation workflow before any real buy/sell
 - [x] Handle partial fills / failed submissions / retries safely
@@ -138,11 +138,10 @@ Use this checklist to track progress toward full completion of `SPECIFICATION.md
 - [x] Complete later reporting/overview hardening through Phase 100, including open-runner visibility, runtime-event/reporting alignment, overview artifact surfacing, and pending-actions contract assertions
 
 ## Working summary
-- Acceptance closure is complete for the in-scope read-only + dry-run MVP.
-- Biggest remaining risk is no longer broad MVP incompleteness; it is post-MVP operational hardening around explicit transmitted live enablement, operator handling, delivery polish, and observability.
-- Current state: read-only IBKR connectivity, holdings sync, dry-run proposal generation, staged live broker orders, approval/rejection flows, duplicate-submission guards, partial-fill inference, resync hardening, dashboard/report generation, core safety controls, and acceptance-sweep closure are all in place.
+- Acceptance closure is complete for the implemented engineering scope.
+- Biggest remaining risks are operational: native IBKR login/2FA dependency, external delivery/infra setup, and decisions about how far bounded self-heal guidance should be promoted.
+- Current state: writable-mode order submission, durable reconciliation/status tracking, guarded live broker operations, approval/rejection flows, duplicate-submission guards, partial-fill inference, resync hardening, dashboard/report generation, and core safety controls are all in place.
 - Suggested follow-up order:
-  1. transmitted live execution hardening
-  2. operator runbooks and incident handling
-  3. production reporting and delivery polish
-  4. risk, logging, and observability hardening
+  1. explicit closeout decisions on remaining decision-only lanes
+  2. blocked external infra work once access exists
+  3. operator runbooks, delivery polish, and observability follow-through where real usage still shows friction

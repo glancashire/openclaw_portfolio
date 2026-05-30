@@ -51,7 +51,7 @@
 | R6 | Terminal-order evidence fallback | ✅ `5dc2723` |
 | next-1 | UBSPX retry: stabilize proposal + timing fixes | ✅ `8f0dfce` |
 | next-2 | Reconciliation & audit-trail hardening | ✅ `b398c85` |
-| next-3 | Session-aware retry ergonomics | 🟡 verifying closeout |
+| next-3 | Session-aware retry ergonomics | ✅ `135c6c2` |
 | 4 | Summary artifact stability | ✅ verified resolved |
 | 5 | Explicit retry preparation surface | ✅ `2159330` |
 
@@ -68,7 +68,7 @@
 
 | Section | Status |
 |---------|--------|
-| §1 Live execution lane | 🟡 verifying final closeout |
+| §1 Live execution lane | 🟡 decision-ready closeout |
 | §2 Approval-gated execution | ✅ |
 | §3 Order lifecycle hardening | ✅ |
 | §4 Strategy validation & blocking | ✅ |
@@ -85,28 +85,6 @@
 ---
 
 ## Detailed Open Work
-
-### 🟡 next-3 — Session-Aware Retry Ergonomics
-
-**File:** `plans/phase-next-3-session-aware-retry-ergonomics.md`  
-**Status:** Verifying closeout  
-**Effort:** S
-
-#### Completed
-- [x] Shared order-preparation helper extracted
-- [x] Diagnostics path reuses helper
-- [x] Market-open submission path reuses helper
-- [x] Focused tests added and currently green
-
-#### In progress
-- [x] Safe-lane rerun in progress
-- [x] Full `npm test` rerun in progress
-- [x] Phase docs being reconciled with git truth
-
-#### Remaining
-- [ ] Capture final safe-lane result
-- [ ] Capture final `npm test` result
-- [ ] If green, commit/push closeout and mark phase complete
 
 ### 🟡 Roll-up D — Auto-Remediation Decision
 
@@ -127,12 +105,22 @@
 
 ### 🟡 Spec §1 — Live Execution Lane
 
-**Status:** Partially complete
+**Status:** Decision-ready closeout
 
 #### Remaining
-- [ ] Finish next-3 verification closeout
-- [ ] Confirm overview/docs now match git truth
-- [ ] Mark §1 closed if broader verification remains green
+- [ ] Decide whether engineering scope is now complete
+- [ ] If yes, update canonical spec-tracking surfaces to mark §1 closed
+- [ ] If no, name the non-engineering closure criteria explicitly
+
+### 🔴 Follow-up — Control UI Direct Embedding
+
+**Status:** blocked on editable app source
+
+#### Remaining
+- [ ] Locate the actual editable `openclaw-control-ui` source/worktree
+- [ ] If found, add a plan in that repo before implementation
+- [ ] Port the already-landed open-phases card into the real dashboard surface
+- [ ] Run that repo's build/test gates
 
 ### 🟡 FX Cash Reconciliation (WIP — Graham's branch)
 
