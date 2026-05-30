@@ -39,14 +39,16 @@ Constraints:
 - 2026-05-30: Phase G root cause resolved: dashboard and summary were both using `buildProfitLossSummary()` but only the dashboard path supplied `holdings-avg-cost.json` sidecar fallback data. Updated `collectPortfolioSummary()` / `buildPortfolioSummaryModel()` to load the same avg-cost sidecar input so cross-surface unrealized P/L totals and coverage counts match.
 - 2026-05-30: Hardened regression tests around Phase G closeout: normalized numeric comparison in `test-profit-loss-surface-consistency.js` and updated `test-summary-broker-block-details.js` to await the async summary model builder after quote-resolution wiring made summary construction async.
 - 2026-05-30: Revalidated Phase G on the safe lane after fixing the one induced regression in `test-summary-broker-block-details.js`; safe lane is green again at 221 passed, 0 failed, 3 quarantined.
+- 2026-05-30: Phase G closeout committed and pushed as `c37090b` (`Close out phase G reporting consistency`).
+- 2026-05-30: Open-work closeout review found no remaining autonomous implementation phase in the visible repo. Remaining items are decision-only, external infra, blocked editable-source discovery, or Graham-owned WIP. Open-work docs need one final truth-reconciliation pass so future agents do not reopen finished engineering.
 
 ## Next
 
-1. Run the broader verification gate (`npm test`) for Phase G closeout.
-2. Stage only the Phase G source/plan/test files plus harvester updates.
-3. Commit and push the Phase G closeout.
-4. Reconcile remaining open-phase docs to mark Phase G complete and distinguish true blockers from finished engineering.
-5. Recheck whether any non-blocked implementation phase remains beyond docs/closeout hygiene.
+1. Verify the Phase H doc-closeout edits against the repo gates.
+2. Stage only the Phase H plan/docs/harvester updates.
+3. Commit and push the final open-work reconciliation.
+4. Confirm whether any non-blocked implementation lane still exists after doc truth is restored.
+5. If none remains, mark this harvester done with a concise final summary.
 
 ## Current status
 - Phase E safe-lane timeout hardening is complete: the issue was manifest lane misclassification, not a product regression.

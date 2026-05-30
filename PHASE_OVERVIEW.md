@@ -55,6 +55,13 @@
 | 4 | Summary artifact stability | ✅ verified resolved |
 | 5 | Explicit retry preparation surface | ✅ `2159330` |
 
+### Reporting / Closeout Track
+
+| Phase | Summary | Status |
+|-------|---------|--------|
+| F | Market-hours-aware broker wording | ✅ `fd21fd9` |
+| G | Fallback quote + unrealized P/L consistency | ✅ `c37090b` |
+
 ### Follow-ups
 
 | # | Summary | Status |
@@ -111,6 +118,10 @@
 - [ ] Decide whether engineering scope is now complete
 - [ ] If yes, update canonical spec-tracking surfaces to mark §1 closed
 - [ ] If no, name the non-engineering closure criteria explicitly
+
+#### Engineering truth as of 2026-05-30
+- Session-aware retry ergonomics and reporting consistency work are landed.
+- Remaining uncertainty is no longer implementation depth; it is whether surrounding non-engineering expectations are being bundled into §1 closure.
 
 ### 🔴 Follow-up — Control UI Direct Embedding
 

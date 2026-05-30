@@ -29,6 +29,10 @@ Legend:
 
 ## Executive summary
 
+### Latest closeout update
+- **Phase G is now complete in git** (`c37090b`). Dashboard/report unrealized P/L now uses one authoritative shared calculation across surfaces, with matching coverage counts and explicit quote-provenance/degraded-state handling.
+- The still-unimplemented idea of a fully robust external last-close adapter is now classified as **deferred technical debt**, not active blocking open work, because the current reporting path is truthful, consistent, and safe without relying on fragile live web quote fetches.
+
 ### Git-truth corrections applied
 - **R6 is already complete in git** (`5dc2723`, following implementation commit `b72519f`).
 - **next-1 is already complete in git** (`8f0dfce`).
@@ -45,6 +49,9 @@ The remaining work is now mostly **truth maintenance, explicit closure decisions
 3. **Spec §1 engineering closeout decision** after doc alignment
 4. **FX cash reconciliation** remains Graham-owned WIP and untouched
 5. **Control UI direct embedding** remains blocked until the editable app source is available
+
+### Explicitly not open implementation work
+- A more ambitious external quote adapter remains a possible future enhancement, but it is **not** required for current closeout because Phase G already fixed the real product bug: inconsistent cross-surface unrealized P/L and unclear degraded quote posture.
 
 ---
 
