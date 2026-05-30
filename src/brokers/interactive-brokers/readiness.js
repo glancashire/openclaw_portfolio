@@ -155,9 +155,9 @@ function summarizeReadiness({ config, auth, marketData }) {
   const guidance = !auth?.ok
     ? `Restore native connectivity first.${authFailureSuffix}`
     : delayedOnly
-      ? 'Keep live submission blocked or explicitly accept delayed-only pricing policy.'
+      ? 'Broker connectivity is healthy, but the current quote posture is delayed-only (common outside market hours); keep live submission blocked unless delayed-only policy is explicitly accepted.'
       : authReadyButUnpriced
-        ? 'Prefer native raw contract details / market-data probes before assuming the portal session is required.'
+        ? 'Broker connectivity is up, but quote posture is still unclear; prefer native raw contract details / market-data probes before assuming a real outage.'
         : 'Broker path is healthy.';
   return {
     configured: Boolean(config?.ok),
@@ -180,7 +180,7 @@ function summarizeReadiness({ config, auth, marketData }) {
     message: liveReady
       ? 'Interactive Brokers read-only connectivity and live/realtime market data are available.'
       : delayedOnly
-        ? 'Interactive Brokers connectivity is available, but API pricing is delayed-only; broker-backed pricing may use delayed fallback values and live submission should remain blocked.'
+        ? 'Interactive Brokers connectivity is available, but current API pricing is delayed-only (common outside market hours); broker-backed pricing may use delayed fallback values and live submission should remain blocked.'
         : authReadyButUnpriced
           ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.'
           : auth?.reason === 'http_error'

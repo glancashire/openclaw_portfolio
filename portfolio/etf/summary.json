@@ -1,24 +1,24 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-29T12:45:06.703Z",
+  "generatedAt": "2026-05-30T10:23:34.065Z",
   "portfolio": "etf",
   "status": {
-    "health": "attention_needed",
-    "strategy": "rebalance_needed",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
-    "deliveryPosture": "needs_operator_attention",
+    "health": "warning",
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionPosture": "degraded_dry_run_only",
+    "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
   "readiness": null,
   "holdings": {
-    "totalValueChf": 94598.36653,
+    "totalValueChf": 90390.18983012001,
     "cashChf": 4701.68,
-    "investedChf": 89896.68653,
+    "investedChf": 85688.50983012,
     "holdingCount": 9,
     "baseCurrency": "CHF",
-    "lastSyncAt": "2026-05-29 12:44:09",
+    "lastSyncAt": "2026-05-29 17:05:28",
     "source": "broker_api",
     "latestSnapshotDate": "2026-05-29",
     "dailyChangeChf": 0,
@@ -31,14 +31,14 @@
         "name": "UBS SPI Mid ETF (SPI ohne SMI)",
         "quantityHeld": 64,
         "averageBuyPrice": null,
-        "lastTradedPrice": 130,
-        "totalValue": 8320,
+        "lastTradedPrice": 130.3,
+        "totalValue": 8339.2,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 8320,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 8339.2,
         "currency": "CHF",
         "allocationPct": 0,
         "targetPct": 0,
@@ -55,13 +55,13 @@
         "quantityHeld": 131,
         "averageBuyPrice": null,
         "lastTradedPrice": 42.785,
-        "totalValue": 6445.56025,
+        "totalValue": 6067.28433102,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 6445.56025,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 6067.28433102,
         "currency": "GBP",
         "allocationPct": 0,
         "targetPct": 0,
@@ -77,14 +77,14 @@
         "name": "HSBC MSCI China UCITS ETF USD",
         "quantityHeld": 701,
         "averageBuyPrice": null,
-        "lastTradedPrice": 7.5575,
-        "totalValue": 4662.0706,
+        "lastTradedPrice": 7.5975,
+        "totalValue": 4411.69240586,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 4662.0706,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 4411.69240586,
         "currency": "USD",
         "allocationPct": 0,
         "targetPct": 0,
@@ -100,14 +100,14 @@
         "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
         "quantityHeld": 29,
         "averageBuyPrice": null,
-        "lastTradedPrice": 265.65,
-        "totalValue": 7395.696,
+        "lastTradedPrice": 265.15,
+        "totalValue": 6948.558021,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 7395.696,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 6948.558021,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -123,14 +123,14 @@
         "name": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
         "quantityHeld": 521,
         "averageBuyPrice": null,
-        "lastTradedPrice": 18.388,
-        "totalValue": 9196.94208,
+        "lastTradedPrice": 18.354,
+        "totalValue": 8641.18910844,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 9196.94208,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 8641.18910844,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -146,14 +146,14 @@
         "name": "Amundi Core MSCI Japan UCITS ETF Acc",
         "quantityHeld": 262,
         "averageBuyPrice": null,
-        "lastTradedPrice": 22.06,
-        "totalValue": 5548.5312,
+        "lastTradedPrice": 21.97,
+        "totalValue": 5201.5934724,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 5548.5312,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 5201.5934724,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -169,14 +169,14 @@
         "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "quantityHeld": 68,
         "averageBuyPrice": null,
-        "lastTradedPrice": 163.54,
-        "totalValue": 11120.72,
+        "lastTradedPrice": 163.2,
+        "totalValue": 11097.6,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 11120.72,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 11097.6,
         "currency": "CHF",
         "allocationPct": 0,
         "targetPct": 0,
@@ -192,14 +192,14 @@
         "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
         "quantityHeld": 329,
         "averageBuyPrice": null,
-        "lastTradedPrice": 41.265,
-        "totalValue": 13033.1376,
+        "lastTradedPrice": 41.11,
+        "totalValue": 12222.1731954,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 13033.1376,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 12222.1731954,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -215,14 +215,14 @@
         "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
         "quantityHeld": 36,
         "averageBuyPrice": null,
-        "lastTradedPrice": 699.48,
-        "totalValue": 24174.0288,
+        "lastTradedPrice": 699.6,
+        "totalValue": 22759.219296,
         "gainSincePurchase": null,
         "gainSincePurchaseChf": null,
         "gainSincePurchasePct": null,
-        "ytdChf": 88858.4,
-        "ytdPct": 1777.2,
-        "valueChf": 24174.0288,
+        "ytdChf": 85390.19,
+        "ytdPct": 1707.8,
+        "valueChf": 22759.219296,
         "currency": "EUR",
         "allocationPct": 0,
         "targetPct": 0,
@@ -236,7 +236,7 @@
     ],
     "totals": {
       "rowCount": 9,
-      "totalValueChf": 89896.68653,
+      "totalValueChf": 85688.50983012,
       "totalGainChf": 0,
       "totalGainPct": 0
     }
@@ -249,7 +249,7 @@
         "name": "SPMCHA",
         "currency": "CHF",
         "quantity": 64,
-        "valueChf": 8320,
+        "valueChf": 8339.2,
         "costBasisCurrency": null,
         "costBasisNative": null,
         "costBasisChf": null,
@@ -264,7 +264,7 @@
         "name": "UKGBPB",
         "currency": "GBP",
         "quantity": 131,
-        "valueChf": 6445.56025,
+        "valueChf": 6067.28433102,
         "costBasisCurrency": null,
         "costBasisNative": null,
         "costBasisChf": null,
@@ -279,7 +279,7 @@
         "name": "HMCD",
         "currency": "USD",
         "quantity": 701,
-        "valueChf": 4662.0706,
+        "valueChf": 4411.69240586,
         "costBasisCurrency": null,
         "costBasisNative": null,
         "costBasisChf": null,
@@ -294,14 +294,14 @@
         "name": "CEBL",
         "currency": "EUR",
         "quantity": 29,
-        "valueChf": 7395.696,
+        "valueChf": 6948.558021,
         "costBasisCurrency": "EUR",
         "costBasisNative": 7740.1,
         "costBasisChf": 7430.5,
         "costBasisSource": "trades_md",
         "avgBuyPrice": 266.9,
-        "unrealizedProfitChf": -34.8,
-        "unrealizedProfitPct": -0.47
+        "unrealizedProfitChf": -481.94,
+        "unrealizedProfitPct": -6.49
       },
       {
         "tickerOrIsin": "507487999",
@@ -309,7 +309,7 @@
         "name": "SEC0",
         "currency": "EUR",
         "quantity": 521,
-        "valueChf": 9196.94208,
+        "valueChf": 8641.18910844,
         "costBasisCurrency": null,
         "costBasisNative": null,
         "costBasisChf": null,
@@ -324,7 +324,7 @@
         "name": "LCUJ",
         "currency": "EUR",
         "quantity": 262,
-        "valueChf": 5548.5312,
+        "valueChf": 5201.5934724,
         "costBasisCurrency": null,
         "costBasisNative": null,
         "costBasisChf": null,
@@ -339,14 +339,14 @@
         "name": "CHSPI",
         "currency": "CHF",
         "quantity": 68,
-        "valueChf": 11120.72,
+        "valueChf": 11097.6,
         "costBasisCurrency": "CHF",
         "costBasisNative": 11147.1083,
         "costBasisChf": 11147.11,
         "costBasisSource": "trades_md",
         "avgBuyPrice": 163.928063,
-        "unrealizedProfitChf": -26.39,
-        "unrealizedProfitPct": -0.24
+        "unrealizedProfitChf": -49.51,
+        "unrealizedProfitPct": -0.44
       },
       {
         "tickerOrIsin": "243939970",
@@ -354,14 +354,14 @@
         "name": "EMUAA",
         "currency": "EUR",
         "quantity": 329,
-        "valueChf": 13033.1376,
+        "valueChf": 12222.1731954,
         "costBasisCurrency": "EUR",
         "costBasisNative": 13111.0435,
         "costBasisChf": 12586.6,
         "costBasisSource": "trades_md",
         "avgBuyPrice": 39.851196,
-        "unrealizedProfitChf": 446.54,
-        "unrealizedProfitPct": 3.55
+        "unrealizedProfitChf": -364.43,
+        "unrealizedProfitPct": -2.9
       },
       {
         "tickerOrIsin": "75776072",
@@ -369,22 +369,22 @@
         "name": "SXR8",
         "currency": "EUR",
         "quantity": 36,
-        "valueChf": 24174.0288,
+        "valueChf": 22759.219296,
         "costBasisCurrency": "EUR",
         "costBasisNative": 24738.48,
         "costBasisChf": 23748.94,
         "costBasisSource": "trades_md",
         "avgBuyPrice": 687.18,
-        "unrealizedProfitChf": 425.09,
-        "unrealizedProfitPct": 1.79
+        "unrealizedProfitChf": -989.72,
+        "unrealizedProfitPct": -4.17
       }
     ],
     "totals": {
-      "totalProfitChf": 810.44,
+      "totalProfitChf": -1885.6,
       "totalCostBasisChf": 54913.15,
-      "coveredValueChf": 55723.58,
+      "coveredValueChf": 53027.55,
       "coveredCount": 4,
-      "totalProfitPct": 1.48
+      "totalProfitPct": -3.43
     }
   },
   "approvals": {
@@ -398,36 +398,36 @@
   "operatorQueue": {
     "summary": {
       "total": 1,
-      "blocking": 0,
+      "blocking": 1,
       "approvals": 0,
       "execution": 0,
       "freshApprovals": 0,
       "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 0,
+      "recovery": 1,
       "delivery": 0,
       "data": 0,
       "warnings": 0,
-      "workflow": 1,
+      "workflow": 0,
       "bySeverity": {
-        "high": 0,
-        "medium": 1,
+        "high": 1,
+        "medium": 0,
         "low": 0
       }
     },
     "items": [
       {
         "rank": 1,
-        "queueType": "backfill_review",
+        "queueType": "recovery",
         "portfolio": "etf",
-        "kind": "delivery",
-        "severity": "medium",
-        "status": "backfill_review",
-        "summary": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
-        "source": "fill_notification_state"
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
       }
     ]
   },
@@ -846,9 +846,9 @@
           "limitPrice": 0,
           "targetPct": 5,
           "intendedChf": 2024.13,
-          "intendedPct": 2.14,
+          "intendedPct": 2.24,
           "executableChf": 2024.13,
-          "executablePct": 2.14,
+          "executablePct": 2.24,
           "executionGapChf": 0,
           "approval": "blocked_by_min_trade_size",
           "reason": "Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order.; allocation before 0%; target 20%; allocation after 39.82%; drift before -20%; drift after 19.82%; drift corrected 0.18%; expected cost CHF 2024.13; funding source cash; Planning entry only; no broker order required for the cash sleeve."
@@ -863,33 +863,33 @@
     "proposalTotals": {
       "plannedCashSleeve": 2024.13,
       "executableBuys": 0,
-      "residualTradableCash": 92574.24
+      "residualTradableCash": 88366.06
     }
   },
   "allocation": [
     {
       "assetClass": "Global equities",
-      "currentPct": 74.48,
+      "currentPct": 73.3,
       "targetPct": 65,
-      "driftPct": 9.48,
+      "driftPct": 8.3,
       "minPct": 60,
       "maxPct": 70,
       "status": "out_of_bounds"
     },
     {
       "assetClass": "Swiss equities",
-      "currentPct": 20.55,
+      "currentPct": 21.5,
       "targetPct": 20,
-      "driftPct": 0.55,
+      "driftPct": 1.5,
       "minPct": 15,
       "maxPct": 25,
       "status": "on_track"
     },
     {
       "assetClass": "Bonds / cash-like",
-      "currentPct": 4.97,
+      "currentPct": 5.2,
       "targetPct": 15,
-      "driftPct": -10.03,
+      "driftPct": -9.8,
       "minPct": 10,
       "maxPct": 20,
       "status": "out_of_bounds"
@@ -1014,67 +1014,134 @@
     }
   ],
   "pendingActions": [
-    "6 reconciled fill(s) were detected after the live window and still need notification backfill review."
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
   ],
-  "recommendedNextStep": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
+  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
   "selfHealPlan": {
     "ok": true,
     "dryRun": true,
     "portfolio": "etf",
     "health": {
-      "health": "degraded",
-      "severity": "low",
-      "blockerCount": 2,
+      "health": "blocked",
+      "severity": "high",
+      "blockerCount": 1,
       "blockers": [
         {
-          "code": "fill_notification_backfill",
-          "message": "6 fill notification(s) still need backfill review."
-        },
-        {
-          "code": "delivery_attention",
-          "message": "6 reconciled fill(s) still need notification backfill review."
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
         }
       ],
       "recommendedActions": [
-        "Review reconciled fills and close the notification backfill backlog."
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
       ],
-      "nextAction": "Review reconciled fills and close the notification backfill backlog."
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
     },
-    "classified": [],
-    "healed": [],
-    "openIssues": [],
-    "actions": [
+    "classified": [
       {
-        "kind": "command",
-        "command": "node scripts/trade.js delivery portfolio/etf",
-        "reason": "Review reconciled fills pending notification backfill."
-      }
-    ],
-    "recoveryLadders": [
-      {
-        "category": "fill_notification_backfill",
-        "ladder": [
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "symptom": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "recommendedAction": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "healable": true,
+        "recipe": "restart_ibkr_gateway_if_socket_dead",
+        "recoveryLadder": [
           {
             "rank": 1,
-            "action": "list_open_orders",
-            "description": "List orders the broker still considers open; this is the source of truth for what is in flight.",
-            "command": "node scripts/diagnostics/list-ibkr-open-orders.js",
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
             "automated": false,
             "risk": "low"
           },
           {
             "rank": 2,
-            "action": "resync_fills",
-            "description": "Resync portfolio order state against the broker so filled rows transition out of the open queue.",
-            "command": "node scripts/resync-portfolio-orders.js portfolio/etf",
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ],
+    "healed": [
+      {
+        "ok": true,
+        "kind": "restart_ibkr_gateway_if_socket_dead",
+        "applied": false,
+        "blocked": "operator_present_restart_only",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "budget": {
+          "blocked": null,
+          "attempts": 0,
+          "lastAttemptAt": null
+        }
+      }
+    ],
+    "openIssues": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "symptom": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      }
+    ],
+    "actions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ],
+    "recoveryLadders": [
+      {
+        "category": "ibkr_socket_dead",
+        "ladder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
             "automated": false,
             "risk": "low"
           },
           {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
             "rank": 3,
-            "action": "close_notification_backlog",
-            "description": "Acknowledge any reconciled fills that still need notification backfill review.",
-            "command": "node scripts/acknowledge-fill-notification-backfill.js portfolio/etf",
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
             "automated": false,
             "risk": "low"
           }
@@ -1083,47 +1150,47 @@
     ]
   },
   "explanations": {
-    "biggestDrift": "Bonds / cash-like is 10.03% under target and outside the allowed band around the 15% target.",
-    "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
-    "executionBlock": "No explicit execution block is currently surfaced.",
+    "biggestDrift": "Bonds / cash-like is 9.8% under target and outside the allowed band around the 15% target.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "approvalBacklog": "53 blocked row(s) still need explicit operator review before the workflow can advance cleanly.",
-    "growthSummary": "Bonds / cash-like is 10.0% under target and outside the allowed band around the 15% target — rebalance recommended.",
+    "growthSummary": "Bonds / cash-like is 9.8% under target and outside the allowed band around the 15% target — rebalance recommended.",
     "deploymentOpportunity": "A small cash position of CHF 4'701.68 is in place."
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-29 09:37:48.922 UTC",
+      "time": "2026-05-30 10:05:20.095 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 09:37:45.639 UTC",
+      "time": "2026-05-30 10:05:17.467 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 09:37:41.045 UTC",
+      "time": "2026-05-30 10:05:15.648 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 09:37:24.661 UTC",
+      "time": "2026-05-30 10:04:59.860 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 09:00:14.243 UTC",
-      "eventType": "safety_controls_blocked",
+      "time": "2026-05-30 10:04:48.666 UTC",
+      "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "nextStep": "Resolve the blocking condition before proceeding."
     }
   ],
@@ -1135,8 +1202,8 @@
         "warn": 100
       },
       "byCategory": {
-        "risk": 70,
-        "execution_policy": 30
+        "risk": 72,
+        "execution_policy": 28
       },
       "blockedTrades": 100,
       "degradedBrokerEvents": 0,
@@ -1146,12 +1213,10 @@
     }
   },
   "delivery": {
-    "ready": false,
+    "ready": true,
     "mode": "email_and_repo",
     "failureAlertMode": "local_operator_review",
-    "pendingActions": [
-      "6 reconciled fill(s) still need notification backfill review."
-    ]
+    "pendingActions": []
   },
   "runtimeState": {
     "brokerAutomationPaused": false,

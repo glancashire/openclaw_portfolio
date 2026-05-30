@@ -35,4 +35,21 @@ const { summarizeReadiness } = require('../src/brokers/interactive-brokers/readi
   assert.match(result.guidance, /Broker path is healthy/i);
 }
 
+
+{
+  const result = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: true, mode: 'native-socket' },
+    marketData: {
+      posture: 'delayed_only',
+      detail: 'Interactive Brokers reports delayed market data is available via approved instrument EMUAA.',
+      probe: { conid: '243939970', label: 'approved instrument LU0950668870', source: 'approved_instrument' },
+    },
+  });
+  assert.strictEqual(result.fallbackRequired, true);
+  assert.strictEqual(result.reason, 'delayed_data_only');
+  assert.match(result.guidance, /common outside market hours/i);
+  assert.match(result.message, /delayed-only \(common outside market hours\)/i);
+}
+
 console.log(JSON.stringify({ ok: true }, null, 2));
