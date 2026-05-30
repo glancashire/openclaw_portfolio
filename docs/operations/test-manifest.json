@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 289,
-    "safe": 225,
+    "total": 290,
+    "safe": 226,
     "integration": 59,
     "live-smoke": 3,
     "external": 2,
@@ -1219,6 +1219,13 @@
     },
     {
       "path": "scripts/test-open-order-row-list.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-open-phases-card.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

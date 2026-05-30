@@ -5,6 +5,7 @@ const { ensureDirFor, writeTextIfChanged } = require('./artifactWriter');
 const { generateOverviewArtifacts } = require('./summaryArtifacts');
 const { fetchCronHealth } = require('./cronJobsFetcher');
 const { evaluateLiveReadinessPreflight } = require('../execution/liveReadinessPreflight');
+const { loadOpenPhasesCard, renderOpenPhasesMarkdown } = require('./openPhasesCard');
 
 function classifyPortfolioKind(item = {}) {
   const name = String(item.portfolio || '').toLowerCase();
@@ -84,15 +85,17 @@ function buildPortfolioTable(index = {}) {
   return portfolios.map((item) => `| ${item.portfolio} | ${classifyPortfolioKind(item)} | ${item.totalValueChf} | ${item.status} | ${formatDriftSummary(item.driftStatuses)} | ${item.blockers} | ${item.pendingApprovals} | ${item.pendingActions} | ${item.openRunnerQueue || 0} | ${item.openRunnerRetry || 0} | ${brokerBlockHint(item)} |`).join('\n');
 }
 
-function formatOverviewMarkdown({ index, pending }) {
+function formatOverviewMarkdown({ index, pending, openPhases }) {
   const totals = summarizeOverview(index, pending);
-  return `# Multi-Portfolio Overview\n\n## Summary\n- Generated at: ${index.generatedAt || new Date().toISOString()}\n- Portfolios discovered: ${totals.portfolioCount}\n- Active portfolios: ${totals.activeCount}\n- Demo-like portfolios: ${totals.demoLikeCount}\n- Total value CHF: ${totals.totalValueChf}\n- Healthy portfolios: ${totals.healthyCount}\n- Warning / attention portfolios: ${totals.warningCount}\n- Blocked portfolios: ${totals.blockedCount}\n- Pending approvals: ${totals.pendingApprovals}\n- Pending actions: ${totals.pendingActions}\n\n## Portfolio Board\n| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |\n|---|---|---:|---|---|---:|---:|---:|---:|---:|---|\n${buildPortfolioTable(index)}\n\n## Operator Queue Summary\n${formatQueueSummary(pending.queueSummary || {})}\n\n## Cross-Portfolio Recommended Actions\n${buildRecommendedActionRows(pending)}\n\n## Notes\n- This board is generated from Phase 29 structured summary artifacts rather than by re-deriving state directly from Markdown.\n- Demo-like portfolios are surfaced explicitly so they do not silently disappear from operator review.\n`;
+  const openPhasesSection = renderOpenPhasesMarkdown(openPhases);
+  return `# Multi-Portfolio Overview\n\n## Summary\n- Generated at: ${index.generatedAt || new Date().toISOString()}\n- Portfolios discovered: ${totals.portfolioCount}\n- Active portfolios: ${totals.activeCount}\n- Demo-like portfolios: ${totals.demoLikeCount}\n- Total value CHF: ${totals.totalValueChf}\n- Healthy portfolios: ${totals.healthyCount}\n- Warning / attention portfolios: ${totals.warningCount}\n- Blocked portfolios: ${totals.blockedCount}\n- Pending approvals: ${totals.pendingApprovals}\n- Pending actions: ${totals.pendingActions}\n\n${openPhasesSection}\n## Portfolio Board\n| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |\n|---|---|---:|---|---|---:|---:|---:|---:|---:|---|\n${buildPortfolioTable(index)}\n\n## Operator Queue Summary\n${formatQueueSummary(pending.queueSummary || {})}\n\n## Cross-Portfolio Recommended Actions\n${buildRecommendedActionRows(pending)}\n\n## Notes\n- This board is generated from Phase 29 structured summary artifacts rather than by re-deriving state directly from Markdown.\n- Demo-like portfolios are surfaced explicitly so they do not silently disappear from operator review.\n- Open phases are read from the maintained OPEN_PHASES_OVERVIEW.md control file.\n`;
 }
 
 async function generateOverviewBoard({ repoRoot = process.cwd(), writeFiles = true } = {}) {
   const readiness = await evaluateLiveReadinessPreflight({ portfolioDir: path.join(repoRoot, 'portfolio', 'etf') }).catch(() => null);
   const { portfolioIndex, pendingActions } = await generateOverviewArtifacts({ repoRoot, writeFiles: true, readiness, cronHealth: fetchCronHealth() });
-  const markdown = formatOverviewMarkdown({ index: portfolioIndex, pending: pendingActions });
+  const openPhases = loadOpenPhasesCard({ repoRoot });
+  const markdown = formatOverviewMarkdown({ index: portfolioIndex, pending: pendingActions, openPhases });
   const overviewDir = path.join(repoRoot, 'runtime', 'overview');
   const markdownPath = path.join(overviewDir, 'portfolio-overview.md');
   const htmlPath = path.join(overviewDir, 'portfolio-overview.html');
@@ -107,6 +110,7 @@ async function generateOverviewBoard({ repoRoot = process.cwd(), writeFiles = tr
     htmlPath,
     portfolioIndex,
     pendingActions,
+    openPhases,
   };
 }
 

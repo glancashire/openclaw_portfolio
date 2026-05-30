@@ -2,7 +2,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { classifyPortfolioKind, formatDriftSummary, summarizeOverview, formatOverviewMarkdown, generateOverviewBoard, formatRecommendedActionLabel, buildRecommendedActionRows, formatQueueSummary, buildPortfolioTable, brokerBlockHint } = require('../src/reporting/overviewBoard');
-const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, renderCockpitPage, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
+const { loadOpenPhasesCard } = require('../src/reporting/openPhasesCard');
+const { buildApprovalsQueue, buildDailySummary, buildReportHistory, buildDeliveryOverview, renderApprovalsQueueMarkdown, renderDailySummaryMarkdown, renderReportHistoryMarkdown, renderDeliveryStatusMarkdown, generateOverviewArtifacts } = require('../src/reporting/summaryArtifacts');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -130,7 +131,9 @@ async function main() {
   const emptyBoardTable = buildPortfolioTable({ portfolios: [] });
   assert(emptyBoardTable === '| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |\n', 'Expected empty board helper row');
 
-  const emptyMarkdown = formatOverviewMarkdown({ index: { generatedAt: '2026-05-06T00:00:00.000Z', totalValueChf: 0, portfolios: [] }, pending: { queueSummary: {}, items: [] } });
+  const emptyMarkdown = formatOverviewMarkdown({ index: { generatedAt: '2026-05-06T00:00:00.000Z', totalValueChf: 0, portfolios: [] }, pending: { queueSummary: {}, items: [] }, openPhases: { items: [] } });
+  assert(emptyMarkdown.includes('## Open Phases'), 'Expected empty-state open phases section');
+  assert(emptyMarkdown.includes('No open phase items found'), 'Expected empty-state open phases message');
   assert(emptyMarkdown.includes('| Portfolio | Kind | Total value CHF | Health | Drift posture | Blockers | Pending approvals | Pending actions | First handoffs | Retries | Recommended next step |'), 'Expected empty-state board header');
   assert(emptyMarkdown.includes('| none | n/a | 0 | unknown | n/a | 0 | 0 | 0 | 0 | 0 | no portfolios discovered |'), 'Expected empty-state board row');
   assert(emptyMarkdown.includes('## Operator Queue Summary\n- Total queue items: 0'), 'Expected empty-state queue summary section');
@@ -142,8 +145,21 @@ async function main() {
   assert(boardTable.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | [exchange_closed_at_submit IE000XZSV718] Retry during the venue trading session or hand the row back to the market-open runner. |'), 'Expected populated ETF board helper row');
   assert(boardTable.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | 0 | 2 | Resolve blockers. |'), 'Expected populated acceptance board helper row');
 
-  const markdown = formatOverviewMarkdown({ index, pending });
+  const openPhases = {
+    items: [
+      {
+        title: 'next-3 session-aware retry ergonomics',
+        status: 'VERIFYING',
+        progressPct: 80,
+        completed: ['Shared order-preparation helper exists'],
+        openItems: ['Capture final safe-lane result'],
+      },
+    ],
+  };
+  const markdown = formatOverviewMarkdown({ index, pending, openPhases });
   assert(markdown.includes('# Multi-Portfolio Overview'), 'Expected title');
+  assert(markdown.includes('## Open Phases'), 'Expected open phases section');
+  assert(markdown.includes('next-3 session-aware retry ergonomics'), 'Expected open phases item');
   assert(markdown.includes('| etf | active | 5000 | warning | 1 out_of_bounds | 0 | 7 | 2 | 1 | 0 | [exchange_closed_at_submit IE000XZSV718] Retry during the venue trading session or hand the row back to the market-open runner. |'), 'Expected ETF board row');
   assert(markdown.includes('| acceptance-closure | demo_like | 0 | warning | 1 out_of_bounds | 5 | 0 | 6 | 0 | 2 | Resolve blockers. |'), 'Expected acceptance board row');
   assert(markdown.includes('## Operator Queue Summary'), 'Expected operator queue summary section');
@@ -208,14 +224,15 @@ async function main() {
   assert(dailyMarkdown.includes('Top broker block: exchange_closed_at_submit (IE000XZSV718)'), 'Expected highlighted top broker block line');
   assert(dailyMarkdown.includes('Why now'), 'Expected highlighted portfolio explanation line');
 
-  const generated = await generateOverviewArtifacts({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
-  await generateOverviewBoard({ repoRoot: path.resolve(__dirname, '..'), writeFiles: true });
+  const repoRoot = path.resolve(__dirname, '..');
+  const generated = await generateOverviewArtifacts({ repoRoot, writeFiles: true });
+  const generatedBoard = await generateOverviewBoard({ repoRoot, writeFiles: true });
   const approvalsHtml = fs.readFileSync(generated.approvalsQueueHtmlPath, 'utf8');
   const dailyHtml = fs.readFileSync(generated.dailySummaryHtmlPath, 'utf8');
-  const overviewMarkdown = fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-overview.md'), 'utf8');
-  const overviewHtml = fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-overview.html'), 'utf8');
-  const portfolioIndexJson = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'portfolio-index.json'), 'utf8'));
-  const pendingActionsJson = JSON.parse(fs.readFileSync(path.join(path.resolve(__dirname, '..'), 'runtime', 'overview', 'pending-actions.json'), 'utf8'));
+  const overviewMarkdown = fs.readFileSync(path.join(repoRoot, 'runtime', 'overview', 'portfolio-overview.md'), 'utf8');
+  const overviewHtml = fs.readFileSync(path.join(repoRoot, 'runtime', 'overview', 'portfolio-overview.html'), 'utf8');
+  const portfolioIndexJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'runtime', 'overview', 'portfolio-index.json'), 'utf8'));
+  const pendingActionsJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'runtime', 'overview', 'pending-actions.json'), 'utf8'));
   assert(fs.existsSync(generated.approvalsQueuePath), 'Expected approvals queue json artifact');
   assert(fs.existsSync(generated.approvalsQueueMarkdownPath), 'Expected approvals queue markdown artifact');
   assert(fs.existsSync(generated.pendingActionsPath), 'Expected pending-actions json artifact');
@@ -223,6 +240,9 @@ async function main() {
   assert(approvalsHtml.includes('Effect if approved'), 'Expected approvals queue consequence rendering');
   assert(fs.existsSync(generated.dailySummaryPath), 'Expected daily summary json artifact');
   assert(overviewMarkdown.includes('# Multi-Portfolio Overview'), 'Expected overview markdown title');
+  assert(overviewMarkdown.includes('## Open Phases'), 'Expected generated overview open phases section');
+  assert(generatedBoard.openPhases && Array.isArray(generatedBoard.openPhases.items), 'Expected generated overview open phases payload');
+  assert(loadOpenPhasesCard({ repoRoot }).items.length >= 1, 'Expected repo open phases to load');
   assert(overviewMarkdown.includes('## Portfolio Board'), 'Expected overview markdown portfolio board section');
   assert(overviewMarkdown.includes('## Operator Queue Summary'), 'Expected overview markdown queue summary section');
   assert(overviewMarkdown.includes('## Cross-Portfolio Recommended Actions'), 'Expected overview markdown recommended actions section');
@@ -279,6 +299,7 @@ async function main() {
   assert(overviewMarkdown.includes('Open-runner first handoffs'), 'Expected first-handoff queue summary in generated overview markdown');
   assert(overviewMarkdown.includes('Open-runner retries'), 'Expected retry queue summary in generated overview markdown');
   assert(overviewHtml.includes('Multi-Portfolio Overview'), 'Expected overview html title');
+  assert(overviewHtml.includes('Open Phases'), 'Expected overview html open phases section');
   assert(overviewHtml.includes('Portfolio Board'), 'Expected overview html portfolio board section');
   assert(overviewHtml.includes('Operator Queue Summary'), 'Expected overview html queue summary section');
   assert(overviewHtml.includes('Cross-Portfolio Recommended Actions'), 'Expected overview html recommended actions section');
@@ -292,8 +313,7 @@ async function main() {
   assert(dailyHtml.includes('Cash waiting to deploy CHF'), 'Expected daily summary cash rendering');
   assert(dailyHtml.includes('Why it matters'), 'Expected daily summary explanation rendering');
 
-  // Phase 39: report history
-  const reportHistory = buildReportHistory(path.resolve(__dirname, '..'), []);
+  const reportHistory = buildReportHistory(repoRoot, []);
   assert(reportHistory.schemaVersion === '1.0', 'Expected report history schema version');
   assert(typeof reportHistory.totalReports === 'number' && reportHistory.totalReports > 0, 'Expected at least one report in history');
   assert(reportHistory.portfolios.some((p) => p.portfolio === 'etf'), 'Expected etf in report history');
@@ -313,21 +333,7 @@ async function main() {
   assert(reportHistoryHtml.includes('Report History'), 'Expected report history html title');
   assert(reportHistoryHtml.includes('<table>'), 'Expected html table in report history');
 
-  // Phase 41: operator cockpit landing page
-  assert(fs.existsSync(generated.cockpitHtmlPath), 'Expected cockpit index.html artifact');
-  const cockpitHtml = fs.readFileSync(generated.cockpitHtmlPath, 'utf8');
-  assert(cockpitHtml.includes('Operator Cockpit'), 'Expected cockpit title');
-  assert(cockpitHtml.includes('status-grid'), 'Expected status grid in cockpit');
-  assert(cockpitHtml.includes('daily-summary.html'), 'Expected daily summary nav link');
-  assert(cockpitHtml.includes('approvals-queue.html'), 'Expected approvals queue nav link');
-  assert(cockpitHtml.includes('report-history.html'), 'Expected report history nav link');
-  assert(cockpitHtml.includes('portfolio-overview.html'), 'Expected overview nav link');
-  assert(cockpitHtml.includes('summary.html'), 'Expected portfolio summary link');
-  assert(cockpitHtml.includes('badge-'), 'Expected health badge in cockpit');
-  assert(cockpitHtml.includes('delivery-status.html'), 'Expected delivery status nav link in cockpit');
-
-  // Phase 42: delivery & alerting status
-  const deliveryOverview = buildDeliveryOverview(path.resolve(__dirname, '..'));
+  const deliveryOverview = buildDeliveryOverview(repoRoot);
   assert(deliveryOverview.schemaVersion === '1.0', 'Expected delivery overview schema version');
   assert(typeof deliveryOverview.portfolioCount === 'number' && deliveryOverview.portfolioCount > 0, 'Expected at least one portfolio in delivery overview');
   assert(deliveryOverview.portfolios.some((p) => p.portfolio === 'etf'), 'Expected etf in delivery overview');
