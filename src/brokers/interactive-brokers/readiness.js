@@ -152,8 +152,13 @@ function summarizeReadiness({ config, auth, marketData }) {
   const portalLikelyDiverged = mode === 'native-socket' && (liveReady || delayedOnly || authReadyButUnpriced);
   const authFailureDetail = String(auth?.error || auth?.diagnostics?.detail || '').trim();
   const authFailureSuffix = authFailureDetail ? ` Detail: ${authFailureDetail}` : '';
+  const operatorState = deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnpriced, marketData });
   const guidance = !auth?.ok
-    ? `Restore native connectivity first.${authFailureSuffix}`
+    ? operatorState.code === 'ibkr_login_or_2fa_pending'
+      ? `Complete the manual login / 2FA step in IB Gateway, then rerun readiness. Do not auto-retry.${authFailureSuffix}`
+      : operatorState.code === 'ibkr_socket_dead'
+        ? `Restore native IBKR gateway connectivity first, then rerun readiness.${authFailureSuffix}`
+        : `Restore native connectivity first.${authFailureSuffix}`
     : delayedOnly
       ? 'Broker connectivity is healthy, but the current quote posture is delayed-only (common outside market hours); keep live submission blocked unless delayed-only policy is explicitly accepted.'
       : authReadyButUnpriced
@@ -176,6 +181,7 @@ function summarizeReadiness({ config, auth, marketData }) {
           ? (marketData?.posture || 'unpriced')
           : auth?.reason || 'unknown',
     portalSessionState: portalLikelyDiverged ? 'unknown_or_separate' : 'not_applicable',
+    operatorState,
     guidance,
     message: liveReady
       ? 'Interactive Brokers read-only connectivity and live/realtime market data are available.'
@@ -186,6 +192,61 @@ function summarizeReadiness({ config, auth, marketData }) {
           : auth?.reason === 'http_error'
             ? `Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`
             : `Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`,
+  };
+}
+
+function deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnpriced, marketData }) {
+  const detail = String(auth?.error || auth?.diagnostics?.detail || marketData?.detail || '').trim();
+  if (!auth?.ok) {
+    if (/awaiting login|login\s*\/\s*2fa|2fa|second-factor|verification|confirm/i.test(detail)) {
+      return {
+        code: 'ibkr_login_or_2fa_pending',
+        summary: 'IBKR is waiting on a manual login/2FA step; keep recovery human-driven and do not auto-retry.',
+        detail: detail || null,
+      };
+    }
+    if (/ECONNREFUSED 127\.0\.0\.1:4001|connect ECONNREFUSED|socket hang up|gateway\/session is not reachable/i.test(detail)) {
+      return {
+        code: 'ibkr_socket_dead',
+        summary: 'IBKR gateway appears offline or unreachable on the native API socket.',
+        detail: detail || null,
+      };
+    }
+    return {
+      code: 'ibkr_auth_unready',
+      summary: 'IBKR is not ready yet; inspect the native gateway/session state before relying on broker-backed actions.',
+      detail: detail || null,
+    };
+  }
+
+  if (liveReady) {
+    return {
+      code: 'ibkr_ready',
+      summary: 'IBKR connectivity and live/realtime market data are available.',
+      detail: detail || null,
+    };
+  }
+
+  if (delayedOnly) {
+    return {
+      code: 'delayed_market_data_only',
+      summary: 'IBKR connectivity is healthy, but only delayed market data is available right now.',
+      detail: detail || null,
+    };
+  }
+
+  if (authReadyButUnpriced) {
+    return {
+      code: 'broker_connected_quote_state_unclear',
+      summary: 'IBKR connectivity is up, but the quote posture is still unclear and needs operator attention before assuming live readiness.',
+      detail: detail || null,
+    };
+  }
+
+  return {
+    code: 'ibkr_unknown',
+    summary: 'IBKR readiness is in an unknown state.',
+    detail: detail || null,
   };
 }
 

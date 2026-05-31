@@ -88,6 +88,8 @@ function evaluateRecipeBudget(recipe, { repoRoot = process.cwd(), now = new Date
 function classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth, errorState }) {
   const classified = [];
   const brokerMessage = String(brokerReadiness?.message || brokerReadiness?.guidance || '').trim();
+  const brokerOperatorCode = String(brokerReadiness?.operatorState?.code || '').trim();
+  const brokerOperatorSummary = String(brokerReadiness?.operatorState?.summary || '').trim();
   const deliveryMessages = Array.isArray(deliveryStatus?.pendingActions) ? deliveryStatus.pendingActions : [];
   const jobs = Array.isArray(cronHealth?.jobs) ? cronHealth.jobs : [];
 
@@ -101,23 +103,33 @@ function classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth, errorSt
     });
   }
 
-  if (/ECONNREFUSED 127\.0\.0\.1:4001/i.test(brokerMessage)) {
+  if (brokerOperatorCode === 'ibkr_socket_dead' || /ECONNREFUSED 127\.0\.0\.1:4001/i.test(brokerMessage)) {
     classified.push({
       category: 'ibkr_socket_dead',
       severity: 'high',
-      symptom: brokerMessage,
+      symptom: brokerOperatorSummary || brokerMessage,
       recommendedAction: 'Restart the native IBKR gateway during market hours or notify the operator.',
       healable: true,
       recipe: 'restart_ibkr_gateway_if_socket_dead',
     });
   }
 
-  if (/2fa|second-factor|awaiting login|login \/ 2fa/i.test(brokerMessage)) {
+  if (brokerOperatorCode === 'ibkr_login_or_2fa_pending' || /2fa|second-factor|awaiting login|login \/ 2fa/i.test(brokerMessage)) {
     classified.push({
       category: 'ibkr_2fa_pending',
       severity: 'high',
-      symptom: brokerMessage,
+      symptom: brokerOperatorSummary || brokerMessage,
       recommendedAction: 'Notify the operator and wait for manual approval; do not auto-retry.',
+      healable: false,
+    });
+  }
+
+  if (brokerOperatorCode === 'broker_connected_quote_state_unclear') {
+    classified.push({
+      category: 'broker_connected_quote_state_unclear',
+      severity: 'medium',
+      symptom: brokerOperatorSummary || brokerMessage,
+      recommendedAction: 'Inspect IBKR quote probes and contract identities before treating the broker as live-ready.',
       healable: false,
     });
   }
@@ -170,7 +182,6 @@ function classifySymptoms({ brokerReadiness, deliveryStatus, cronHealth, errorSt
     });
   }
 
-  // Attach a recovery ladder per symptom (informational only).
   for (const item of classified) {
     item.recoveryLadder = getRecoveryLadder(item.category);
   }

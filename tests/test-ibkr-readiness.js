@@ -1,6 +1,12 @@
 'use strict';
 
-const { summarizeReadiness, getGenericFallbackProbeCandidates, getProbeCandidates, detectMarketDataPosture } = require('../src/brokers/interactive-brokers/readiness');
+const {
+  summarizeReadiness,
+  getGenericFallbackProbeCandidates,
+  getProbeCandidates,
+  detectMarketDataPosture,
+} = require('../src/brokers/interactive-brokers/readiness');
+const { classifySymptoms } = require('../src/execution/selfHeal');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -36,6 +42,41 @@ async function main() {
   assert(summary.marketDataMode === 'unknown', 'expected auth-ok unknown posture marketDataMode');
   assert(/not yet yielding a usable live\/delayed quote posture/i.test(summary.message), 'expected auth-ok unknown posture message');
 
+  summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: false, reason: 'native_error', error: 'connect ECONNREFUSED 127.0.0.1:4001' },
+    marketData: null,
+  });
+  assert(summary.reason === 'native_error', 'expected auth failure reason to pass through');
+  assert(summary.fallbackRequired === true, 'expected auth failure to require fallback');
+  assert(summary.operatorState?.code === 'ibkr_socket_dead', 'expected socket-dead operator state');
+  assert(/gateway appears offline/i.test(summary.operatorState?.summary || ''), 'expected socket-dead operator summary');
+
+  summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: false, reason: 'native_error', error: 'Login failed: awaiting login / 2FA confirmation in IB Gateway' },
+    marketData: null,
+  });
+  assert(summary.operatorState?.code === 'ibkr_login_or_2fa_pending', 'expected 2FA/login pending operator state');
+  assert(/manual login\/2fa/i.test(summary.operatorState?.summary || ''), 'expected 2FA/login pending operator summary');
+  assert(/do not auto-retry/i.test(summary.guidance), 'expected 2FA guidance to avoid auto-retry');
+
+  summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: true, reason: 'ready' },
+    marketData: { posture: 'delayed_only', detail: 'Delayed market data is available via executable trade VUSA.' },
+  });
+  assert(summary.operatorState?.code === 'delayed_market_data_only', 'expected delayed-only operator state');
+  assert(/delayed-only/i.test(summary.operatorState?.summary || ''), 'expected delayed-only operator summary');
+
+  summary = summarizeReadiness({
+    config: { ok: true },
+    auth: { ok: true, reason: 'ready' },
+    marketData: { posture: 'unknown', detail: 'No probe contract conid available.' },
+  });
+  assert(summary.operatorState?.code === 'broker_connected_quote_state_unclear', 'expected unknown quote posture operator state');
+  assert(/quote posture is still unclear/i.test(summary.operatorState?.summary || ''), 'expected unclear quote posture summary');
+
   const fallbackCandidates = getGenericFallbackProbeCandidates();
   assert(Array.isArray(fallbackCandidates) && fallbackCandidates.length >= 2, 'expected generic fallback probe candidates');
   assert(fallbackCandidates.some((row) => row.symbol === 'EMUAA'), 'expected EMUAA fallback candidate');
@@ -62,13 +103,13 @@ async function main() {
   assert(posture.posture === 'delayed_only', 'expected delayed-only posture from fallback close');
   assert(posture.probeSource === 'generic_fallback', 'expected probe source to report generic fallback');
 
-  summary = summarizeReadiness({
-    config: { ok: true },
-    auth: { ok: false, reason: 'native_error' },
-    marketData: null,
+  const classified = classifySymptoms({
+    brokerReadiness: summary,
+    deliveryStatus: { pendingActions: [] },
+    cronHealth: { jobs: [] },
+    errorState: null,
   });
-  assert(summary.reason === 'native_error', 'expected auth failure reason to pass through');
-  assert(summary.fallbackRequired === true, 'expected auth failure to require fallback');
+  assert(classified.some((item) => item.category === 'broker_connected_quote_state_unclear'), 'expected self-heal symptom classification to include unclear quote posture');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 }
