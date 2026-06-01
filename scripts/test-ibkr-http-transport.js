@@ -22,7 +22,7 @@ const privateLan = buildRequestOptions('https://192.168.1.10:5000/v1/api/tickle'
 assert(!privateLan.agent, 'Expected private LAN https request to avoid loopback-only scoped agent');
 
 const loopbackByIpV6 = buildRequestOptions('https://[::1]:5000/v1/api/tickle');
-assert(!loopbackByIpV6.agent, 'IPv6 loopback must not silently get insecure TLS under the current guard');
+assert(loopbackByIpV6.agent, 'Expected IPv6 loopback https request to use scoped agent');
 
 const httpLocal = buildRequestOptions('http://localhost:5000/v1/api/tickle');
 assert(!httpLocal.agent, 'Expected plain http request to avoid TLS agent');

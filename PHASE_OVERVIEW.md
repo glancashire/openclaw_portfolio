@@ -94,10 +94,8 @@
 **Status:** ready
 
 #### Remaining
-- [ ] add `docs/config-matrix.md`
-- [ ] introduce pure `readWorkspaceEnv()` alongside mutating loader
-- [ ] add tests proving loopback-only TLS relaxations never apply to non-local hosts
 - [ ] centralize IBKR host/port/baseUrl defaults and document them once
+- [ ] reconcile Phase 2 checklist/docs with the now-landed env/config work
 
 ### 🟡 Phase 4 — Test governance and coverage transparency
 

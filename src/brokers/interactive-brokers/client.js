@@ -1,5 +1,5 @@
 const https = require('https');
-const { loadInteractiveBrokersConfig, validateInteractiveBrokersConfig } = require('./config');
+const { loadInteractiveBrokersConfig, shouldUseInsecureLoopbackTls, validateInteractiveBrokersConfig } = require('./config');
 const { logBrokerEvent } = require('../shared/safeLogger');
 const { normaliseOrder, normaliseOrderQuote, normaliseCancelResult } = require('./types');
 const { InteractiveBrokersNativeClient } = require('./nativeClient');
@@ -648,19 +648,10 @@ function buildRequestOptions(url, { method = 'GET', body } = {}) {
     },
     body: body ? JSON.stringify(body) : undefined,
   };
-  if (shouldUseInsecureLocalTls(url)) {
+  if (shouldUseInsecureLoopbackTls(url)) {
     options.agent = new https.Agent({ rejectUnauthorized: false });
   }
   return options;
-}
-
-function shouldUseInsecureLocalTls(url) {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'https:' && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1');
-  } catch {
-    return false;
-  }
 }
 
 function safeJson(text) {
@@ -780,4 +771,4 @@ function numberOrNull(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-module.exports = { InteractiveBrokersClient, aggregateExecutionFills, brokerDiagnostics, activeMode, buildRequestOptions, shouldUseInsecureLocalTls };
+module.exports = { InteractiveBrokersClient, aggregateExecutionFills, brokerDiagnostics, activeMode, buildRequestOptions, shouldUseInsecureLoopbackTls };

@@ -39,6 +39,7 @@ For each field, the loader checks:
 - `IBKR_MODE`: `native`
 - `IBKR_RUNTIME`: `live`
 - `IBKR_BASE_URL`: `https://localhost:5000/v1/api`
+- portal API base URL helper: `https://localhost:5000/portal.proxy/v1/api`
 - `IBKR_HOST`: `127.0.0.1`
 - native port by runtime:
   - `live` → `4001`
@@ -70,6 +71,7 @@ For each field, the loader checks:
 Current guarded cases:
 - `https://localhost:...`
 - `https://127.0.0.1:...`
+- `https://[::1]:...`
 
 Non-loopback hosts must not inherit the relaxed TLS behavior.
 No code should mutate global `NODE_TLS_REJECT_UNAUTHORIZED`.

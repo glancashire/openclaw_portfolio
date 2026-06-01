@@ -4,10 +4,15 @@ const path = require('path');
 const SECRET_PATH = path.join(__dirname, '..', '..', '..', 'secrets', 'interactive-brokers.json');
 const { loadWorkspaceEnv, readWorkspaceEnv } = require('../../shared/env');
 
+const IBKR_PORTAL_ORIGIN = 'https://localhost:5000';
+const IBKR_API_BASE_PATH = '/v1/api';
+const IBKR_PORTAL_API_BASE_PATH = '/portal.proxy/v1/api';
+const LOOPBACK_HOSTS = Object.freeze(new Set(['localhost', '127.0.0.1', '::1']));
+
 const IBKR_DEFAULTS = Object.freeze({
   mode: 'native',
   runtime: 'live',
-  baseUrl: 'https://localhost:5000/v1/api',
+  baseUrl: `${IBKR_PORTAL_ORIGIN}${IBKR_API_BASE_PATH}`,
   host: '127.0.0.1',
   clientId: 101,
   readonly: true,
@@ -31,7 +36,7 @@ function loadInteractiveBrokersConfig() {
   return {
     mode,
     runtime,
-    baseUrl: firstNonEmpty(process.env.IBKR_BASE_URL, workspaceEnv.IBKR_BASE_URL, cfg.baseUrl, IBKR_DEFAULTS.baseUrl),
+    baseUrl: firstNonEmpty(process.env.IBKR_BASE_URL, workspaceEnv.IBKR_BASE_URL, cfg.baseUrl, getDefaultBaseUrl()),
     host: firstNonEmpty(process.env.IBKR_HOST, workspaceEnv.IBKR_HOST, cfg.host, IBKR_DEFAULTS.host),
     port: Number(firstNonEmpty(process.env.IBKR_PORT, workspaceEnv.IBKR_PORT, cfg.port, defaultNativePort)),
     clientId: Number(firstNonEmpty(process.env.IBKR_CLIENT_ID, workspaceEnv.IBKR_CLIENT_ID, cfg.clientId, IBKR_DEFAULTS.clientId)),
@@ -45,6 +50,26 @@ function loadInteractiveBrokersConfig() {
 
 function getDefaultNativePort(runtime = IBKR_DEFAULTS.runtime) {
   return IBKR_DEFAULTS.nativePortByRuntime[runtime] || IBKR_DEFAULTS.nativePortByRuntime.live;
+}
+
+function getDefaultBaseUrl(kind = 'api') {
+  if (kind === 'portal') return `${IBKR_PORTAL_ORIGIN}${IBKR_PORTAL_API_BASE_PATH}`;
+  return `${IBKR_PORTAL_ORIGIN}${IBKR_API_BASE_PATH}`;
+}
+
+function isLoopbackHostname(hostname) {
+  if (!hostname) return false;
+  const normalized = String(hostname).toLowerCase().replace(/^\[/, '').replace(/\]$/, '');
+  return LOOPBACK_HOSTS.has(normalized);
+}
+
+function shouldUseInsecureLoopbackTls(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && isLoopbackHostname(parsed.hostname);
+  } catch {
+    return false;
+  }
 }
 
 function parseReadonly(value) {
@@ -102,9 +127,15 @@ function validateInteractiveBrokersConfig(config = loadInteractiveBrokersConfig(
 }
 
 module.exports = {
+  IBKR_API_BASE_PATH,
   IBKR_DEFAULTS,
+  IBKR_PORTAL_API_BASE_PATH,
+  IBKR_PORTAL_ORIGIN,
+  getDefaultBaseUrl,
   getDefaultNativePort,
+  isLoopbackHostname,
   loadInteractiveBrokersConfig,
   redactInteractiveBrokersConfig,
+  shouldUseInsecureLoopbackTls,
   validateInteractiveBrokersConfig,
 };

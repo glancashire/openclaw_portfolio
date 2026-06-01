@@ -25,11 +25,15 @@ Turn the current portfolio-manager codebase into a cleaner, more reliable, easie
 - separate pure config loading from global environment mutation
 - document the full config matrix
 
-### Candidate work
-- add `docs/config-matrix.md`
-- introduce a pure `readWorkspaceEnv()` alongside mutating `loadWorkspaceEnv()`
-- add tests proving loopback-only TLS relaxations never apply to non-local hosts
+### Delivered / remaining
+Delivered already:
+- `docs/config-matrix.md` added
+- pure `readWorkspaceEnv()` introduced alongside mutating `loadWorkspaceEnv()`
+- tests proving loopback-only TLS relaxations do not apply to non-local hosts
+
+Remaining closeout:
 - centralize IBKR host/port/baseUrl defaults and document them once
+- keep config docs/checklists aligned with the actual loader behavior
 
 ## Phase 3 — CLI and orchestration refactor
 ### Objectives
