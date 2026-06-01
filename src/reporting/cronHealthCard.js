@@ -22,7 +22,7 @@ function severityFor({ consecutiveErrors = 0, lastRunAtMs }) {
   return 'ok';
 }
 
-function summarizeCronJobs(jobs = [], { now = Date.now() } = {}) {
+function summarizeCronJobs(jobs = [], { now = Date.now(), sourceStatus = 'ok', sourceMessage = null } = {}) {
   const summary = jobs
     .filter((job) => job.enabled !== false)
     .map((job) => {
@@ -54,12 +54,34 @@ function summarizeCronJobs(jobs = [], { now = Date.now() } = {}) {
     return acc;
   }, {});
 
-  return {
+  const base = {
     jobs: summary,
     counts,
     total: summary.length,
     healthy: counts.ok || 0,
     failing: (counts.warning || 0) + (counts.alert || 0) + (counts.critical || 0),
+  };
+
+  if (sourceStatus !== 'ok') {
+    return {
+      ...base,
+      status: 'unavailable',
+      message: sourceMessage || 'Cron inspection unavailable.',
+    };
+  }
+
+  if (base.total === 0) {
+    return {
+      ...base,
+      status: 'empty',
+      message: sourceMessage || 'No enabled cron jobs found.',
+    };
+  }
+
+  return {
+    ...base,
+    status: 'ok',
+    message: sourceMessage || null,
   };
 }
 

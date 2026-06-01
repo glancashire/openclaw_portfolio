@@ -47,6 +47,7 @@ fs.writeFileSync(counterPath, '0');
   fetchCronJobs();
   ok('first call invokes CLI', readCount() === 1);
   ok('cache populated after first call', _peekCronCache() !== null);
+  ok('first call returns ok status', fetchCronJobs().status === 'ok');
 }
 
 // 2. Subsequent calls within TTL → no spawn
@@ -59,8 +60,9 @@ fs.writeFileSync(counterPath, '0');
 
 // 3. fetchCronHealth also hits cache
 {
-  fetchCronHealth();
+  const health = fetchCronHealth();
   ok('fetchCronHealth uses the same cache (still 1)', readCount() === 1);
+  ok('fetchCronHealth reports empty status for zero jobs', health.status === 'empty');
 }
 
 // 4. clearCronCache forces re-spawn

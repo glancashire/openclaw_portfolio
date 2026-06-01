@@ -268,6 +268,7 @@ function renderInstrumentHealthCard(summary = {}) {
 }
 
 function renderCronHealthCard(cronHealth = {}) {
+  const status = cronHealth.status || 'ok';
   const rows = (cronHealth.jobs || []).slice(0, 8).map((job) => [
     escapeHtml(job.name || 'unnamed'),
     badge({ label: job.severity || 'ok', tone: toneForCronSeverity(job.severity) }),
@@ -275,15 +276,15 @@ function renderCronHealthCard(cronHealth = {}) {
     escapeHtml(job.lastRunAgeHours == null ? 'n/a' : `${job.lastRunAgeHours.toFixed(1)}h`),
     escapeHtml(job.lastError ? String(job.lastError).slice(0, 120) : '—'),
   ]);
-  return card({
-    title: 'Cron health',
-    tone: 'surface',
-    contentHtml: `
-      <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;">
+  const summaryBadges = status === 'unavailable'
+    ? `${badge({ label: 'inspection unavailable', tone: 'warn' })}`
+    : `
         ${badge({ label: `${cronHealth.healthy || 0}/${cronHealth.total || 0} healthy`, tone: (cronHealth.failing || 0) > 0 ? 'warn' : 'success' })}
         ${badge({ label: `${cronHealth.failing || 0} failing`, tone: (cronHealth.failing || 0) > 0 ? 'danger' : 'success' })}
-      </div>
-      ${dataTable({
+      `;
+  const detail = status === 'unavailable'
+    ? `<div style="font-size:13px;color:#92400e;">${escapeHtml(cronHealth.message || 'Cron inspection unavailable.')}</div>`
+    : dataTable({
         columns: [
           { label: 'Job' },
           { label: 'Severity' },
@@ -292,7 +293,15 @@ function renderCronHealthCard(cronHealth = {}) {
           { label: 'Last error' },
         ],
         rows,
-      })}
+      });
+  return card({
+    title: 'Cron health',
+    tone: 'surface',
+    contentHtml: `
+      <div style="margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        ${summaryBadges}
+      </div>
+      ${detail}
     `,
   });
 }
@@ -452,7 +461,9 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
     `Unrealized profit: ${formatCurrency(profitTotals.totalProfitChf, 'CHF')}${profitTotals.totalProfitPct != null ? ` (${profitTotals.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotals.totalProfitPct).toFixed(2)}%)` : ''}`,
     `Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}`,
     `Operator queue: ${summary.operatorQueue?.summary?.total || 0}`,
-    `Cron health: ${resolvedCronHealth.healthy || 0}/${resolvedCronHealth.total || 0} healthy, ${resolvedCronHealth.failing || 0} failing`,
+    resolvedCronHealth.status === 'unavailable'
+      ? `Cron health: unavailable (${resolvedCronHealth.message || 'cron inspection unavailable'})`
+      : `Cron health: ${resolvedCronHealth.healthy || 0}/${resolvedCronHealth.total || 0} healthy, ${resolvedCronHealth.failing || 0} failing`,
     '',
     'Holdings (value / profit)',
     ...profitRows.map((r) => {

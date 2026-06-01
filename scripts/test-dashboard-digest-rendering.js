@@ -72,3 +72,23 @@ function seed(repoRoot) {
   console.error(error.stack || String(error));
   process.exit(1);
 });
+
+
+(async function unavailableCronMain() {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dashboard-digest-render-unavail-'));
+  const portfolioDir = seed(repoRoot);
+  const digest = await buildDashboardDigest({
+    portfolioDir,
+    frequency: 'daily',
+    generatedAt: '2026-05-23T17:00:00Z',
+    modelClient: noopModelClient,
+    cronHealth: { status: 'unavailable', total: 0, healthy: 0, failing: 0, jobs: [], message: 'Cron inspection unavailable.' },
+  });
+
+  assert(digest.html.includes('Cron inspection unavailable.'));
+  assert(digest.text.includes('Cron health: unavailable'));
+  console.log(JSON.stringify({ ok: true, unavailableCron: true }, null, 2));
+})().catch((error) => {
+  console.error(error.stack || String(error));
+  process.exit(1);
+});
