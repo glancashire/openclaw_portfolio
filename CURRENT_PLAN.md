@@ -43,10 +43,10 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
 **Tranches:**
 
 1. **Tranche 1 — autonomous, low risk**
-   - 1A. Working-tree hygiene: drop redundant stash, gitignore `runtime-events.jsonl`, decide monthly-report policy, refresh memory + checklist.
-   - 1B. `regenerate-dashboard.js` accepts bare portfolio name.
-   - 1G. Migrate deprecated `messages.groupChat.visibleReplies` config key.
-   - 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out".
+   - [x] 1A. Working-tree hygiene: stash dropped, `runtime-events.jsonl` + report derivatives gitignored, regression test `test-gitignore-policy.js`.
+   - [ ] 1B. `regenerate-dashboard.js` accepts bare portfolio name.
+   - [ ] 1G. Migrate deprecated `messages.groupChat.visibleReplies` config key.
+   - [ ] 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out".
 2. **Tranche 2 — autonomous, deeper**
    - 1D. Bound posture-probe wall-clock during holdings sync; skip identical avg-cost rewrites.
    - 1E. Surface "Today / This week" deltas as `—` under `posture=unknown` instead of silent `+0.00`.

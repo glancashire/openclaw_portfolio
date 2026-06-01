@@ -23,3 +23,17 @@ runtime/
 *.tmp
 tmp_render_summary_html.js.txt
 runtime/email-locks/
+
+# Generated artifacts that dirty git status on every sync (cleanup-1a, 2026-06-01)
+# Keep canonical .md reports tracked; ignore deterministic derivatives.
+portfolio/*/reports/monthly/*.html
+portfolio/*/reports/monthly/*.json
+portfolio/*/reports/monthly/*.pdf
+portfolio/*/reports/weekly/*.html
+portfolio/*/reports/weekly/*.json
+portfolio/*/reports/weekly/*.pdf
+portfolio/*/reports/quarterly/*.html
+portfolio/*/reports/quarterly/*.json
+portfolio/*/reports/quarterly/*.pdf
+# runtime-events.jsonl is append-only and was tracked before runtime/ was ignored
+runtime/events/runtime-events.jsonl
