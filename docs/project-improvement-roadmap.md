@@ -52,11 +52,15 @@ Remaining closeout:
 - show which domains are covered by `npm test`
 - externalize lane/quarantine policy
 
-### Candidate work
-- generate a coverage-by-domain manifest from discovered tests
-- add `docs/test-governance.md`
-- move quarantine/override policy to versioned data files
-- add a generated-artifact idempotence lane
+### Delivered / remaining
+Delivered in Phase 4B:
+- generated `docs/operations/test-coverage-by-domain.json` from discovered tests
+- moved skip/override/quarantine policy into `config/test-discovery-policy.json`
+- tightened manifest drift validation to cover policy + domain-summary artifacts
+- promoted `docs/operations/test-lanes.md` as the canonical human-facing governance doc
+
+Remaining evaluation:
+- decide later whether generated-artifact idempotence deserves its own named lane or should remain covered by targeted artifact/reporting tests
 
 ## Phase 5 — Artifact hygiene and dead-code retirement
 ### Objectives

@@ -78,10 +78,10 @@ Legend:
 ### Phase 4 — Test governance and coverage transparency
 **Status:** READY FOR IMPLEMENTATION
 
-#### Still open
-- [ ] generate coverage-by-domain manifest from discovered tests
-- [ ] add `docs/test-governance.md`
-- [ ] externalize lane/quarantine policy into versioned data
+#### Status update
+- [x] generated coverage-by-domain manifest from discovered tests
+- [x] kept `docs/operations/test-lanes.md` as the canonical governance doc
+- [x] externalized lane/quarantine policy into versioned data
 - [ ] consider generated-artifact idempotence lane
 
 ---

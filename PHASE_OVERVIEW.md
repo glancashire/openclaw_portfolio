@@ -99,12 +99,13 @@
 
 ### 🟡 Phase 4 — Test governance and coverage transparency
 
-**Status:** ready
+**Status:** complete (2026-06-01)
 
-#### Remaining
-- [ ] generate a coverage-by-domain manifest from discovered tests
-- [ ] add `docs/test-governance.md`
-- [ ] move quarantine/override policy to versioned data files
+#### Delivered
+- [x] generated `docs/operations/test-coverage-by-domain.json` from discovered tests
+- [x] promoted `docs/operations/test-lanes.md` as the canonical governance doc
+- [x] moved quarantine/override policy to versioned `config/test-discovery-policy.json`
+- [x] tightened manifest drift tests to validate policy + domain-summary linkage
 - [ ] evaluate a generated-artifact idempotence lane
 
 ### 🟡 Phase 7 — Reliability and guided-remediation realism

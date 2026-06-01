@@ -20,35 +20,8 @@ const { checks } = require('../src/reporting/verifyRepoChecks');
 
 const ROOT = path.resolve(__dirname, '..');
 const MANIFEST_PATH = path.join(ROOT, 'docs/operations/test-manifest.json');
-const SCAN_DIRS = ['scripts', 'tests'];
-
-// Explicit overrides for files where the heuristic gets it wrong, or where
-// the lane decision is policy rather than heuristic.
-const OVERRIDES = {
-  // Static source-grep tests (no actual broker calls).
-  'scripts/test-monitor-fills-real-orders.js': { lane: 'safe', reason: 'source-grep over monitor-fills.js, no execution' },
-  // Mailgun smoke (sends real email).
-  'scripts/test-mailgun.js': { lane: 'external', reason: 'sends real Mailgun email' },
-  'scripts/test-mailgun-inbound.js': { lane: 'safe', reason: 'unit test of inbound parser, no network' },
-  'scripts/test-trade-notification-email.js': { lane: 'external', reason: 'sends real trade notification email' },
-  'scripts/test-trade-notify-action-currency-normalization.js': { lane: 'safe', reason: 'pure formatter unit test' },
-  // Heavy reporting/fixture tests: no external network, but they exercise full
-  // filesystem-backed generation paths and can exceed the cheap safe-lane budget.
-  'scripts/test-dashboard-digest-rebalance-and-ai.js': { lane: 'integration', reason: 'builds reporting artifacts from seeded repo fixtures' },
-  'scripts/test-dashboard-digest-rendering.js': { lane: 'integration', reason: 'builds digest output from seeded repo fixtures' },
-  'scripts/test-dashboard-digest-with-model.js': { lane: 'integration', reason: 'builds digest output with stubbed model over seeded repo fixtures' },
-  'scripts/test-multi-portfolio-overview.js': { lane: 'integration', reason: 'generates overview artifacts from seeded repo/runtime fixtures' },
-  // Broker auth / socket smoke tests.
-  'scripts/test-interactive-brokers-auth.js': { lane: 'live-smoke', reason: 'authenticates against live IBKR gateway' },
-  'scripts/test-interactive-brokers-native-socket.js': { lane: 'live-smoke', reason: 'opens TCP socket to IBKR gateway' },
-  'scripts/test-interactive-brokers-native-client.js': { lane: 'live-smoke', reason: 'connects via native client' },
-  'scripts/test-broker-adapter-completeness.js': { lane: 'safe', reason: 'mocks broker client via Module._load patch; no real network' },
-  'tests/test-ibkr-readiness.js': { lane: 'safe', reason: 'pure unit test of readiness summarizer' },
-  'scripts/test-ibkr-readiness.js': { lane: 'safe', reason: 'pure unit test if present' },
-  // The discoverer / harness itself.
-  'scripts/test-all.js': { skip: true, reason: 'legacy runner wrapper, not a test' },
-  'scripts/test-test-manifest-shape.js': { lane: 'safe', reason: 'validates the manifest itself' },
-};
+const DOMAIN_SUMMARY_PATH = path.join(ROOT, 'docs/operations/test-coverage-by-domain.json');
+const POLICY_PATH = path.join(ROOT, 'config/test-discovery-policy.json');
 
 // Patterns that flip a file into a particular lane regardless of imports.
 const FILENAME_RULES = [
@@ -80,9 +53,13 @@ const LIVE_NETWORK_MARKERS = [
   /\bhttps\.request\(/,
 ];
 
-function listTestFiles() {
+function loadDiscoveryPolicy() {
+  return JSON.parse(fs.readFileSync(POLICY_PATH, 'utf8'));
+}
+
+function listTestFiles(policy) {
   const out = [];
-  for (const dir of SCAN_DIRS) {
+  for (const dir of policy.scanDirs || []) {
     const abs = path.join(ROOT, dir);
     if (!fs.existsSync(abs)) continue;
     for (const entry of fs.readdirSync(abs).sort()) {
@@ -93,10 +70,12 @@ function listTestFiles() {
   return out;
 }
 
-function classify(relPath, source) {
-  const override = OVERRIDES[relPath];
+function classify(relPath, source, policy) {
+  const skipReason = policy.skips && policy.skips[relPath];
+  if (skipReason) return null;
+
+  const override = policy.overrides && policy.overrides[relPath];
   if (override) {
-    if (override.skip) return null;
     return { lane: override.lane, reason: override.reason };
   }
 
@@ -146,14 +125,47 @@ function buildVerifyRepoSet() {
   return set;
 }
 
+function summarizeDomain(relPath) {
+  const base = path.basename(relPath).replace(/^test-/, '').replace(/\.js$/, '');
+  return (base.split('-')[0] || base || 'misc').toLowerCase();
+}
+
+function buildDomainSummary(entries) {
+  const map = new Map();
+  for (const entry of entries) {
+    const domain = summarizeDomain(entry.path);
+    if (!map.has(domain)) {
+      map.set(domain, {
+        domain,
+        total: 0,
+        safe: 0,
+        integration: 0,
+        'live-smoke': 0,
+        external: 0,
+        quarantined: 0,
+        inVerifyRepoChecks: 0,
+        examples: [],
+      });
+    }
+    const row = map.get(domain);
+    row.total += 1;
+    row[entry.lane] += 1;
+    if (entry.quarantined) row.quarantined += 1;
+    if (entry.inVerifyRepoChecks) row.inVerifyRepoChecks += 1;
+    if (row.examples.length < 3) row.examples.push(entry.path);
+  }
+  return Array.from(map.values()).sort((a, b) => b.total - a.total || a.domain.localeCompare(b.domain));
+}
+
 function buildManifest() {
+  const policy = loadDiscoveryPolicy();
   const verifySet = buildVerifyRepoSet();
-  const files = listTestFiles();
+  const files = listTestFiles(policy);
   const entries = [];
   for (const rel of files) {
     const abs = path.join(ROOT, rel);
     const source = fs.readFileSync(abs, 'utf8');
-    const result = classify(rel, source);
+    const result = classify(rel, source, policy);
     if (!result) continue; // explicit skip
     entries.push({
       path: rel,
@@ -165,7 +177,7 @@ function buildManifest() {
   }
   // Quarantines: tests known to fail today; documented and skipped by runner.
   // (Empty for now — populated as we run --lane=safe and observe failures.)
-  applyQuarantines(entries);
+  applyQuarantines(entries, policy);
 
   // Validate every verifyRepoChecks test-* file is represented.
   for (const rel of verifySet) {
@@ -198,20 +210,12 @@ function buildManifest() {
   };
 }
 
-function applyQuarantines(entries) {
-  // Populated by `npm run test:all -- --lane=safe` runs. Tests here are
-  // pre-existing failures NOT introduced by W10. Re-categorise or fix in
-  // a follow-up wave; the W10 brief explicitly says "don't fix, just
-  // quarantine".
-  const QUARANTINE = {
-    'scripts/test-delivery-executor.js': 'pre-existing: html payload no longer includes "Demo summary" literal (W10 quarantine)',
-    'scripts/test-health-report-trends.js': 'pre-existing: assertion against current trend formatting drifts (W10 quarantine)',
-    'scripts/test-portfolio-etf-instruments.js': 'pre-existing: portfolio fixture drift (W10 quarantine)',
-  };
+function applyQuarantines(entries, policy) {
+  const quarantine = policy.quarantines || {};
   for (const e of entries) {
-    if (QUARANTINE[e.path]) {
+    if (quarantine[e.path]) {
       e.quarantined = true;
-      e.quarantineReason = QUARANTINE[e.path];
+      e.quarantineReason = quarantine[e.path];
     }
   }
 }
@@ -221,6 +225,22 @@ function writeManifest(manifest) {
   fs.mkdirSync(path.dirname(MANIFEST_PATH), { recursive: true });
   fs.writeFileSync(MANIFEST_PATH, json);
   return json;
+}
+
+function writeDomainSummary(manifest) {
+  const payload = {
+    generatedBy: 'scripts/discover-test-suites.js',
+    description: 'Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.',
+    generatedAt: new Date().toISOString(),
+    counts: {
+      totalTests: manifest.counts.total,
+      domains: buildDomainSummary(manifest.entries).length,
+    },
+    domains: buildDomainSummary(manifest.entries),
+  };
+  fs.mkdirSync(path.dirname(DOMAIN_SUMMARY_PATH), { recursive: true });
+  fs.writeFileSync(DOMAIN_SUMMARY_PATH, JSON.stringify(payload, null, 2) + '\n');
+  return payload;
 }
 
 function main() {
@@ -239,9 +259,10 @@ function main() {
   }
 
   writeManifest(manifest);
-  console.log(JSON.stringify({ ok: true, wrote: path.relative(ROOT, MANIFEST_PATH), counts: manifest.counts }, null, 2));
+  const domainSummary = writeDomainSummary(manifest);
+  console.log(JSON.stringify({ ok: true, wrote: path.relative(ROOT, MANIFEST_PATH), wroteDomainSummary: path.relative(ROOT, DOMAIN_SUMMARY_PATH), counts: manifest.counts, domainCounts: domainSummary.counts }, null, 2));
 }
 
 if (require.main === module) main();
 
-module.exports = { buildManifest, MANIFEST_PATH };
+module.exports = { buildManifest, MANIFEST_PATH, DOMAIN_SUMMARY_PATH, POLICY_PATH, loadDiscoveryPolicy, classify, buildDomainSummary, summarizeDomain };

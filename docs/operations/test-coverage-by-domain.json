@@ -1,0 +1,1514 @@
+{
+  "generatedBy": "scripts/discover-test-suites.js",
+  "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
+  "generatedAt": "2026-06-01T07:59:14.990Z",
+  "counts": {
+    "totalTests": 296,
+    "domains": 109
+  },
+  "domains": [
+    {
+      "domain": "basket",
+      "total": 13,
+      "safe": 13,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-basket-approval-envelope.js",
+        "scripts/test-basket-execution-runner.js",
+        "scripts/test-basket-lifecycle.js"
+      ]
+    },
+    {
+      "domain": "market",
+      "total": 13,
+      "safe": 10,
+      "integration": 3,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-market-calendar-artifact-has-holiday-fields.js",
+        "scripts/test-market-calendar-holidays.js",
+        "scripts/test-market-calendar-readiness.js"
+      ]
+    },
+    {
+      "domain": "trade",
+      "total": 13,
+      "safe": 7,
+      "integration": 5,
+      "live-smoke": 0,
+      "external": 1,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 3,
+      "examples": [
+        "scripts/test-trade-blocking-safety-hardening.js",
+        "scripts/test-trade-cli-surface.js",
+        "scripts/test-trade-cli-venue-aware-market-message.js"
+      ]
+    },
+    {
+      "domain": "dashboard",
+      "total": 12,
+      "safe": 7,
+      "integration": 5,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 3,
+      "examples": [
+        "scripts/test-dashboard-best-next-step-priority.js",
+        "scripts/test-dashboard-command-center.js",
+        "scripts/test-dashboard-delivery-backfill-dedup.js"
+      ]
+    },
+    {
+      "domain": "native",
+      "total": 11,
+      "safe": 7,
+      "integration": 4,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-native-conid-contract-normalization.js",
+        "scripts/test-native-conid-order-minimal-contract.js",
+        "scripts/test-native-contract-details-normalization.js"
+      ]
+    },
+    {
+      "domain": "interactive",
+      "total": 9,
+      "safe": 0,
+      "integration": 6,
+      "live-smoke": 3,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-interactive-brokers-auth.js",
+        "scripts/test-interactive-brokers-completed-order-surface.js",
+        "scripts/test-interactive-brokers-filled-order-surface.js"
+      ]
+    },
+    {
+      "domain": "live",
+      "total": 9,
+      "safe": 8,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-live-order-guard.js",
+        "scripts/test-live-preflight-diagnostic-artifact.js",
+        "scripts/test-live-preflight-no-hardcoded-ebs-market-window.js"
+      ]
+    },
+    {
+      "domain": "ibkr",
+      "total": 8,
+      "safe": 7,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-ibkr-cli-tzdata-hardening.js",
+        "scripts/test-ibkr-config-defaults-native.js",
+        "scripts/test-ibkr-config-helpers.js"
+      ]
+    },
+    {
+      "domain": "portfolio",
+      "total": 8,
+      "safe": 6,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 1,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-portfolio-creation-hardening.js",
+        "scripts/test-portfolio-etf-instruments.js",
+        "scripts/test-portfolio-execution-gates.js"
+      ]
+    },
+    {
+      "domain": "cancel",
+      "total": 7,
+      "safe": 6,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-cancel-broker-only-orderid.js",
+        "scripts/test-cancel-loop-breaker-integration.js",
+        "scripts/test-cancel-loop-breaker.js"
+      ]
+    },
+    {
+      "domain": "broker",
+      "total": 6,
+      "safe": 6,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-broker-adapter-completeness.js",
+        "scripts/test-broker-block-priority.js",
+        "scripts/test-broker-error-pause-gating.js"
+      ]
+    },
+    {
+      "domain": "delivery",
+      "total": 6,
+      "safe": 6,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 1,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-delivery-backfill-next-action.js",
+        "scripts/test-delivery-backfill-review-readiness.js",
+        "scripts/test-delivery-diagnostic-broker-block-context.js"
+      ]
+    },
+    {
+      "domain": "execution",
+      "total": 6,
+      "safe": 6,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-execution-authority.js",
+        "scripts/test-execution-classification.js",
+        "scripts/test-execution-command-surface-doc.js"
+      ]
+    },
+    {
+      "domain": "health",
+      "total": 6,
+      "safe": 4,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 1,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-health-check-cli.js",
+        "scripts/test-health-monitor-cron.js",
+        "scripts/test-health-report-priority-order.js"
+      ]
+    },
+    {
+      "domain": "transmitted",
+      "total": 6,
+      "safe": 6,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-transmitted-live-gating.js",
+        "scripts/test-transmitted-live-immediate-inactive-acceptance.js",
+        "scripts/test-transmitted-live-lane-acceptance.js"
+      ]
+    },
+    {
+      "domain": "email",
+      "total": 5,
+      "safe": 2,
+      "integration": 3,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-email-dedup.js",
+        "scripts/test-email-delivery-policy.js",
+        "scripts/test-email-html-rendering.js"
+      ]
+    },
+    {
+      "domain": "open",
+      "total": 5,
+      "safe": 5,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-open-order-row-list.js",
+        "scripts/test-open-phases-card.js",
+        "scripts/test-open-runner-block-persistence.js"
+      ]
+    },
+    {
+      "domain": "runtime",
+      "total": 5,
+      "safe": 2,
+      "integration": 3,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-runtime-broker-error-state.js",
+        "scripts/test-runtime-cleanup.js",
+        "scripts/test-runtime-ephemeral-policy.js"
+      ]
+    },
+    {
+      "domain": "holdings",
+      "total": 4,
+      "safe": 4,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-holdings-approved-instrument-mapping.js",
+        "scripts/test-holdings-fx-reconciliation.js",
+        "scripts/test-holdings-snapshot-matching.js"
+      ]
+    },
+    {
+      "domain": "monitor",
+      "total": 4,
+      "safe": 4,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-monitor-fills-backfill-path.js",
+        "scripts/test-monitor-fills-email-accounting.js",
+        "scripts/test-monitor-fills-real-orders.js"
+      ]
+    },
+    {
+      "domain": "order",
+      "total": 4,
+      "safe": 3,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-order-preparation.js",
+        "scripts/test-order-status-completed-hints.js",
+        "scripts/test-order-status-not-found-reconciliation.js"
+      ]
+    },
+    {
+      "domain": "report",
+      "total": 4,
+      "safe": 4,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-report-delivery-readiness.js",
+        "scripts/test-report-email-rendering.js",
+        "scripts/test-report-execution-lifecycle-summary.js"
+      ]
+    },
+    {
+      "domain": "stage",
+      "total": 4,
+      "safe": 3,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-stage-live-order-records-broker-order-id.js",
+        "scripts/test-stage-live-order-status-submitted.js",
+        "scripts/test-stage-order-applies-timing-policy.js"
+      ]
+    },
+    {
+      "domain": "submit",
+      "total": 4,
+      "safe": 2,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-submit-immediate-inactive-recording.js",
+        "scripts/test-submit-open-clears-stale-blocks.js",
+        "scripts/test-submit-open-immediate-inactive-reason-persistence.js"
+      ]
+    },
+    {
+      "domain": "sync",
+      "total": 4,
+      "safe": 4,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-sync-order-status-does-not-hit-history-collisions.js",
+        "scripts/test-sync-probable-cancelled-does-not-match-on-reason-text-alone.js",
+        "scripts/test-sync-probable-cancelled-requires-strong-match.js"
+      ]
+    },
+    {
+      "domain": "approval",
+      "total": 3,
+      "safe": 2,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-approval-gate.js",
+        "scripts/test-approval-queue-grouping.js",
+        "scripts/test-approval-transition-guard.js"
+      ]
+    },
+    {
+      "domain": "approvals",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-approvals-queue-basket-first.js",
+        "scripts/test-approvals-queue-markdown-annotations.js",
+        "scripts/test-approvals-surface-annotations.js"
+      ]
+    },
+    {
+      "domain": "artifact",
+      "total": 3,
+      "safe": 2,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-artifact-hash-gate.js",
+        "scripts/test-artifact-policy-contract.js",
+        "scripts/test-artifact-writer.js"
+      ]
+    },
+    {
+      "domain": "contract",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-contract-cache.js",
+        "scripts/test-contract-intelligence-observability.js",
+        "scripts/test-contract-intelligence.js"
+      ]
+    },
+    {
+      "domain": "cron",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-cron-job-policy.js",
+        "scripts/test-cron-jobs-cache.js",
+        "scripts/test-cron-non-docker-defaults.js"
+      ]
+    },
+    {
+      "domain": "etf",
+      "total": 3,
+      "safe": 2,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-etf-shortlist.js",
+        "scripts/test-etf-suggestion-completion.js",
+        "scripts/test-etf-suggestion-hardening.js"
+      ]
+    },
+    {
+      "domain": "fill",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-fill-notification-backfill-ack.js",
+        "scripts/test-fill-notification-policy.js",
+        "scripts/test-fill-notification-state-transition.js"
+      ]
+    },
+    {
+      "domain": "operator",
+      "total": 3,
+      "safe": 1,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-operator-action-audit-trail.js",
+        "scripts/test-operator-incident-summary.js",
+        "scripts/test-operator-runbooks-contract.js"
+      ]
+    },
+    {
+      "domain": "resync",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-resync-classifies-cross-client-presubmitted.js",
+        "scripts/test-resync-idempotent-open-order-filter.js",
+        "scripts/test-resync-latest-row-only.js"
+      ]
+    },
+    {
+      "domain": "self",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-self-heal-budget.js",
+        "scripts/test-self-heal-observability.js",
+        "scripts/test-self-heal-plan.js"
+      ]
+    },
+    {
+      "domain": "ai",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-ai-assessment-narration.js",
+        "scripts/test-ai-assessment.js"
+      ]
+    },
+    {
+      "domain": "approved",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-approved-instruments-metadata.js",
+        "scripts/test-approved-instruments-sentinel-identity.js"
+      ]
+    },
+    {
+      "domain": "diagnostics",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-diagnostics-require-paths.js",
+        "scripts/test-diagnostics-script-compat.js"
+      ]
+    },
+    {
+      "domain": "history",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-history-material-events.js",
+        "scripts/test-history-snapshot-types.js"
+      ]
+    },
+    {
+      "domain": "latest",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-latest-proposal-for-portfolio.js",
+        "scripts/test-latest-trade-proposals-dedup.js"
+      ]
+    },
+    {
+      "domain": "mailgun",
+      "total": 2,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 1,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-mailgun-inbound.js",
+        "scripts/test-mailgun.js"
+      ]
+    },
+    {
+      "domain": "proposal",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-proposal-distribution-underweight.js",
+        "scripts/test-proposal-generator-quote-quality.js"
+      ]
+    },
+    {
+      "domain": "quote",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-quote-quality-classifier.js",
+        "scripts/test-quote-resolution.js"
+      ]
+    },
+    {
+      "domain": "rebalancing",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-rebalancing-closure.js",
+        "scripts/test-rebalancing-hardening.js"
+      ]
+    },
+    {
+      "domain": "reproposal",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-reproposal-latest-and-sweep.js",
+        "scripts/test-reproposal-surface.js"
+      ]
+    },
+    {
+      "domain": "stale",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-stale-approval-refresh-command.js",
+        "scripts/test-stale-proposal-approval-guard.js"
+      ]
+    },
+    {
+      "domain": "summary",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-summary-backfill-priority.js",
+        "scripts/test-summary-broker-block-details.js"
+      ]
+    },
+    {
+      "domain": "trading",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-trading-guards.js",
+        "scripts/test-trading-workflow-doc-contract.js"
+      ]
+    },
+    {
+      "domain": "ubspx",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-ubspx-alternatives-decision-support.js",
+        "scripts/test-ubspx-primary-exchange-propagation.js"
+      ]
+    },
+    {
+      "domain": "venue",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-venue-aware-market-open-helper.js",
+        "scripts/test-venue-hours-reference.js"
+      ]
+    },
+    {
+      "domain": "writable",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-writable-execution-handoff-e2e.js",
+        "scripts/test-writable-live-lane-acceptance.js"
+      ]
+    },
+    {
+      "domain": "all",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-all-trading.js"
+      ]
+    },
+    {
+      "domain": "allocation",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-allocation-analysis-cash-sleeve.js"
+      ]
+    },
+    {
+      "domain": "apply",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-apply-portfolio-answers.js"
+      ]
+    },
+    {
+      "domain": "approve",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-approve-and-execute.js"
+      ]
+    },
+    {
+      "domain": "check",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-check-health-monitor-cron.js"
+      ]
+    },
+    {
+      "domain": "cleanup",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-cleanup-runtime-artifacts-cli.js"
+      ]
+    },
+    {
+      "domain": "clear",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-clear-circuit-breaker-audit.js"
+      ]
+    },
+    {
+      "domain": "client",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-client-order-quote-close-fallback.js"
+      ]
+    },
+    {
+      "domain": "cockpit",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-cockpit-delivery-broker-block-context.js"
+      ]
+    },
+    {
+      "domain": "cost",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-cost-basis.js"
+      ]
+    },
+    {
+      "domain": "currency",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-currency-deployment.js"
+      ]
+    },
+    {
+      "domain": "discover",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-discover-test-policy.js"
+      ]
+    },
+    {
+      "domain": "duplicate",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-duplicate-submission-guard.js"
+      ]
+    },
+    {
+      "domain": "effective",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-effective-config.js"
+      ]
+    },
+    {
+      "domain": "env",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-env-secret-loading.js"
+      ]
+    },
+    {
+      "domain": "etfqualityfilter",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-etfQualityFilter.js"
+      ]
+    },
+    {
+      "domain": "first",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-first-purchase-sales-approval-gates.js"
+      ]
+    },
+    {
+      "domain": "inactive",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-inactive-order-reconciliation.js"
+      ]
+    },
+    {
+      "domain": "instrument",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-instrument-allocation-loader.js"
+      ]
+    },
+    {
+      "domain": "investor",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-investor-reporting-data.js"
+      ]
+    },
+    {
+      "domain": "isin",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-isin-search-contracts.js"
+      ]
+    },
+    {
+      "domain": "lifecycle",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-lifecycle-status-normalization.js"
+      ]
+    },
+    {
+      "domain": "markethours",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "tests/test-marketHours.js"
+      ]
+    },
+    {
+      "domain": "model",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-model-client.js"
+      ]
+    },
+    {
+      "domain": "monitorfills",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-monitorFills.js"
+      ]
+    },
+    {
+      "domain": "multi",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-multi-portfolio-overview.js"
+      ]
+    },
+    {
+      "domain": "observability",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-observability-doc-contract.js"
+      ]
+    },
+    {
+      "domain": "partial",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-partial-fill-status-inference.js"
+      ]
+    },
+    {
+      "domain": "pipeline",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-pipeline-end-to-end.js"
+      ]
+    },
+    {
+      "domain": "portfolioexecution",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-portfolioExecution.js"
+      ]
+    },
+    {
+      "domain": "portfoliostate",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-portfolioState.js"
+      ]
+    },
+    {
+      "domain": "probable",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-probable-cancelled-hint-reconciliation.js"
+      ]
+    },
+    {
+      "domain": "profit",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-profit-loss-surface-consistency.js"
+      ]
+    },
+    {
+      "domain": "readiness",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-readiness-surface-integration.js"
+      ]
+    },
+    {
+      "domain": "rebalance",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-rebalance-analyzer.js"
+      ]
+    },
+    {
+      "domain": "recovery",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-recovery-ladder.js"
+      ]
+    },
+    {
+      "domain": "reject",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-reject-trade-transition.js"
+      ]
+    },
+    {
+      "domain": "repo",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-repo-root-cleanliness.js"
+      ]
+    },
+    {
+      "domain": "reporting",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-reporting-completeness.js"
+      ]
+    },
+    {
+      "domain": "resting",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-resting-state-artifact-writes.js"
+      ]
+    },
+    {
+      "domain": "retryable",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-retryable-blocked-open-runner-selection.js"
+      ]
+    },
+    {
+      "domain": "risk",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-risk-observability.js"
+      ]
+    },
+    {
+      "domain": "scheduling",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-scheduling-ops-reliability.js"
+      ]
+    },
+    {
+      "domain": "shared",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-shared-quote-path-fallback.js"
+      ]
+    },
+    {
+      "domain": "soak",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-soak-baseline-shape.js"
+      ]
+    },
+    {
+      "domain": "staged",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-staged-order-approval-guard.js"
+      ]
+    },
+    {
+      "domain": "structured",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-structured-summary-artifacts.js"
+      ]
+    },
+    {
+      "domain": "system",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-system-policy-contract.js"
+      ]
+    },
+    {
+      "domain": "target",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-target-gap-deployment.js"
+      ]
+    },
+    {
+      "domain": "test",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-test-manifest-shape.js"
+      ]
+    },
+    {
+      "domain": "tradecli",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-tradeCli.js"
+      ]
+    },
+    {
+      "domain": "tradeexecutionnotifier",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-tradeExecutionNotifier.js"
+      ]
+    },
+    {
+      "domain": "tradenotificationemail",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-tradeNotificationEmail.js"
+      ]
+    },
+    {
+      "domain": "tradeproposal",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-tradeProposal.js"
+      ]
+    },
+    {
+      "domain": "tradestate",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "tests/test-tradeState.js"
+      ]
+    },
+    {
+      "domain": "verification",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-verification-runner.js"
+      ]
+    },
+    {
+      "domain": "verify",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-verify-repo-check-list.js"
+      ]
+    },
+    {
+      "domain": "workspace",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-workspace-env.js"
+      ]
+    }
+  ]
+}

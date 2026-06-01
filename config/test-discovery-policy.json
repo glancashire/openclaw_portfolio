@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "scanDirs": ["scripts", "tests"],
+  "skips": {
+    "scripts/test-all.js": "legacy runner wrapper, not a test"
+  },
+  "overrides": {
+    "scripts/test-monitor-fills-real-orders.js": {
+      "lane": "safe",
+      "reason": "source-grep over monitor-fills.js, no execution"
+    },
+    "scripts/test-mailgun.js": {
+      "lane": "external",
+      "reason": "sends real Mailgun email"
+    },
+    "scripts/test-mailgun-inbound.js": {
+      "lane": "safe",
+      "reason": "unit test of inbound parser, no network"
+    },
+    "scripts/test-trade-notification-email.js": {
+      "lane": "external",
+      "reason": "sends real trade notification email"
+    },
+    "scripts/test-trade-notify-action-currency-normalization.js": {
+      "lane": "safe",
+      "reason": "pure formatter unit test"
+    },
+    "scripts/test-dashboard-digest-rebalance-and-ai.js": {
+      "lane": "integration",
+      "reason": "builds reporting artifacts from seeded repo fixtures"
+    },
+    "scripts/test-dashboard-digest-rendering.js": {
+      "lane": "integration",
+      "reason": "builds digest output from seeded repo fixtures"
+    },
+    "scripts/test-dashboard-digest-with-model.js": {
+      "lane": "integration",
+      "reason": "builds digest output with stubbed model over seeded repo fixtures"
+    },
+    "scripts/test-multi-portfolio-overview.js": {
+      "lane": "integration",
+      "reason": "generates overview artifacts from seeded repo/runtime fixtures"
+    },
+    "scripts/test-interactive-brokers-auth.js": {
+      "lane": "live-smoke",
+      "reason": "authenticates against live IBKR gateway"
+    },
+    "scripts/test-interactive-brokers-native-socket.js": {
+      "lane": "live-smoke",
+      "reason": "opens TCP socket to IBKR gateway"
+    },
+    "scripts/test-interactive-brokers-native-client.js": {
+      "lane": "live-smoke",
+      "reason": "connects via native client"
+    },
+    "scripts/test-broker-adapter-completeness.js": {
+      "lane": "safe",
+      "reason": "mocks broker client via Module._load patch; no real network"
+    },
+    "tests/test-ibkr-readiness.js": {
+      "lane": "safe",
+      "reason": "pure unit test of readiness summarizer"
+    },
+    "scripts/test-ibkr-readiness.js": {
+      "lane": "safe",
+      "reason": "pure unit test if present"
+    },
+    "scripts/test-test-manifest-shape.js": {
+      "lane": "safe",
+      "reason": "validates the manifest itself"
+    }
+  },
+  "quarantines": {
+    "scripts/test-delivery-executor.js": "pre-existing: html payload no longer includes \"Demo summary\" literal (W10 quarantine)",
+    "scripts/test-health-report-trends.js": "pre-existing: assertion against current trend formatting drifts (W10 quarantine)",
+    "scripts/test-portfolio-etf-instruments.js": "pre-existing: portfolio fixture drift (W10 quarantine)"
+  }
+}

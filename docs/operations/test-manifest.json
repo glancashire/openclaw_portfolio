@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 293,
-    "safe": 225,
+    "total": 296,
+    "safe": 228,
     "integration": 63,
     "live-smoke": 3,
     "external": 2,
@@ -545,6 +545,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-discover-test-policy.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-duplicate-submission-guard.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
@@ -785,6 +792,13 @@
     },
     {
       "path": "scripts/test-ibkr-config-defaults-native.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-config-helpers.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -1969,6 +1983,13 @@
     },
     {
       "path": "scripts/test-verify-repo-check-list.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-workspace-env.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
