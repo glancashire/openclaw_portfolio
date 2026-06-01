@@ -25,6 +25,8 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
       const bid = asNumber(quote?.['84']);
       const ask = asNumber(quote?.['86']);
       const last = asNumber(quote?.['31']);
+      const delayedBid = asNumber(quote?.['88']) ?? asNumber(quote?.delayedBid);
+      const delayedAsk = asNumber(quote?.['87']) ?? asNumber(quote?.delayedAsk);
       const close = asNumber(quote?.['7295']) ?? asNumber(quote?.close);
       if ([bid, ask, last].some(Number.isFinite)) {
         return {
@@ -34,10 +36,18 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
           probeSource: candidate?.source || 'unknown',
         };
       }
+      if ([delayedBid, delayedAsk].some(Number.isFinite)) {
+        return {
+          posture: 'delayed_bid_ask_only',
+          detail: `Delayed bid/ask values are available via ${candidate.label}, but live bid/ask/last are unavailable.`,
+          probe: candidate,
+          probeSource: candidate?.source || 'unknown',
+        };
+      }
       if (Number.isFinite(close)) {
         return {
-          posture: 'delayed_only',
-          detail: `Delayed close fallback is available via ${candidate.label}, but live bid/ask/last are unavailable.`,
+          posture: 'delayed_close_only',
+          detail: `Delayed close fallback is available via ${candidate.label}, but bid/ask/last are unavailable.`,
           probe: candidate,
           probeSource: candidate?.source || 'unknown',
         };
@@ -49,6 +59,14 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
         return {
           posture: 'delayed_only',
           detail: `Interactive Brokers reports delayed market data is available via ${candidate.label}.`,
+          probe: candidate,
+          probeSource: candidate?.source || 'unknown',
+        };
+      }
+      if (/(10089|10090|10168|354)|subscription/i.test(message)) {
+        return {
+          posture: 'subscription_missing',
+          detail: `Interactive Brokers reports a market-data subscription issue via ${candidate.label}: ${message}`,
           probe: candidate,
           probeSource: candidate?.source || 'unknown',
         };
@@ -140,62 +158,89 @@ function getGenericFallbackProbeCandidates() {
 }
 
 function summarizeReadiness({ config, auth, marketData }) {
-  const delayedOnly = auth?.ok && marketData?.posture === 'delayed_only';
   const liveReady = auth?.ok && marketData?.posture === 'live_or_realtime';
-  const authReadyButUnpriced = auth?.ok && !liveReady && !delayedOnly;
+  const delayedBidAskOnly = auth?.ok && marketData?.posture === 'delayed_bid_ask_only';
+  const delayedCloseOnly = auth?.ok && marketData?.posture === 'delayed_close_only';
+  const delayedOnly = auth?.ok && (marketData?.posture === 'delayed_only' || delayedBidAskOnly || delayedCloseOnly);
+  const subscriptionMissing = auth?.ok && marketData?.posture === 'subscription_missing';
+  const authReadyButUnpriced = auth?.ok && !liveReady && !delayedOnly && !subscriptionMissing;
   const mode = auth?.mode || 'unknown';
-  const marketDataMode = delayedOnly
-    ? 'delayed'
-    : liveReady
-      ? 'live_or_realtime'
-      : (authReadyButUnpriced ? (marketData?.posture || 'unpriced') : 'unavailable');
-  const portalLikelyDiverged = mode === 'native-socket' && (liveReady || delayedOnly || authReadyButUnpriced);
+  const marketDataMode = liveReady
+    ? 'live_or_realtime'
+    : delayedBidAskOnly
+      ? 'delayed_bid_ask_only'
+      : delayedCloseOnly
+        ? 'delayed_close_only'
+        : delayedOnly
+          ? 'delayed'
+          : subscriptionMissing
+            ? 'subscription_missing'
+            : (authReadyButUnpriced ? (marketData?.posture || 'unpriced') : 'unavailable');
+  const portalLikelyDiverged = mode === 'native-socket' && (liveReady || delayedOnly || authReadyButUnpriced || subscriptionMissing);
   const authFailureDetail = String(auth?.error || auth?.diagnostics?.detail || '').trim();
   const authFailureSuffix = authFailureDetail ? ` Detail: ${authFailureDetail}` : '';
-  const operatorState = deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnpriced, marketData });
+  const operatorState = deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnpriced, marketData, subscriptionMissing, delayedBidAskOnly, delayedCloseOnly });
   const guidance = !auth?.ok
     ? operatorState.code === 'ibkr_login_or_2fa_pending'
       ? `Complete the manual login / 2FA step in IB Gateway, then rerun readiness. Do not auto-retry.${authFailureSuffix}`
       : operatorState.code === 'ibkr_socket_dead'
         ? `Restore native IBKR gateway connectivity first, then rerun readiness.${authFailureSuffix}`
         : `Restore native connectivity first.${authFailureSuffix}`
-    : delayedOnly
-      ? 'Broker connectivity is healthy, but the current quote posture is delayed-only (common outside market hours); keep live submission blocked unless delayed-only policy is explicitly accepted.'
-      : authReadyButUnpriced
-        ? 'Broker connectivity is up, but quote posture is still unclear; prefer native raw contract details / market-data probes before assuming a real outage.'
-        : 'Broker path is healthy.';
+    : subscriptionMissing
+      ? 'Broker connectivity is healthy, but the requested market-data subscription does not appear active for the probed instrument(s); verify exchange/package entitlements or market-data attachment before relying on broker-backed pricing.'
+      : delayedBidAskOnly
+        ? 'Broker connectivity is healthy and delayed bid/ask data is available, but live bid/ask/last are unavailable; keep live submission blocked and treat pricing as delayed review-only.'
+        : delayedCloseOnly
+          ? 'Broker connectivity is healthy, but only delayed close fallback is available; keep live submission blocked and treat valuation as stale/close-only.'
+          : delayedOnly
+            ? 'Broker connectivity is healthy, but the current quote posture is delayed-only (common outside market hours); keep live submission blocked unless delayed-only policy is explicitly accepted.'
+            : authReadyButUnpriced
+              ? 'Broker connectivity is up, but quote posture is still unclear; prefer native raw contract details / market-data probes before assuming a real outage.'
+              : 'Broker path is healthy.';
   return {
     configured: Boolean(config?.ok),
     authenticated: Boolean(auth?.ok),
     reachable: auth?.reason !== 'http_error' ? Boolean(auth?.ok) : false,
     mode,
-    fallbackRequired: !auth?.ok || delayedOnly || authReadyButUnpriced,
+    fallbackRequired: !auth?.ok || delayedOnly || authReadyButUnpriced || subscriptionMissing,
     marketDataMode,
     marketDataDetail: marketData?.detail || null,
     marketDataProbe: marketData?.probe || null,
     reason: liveReady
       ? 'ready'
-      : delayedOnly
-        ? 'delayed_data_only'
-        : authReadyButUnpriced
-          ? (marketData?.posture || 'unpriced')
-          : auth?.reason || 'unknown',
+      : subscriptionMissing
+        ? 'subscription_missing'
+        : delayedBidAskOnly
+          ? 'delayed_bid_ask_only'
+          : delayedCloseOnly
+            ? 'delayed_close_only'
+            : delayedOnly
+              ? 'delayed_data_only'
+              : authReadyButUnpriced
+                ? (marketData?.posture || 'unpriced')
+                : auth?.reason || 'unknown',
     portalSessionState: portalLikelyDiverged ? 'unknown_or_separate' : 'not_applicable',
     operatorState,
     guidance,
     message: liveReady
       ? 'Interactive Brokers read-only connectivity and live/realtime market data are available.'
-      : delayedOnly
-        ? 'Interactive Brokers connectivity is available, but current API pricing is delayed-only (common outside market hours); broker-backed pricing may use delayed fallback values and live submission should remain blocked.'
-        : authReadyButUnpriced
-          ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.'
-          : auth?.reason === 'http_error'
-            ? `Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`
-            : `Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`,
+      : subscriptionMissing
+        ? 'Interactive Brokers connectivity is available, but the required market-data subscription does not appear active for the probed instrument set.'
+        : delayedBidAskOnly
+          ? 'Interactive Brokers connectivity is available, but only delayed bid/ask data is available; broker-backed pricing should remain review-only.'
+          : delayedCloseOnly
+            ? 'Interactive Brokers connectivity is available, but only delayed close fallback is available; broker-backed pricing should remain review-only.'
+            : delayedOnly
+              ? 'Interactive Brokers connectivity is available, but current API pricing is delayed-only (common outside market hours); broker-backed pricing may use delayed fallback values and live submission should remain blocked.'
+              : authReadyButUnpriced
+                ? 'Interactive Brokers connectivity is available, but broker-backed pricing is not yet yielding a usable live/delayed quote posture.'
+                : auth?.reason === 'http_error'
+                  ? `Interactive Brokers gateway/session is not reachable; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`
+                  : `Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions.${authFailureSuffix}`,
   };
 }
 
-function deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnpriced, marketData }) {
+function deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnpriced, marketData, subscriptionMissing, delayedBidAskOnly, delayedCloseOnly }) {
   const detail = String(auth?.error || auth?.diagnostics?.detail || marketData?.detail || '').trim();
   if (!auth?.ok) {
     if (/awaiting login|login\s*\/\s*2fa|2fa|second-factor|verification|confirm/i.test(detail)) {
@@ -223,6 +268,30 @@ function deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnprice
     return {
       code: 'ibkr_ready',
       summary: 'IBKR connectivity and live/realtime market data are available.',
+      detail: detail || null,
+    };
+  }
+
+  if (subscriptionMissing) {
+    return {
+      code: 'market_data_subscription_missing',
+      summary: 'IBKR connectivity is healthy, but the required market-data subscription does not appear active for the probed instrument set.',
+      detail: detail || null,
+    };
+  }
+
+  if (delayedBidAskOnly) {
+    return {
+      code: 'delayed_bid_ask_only',
+      summary: 'IBKR connectivity is healthy, but only delayed bid/ask data is available right now.',
+      detail: detail || null,
+    };
+  }
+
+  if (delayedCloseOnly) {
+    return {
+      code: 'delayed_close_only',
+      summary: 'IBKR connectivity is healthy, but only delayed close data is available right now.',
       detail: detail || null,
     };
   }
