@@ -88,9 +88,18 @@ lines.push('');
 
 // ── Performance ───────────────────────────────────────────────────────────────
 lines.push('💰 Performance');
-lines.push(`  Today      ${signed(dailyChf).padStart(10)} CHF  (${pct(dailyPct)})`);
-lines.push(`  This week  ${signed(weeklyChf).padStart(10)} CHF  (${pct(weeklyPct)})`);
+const dailyKnown = dailyChf != null;
+const weeklyKnown = weeklyChf != null;
+const dailyChfStr = dailyKnown ? signed(dailyChf).padStart(10) : '       —';
+const dailyPctStr = dailyKnown ? pct(dailyPct) : 'unknown';
+const weeklyChfStr = weeklyKnown ? signed(weeklyChf).padStart(10) : '       —';
+const weeklyPctStr = weeklyKnown ? pct(weeklyPct) : 'unknown';
+lines.push(`  Today      ${dailyChfStr} CHF  (${dailyPctStr})`);
+lines.push(`  This week  ${weeklyChfStr} CHF  (${weeklyPctStr})`);
 lines.push(`  All-time   ${signed(headlineReturnChf).padStart(10)} CHF  (${pct(headlineReturnPct)})`);
+if (!dailyKnown || !weeklyKnown) {
+  lines.push('  (broker quote posture is degraded — daily/weekly deltas not available)');
+}
 lines.push('');
 
 // ── Holdings by value ─────────────────────────────────────────────────────────

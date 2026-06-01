@@ -49,7 +49,7 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
    - [x] 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out" (staged auth + posture bounding; new `posture_detection_timeout` fallback shape with regression test `test-readiness-bounded-stages.js`).
 2. **Tranche 2 — autonomous, deeper**
    - [x] 1D. Bound posture-probe wall-clock during holdings sync; skip identical avg-cost rewrites. Real-world measurement: 124 s → 36 s (3.4× faster). Avg-cost diff guard active; values genuinely change microscopically per sync but guard suppresses key-order-only diffs and identical content.
-   - [ ] 1E. Surface "Today / This week" deltas as `—` under `posture=unknown` instead of silent `+0.00`.
+   - [x] 1E. Surface "Today / This week" deltas as `—`/`unknown` under `posture=unknown` instead of silent `+0.00` (regression test `test-dashboard-delta-truth.js`).
    - [ ] 1F. Cron delivery hardening: ensure every job has `--best-effort-deliver`; resolve `portfolio-health-monitor` error.
 3. **Tranche 3 — operator-gated**
    - 1H. Document IBKR market-data subscription posture verification (no auto-fix).

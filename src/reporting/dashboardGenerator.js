@@ -530,6 +530,20 @@ function fmtPct(value) {
   return `${n >= 0 ? '+' : ''}${n.toFixed(2)}%`;
 }
 
+// Phase Cleanup-1E: when broker quote posture is degraded/undetermined we
+// can't compute reliable daily/since-last-report deltas. Surface 'unknown'
+// so the operator (and show-dashboard.js) can distinguish 'flat market'
+// from 'we don't know'.
+function quotePostureUnknown(readiness) {
+  if (!readiness || !readiness.fallbackRequired) return false;
+  const mode = String(readiness.marketDataMode || '').toLowerCase();
+  const reason = String(readiness.reason || '').toLowerCase();
+  if (reason === 'posture_detection_timeout') return true;
+  if (reason === 'timeout') return true;
+  if (mode === 'unknown' || mode === 'unpriced' || mode === 'unavailable') return true;
+  return false;
+}
+
 function formatProfitLossRows(rows = []) {
   if (!rows.length) return '| — | — | — | — | — | — |';
   return rows.map((row) => {
@@ -551,6 +565,26 @@ async function generateDashboard({ portfolioName, tradesPath = '', holdingsText,
   const summary = parseHoldingsSummary(holdingsText);
   const holdingCount = countHoldingRows(holdingsText);
   const totalValue = Number(summary.totalValue || 0);
+  // Phase Cleanup-1E: prefer 'unknown' over a misleading numeric zero when
+  // posture is degraded. A literal 0 from the latest history snapshot is not
+  // trustworthy under degraded posture (it usually means 'no recent
+  // history-side movement was recorded' rather than 'market actually flat'),
+  // so we route both null/undefined AND zero to 'unknown' when posture is
+  // unknown. Non-zero numeric deltas are still surfaced (they were computed
+  // from earlier history snapshots, not the current quote).
+  const postureUnknown = quotePostureUnknown(brokerReadiness);
+  const dailyChangeRaw = latestSnapshot?.dailyChange;
+  const dailyChangePctRaw = latestSnapshot?.dailyChangePct;
+  const dailyChangeNum = Number(dailyChangeRaw);
+  const dailyChangePctNum = Number(dailyChangePctRaw);
+  const hasMeaningfulDelta = (Number.isFinite(dailyChangeNum) && dailyChangeNum !== 0)
+    || (Number.isFinite(dailyChangePctNum) && dailyChangePctNum !== 0);
+  const dailyChangeOut = hasMeaningfulDelta
+    ? (dailyChangeRaw ?? '0')
+    : (postureUnknown ? 'unknown' : '0');
+  const dailyChangePctOut = hasMeaningfulDelta
+    ? (dailyChangePctRaw ?? '0')
+    : (postureUnknown ? 'unknown' : '0');
   // Cost-basis enrichment for the Profit / Loss section.
   const tradesTextForCostBasis = tradesPath && fs.existsSync(tradesPath) ? fs.readFileSync(tradesPath, 'utf8') : '';
   // Load avg-cost sidecar for cost-basis enrichment (written by holdings sync)
@@ -673,13 +707,13 @@ ${holdingsRows.map((r) => {
 `,
     `- Invested CHF: ${summary.invested}
 `,
-    `- Daily move CHF: ${latestSnapshot?.dailyChange || '0'}
+    `- Daily move CHF: ${dailyChangeOut}
 `,
-    `- Daily move %: ${latestSnapshot?.dailyChangePct || '0'}
+    `- Daily move %: ${dailyChangePctOut}
 `,
-    `- Since last report CHF: ${latestSnapshot?.dailyChange || '0'}
+    `- Since last report CHF: ${dailyChangeOut}
 `,
-    `- Since last report %: ${latestSnapshot?.dailyChangePct || '0'}
+    `- Since last report %: ${dailyChangePctOut}
 `,
     `- Number of holdings: ${holdingCount}
 `,
@@ -907,4 +941,4 @@ async function regenerateDashboard(portfolioDir) {
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, buildContractIntelligenceQueueItems };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, buildContractIntelligenceQueueItems, quotePostureUnknown };
