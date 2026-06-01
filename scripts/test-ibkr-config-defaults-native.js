@@ -42,6 +42,7 @@ try {
   assert.strictEqual(noSecret.host, '127.0.0.1');
   assert.strictEqual(noSecret.port, 4001);
   assert.strictEqual(noSecret.clientId, 101);
+  assert.strictEqual(noSecret.readonlyClientId, 150);
   assert.strictEqual(noSecret.baseUrl, 'https://localhost:5000/v1/api');
   assert.strictEqual(noSecret.readonly, true);
 
@@ -58,6 +59,7 @@ try {
   assert.strictEqual(envConfig.host, '127.0.0.1');
   assert.strictEqual(envConfig.port, 4011);
   assert.strictEqual(envConfig.clientId, 777);
+  assert.strictEqual(envConfig.readonlyClientId, 150);
   assert.strictEqual(envConfig.readonly, true);
 
   console.log(JSON.stringify({ ok: true }, null, 2));

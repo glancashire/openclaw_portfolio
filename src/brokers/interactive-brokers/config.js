@@ -15,6 +15,7 @@ const IBKR_DEFAULTS = Object.freeze({
   baseUrl: `${IBKR_PORTAL_ORIGIN}${IBKR_API_BASE_PATH}`,
   host: '127.0.0.1',
   clientId: 101,
+  readonlyClientId: 150,
   readonly: true,
   nativePortByRuntime: Object.freeze({
     live: 4001,
@@ -40,6 +41,7 @@ function loadInteractiveBrokersConfig() {
     host: firstNonEmpty(process.env.IBKR_HOST, workspaceEnv.IBKR_HOST, cfg.host, IBKR_DEFAULTS.host),
     port: Number(firstNonEmpty(process.env.IBKR_PORT, workspaceEnv.IBKR_PORT, cfg.port, defaultNativePort)),
     clientId: Number(firstNonEmpty(process.env.IBKR_CLIENT_ID, workspaceEnv.IBKR_CLIENT_ID, cfg.clientId, IBKR_DEFAULTS.clientId)),
+    readonlyClientId: Number(firstNonEmpty(process.env.IBKR_READONLY_CLIENT_ID, workspaceEnv.IBKR_READONLY_CLIENT_ID, cfg.readonlyClientId, IBKR_DEFAULTS.readonlyClientId)),
     readonly: parseReadonly(firstNonEmpty(process.env.IBKR_READONLY, workspaceEnv.IBKR_READONLY, cfg.readonly, IBKR_DEFAULTS.readonly)),
     username: firstNonEmpty(process.env.IBKR_USERNAME, workspaceEnv.IBKR_USERNAME, cfg.username, ''),
     password: firstNonEmpty(process.env.IBKR_PASSWORD, workspaceEnv.IBKR_PASSWORD, cfg.password, ''),
@@ -92,6 +94,7 @@ function redactInteractiveBrokersConfig(config = loadInteractiveBrokersConfig())
     host: config.host,
     port: config.port,
     clientId: config.clientId,
+    readonlyClientId: config.readonlyClientId,
     readonly: config.readonly,
     hasUsername: Boolean(config.username),
     hasPassword: Boolean(config.password),
@@ -107,6 +110,7 @@ function validateInteractiveBrokersConfig(config = loadInteractiveBrokersConfig(
     if (!config.host) missing.push('host');
     if (!Number.isFinite(config.port) || config.port <= 0) missing.push('port');
     if (!Number.isFinite(config.clientId)) missing.push('clientId');
+    if (!Number.isFinite(config.readonlyClientId)) missing.push('readonlyClientId');
   } else {
     if (!config.baseUrl) missing.push('baseUrl');
   }

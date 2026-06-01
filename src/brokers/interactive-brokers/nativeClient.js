@@ -55,6 +55,15 @@ class InteractiveBrokersNativeClient {
     this.recentOrderErrors.delete(String(numericOrderId));
   }
 
+  clientIdFor(operation = 'read') {
+    if (operation === 'write') return this.config.clientId;
+    const baseReadClientId = Number.isFinite(Number(this.config.readonlyClientId))
+      ? Number(this.config.readonlyClientId)
+      : Number(this.config.clientId);
+    if (!Number.isFinite(baseReadClientId)) return this.config.clientId;
+    return baseReadClientId + Math.floor(Math.random() * 1000);
+  }
+
   async authenticate() {
     return this.withApi(async ({ connected }) => {
       await connected;
@@ -73,7 +82,16 @@ class InteractiveBrokersNativeClient {
   async fetchAccounts() {
     return this.withApi(async ({ api, connected }) => {
       await connected;
-      return waitForManagedAccounts(api);
+      try {
+        return await waitForManagedAccounts(api);
+      } catch (error) {
+        if (!/Timed out waiting for managed accounts/i.test(String(error?.message || error))) throw error;
+        const positions = await waitForPositions(api);
+        const positionAccounts = Array.from(new Set((positions || []).map((row) => row?.account).filter(Boolean)));
+        if (positionAccounts.length) return positionAccounts;
+        const ledgerRows = await waitForAccountSummary(api, 'All');
+        return Array.from(new Set((ledgerRows || []).map((row) => row?.account).filter(Boolean)));
+      }
     });
   }
 
@@ -136,6 +154,7 @@ class InteractiveBrokersNativeClient {
       await connected;
       return placeNativeOrder(api, order, this);
     }, {
+      operation: 'write',
       handshake: {
         timeoutMs: 15000,
         label: 'native order handshake',
@@ -154,8 +173,9 @@ class InteractiveBrokersNativeClient {
       ...this.options.handshake,
       ...(overrides.handshake || {}),
     });
+    const operation = overrides.operation || 'read';
     try {
-      api.connect(this.config.clientId);
+      api.connect(this.clientIdFor(operation));
       return await fn({ api, connected });
     } finally {
       try { api.disconnect(); } catch {}
@@ -163,13 +183,14 @@ class InteractiveBrokersNativeClient {
   }
 }
 
-function waitForManagedAccounts(api) {
+function waitForManagedAccounts(api, { timeoutMs = 10000 } = {}) {
   return new Promise((resolve, reject) => {
     const onManaged = (accountsList) => {
       cleanup();
       resolve(String(accountsList || '').split(',').map((v) => v.trim()).filter(Boolean));
     };
     const onError = (err, code, reqId) => {
+      if (isIgnorableCode(code)) return;
       cleanup();
       reject(normalizeError(err, code, reqId));
     };
@@ -182,7 +203,7 @@ function waitForManagedAccounts(api) {
     const timer = setTimeout(() => {
       cleanup();
       reject(new Error('Timed out waiting for managed accounts'));
-    }, 10000);
+    }, timeoutMs);
     const { EventName } = loadIbModule();
     api.on(EventName.managedAccounts, onManaged);
     api.on(EventName.error, onError);
@@ -788,6 +809,7 @@ module.exports = {
   buildConidContract,
   buildSearchContracts,
   isIsin,
+  waitForManagedAccounts,
   waitForNativeHandshake,
   waitForOpenOrders,
   normalizeContractDetails,

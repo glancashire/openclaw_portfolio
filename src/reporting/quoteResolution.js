@@ -179,7 +179,8 @@ async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = []
         : 'Using broker-backed holdings snapshot from the latest healthy IBKR sync.';
     }
 
-    const shouldTryExternalFallback = Boolean(instrument) && !brokerSupportsSnapshotValuation;
+    const hasUsableSnapshotValue = quantity != null && (snapshotValueChf != null || snapshotPriceNative != null);
+    const shouldTryExternalFallback = Boolean(instrument) && !brokerSupportsSnapshotValuation && !hasUsableSnapshotValue;
     if (shouldTryExternalFallback) {
       const external = await fetchExternalLastClose({ instrument, externalSymbol });
       if (external?.ok && asNumber(external.close) != null && quantity != null && fxToChf != null) {
@@ -192,6 +193,8 @@ async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = []
       } else if (external?.reason) {
         quoteNote = `${quoteNote} External fallback unavailable: ${external.reason}.`;
       }
+    } else if (!brokerSupportsSnapshotValuation && hasUsableSnapshotValue) {
+      quoteNote = 'Using the latest holdings snapshot value because broker quote posture is unclear; external fallback was skipped to keep dashboard regeneration responsive.';
     }
 
     resolvedRows.push({

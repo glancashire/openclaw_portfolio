@@ -44,7 +44,7 @@ const { enrichHoldings } = require('../src/reporting/costBasis');
     assert.match(resolved.rows[0].quoteNote, /Yahoo Finance/i);
   } else {
     assert.strictEqual(resolved.rows[0].quoteQuality, 'stale_or_unknown');
-    assert.match(resolved.rows[0].quoteNote, /no fresher reporting-time quote|External fallback unavailable/i);
+    assert.match(resolved.rows[0].quoteNote, /no fresher reporting-time quote|External fallback unavailable|external fallback was skipped/i);
   }
 
   const enriched = enrichHoldings({

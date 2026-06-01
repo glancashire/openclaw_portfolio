@@ -13,6 +13,7 @@ assert.strictEqual(IBKR_DEFAULTS.mode, 'native');
 assert.strictEqual(IBKR_DEFAULTS.runtime, 'live');
 assert.strictEqual(IBKR_DEFAULTS.host, '127.0.0.1');
 assert.strictEqual(IBKR_DEFAULTS.clientId, 101);
+assert.strictEqual(IBKR_DEFAULTS.readonlyClientId, 150);
 assert.strictEqual(getDefaultNativePort('live'), 4001);
 assert.strictEqual(getDefaultNativePort('paper'), 4002);
 assert.strictEqual(getDefaultNativePort('weird'), 4001);
