@@ -64,11 +64,24 @@ function parseDetailedSections(markdown = '') {
 }
 
 function loadOpenPhasesCard({ repoRoot = process.cwd() } = {}) {
-  const markdownPath = path.join(repoRoot, 'OPEN_PHASES_OVERVIEW.md');
-  if (!fs.existsSync(markdownPath)) {
-    return { markdownPath, items: [], generatedFrom: 'missing' };
+  // Prefer CURRENT_PLAN.md (post-2026-06-01 consolidation). Fall back to the
+  // legacy OPEN_PHASES_OVERVIEW.md for callers / tests that still seed it.
+  const candidates = [
+    { rel: 'CURRENT_PLAN.md', generatedFrom: 'CURRENT_PLAN.md' },
+    { rel: 'OPEN_PHASES_OVERVIEW.md', generatedFrom: 'OPEN_PHASES_OVERVIEW.md' },
+  ];
+  let chosen = null;
+  for (const candidate of candidates) {
+    const full = path.join(repoRoot, candidate.rel);
+    if (fs.existsSync(full)) {
+      chosen = { ...candidate, full };
+      break;
+    }
   }
-  const markdown = fs.readFileSync(markdownPath, 'utf8');
+  if (!chosen) {
+    return { markdownPath: path.join(repoRoot, 'CURRENT_PLAN.md'), items: [], generatedFrom: 'missing' };
+  }
+  const markdown = fs.readFileSync(chosen.full, 'utf8');
   const roadmapItems = parseVisualRoadmap(markdown);
   const detailMap = parseDetailedSections(markdown);
   const items = roadmapItems.map((item) => {
@@ -86,8 +99,8 @@ function loadOpenPhasesCard({ repoRoot = process.cwd() } = {}) {
     };
   });
   return {
-    markdownPath,
-    generatedFrom: 'OPEN_PHASES_OVERVIEW.md',
+    markdownPath: chosen.full,
+    generatedFrom: chosen.generatedFrom,
     items,
   };
 }

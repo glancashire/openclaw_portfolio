@@ -39,7 +39,9 @@ test('archive/phase-plans/README.md exists', () => {
 
 test('every root phase-*.md is an active wave/stabilization plan', () => {
   // Allow phase-S* (stabilization, 2026-05-25) and phase-W* (wave plans,
-  // 2026-05-27+ closeout). Anything else in root is an offender.
+  // 2026-05-27+ closeout). After the 2026-06-01 consolidation, the root holds
+  // no `phase-*.md` files at all (they live under `plans/<phase>.md` until
+  // archived). Anything else in root is an offender.
   const offenders = ROOT_MARKDOWN.filter((f) => /^phase-/i.test(f) && !/^phase-[SW]\d/i.test(f));
   assert.deepStrictEqual(
     offenders,
@@ -68,8 +70,8 @@ test('no broken in-repo links to archived files in current docs', () => {
   // Sample a few canonical files that should never link into archived plans.
   const filesToScan = [
     'AGENTS.md',
-    'PROGRESS_REPORT.md',
-    'ROLLUP_OUTSTANDING_PLAN.md',
+    'CURRENT_PLAN.md',
+    'STATUS.md',
     'SPECIFICATION.md',
     'docs/operations/cron.md',
     'docs/operations/repo-map.md',

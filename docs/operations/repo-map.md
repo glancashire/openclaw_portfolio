@@ -42,21 +42,15 @@ workspace. Updated 2026-05-25 (Phase S4).
 - `artifact-policy.md` — what we persist where and why
 - `system-policy.md` — execution policy controls
 
-### Spec & progress
+### Spec, status & plan
 - `SPECIFICATION.md` — the system contract
-- `SPEC_PROGRESS.md` — spec coverage tracker
-- `PROGRESS_REPORT.md` — current state summary
-- `ROLLUP_OUTSTANDING_PLAN.md` — current active lane
-- `post-mvp-roadmap.md` — forward-looking work
-- `spec-outstanding-checklist.md` — spec items still in flight
+- `STATUS.md` — current health snapshot (what works, what's degraded, what's blocked)
+- `CURRENT_PLAN.md` — the single living plan (active phase + backlog + decisions)
+- `plans/<phase>.md` — the active phase's detailed plan (one at a time)
 
-### Active stabilization phase (May 2026)
-- `stabilization-master-plan-2026-05-25.md`
-- `phase-S1-repo-truth-and-test-gates-plan.md`
-- `phase-S2-carry-over-bug-closeout-plan.md`
-- `phase-S3-cron-and-delivery-hardening-plan.md`
-- `phase-S4-runtime-and-doc-hygiene-plan.md`
-- (`phase-S5-soak-prep-plan.md` to be written next)
+### History
+- `archive/phase-plans/` — every retired plan (per-phase audit trail)
+- `archive/phase-plans/2026-06-01-consolidation/` — the 2026-06-01 consolidation drop, including the older `OPEN_PHASES_OVERVIEW.md`, `PHASE_OVERVIEW.md`, `PROGRESS_REPORT.md`, `ROLLUP_OUTSTANDING_PLAN.md`, `SPEC_PROGRESS.md`, `spec-outstanding-checklist.md`, the W1-W10 wave plans, and the bulk of `plans/phase-*.md`.
 
 ## `docs/` highlights
 
@@ -96,5 +90,6 @@ workspace. Updated 2026-05-25 (Phase S4).
 - **"Why did this cron job fail?"** → `docs/operations/cron.md` + `TOOLS.md`
 - **"How do I verify a change didn't break anything?"** → `npm test`
 - **"What was decided yesterday/today?"** → `memory/YYYY-MM-DD.md`
-- **"What's the active work?"** → `ROLLUP_OUTSTANDING_PLAN.md` + `phase-S*-*.md`
+- **"What's the active work?"** → `CURRENT_PLAN.md` (with detail in `plans/<phase>.md`)
+- **"What's the current health?"** → `STATUS.md`
 - **"What does this old phase plan say?"** → `archive/phase-plans/`

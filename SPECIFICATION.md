@@ -238,10 +238,10 @@ For the active repository, “acceptable” now means:
 ## 14. Current Outstanding Work
 
 The current outstanding work should be tracked in:
-- `ROLLUP_OUTSTANDING_PLAN.md`
+- `CURRENT_PLAN.md` (active phase + backlog)
+- `STATUS.md` (current health snapshot)
 
-At present, the highest-signal lane is:
-- market-calendar intelligence and integration for approved instruments
+Detail for the active phase lives in `plans/<phase>.md`. Historical plans are under `archive/phase-plans/`.
 
 ## 15. Historical Traceability
 
