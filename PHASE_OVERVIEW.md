@@ -123,9 +123,9 @@
 **Status:** queued after the ready hardening phases
 
 #### Remaining
-- [ ] classify debug scripts into keep/move/remove
+- [x] classify obvious debug scripts into keep/move/remove and move diagnostic probes under `scripts/diagnostics/` with compatibility wrappers
 - [ ] determine whether obsolete compatibility helpers can be retired
-- [ ] separate supported operator helpers from debug-only tooling more cleanly
+- [x] separate supported operator helpers from debug-only tooling more cleanly
 - [ ] improve generated/live artifact hygiene boundaries
 
 ### 🔴 Follow-up #2 — Mailgun Inbound Route (Infra)

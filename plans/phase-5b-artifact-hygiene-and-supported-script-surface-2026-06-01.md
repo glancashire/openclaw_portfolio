@@ -14,7 +14,7 @@
 
 ## Actionable checklist
 - [ ] inventory current debug/probe/compatibility scripts and group them into keep / move / retire
-- [ ] confirm `scripts/execute-trades.js` is safe to retire or reduce further based on current repo references
+- [x] confirm `scripts/execute-trades.js` should remain an explicit failure shim for now; docs/tests still intentionally reference the obsolete stub behavior
 - [ ] move obvious diagnostics/probe scripts under `scripts/diagnostics/` where that boundary is already established
 - [ ] leave thin compatibility wrappers in `scripts/` only where low-risk and still helpful
 - [ ] update operator/developer docs to make the supported surface vs diagnostic surface explicit

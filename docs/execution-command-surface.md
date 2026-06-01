@@ -43,7 +43,7 @@ These remain callable for now but should not be treated as the primary operator 
   - do not use for real operations
 
 ## Debug / diagnostic scripts
-The `debug-native-*` and similar broker-diagnostic scripts are investigative tools, not canonical operator commands.
+Broker-diagnostic probes live under `scripts/diagnostics/`. Thin wrappers may remain in `scripts/` for compatibility, but they are investigative tools, not canonical operator commands.
 
 ## Diagnostic guidance
 Use the canonical diagnostics together when checking whether the system is truly ready for action:

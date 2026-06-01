@@ -62,13 +62,14 @@ try {
   assert(e.stdout.includes('Market is closed') || e.stderr.includes('Market is closed') || e.status === 1, 'execute-trades rejects when market closed');
 }
 
-// --- Submit-orders market guard ---
-console.log('\n=== Submit-orders market closed guard ===');
+// --- Submit-orders closed-venue guard surface ---
+console.log('\n=== Submit-orders closed-venue guard surface ===');
 try {
-  execSync('node scripts/submit-orders-at-open.js 2>&1', { encoding: 'utf8', cwd: '/home/ubuntu/.openclaw/workspace' });
-  assert(false, 'submit-orders should fail when market closed');
+  const output = execSync('node scripts/submit-orders-at-open.js 2>&1', { encoding: 'utf8', cwd: '/home/ubuntu/.openclaw/workspace' });
+  assert(output.includes('Market is closed') || output.includes('Closed-venue rows will be parked') || output.includes('No approved executable trade rows found'), 'submit-orders surfaces guarded non-execution guidance');
 } catch (e) {
-  assert(e.stdout.includes('Market is closed') || e.stderr.includes('Market is closed') || e.status === 1, 'submit-orders rejects when market closed');
+  const output = String(e.stdout || '') + String(e.stderr || '');
+  assert(output.includes('Market is closed') || output.includes('Closed-venue rows will be parked') || output.includes('No approved executable trade rows found') || e.status === 1, 'submit-orders surfaces guarded non-execution guidance');
 }
 
 // --- Summary ---

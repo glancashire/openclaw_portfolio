@@ -101,9 +101,9 @@ Legend:
 **Status:** READY AFTER PHASES 2/4/7
 
 #### Still open
-- [ ] classify debug scripts into keep/move/remove
+- [x] classify obvious debug scripts into keep/move/remove and move diagnostic probes under `scripts/diagnostics/` with compatibility wrappers
 - [ ] determine whether legacy helpers like `scripts/execute-trades.js` can be retired
-- [ ] separate supported operator helpers from debug-only tooling more clearly
+- [x] separate supported operator helpers from debug-only tooling more clearly
 - [ ] improve generated/live artifact hygiene boundaries
 
 ---

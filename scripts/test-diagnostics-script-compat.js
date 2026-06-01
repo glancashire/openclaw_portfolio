@@ -9,6 +9,16 @@ const path = require('path');
     'probe-six-subscription-detail.js',
     'probe-spmcha-raw.js',
     'probe-subscription-pattern.js',
+    'probe-spmcha.js',
+    'probe-spmcha-quotes.js',
+    'debug-native-aapl.js',
+    'debug-native-api-surface.js',
+    'debug-native-conid-snapshot.js',
+    'debug-native-contract-details.js',
+    'debug-native-contract-isin.js',
+    'debug-native-contract-matrix.js',
+    'debug-native-contract-one.js',
+    'debug-native-us-controls.js',
   ];
 
   for (const name of moved) {

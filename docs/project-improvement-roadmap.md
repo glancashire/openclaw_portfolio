@@ -68,11 +68,15 @@ Remaining evaluation:
 - clarify supported vs debug-only tools
 - retire obsolete compatibility surfaces
 
-### Candidate work
-- confirm whether `scripts/execute-trades.js` can be removed
-- classify current debug scripts into keep/move/remove
-- move stable operator helpers into a supported namespace
-- separate golden fixtures from live/generated report artifacts more cleanly
+### Delivered / remaining
+Delivered in Phase 5B:
+- classified obvious broker probe/debug scripts as diagnostics and moved them under `scripts/diagnostics/` with thin compatibility wrappers
+- strengthened compatibility coverage so moved diagnostic wrappers remain intentional
+- clarified docs so the canonical operator surface is distinct from diagnostic tooling
+
+Remaining follow-up:
+- decide later whether the obsolete `scripts/execute-trades.js` stub should be removed entirely or kept as an explicit failure shim
+- continue tightening fixture/live/generated artifact boundaries where real churn still appears
 
 ## Phase 6 — Operator UX and support simplification
 ### Objectives
