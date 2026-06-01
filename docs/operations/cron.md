@@ -54,3 +54,40 @@ For one-shot reminders, set `"deleteAfterRun": true` and use `schedule.kind = "a
 - `docs/operations/active-cron-jobs.md` — committed snapshot of current jobs.
 - `TOOLS.md` — historical context and the Phase 204c sandbox-mode fix.
 - `master-plan-204-212-refined.md` — `[HISTORICAL]`, kept for audit.
+
+## Delivery posture (Phase Cleanup-1F, 2026-06-01)
+
+All active cron jobs run with `delivery: { mode: "announce", bestEffort: true }`.
+The Telegram channel is the only configured surface, but no `chatId` is wired
+in, so the announce route reports `no route, will fail-closed: Delivering to
+Telegram requires target <chatId>` for every job. This is **intentional**:
+
+- Substantive work always runs and updates dashboard / report files. The
+  delivery layer fail-closing has no effect on what the system actually does.
+- `bestEffort: true` ensures delivery-layer failures do **not** increment
+  `consecutiveErrors` on the job, so health surfaces stay accurate.
+- Operators read cron output via:
+  - `node scripts/show-dashboard.js etf` for the live snapshot.
+  - Generated `.md` reports under `portfolio/<name>/reports/`.
+  - `openclaw cron runs <jobId>` for per-run history.
+
+### Upgrading to push delivery (operator-only)
+
+When a chat surface is desired, two paths are supported:
+
+1. **Per-job announce target.** Add `delivery.channel: "telegram"` and
+   `delivery.to: "<chatId>"` to a specific job and the daemon will route
+   directly. Recommended for noisy jobs where the operator wants opt-in.
+2. **Default last-channel route.** Configure a host-level Telegram
+   `chatId` so the announce-to-last fallback resolves. Affects every
+   job at once. Use carefully — most jobs do not need a push.
+
+### Regression
+
+`scripts/test-cron-delivery-posture.js` enforces:
+
+- Every job with `delivery.mode === "announce"` carries `bestEffort: true`.
+- No job is in `error` state.
+- No job has `consecutiveErrors > 0`.
+
+Run it manually or wire it into the safe-lane sweep.
