@@ -38,9 +38,9 @@
 
 ## What is degraded
 
-- **Quote posture `unknown`** on U25624150 — `fetchMarketSnapshot` returns neither live (84/86/31) nor delayed (88/87) fields. Likely a market-data subscription / data-farm state on the IBKR side. Reads remain healthy; live submission stays gated.
-- **Dashboard wording** lumps "broker reachable but degraded" with "broker timed out". Misleading but cosmetic.
-- **Holdings sync wall-clock** (~124 s) dominated by per-candidate posture probes when posture is `unknown`.
+- **Quote posture `unknown`** on U25624150 — `fetchMarketSnapshot` returns neither live (84/86/31) nor delayed (88/87) fields. Likely a market-data subscription / data-farm state on the IBKR side. Reads remain healthy; live submission stays gated. **Investigation steps are in `docs/operations/ibkr-recovery.md` Step 6 (operator-gated).**
+- **Dashboard wording** lumps "broker reachable but degraded" with "broker timed out". Misleading but cosmetic. (resolved by Phase Cleanup-1C — staged readiness now distinguishes the two outcomes.)
+- **Holdings sync wall-clock** ~~(~124 s)~~ — reduced to ~36 s by Phase Cleanup-1D parallel snapshot fetches.
 
 ## What is blocked or parked
 

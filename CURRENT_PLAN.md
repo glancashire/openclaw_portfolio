@@ -52,7 +52,7 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
    - [x] 1E. Surface "Today / This week" deltas as `—`/`unknown` under `posture=unknown` instead of silent `+0.00` (regression test `test-dashboard-delta-truth.js`).
    - [x] 1F. Cron delivery hardening: verified — all 11 active jobs already healthy (`ok`/`idle`, 0 consecutive errors, `bestEffort:true`). Earlier `portfolio-health-monitor` error note was stale. New regression test `test-cron-delivery-posture.js` locks the posture; runbook documents the file-only delivery decision in `docs/operations/cron.md`.
 3. **Tranche 3 — operator-gated**
-   - 1H. Document IBKR market-data subscription posture verification (no auto-fix).
+   - [x] 1H. Document IBKR market-data subscription posture verification — added Step 6 to `docs/operations/ibkr-recovery.md` with Client Portal pointers and an `ib_insync` cross-check; runbook regression test `test-ibkr-recovery-runbook.js`.
 
 ---
 

@@ -74,6 +74,45 @@ This wraps `sync-ibkr-accounting-snapshot.js` and `sync-interactive-brokers-hold
 
 Holdings and cash are truthful. Live submission must stay blocked. Dashboard regen is bounded so it does not stall. No action required unless the user explicitly wants to attempt live execution under delayed/unpriced posture, which requires a separate explicit decision.
 
+## Step 6 — Quote posture remains `unknown` after auth and read are healthy
+
+If `ibkr-fast-status` returns exit code 4 with `marketDataMode=unknown` and the readiness staged probe (Phase Cleanup-1C) reports `reason: 'posture_detection_timeout'` while positions and accounting come back fine, the issue is upstream of our code. The most likely causes, in priority order:
+
+1. **Market-data subscription not active for the requested instruments / exchanges.**
+   - Open the IBKR Client Portal: <https://www.interactivebrokers.com/sso/Login>
+   - Account number: U25624150 (the one this workspace tracks).
+   - Navigate to Settings → User Settings → Market Data Subscriptions.
+   - Verify subscriptions for the venues in `portfolio/etf/portfolio.md` (LSE/SIX/NASDAQ/NYSE/Xetra in our case). Reactivate any lapsed packages.
+   - After reactivation, IBKR may take a few minutes to propagate. Re-run `node scripts/ibkr-fast-status.js` to confirm.
+
+2. **Data-farm not connected on the running gateway.**
+   - In IB Gateway, the data-farm status row in the bottom of the UI should show `ushmds2a`, `eufarm.uk`, `eufarm.ge` etc. as `connected`.
+   - If any are red, restart the gateway via the path in step 2.
+   - As a cross-check from the host shell, this minimal probe should return at least one numeric field for SXR8 (conid 75776072):
+     ```bash
+     python3 - <<'PY'
+     from ib_insync import IB, Stock
+     ib = IB()
+     ib.connect('127.0.0.1', 4001, clientId=171)
+     contract = Stock(symbol='SXR8', exchange='LSEETF', currency='GBP')
+     ib.qualifyContracts(contract)
+     ticker = ib.reqMktData(contract, '', False, False)
+     ib.sleep(2)
+     print({'bid': ticker.bid, 'ask': ticker.ask, 'last': ticker.last, 'close': ticker.close})
+     ib.disconnect()
+     PY
+     ```
+   - All `nan` fields confirms a subscription / data-farm issue (not a code bug).
+
+3. **Account is in a state where snapshots are silently rejected** (e.g. paper account that was migrated, demo / view-only mode).
+   - Confirm in the Client Portal that the account status reads `Active` and the API permissions include market data.
+
+### Why this is operator-gated
+
+Nothing in this step can be fixed from the workspace shell. The credentials, subscription billing, and gateway login UI are all on the IBKR side. The agent will not attempt to log in or click buttons in the Client Portal.
+
+While this is unresolved, the system stays in `degraded_dry_run_only` posture. Reads (positions, accounting, dashboards) remain truthful; the dashboard reports `Daily move CHF: unknown` per Phase Cleanup-1E so operators can distinguish a genuinely flat market from missing data.
+
 ## Why this list exists
 
 On 2026-06-01 a recovery that should have taken 30 minutes took most of a day because the diagnosis ladder above wasn't written down. Specifically:
