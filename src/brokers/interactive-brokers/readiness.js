@@ -250,6 +250,39 @@ function deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnprice
   };
 }
 
+
+async function getInteractiveBrokersReadinessBounded({ portfolio = 'etf', timeoutMs = 10000 } = {}) {
+  let timer = null;
+  try {
+    return await Promise.race([
+      getInteractiveBrokersReadiness({ portfolio }),
+      new Promise((resolve) => {
+        timer = setTimeout(() => resolve({
+          configured: true,
+          authenticated: false,
+          reachable: false,
+          mode: 'unknown',
+          fallbackRequired: true,
+          marketDataMode: 'unknown',
+          marketDataDetail: 'Readiness timed out during dashboard regeneration.',
+          marketDataProbe: null,
+          reason: 'timeout',
+          portalSessionState: 'unknown_or_separate',
+          operatorState: {
+            code: 'ibkr_readiness_timeout',
+            summary: 'IBKR readiness timed out during dashboard regeneration.',
+            detail: 'Dashboard regeneration used a bounded readiness fallback to stay responsive.',
+          },
+          guidance: 'Dashboard regeneration used the latest holdings snapshot because broker readiness checks timed out.',
+          message: 'Interactive Brokers readiness timed out during dashboard regeneration; using the latest holdings snapshot with degraded broker posture.',
+        }), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 function asNumber(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
@@ -257,6 +290,7 @@ function asNumber(value) {
 
 module.exports = {
   getInteractiveBrokersReadiness,
+  getInteractiveBrokersReadinessBounded,
   summarizeReadiness,
   detectMarketDataPosture,
   getGenericFallbackProbeCandidates,

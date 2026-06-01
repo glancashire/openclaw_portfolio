@@ -4,7 +4,7 @@ const { analyzeAllocation } = require('../analysis/allocationAnalysis');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary } = require('./portfolioData');
-const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
+const { getInteractiveBrokersReadinessBounded } = require('../brokers/interactive-brokers/readiness');
 const { brokerErrorStatus } = require('../execution/runtimeState');
 const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { fileFreshnessSummary } = require('./freshness');
@@ -839,7 +839,7 @@ async function regenerateDashboard(portfolioDir) {
   const approvedInstruments = readApprovedInstruments(portfolioPath);
   const contractIntelligence = summarizeContractIntelligence(approvedInstruments);
   const latestProposals = latestTradeProposals(tradesPath);
-  const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
+  const brokerReadiness = await getInteractiveBrokersReadinessBounded({ portfolio: portfolioName, timeoutMs: 10000 });
   const sourcePaths = [portfolioPath, holdingsPath, tradesPath, historyPath];
   const currentBrokerErrorState = brokerErrorStatus(portfolioName);
   const safetyEvaluation = evaluateSafetyControls({ portfolioPath, holdingsPath });

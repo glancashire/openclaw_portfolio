@@ -4,13 +4,16 @@
 const fs = require('fs');
 const path = require('path');
 const { InteractiveBrokersClient } = require('../src/brokers/interactive-brokers/client');
+const { preservePreviousAccountingSnapshotIfNeeded, runAccountingSnapshotSync } = require('../src/brokers/interactive-brokers/accountingSnapshot');
 
 async function main() {
   const portfolio = process.argv[2] || 'etf';
   const outDir = path.join(process.cwd(), 'runtime', 'ibkr-accounting', portfolio);
+  const portfolioDir = path.join(process.cwd(), 'portfolio', portfolio);
   fs.mkdirSync(outDir, { recursive: true });
 
-  const client = new InteractiveBrokersClient({ portfolio });
+  await runAccountingSnapshotSync({ portfolioDir, outDir, writer: async () => {
+    const client = new InteractiveBrokersClient({ portfolio });
   const auth = await client.authenticate();
   if (!auth?.ok) {
     console.error(JSON.stringify({ ok: false, step: 'authenticate', auth }, null, 2));
@@ -35,6 +38,12 @@ async function main() {
     } catch (error) {
       executions = { ok: false, error: error.message };
     }
+  }
+
+  const preserved = preservePreviousAccountingSnapshotIfNeeded({ outDir, authOk: Boolean(auth?.ok), accountId, positions, ledger });
+  if (preserved) {
+    console.error(JSON.stringify(preserved, null, 2));
+    process.exit(4);
   }
 
   const snapshot = {
@@ -66,7 +75,8 @@ async function main() {
   }
   fs.writeFileSync(path.join(outDir, 'avg-cost-by-key.json'), JSON.stringify(avgCostIndex, null, 2));
 
-  console.log(JSON.stringify({ ok: true, outDir, accountId, positionCount: rows.length, executionCount: Array.isArray(executions) ? executions.length : null }, null, 2));
+    console.log(JSON.stringify({ ok: true, outDir, accountId, positionCount: rows.length, executionCount: Array.isArray(executions) ? executions.length : null }, null, 2));
+  }});
 }
 
 main().catch((error) => {

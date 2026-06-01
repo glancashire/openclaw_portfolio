@@ -4,8 +4,11 @@ const { writeHoldingsSnapshot } = require('../shared/holdingsSnapshot');
 const { InteractiveBrokersClient } = require('./client');
 const { normaliseHolding } = require('./types');
 const { readApprovedInstruments } = require('../../analysis/approvedInstruments');
+const { runWithIbkrSyncGuard } = require('./syncGuard');
+const { regenerateDashboard } = require('../../reporting/dashboardGenerator');
 
 async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
+  return runWithIbkrSyncGuard({ portfolioDir, operation: 'holdings_sync' }, async () => {
   const client = new InteractiveBrokersClient({ portfolio: path.basename(portfolioDir) });
   const auth = await client.authenticate();
   if (!auth.ok) {
@@ -89,6 +92,17 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     }
   }
 
+  const preserved = preservePreviousHoldingsSnapshotIfNeeded({
+    portfolioDir,
+    authOk: Boolean(auth?.ok),
+    accountId: resolvedAccountId,
+    holdings,
+    cashChf: cash.value,
+    positionsRaw: positions,
+    ledgerRaw: ledger,
+  });
+  if (preserved) return preserved;
+
   const result = writeHoldingsSnapshot({
     portfolioDir,
     holdings,
@@ -102,6 +116,8 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     normaliseHolding: (h) => h,
   });
 
+  const dashboardPath = await regenerateDashboard(portfolioDir);
+
   return {
     ok: true,
     accountId: resolvedAccountId,
@@ -112,7 +128,9 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     portfolioCashBasis: 'broker_reported',
     count: holdings.length,
     result,
+    dashboardPath,
   };
+  });
 }
 
 async function enrichPositionsWithMarketSnapshot(client, positions = []) {
@@ -234,4 +252,25 @@ function extractCashChf(ledger) {
   return { value: 0, basis: 'missing', detail: {} };
 }
 
-module.exports = { syncInteractiveBrokersHoldings, extractCashChf, extractFxRatesToChf, enrichPositionsWithMarketSnapshot, preferredSnapshotPrice, snapshotPriceSource };
+function shouldPreservePreviousHoldingsSnapshot({ authOk, accountId, holdings = [], cashChf = 0, positionsRaw = [], ledgerRaw = [] } = {}) {
+  if (!authOk || !accountId) return false;
+  const hasHoldings = Array.isArray(holdings) && holdings.length > 0;
+  const hasPositions = Array.isArray(positionsRaw) && positionsRaw.length > 0;
+  const hasLedger = Array.isArray(ledgerRaw) && ledgerRaw.length > 0;
+  const hasCash = Number.isFinite(Number(cashChf)) && Number(cashChf) > 0;
+  return !hasHoldings && !hasPositions && !hasLedger && !hasCash;
+}
+
+function preservePreviousHoldingsSnapshotIfNeeded({ portfolioDir, ...state } = {}) {
+  if (!shouldPreservePreviousHoldingsSnapshot(state)) return null;
+  const holdingsPath = path.join(portfolioDir, 'holdings.md');
+  if (!fs.existsSync(holdingsPath)) return null;
+  return {
+    ok: false,
+    reason: 'preserved_last_known_good',
+    message: 'Degraded broker read returned empty holdings/cash after successful auth; preserved last-known-good holdings snapshot.',
+    preservedPath: holdingsPath,
+  };
+}
+
+module.exports = { syncInteractiveBrokersHoldings, extractCashChf, extractFxRatesToChf, enrichPositionsWithMarketSnapshot, preferredSnapshotPrice, snapshotPriceSource, shouldPreservePreviousHoldingsSnapshot, preservePreviousHoldingsSnapshotIfNeeded };
