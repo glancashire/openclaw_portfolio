@@ -15,8 +15,9 @@ async function getInteractiveBrokersReadiness({ portfolio = 'etf' } = {}) {
 async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
   const probeCandidates = getProbeCandidates({ portfolio });
   const errors = [];
+  const maxProbeCount = 2;
 
-  for (const candidate of probeCandidates) {
+  for (const candidate of probeCandidates.slice(0, maxProbeCount)) {
     try {
       const conid = candidate?.conid || null;
       if (!conid) continue;
@@ -83,6 +84,7 @@ async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
 
 function getProbeCandidates({ portfolio = 'etf' } = {}) {
   const orderedGroups = [
+    { source: 'generic_control', items: getGenericControlProbeCandidates() },
     { source: 'executable_trade', items: getPortfolioExecutableProbeCandidates({ portfolio }) },
     { source: 'approved_instrument', items: getPortfolioApprovedProbeCandidates({ portfolio }) },
     { source: 'generic_fallback', items: getGenericFallbackProbeCandidates() },
@@ -148,6 +150,12 @@ function getPortfolioApprovedProbeCandidates({ portfolio = 'etf' } = {}) {
   } catch {
     return [];
   }
+}
+
+function getGenericControlProbeCandidates() {
+  return [
+    { conid: '75776072', symbol: 'SXR8', tickerOrIsin: 'IE00B5BMR087', label: 'generic control SXR8', source: 'generic_control' },
+  ];
 }
 
 function getGenericFallbackProbeCandidates() {
@@ -362,6 +370,7 @@ module.exports = {
   getInteractiveBrokersReadinessBounded,
   summarizeReadiness,
   detectMarketDataPosture,
+  getGenericControlProbeCandidates,
   getGenericFallbackProbeCandidates,
   getPortfolioApprovedProbeCandidates,
   getPortfolioExecutableProbeCandidates,
