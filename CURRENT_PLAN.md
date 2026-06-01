@@ -45,7 +45,7 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
 1. **Tranche 1 — autonomous, low risk**
    - [x] 1A. Working-tree hygiene: stash dropped, `runtime-events.jsonl` + report derivatives gitignored, regression test `test-gitignore-policy.js`.
    - [x] 1B. `regenerate-dashboard.js` accepts bare portfolio name (with regression test `test-regenerate-dashboard-cli.js`).
-   - [ ] 1G. Migrate deprecated `messages.groupChat.visibleReplies` config key.
+   - [x] 1G. Migrate deprecated `messages.groupChat.visibleReplies` config key — NO-OP (verified valid in current schema; warning was stale).
    - [ ] 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out".
 2. **Tranche 2 — autonomous, deeper**
    - 1D. Bound posture-probe wall-clock during holdings sync; skip identical avg-cost rewrites.
@@ -64,7 +64,7 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
 | B2 | Reporting | Decide monthly-report file policy: track `.md` only and ignore `.html/.json/.pdf`, or track all four. | Cleanup-1A.Q1 |
 | B3 | Cron | Configure announce delivery target so periodic outputs reach the operator (or formalize file-only). | Cleanup-1F.Q2 |
 | B4 | IBKR | Verify market-data subscriptions on U25624150 from IBKR client portal. | Cleanup-1H.Q3 |
-| B5 | Tests | Reconcile stash `stash@{0}` — extract SXR8 generic-control candidate hunk if not already in HEAD. | Cleanup-1A |
+| ~~B5~~ | ~~Tests~~ | ~~Reconcile stash `stash@{0}` — SXR8 generic-control candidate.~~ Done in 1A; stash dropped. | Cleanup-1A |
 
 When a backlog item is picked up, lift it into "Active phase" with a dedicated `plans/<phase>.md`.
 
