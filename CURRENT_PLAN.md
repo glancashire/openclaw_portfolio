@@ -44,7 +44,7 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
 
 1. **Tranche 1 — autonomous, low risk**
    - [x] 1A. Working-tree hygiene: stash dropped, `runtime-events.jsonl` + report derivatives gitignored, regression test `test-gitignore-policy.js`.
-   - [ ] 1B. `regenerate-dashboard.js` accepts bare portfolio name.
+   - [x] 1B. `regenerate-dashboard.js` accepts bare portfolio name (with regression test `test-regenerate-dashboard-cli.js`).
    - [ ] 1G. Migrate deprecated `messages.groupChat.visibleReplies` config key.
    - [ ] 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out".
 2. **Tranche 2 — autonomous, deeper**
