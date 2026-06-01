@@ -4,7 +4,11 @@ const { analyzeAllocation } = require('../analysis/allocationAnalysis');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary } = require('./portfolioData');
-const { getInteractiveBrokersReadinessBounded } = require('../brokers/interactive-brokers/readiness');
+const readinessModule = require('../brokers/interactive-brokers/readiness');
+const getInteractiveBrokersReadinessBounded =
+  typeof readinessModule.getInteractiveBrokersReadinessBounded === 'function'
+    ? readinessModule.getInteractiveBrokersReadinessBounded
+    : readinessModule.getInteractiveBrokersReadiness;
 const { brokerErrorStatus } = require('../execution/runtimeState');
 const { reportDeliveryStatus } = require('./deliveryPolicy');
 const { fileFreshnessSummary } = require('./freshness');
