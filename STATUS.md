@@ -4,9 +4,9 @@
 > **Live planning lives in `CURRENT_PLAN.md`.** Spec lives in `SPECIFICATION.md`.
 > Everything historical is under `archive/phase-plans/`.
 
-**Last refreshed:** 2026-06-01 19:55 UTC
+**Last refreshed:** 2026-06-01 22:55 UTC
 **OpenClaw:** 2026.5.28 (e932160)
-**Repo head:** `d38f5eb` — plan: phase cleanup-1 end-of-day issue roundup
+**Repo head:** `d976da8` — phase cleanup-1h: ibkr quote-posture investigation runbook (operator-gated)
 
 ---
 
@@ -14,13 +14,13 @@
 
 | Lane | State | Notes |
 | --- | --- | --- |
-| ETF portfolio (live) | ✅ healthy reads | NetLiq CHF 100'766.08, 9 positions, cash CHF 14'701.69 |
+| ETF portfolio (live) | ✅ healthy reads | NetLiq CHF 100'750.58, 9 positions, cash CHF 14'687.85 |
 | IBKR socket / auth / read | ✅ green | exit 0–3 paths all healthy |
-| IBKR quote posture | ⚠️ degraded | `marketDataMode=unknown`; live submission **blocked** |
-| Holdings sync | ✅ functional, ⚠️ slow | ~124 s for 9 positions; root cause: posture-probe budget |
-| Dashboard / reports | ✅ regenerates | message overstates "timeout" when broker is reachable but degraded |
-| Safe-lane test suite | ✅ green | `test-effective-config` and `test-execution-authority` now pass after OpenClaw 2026.5.28 |
-| Cron jobs | ⚠️ delivery-only | 1 job in `error` state from delivery layer; substantive work runs |
+| IBKR quote posture | ⚠️ degraded | `marketDataMode=unknown`; live submission **blocked** — operator-gated, see runbook step 6 |
+| Holdings sync | ✅ functional, ⚠️ tolerable | ~36 s for 9 positions (was 124 s; Phase Cleanup-1D parallelized) |
+| Dashboard / reports | ✅ truthful | Posture-aware messaging (Phase Cleanup-1C); deltas show `unknown` under degraded posture (Phase Cleanup-1E) |
+| Safe-lane test suite | ✅ 13/13 PASS | gitignore-policy, regenerate-dashboard-cli, repo-root-cleanliness, open-phases-card, effective-config, execution-authority, trading-guards, readiness-bounded-stages, holdings-sync-perf-and-avg-cost, dashboard-delta-truth, cron-delivery-posture, ibkr-recovery-runbook, diagnostics-script-compat |
+| Cron jobs | ✅ 11/11 healthy | All `ok`/`idle`, 0 consecutive errors, all `bestEffort:true`. File-only delivery posture documented. |
 | OpenClaw control UI | ✅ snappy | `status` 14s → 2.4s after retention policy applied |
 
 ---
