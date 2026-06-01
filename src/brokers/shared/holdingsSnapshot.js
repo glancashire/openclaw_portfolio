@@ -147,7 +147,10 @@ ${cashDetail ? `- Cash detail (CHF ledger tags): ${Object.entries(cashDetail).ma
 
   fs.writeFileSync(outPath, content);
 
-  // Write avg-cost sidecar for cost-basis enrichment (keyed by conid and symbol)
+  // Phase Cleanup-1D: write avg-cost sidecar only when canonicalized JSON
+  // differs from disk. Avoids dirtying git status on every sync when avg-cost
+  // values are unchanged (and key-order changes are absorbed by the canonical
+  // form).
   const avgCostMap = {};
   for (const h of normalized) {
     const avgCost = Number(h.avgCost);
@@ -156,9 +159,37 @@ ${cashDetail ? `- Cash detail (CHF ledger tags): ${Object.entries(cashDetail).ma
     for (const k of keys) avgCostMap[String(k).toUpperCase()] = avgCost;
   }
   const sidecarPath = path.join(portfolioDir, 'holdings-avg-cost.json');
-  fs.writeFileSync(sidecarPath, JSON.stringify(avgCostMap, null, 2));
+  writeAvgCostSidecarIfChanged(sidecarPath, avgCostMap);
 
   return { outPath, total, invested, cashChf, portfolioCashChf, count: normalized.length };
 }
 
-module.exports = { writeHoldingsSnapshot, formatHoldingRow };
+function canonicalizeAvgCostMap(map = {}) {
+  if (map == null || typeof map !== 'object') return '{}';
+  const sortedKeys = Object.keys(map).sort();
+  const sorted = {};
+  for (const key of sortedKeys) sorted[key] = map[key];
+  return JSON.stringify(sorted, null, 2);
+}
+
+function writeAvgCostSidecarIfChanged(sidecarPath, avgCostMap) {
+  const next = canonicalizeAvgCostMap(avgCostMap);
+  let prev = null;
+  if (fs.existsSync(sidecarPath)) {
+    try {
+      const raw = fs.readFileSync(sidecarPath, 'utf8');
+      // Re-canonicalize the previous file so a key-order-only diff is absorbed.
+      const parsed = JSON.parse(raw);
+      prev = canonicalizeAvgCostMap(parsed);
+    } catch {
+      prev = null;
+    }
+  }
+  if (prev === next) {
+    return { written: false, sidecarPath };
+  }
+  fs.writeFileSync(sidecarPath, next);
+  return { written: true, sidecarPath };
+}
+
+module.exports = { writeHoldingsSnapshot, formatHoldingRow, writeAvgCostSidecarIfChanged, canonicalizeAvgCostMap };

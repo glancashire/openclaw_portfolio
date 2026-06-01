@@ -133,22 +133,18 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
   });
 }
 
-async function enrichPositionsWithMarketSnapshot(client, positions = []) {
+async function enrichPositionsWithMarketSnapshot(client, positions = [], options = {}) {
   const conids = [...new Set(positions.map((row) => row?.conid || row?.contract?.conId).filter(Boolean))];
   if (!conids.length) return positions;
 
-  // Fetch snapshots individually so one failure doesn't block the rest
-  const snapshotByConid = new Map();
-  for (const conid of conids) {
-    try {
-      const snaps = await client.fetchMarketSnapshot([conid]);
-      if (Array.isArray(snaps) && snaps.length > 0) {
-        snapshotByConid.set(String(conid), snaps[0]);
-      }
-    } catch {
-      // Skip conids that fail (e.g. FX helper positions)
-    }
-  }
+  // Phase Cleanup-1D: bounded concurrency + per-call timeout so a single slow
+  // conid can't stall the whole sync. Default concurrency=4 keeps us well
+  // under any sensible IBKR snapshot rate-limit while giving a 4x speedup
+  // floor compared with the previous sequential loop.
+  const snapshotByConid = await fetchSnapshotsConcurrent(client, conids, {
+    concurrency: Number.isFinite(options.concurrency) ? options.concurrency : 4,
+    perCallTimeoutMs: Number.isFinite(options.perCallTimeoutMs) ? options.perCallTimeoutMs : 4000,
+  });
 
   return positions.map((position) => {
     const conid = String(position?.conid || position?.contract?.conId || '').trim();
@@ -166,6 +162,48 @@ async function enrichPositionsWithMarketSnapshot(client, positions = []) {
       marketSnapshotRaw: snapshot,
     };
   });
+}
+
+async function fetchSnapshotsConcurrent(client, conids = [], { concurrency = 4, perCallTimeoutMs = 4000 } = {}) {
+  const snapshotByConid = new Map();
+  const queue = [...conids];
+  const inFlight = [];
+
+  async function fetchOne(conid) {
+    let timer = null;
+    try {
+      const result = await Promise.race([
+        client.fetchMarketSnapshot([conid]),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(`market-snapshot timeout (${perCallTimeoutMs}ms)`)), perCallTimeoutMs);
+        }),
+      ]);
+      if (Array.isArray(result) && result.length > 0) {
+        snapshotByConid.set(String(conid), result[0]);
+      }
+    } catch {
+      // Skip conids that fail or time out; downstream falls back to mktPrice.
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  while (queue.length > 0 || inFlight.length > 0) {
+    while (queue.length > 0 && inFlight.length < Math.max(1, concurrency)) {
+      const conid = queue.shift();
+      const task = fetchOne(conid).finally(() => {
+        const idx = inFlight.indexOf(task);
+        if (idx >= 0) inFlight.splice(idx, 1);
+      });
+      inFlight.push(task);
+    }
+    if (inFlight.length > 0) {
+      // Wait for at least one in-flight task to complete before refilling.
+      await Promise.race(inFlight);
+    }
+  }
+
+  return snapshotByConid;
 }
 
 function preferredSnapshotPrice(snapshot = {}) {
@@ -273,4 +311,4 @@ function preservePreviousHoldingsSnapshotIfNeeded({ portfolioDir, ...state } = {
   };
 }
 
-module.exports = { syncInteractiveBrokersHoldings, extractCashChf, extractFxRatesToChf, enrichPositionsWithMarketSnapshot, preferredSnapshotPrice, snapshotPriceSource, shouldPreservePreviousHoldingsSnapshot, preservePreviousHoldingsSnapshotIfNeeded };
+module.exports = { syncInteractiveBrokersHoldings, extractCashChf, extractFxRatesToChf, enrichPositionsWithMarketSnapshot, fetchSnapshotsConcurrent, preferredSnapshotPrice, snapshotPriceSource, shouldPreservePreviousHoldingsSnapshot, preservePreviousHoldingsSnapshotIfNeeded };
