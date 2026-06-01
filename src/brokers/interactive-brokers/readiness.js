@@ -12,6 +12,65 @@ async function getInteractiveBrokersReadiness({ portfolio = 'etf' } = {}) {
   return summarizeReadiness({ config, auth, marketData });
 }
 
+// Internal helper: run the readiness pipeline in two bounded stages so the
+// dashboard can distinguish 'broker reachable but posture detection slow/
+// undetermined' from 'broker unreachable / auth timed out'. Phase Cleanup-1C.
+async function runStagedReadiness({
+  portfolio = 'etf',
+  authTimeoutMs = 5000,
+  postureTimeoutMs = 7000,
+  // Injectable hooks for unit tests.
+  buildClient = null,
+  authenticate = null,
+  posture = null,
+} = {}) {
+  const client = buildClient ? buildClient() : new InteractiveBrokersClient({ portfolio });
+  const config = client.configurationStatus();
+
+  // Stage 1: bounded auth.
+  const authPromise = authenticate ? authenticate(client) : client.authenticate();
+  let authTimer = null;
+  const authRace = await Promise.race([
+    authPromise.then((value) => ({ kind: 'auth_resolved', auth: value })).catch((error) => ({
+      kind: 'auth_resolved',
+      auth: { ok: false, error: String(error?.message || error || 'auth-error') },
+    })),
+    new Promise((resolve) => {
+      authTimer = setTimeout(() => resolve({ kind: 'auth_timeout' }), authTimeoutMs);
+    }),
+  ]);
+  if (authTimer) clearTimeout(authTimer);
+
+  if (authRace.kind === 'auth_timeout') {
+    return { stage: 'auth_timeout', config };
+  }
+  const auth = authRace.auth;
+  if (!auth?.ok) {
+    return { stage: 'auth_failed', config, auth };
+  }
+
+  // Stage 2: bounded posture detection.
+  const posturePromise = posture
+    ? posture(client, { portfolio })
+    : detectMarketDataPosture(client, { portfolio }).catch((error) => ({
+      posture: 'unknown',
+      detail: String(error?.message || error || 'posture-error'),
+    }));
+  let postureTimer = null;
+  const postureRace = await Promise.race([
+    posturePromise.then((value) => ({ kind: 'posture_resolved', marketData: value })),
+    new Promise((resolve) => {
+      postureTimer = setTimeout(() => resolve({ kind: 'posture_timeout' }), postureTimeoutMs);
+    }),
+  ]);
+  if (postureTimer) clearTimeout(postureTimer);
+
+  if (postureRace.kind === 'posture_timeout') {
+    return { stage: 'posture_timeout', config, auth };
+  }
+  return { stage: 'resolved', config, auth, marketData: postureRace.marketData };
+}
+
 async function detectMarketDataPosture(client, { portfolio = 'etf' } = {}) {
   const probeCandidates = getProbeCandidates({ portfolio });
   const errors = [];
@@ -328,36 +387,98 @@ function deriveOperatorState({ auth, delayedOnly, liveReady, authReadyButUnprice
 }
 
 
-async function getInteractiveBrokersReadinessBounded({ portfolio = 'etf', timeoutMs = 10000 } = {}) {
-  let timer = null;
+function buildReadinessTimeoutFallback() {
+  return {
+    configured: true,
+    authenticated: false,
+    reachable: false,
+    mode: 'unknown',
+    fallbackRequired: true,
+    marketDataMode: 'unknown',
+    marketDataDetail: 'Readiness timed out during dashboard regeneration.',
+    marketDataProbe: null,
+    reason: 'timeout',
+    portalSessionState: 'unknown_or_separate',
+    operatorState: {
+      code: 'ibkr_readiness_timeout',
+      summary: 'IBKR readiness timed out during dashboard regeneration.',
+      detail: 'Dashboard regeneration used a bounded readiness fallback to stay responsive.',
+    },
+    guidance: 'Dashboard regeneration used the latest holdings snapshot because broker readiness checks timed out.',
+    message: 'Interactive Brokers readiness timed out during dashboard regeneration; using the latest holdings snapshot with degraded broker posture.',
+  };
+}
+
+// Phase Cleanup-1C: emitted when auth+read are healthy but posture detection
+// did not produce a usable classification within the budget. Distinct from a
+// full readiness timeout so the dashboard can describe the state truthfully.
+function buildPostureDetectionTimeoutFallback({ auth }) {
+  return {
+    configured: true,
+    authenticated: Boolean(auth?.ok),
+    reachable: Boolean(auth?.ok),
+    mode: auth?.mode || 'native-socket',
+    fallbackRequired: true,
+    marketDataMode: 'unknown',
+    marketDataDetail: 'Quote posture detection did not classify within the bounded budget; broker socket and auth were healthy.',
+    marketDataProbe: null,
+    reason: 'posture_detection_timeout',
+    portalSessionState: 'unknown_or_separate',
+    operatorState: {
+      code: 'broker_reachable_posture_undetermined',
+      summary: 'IBKR is reachable; quote posture is degraded (live submission blocked, reads OK).',
+      detail: 'Bounded posture detection did not classify within budget. Broker socket, authentication and read paths are healthy.',
+    },
+    guidance: 'Broker connectivity is healthy, but the quote posture is degraded. Reads (positions, accounting) are reliable; live order submission stays blocked until posture clears.',
+    message: 'Interactive Brokers is reachable; quote posture is degraded (live submission blocked, reads OK).',
+  };
+}
+
+async function getInteractiveBrokersReadinessBounded({
+  portfolio = 'etf',
+  timeoutMs = 10000,
+  authTimeoutMs = null,
+  postureTimeoutMs = null,
+} = {}) {
+  // Default split: auth gets ~40% of the budget, posture gets ~70% of the
+  // budget (overlapping is fine because the stages run sequentially and the
+  // total wall-clock is bounded by their sum).
+  const authBudget = Number.isFinite(authTimeoutMs)
+    ? authTimeoutMs
+    : Math.max(1500, Math.round(timeoutMs * 0.4));
+  const postureBudget = Number.isFinite(postureTimeoutMs)
+    ? postureTimeoutMs
+    : Math.max(2500, Math.round(timeoutMs * 0.7));
+
+  let staged;
   try {
-    return await Promise.race([
-      getInteractiveBrokersReadiness({ portfolio }),
-      new Promise((resolve) => {
-        timer = setTimeout(() => resolve({
-          configured: true,
-          authenticated: false,
-          reachable: false,
-          mode: 'unknown',
-          fallbackRequired: true,
-          marketDataMode: 'unknown',
-          marketDataDetail: 'Readiness timed out during dashboard regeneration.',
-          marketDataProbe: null,
-          reason: 'timeout',
-          portalSessionState: 'unknown_or_separate',
-          operatorState: {
-            code: 'ibkr_readiness_timeout',
-            summary: 'IBKR readiness timed out during dashboard regeneration.',
-            detail: 'Dashboard regeneration used a bounded readiness fallback to stay responsive.',
-          },
-          guidance: 'Dashboard regeneration used the latest holdings snapshot because broker readiness checks timed out.',
-          message: 'Interactive Brokers readiness timed out during dashboard regeneration; using the latest holdings snapshot with degraded broker posture.',
-        }), timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
+    staged = await runStagedReadiness({
+      portfolio,
+      authTimeoutMs: authBudget,
+      postureTimeoutMs: postureBudget,
+    });
+  } catch (error) {
+    // Defensive fallback to the legacy timeout shape so callers always get a
+    // well-formed readiness object.
+    return buildReadinessTimeoutFallback();
   }
+
+  if (staged.stage === 'auth_timeout' || staged.stage === 'auth_failed') {
+    if (staged.stage === 'auth_failed' && staged.auth) {
+      return summarizeReadiness({ config: staged.config, auth: staged.auth, marketData: null });
+    }
+    return buildReadinessTimeoutFallback();
+  }
+
+  if (staged.stage === 'posture_timeout') {
+    return buildPostureDetectionTimeoutFallback({ auth: staged.auth });
+  }
+
+  return summarizeReadiness({
+    config: staged.config,
+    auth: staged.auth,
+    marketData: staged.marketData,
+  });
 }
 
 function asNumber(value) {
@@ -375,4 +496,8 @@ module.exports = {
   getPortfolioApprovedProbeCandidates,
   getPortfolioExecutableProbeCandidates,
   getProbeCandidates,
+  // Phase Cleanup-1C internals exported for tests.
+  runStagedReadiness,
+  buildReadinessTimeoutFallback,
+  buildPostureDetectionTimeoutFallback,
 };

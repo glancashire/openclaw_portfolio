@@ -46,7 +46,7 @@ Legend: `STARTED` = active autonomous lane; `OPEN` = ready to start; `WAITING` =
    - [x] 1A. Working-tree hygiene: stash dropped, `runtime-events.jsonl` + report derivatives gitignored, regression test `test-gitignore-policy.js`.
    - [x] 1B. `regenerate-dashboard.js` accepts bare portfolio name (with regression test `test-regenerate-dashboard-cli.js`).
    - [x] 1G. Migrate deprecated `messages.groupChat.visibleReplies` config key — NO-OP (verified valid in current schema; warning was stale).
-   - [ ] 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out".
+   - [x] 1C. Dashboard: distinguish "reachable + degraded posture" from "timed out" (staged auth + posture bounding; new `posture_detection_timeout` fallback shape with regression test `test-readiness-bounded-stages.js`).
 2. **Tranche 2 — autonomous, deeper**
    - 1D. Bound posture-probe wall-clock during holdings sync; skip identical avg-cost rewrites.
    - 1E. Surface "Today / This week" deltas as `—` under `posture=unknown` instead of silent `+0.00`.
