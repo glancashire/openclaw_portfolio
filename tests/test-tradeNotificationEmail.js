@@ -107,6 +107,27 @@ assert(typeof htmlMin === 'string' && htmlMin.length > 100, 'Handles minimal/zer
 const textMin = buildTradeEmailText(minTrade, minPortfolio, []);
 assert(typeof textMin === 'string' && textMin.length > 50, 'Text handles minimal/zero values without crash');
 
+console.log('\n-- Phase C: no Unavailable or dash placeholders in investor-ready path --');
+assert(!html.includes('Unavailable'), 'Investor-ready HTML has no Unavailable text');
+assert(!text.includes('Unavailable'), 'Investor-ready text has no Unavailable text');
+assert(!text.includes('Portfolio value: CHF \u2014'), 'Investor-ready text has no dash for portfolio value');
+assert(!text.includes('Cash balance: CHF \u2014'), 'Investor-ready text has no dash for cash balance');
+assert(text.includes('Resulting total held: 18'), 'Investor-ready text shows real resulting total');
+assert(text.includes('Portfolio after fill'), 'Investor-ready text shows Portfolio after fill section');
+assert(html.includes('Portfolio after fill'), 'Investor-ready HTML shows Portfolio after fill section');
+
+console.log('\n-- Phase C: low-trust portfolio suppresses sections --');
+const lowTrustPortfolio = { name: 'Test', totalValueChf: 0, cashChf: 0, holdings: [] };
+const htmlLow = buildTradeEmailHtml(trade, lowTrustPortfolio, []);
+const textLow = buildTradeEmailText(trade, lowTrustPortfolio, []);
+assert(!htmlLow.includes('Portfolio after fill'), 'Low-trust HTML omits Portfolio after fill');
+assert(!textLow.includes('Portfolio after fill'), 'Low-trust text omits Portfolio after fill');
+assert(!htmlLow.includes('Resulting total held'), 'Low-trust HTML omits Resulting total held row');
+assert(!textLow.includes('Resulting total held'), 'Low-trust text omits Resulting total held line');
+assert(!htmlLow.includes('Unavailable'), 'Low-trust HTML has no Unavailable fallback');
+assert(!textLow.includes('Unavailable'), 'Low-trust text has no Unavailable fallback');
+assert(!textLow.includes('Holdings snapshot is not available yet'), 'Low-trust text has no stale placeholder');
+
 console.log('\n-- Name enrichment: instrument name from portfolio holdings --');
 const tradeNoName = { ...trade, name: undefined, instrument: undefined };
 const htmlName = buildTradeEmailHtml(tradeNoName, portfolio, []);

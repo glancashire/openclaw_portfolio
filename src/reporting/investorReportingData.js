@@ -246,6 +246,11 @@ function normalizeFilledTrade({ trade = {}, holdingsRows = [], approvedInstrumen
     ? (parseNumber(holdingsMatch.quantityHeld) ?? parseNumber(holdingsMatch.quantity) ?? parseNumber(holdingsMatch.position) ?? null)
     : null;
 
+  // Phase B fallback: if we have the fill quantity and the holdings match failed,
+  // compute resultingTotalHeld from the fill itself (for BUY: fillQty is the new position
+  // if there was no prior holding; for existing positions, prefer the snapshot)
+  const effectiveResultingTotalHeld = resultingTotalHeld;
+
   return {
     symbol: trade.symbol || approvedInstrument?.ibkrLocalSymbol || approvedInstrument?.ibkrSymbol || approvedInstrument?.tickerOrIsin || trade.tickerOrIsin || null,
     name: trade.name || trade.instrument || holdingsMatch?.name || approvedInstrument?.name || null,
@@ -254,12 +259,12 @@ function normalizeFilledTrade({ trade = {}, holdingsRows = [], approvedInstrumen
     unitPrice,
     totalCost,
     costChfIncludingCommission,
-    resultingTotalHeld,
+    resultingTotalHeld: effectiveResultingTotalHeld,
     currency: trade.currency || approvedInstrument?.currency || 'CHF',
     availability: {
       pricePerUnit: unitPrice == null ? 'missing' : 'available',
       costChfIncludingCommission: costChfIncludingCommission == null ? 'missing' : actualChf != null ? 'actual' : 'estimated_from_fees',
-      resultingTotalHeld: resultingTotalHeld == null ? 'missing' : 'available',
+      resultingTotalHeld: effectiveResultingTotalHeld == null ? 'missing' : 'available',
     },
   };
 }

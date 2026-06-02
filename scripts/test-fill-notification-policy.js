@@ -33,7 +33,9 @@ function seedRepo(policy) {
   const sent = await notifyTradeFill({
     portfolioDir: enabled.portfolioDir,
     trade: { symbol: 'SLICHA', action: 'BUY', qty: 1, fillQty: 1, fillPrice: 221.8, price: 221.8, currency: 'CHF', costChf: 221.8 },
-    portfolio: { name: 'ETF Portfolio', totalValueChf: 5000, cashChf: 4778.2, holdings: [] },
+    portfolio: { name: 'ETF Portfolio', totalValueChf: 5000, cashChf: 4778.2, holdings: [
+      { symbol: 'SLICHA', name: 'UBS ETF SLI', quantityHeld: 1, valueChf: 221.8, allocPct: 4.4, targetPct: 5 },
+    ] },
     openOrders: [],
     sendEmailImpl: async (next) => {
       payload = next;

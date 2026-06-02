@@ -106,7 +106,8 @@ async function main() {
       const allocPct = totalValue > 0 ? (mv / totalValue) * 100 : 0;
       return {
         symbol: p.contract?.symbol || p.symbol || '?',
-        name: '',
+        name: p.contract?.description || p.contract?.localSymbol || p.contract?.symbol || '',
+        quantityHeld: p.position || p.pos || null,
         valueChf: mv,
         allocPct,
         targetPct: 0,
@@ -152,6 +153,9 @@ async function main() {
     if (notification && notification.sent) {
       state = markFillsNotified(state, [order.orderId]);
       newFills++;
+    } else if (notification && notification.reason === 'not_investor_ready') {
+      // Phase D: don't mark as notified — retry on next monitor pass
+      console.log(`[monitor] Fill ${order.symbol} (${order.orderId}) deferred: ${notification.missing?.join(', ') || 'not investor ready'}. Will retry next pass.`);
     } else {
       console.log(`[monitor] Notification not recorded for ${order.symbol} (${order.orderId}): ${notification?.reason || notification?.error || 'send_not_confirmed'}`);
     }
