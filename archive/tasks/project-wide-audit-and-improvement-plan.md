@@ -1,3 +1,9 @@
+# Historical task note - project-wide audit and improvement plan
+
+- Status: archived reference
+- Superseded by: `CURRENT_PLAN.md` (live open work) and `archive/docs/project-improvement-roadmap.md` (historical roadmap)
+- Last updated: 2026-06-02 archive move
+
 # Project-wide audit and improvement plan
 
 - Status: active
@@ -21,7 +27,7 @@ Audit the entire project from engineering, QA, support, docs, operations, produc
 - 2026-05-30: Created harvester for the project-wide audit and improvement pass.
 - 2026-05-30: Gathered code-heavy audit findings across engineering, QA, operations, product, support, documentation, OpenClaw/config, and Spitex-domain-transfer perspectives.
 - 2026-05-30: Applied safe cleanup fixes: removed stale Mailgun test naming drift, replaced fixed `/tmp/answers.json` package-script usage with a unique-temp wrapper script, and reconciled report-delivery policy notes with actual configured recipient posture.
-- 2026-05-30: Wrote `docs/project-audit-2026-05-30.md` and `docs/project-improvement-roadmap.md` to capture implemented state, risks, opportunities, removal candidates, and an implementation-ready roadmap.
+- 2026-05-30: Wrote `archive/docs/project-audit-2026-05-30.md` and `archive/docs/project-improvement-roadmap.md` to capture implemented state, risks, opportunities, removal candidates, and an implementation-ready roadmap.
 - 2026-05-30: Closed the reporting/accounting/quote hardening lane in git (`67229ae`, `dc1eb42`) and reconciled open-work tracking so the remaining autonomous work now points at the roadmap hardening phases.
 
 ## Next

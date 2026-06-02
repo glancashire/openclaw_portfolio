@@ -1,4 +1,8 @@
-# Project Audit — 2026-05-30
+# Historical audit - project-wide audit (archived)
+
+Superseded as a live planning surface by `CURRENT_PLAN.md` and `STATUS.md` on 2026-06-02. Keep this file for historical context only.
+
+# Project Audit - 2026-05-30
 
 ## Purpose
 This document consolidates a project-wide audit of the OpenClaw portfolio-manager repository from engineering, QA, support, documentation, operations, product, reliability, OpenClaw power-user, and future Spitex-domain perspectives.

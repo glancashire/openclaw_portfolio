@@ -183,7 +183,7 @@ _(Newest first. Each wave entry: plan link, commits, test counts, blockers.)_
 ### Pending start: W1 — Roll-up B + F (doc archive + rollup closing pass)
 
 Plan to write next. Will land:
-- `tasks/wave-plan-2026-05-27-closeout.md` (this file) committed
+- `archive/tasks/wave-plan-2026-05-27-closeout.md` (this file) committed
 - `phase-W1-doc-archive-and-rollup-closeout-plan.md` committed
 - Move misleading historical roadmaps under `archive/`
 - Tick Roll-up B and F items in `ROLLUP_OUTSTANDING_PLAN.md`

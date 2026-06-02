@@ -1,7 +1,8 @@
 # Phase C2 — Current docs consolidation and open-work reset
 
 Date: 2026-06-02
-Status: planned
+Status: complete
+Completed: 2026-06-02
 
 ## Goal
 Reduce the repo to one clean live plan surface plus a small supporting current-doc set, while moving stale audit/phase/task notes into the historical archive.

@@ -1,6 +1,6 @@
 # Phase W9 — Recovery playbooks as executable guidance
 
-- **Wave:** W9 of `tasks/wave-plan-2026-05-27-closeout.md`
+- **Wave:** W9 of `archive/tasks/wave-plan-2026-05-27-closeout.md`
 - **Owner:** bb8 (subagent)
 - **Status:** in-flight
 - **Started:** 2026-05-27

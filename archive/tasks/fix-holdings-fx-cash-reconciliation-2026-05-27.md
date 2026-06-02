@@ -1,3 +1,7 @@
+# Historical task note - FX cash reconciliation (parked reference)
+
+Superseded as a live planning surface by `CURRENT_PLAN.md` Phase 5 and the parked note in `STATUS.md`.
+
 # Fix holdings FX cash reconciliation (2026-05-27)
 
 ## Objective

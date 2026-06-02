@@ -1,6 +1,6 @@
 # Phase W8 — Approval lifecycle UX hardening (plan)
 
-- **Wave:** W8 of `tasks/wave-plan-2026-05-27-closeout.md`
+- **Wave:** W8 of `archive/tasks/wave-plan-2026-05-27-closeout.md`
 - **Roadmap item:** Post-MVP #2 — approval lifecycle UX
 - **Author:** bb8 (subagent, autonomous)
 - **Date:** 2026-05-27

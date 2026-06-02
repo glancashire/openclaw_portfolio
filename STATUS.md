@@ -1,10 +1,9 @@
-# STATUS — Portfolio Manager
+# STATUS - Portfolio Manager
 
-> Single source of truth for the **current state** of the system.
-> **Live planning lives in `CURRENT_PLAN.md`.** Spec lives in `SPECIFICATION.md`.
-> Everything historical is under `archive/phase-plans/`.
+> Single source of truth for the current operational state.
+> Live work lives in `CURRENT_PLAN.md`. Historical plans, audits, and task notes live under `archive/`.
 
-**Last refreshed:** 2026-06-02 15:45 UTC
+**Last refreshed:** 2026-06-02 22:20 UTC
 **Repo head:** current `master` (see `git log -1 --oneline` for exact head)
 
 ---
@@ -13,71 +12,62 @@
 
 | Lane | State | Notes |
 | --- | --- | --- |
-| ETF portfolio (live) | ✅ healthy reads | NetLiq CHF 100'750.58, 9 positions, cash CHF 14'687.85 |
-| IBKR socket / auth / read | ✅ green | exit 0–3 paths all healthy |
-| IBKR quote posture | ⚠️ degraded | `marketDataMode=unknown`; live submission **blocked** — operator-gated, see runbook step 6 |
-| Holdings sync | ✅ functional, ⚠️ tolerable | ~36 s for 9 positions (was 124 s; Phase Cleanup-1D parallelized) |
-| Dashboard / reports | ✅ truthful | Posture-aware messaging (Phase Cleanup-1C); deltas show `unknown` under degraded posture (Phase Cleanup-1E) |
-| Safe-lane test suite | ✅ 13/13 PASS | gitignore-policy, regenerate-dashboard-cli, repo-root-cleanliness, open-phases-card, effective-config, execution-authority, trading-guards, readiness-bounded-stages, holdings-sync-perf-and-avg-cost, dashboard-delta-truth, cron-delivery-posture, ibkr-recovery-runbook, diagnostics-script-compat |
-| Cron jobs | ✅ 11/11 healthy | All `ok`/`idle`, 0 consecutive errors, all `bestEffort:true`. File-only delivery posture documented. |
-| OpenClaw control UI | ✅ snappy | `status` 14s → 2.4s after retention policy applied |
-
----
+| ETF portfolio read/report path | healthy | regular reporting surfaces build from current repo/runtime state |
+| IBKR socket / auth / read | green | readonly access and reporting flows are healthy |
+| IBKR quote posture | degraded | `marketDataMode=unknown`; live submission stays blocked pending operator-side diagnosis |
+| Holdings sync | functional | sync is truthful and usable, though still not especially fast |
+| Dashboard / report emails | healthy | digest + investor emails now share the cleaned-up three-block visual template |
+| Safe-lane verification | green | last run: 235 passed, 0 failed, 3 quarantined |
+| Cron jobs | healthy snapshot | latest tracked cron snapshot is healthy; see `docs/operations/active-cron-jobs.md` |
+| OpenClaw control UI | healthy | session-retention cleanup and current repo surfaces are in place |
 
 ## What works
 
-- Markdown-controlled portfolio contracts (portfolio.md / holdings.md / trades.md / history.md / dashboard.md).
-- Native IBKR readonly client (account discovery, positions, accounting snapshot).
-- Sync guard lock + last-known-good preservation (no false-zero rewrites).
-- Execution authority pipeline (dry-run → require_confirmation → transmitted_live with explicit ack).
-- Approval gate, basket execution, market-calendar awareness.
-- Reporting pipeline: dashboard, weekly/monthly/quarterly reports, investor health/email.
-- Self-maintaining session retention via `session.maintenance.mode = enforce`.
-- IBKR fast-status probe (5 s tier-1 socket/auth/read/quote check) + recovery runbook.
+- Markdown-controlled portfolio contracts (`portfolio.md`, `holdings.md`, `trades.md`, `history.md`, `dashboard.md`).
+- Native IBKR readonly client for account discovery, positions, and accounting snapshots.
+- Sync guard lock plus last-known-good preservation on broker reads.
+- Approval-gated execution flow with dry-run, confirmation, and transmitted-live boundaries.
+- Reporting stack: dashboard, health reports, overview surfaces, digests, investor emails, fill emails.
+- Test governance and repo-truth checks (`npm test`, manifest/domain-summary validation, root-cleanliness gate).
+- Archive-backed history: completed phase plans, audits, and task notes live outside the current docs.
 
 ## What is degraded
 
-- **Quote posture `unknown`** on U25624150 — `fetchMarketSnapshot` returns neither live (84/86/31) nor delayed (88/87) fields. Likely a market-data subscription / data-farm state on the IBKR side. Reads remain healthy; live submission stays gated. **Investigation steps are in `docs/operations/ibkr-recovery.md` Step 6 (operator-gated).**
-- **Dashboard wording** lumps "broker reachable but degraded" with "broker timed out". Misleading but cosmetic. (resolved by Phase Cleanup-1C — staged readiness now distinguishes the two outcomes.)
-- **Holdings sync wall-clock** ~~(~124 s)~~ — reduced to ~36 s by Phase Cleanup-1D parallel snapshot fetches.
+- **Quote posture is still `unknown`.** The reporting/read path is fine, but live order submission remains blocked until the IBKR subscription/data-farm diagnosis in `docs/operations/ibkr-recovery.md` Step 6 is completed.
 
 ## What is blocked or parked
 
-- **Live order submission** — gated by quote posture. Operator-side action on IBKR client portal needed.
-- **Mailgun inbound** — code-side READY (`lib/mailgunInbound.js`); waiting on infra route configuration for `c3po@mailgun.swift.ch`.
-- **Control UI direct embedding** — implementation target exists, editable surface unavailable.
-- **FX cash reconciliation** — Graham-owned WIP, intentionally not taken over.
+- **Live order submission** - blocked by quote posture, not by the readonly/reporting path.
+- **Mailgun inbound** - code-side ready, infrastructure-side incomplete.
+- **Control UI direct embedding** - target exists, editable source remains undiscovered or unavailable.
+- **FX cash reconciliation** - parked as Graham-owned WIP unless explicitly reactivated.
+- **Spitex exploration** - concept only; not active implementation work.
 
----
+## Current open-work buckets
 
-## Truth markers
-
-- **Spec §1 engineering scope:** complete.
-- **Closeout phases (committed and pushed):** Phase 2B, 4B, 7B, 5B, IBKR-B1, IBKR-B2, UX-1.
-- **Two previously-blocking timeouts cleared:**
-  - `scripts/test-effective-config.js` — runs in <5 s, exit 0.
-  - `scripts/test-execution-authority.js` — runs in <5 s, exit 0.
-- **Stash `stash@{0}`** is functionally redundant; its content was merged in `1e51f7b`.
+- **Autonomous engineering backlog** - see `CURRENT_PLAN.md` Phases 1-4.
+- **Operator / external unblockers** - see `CURRENT_PLAN.md` Phase 0.
+- **Parked or decision-led work** - see `CURRENT_PLAN.md` Phase 5.
 
 ## Operator quick refs
 
 - IBKR live status: `node scripts/ibkr-fast-status.js`
 - Sync after recovery: `node scripts/sync-ibkr-after-recovery.js etf`
 - Compact dashboard: `node scripts/show-dashboard.js etf`
-- Cron list: `openclaw cron list`
+- Cron snapshot: `docs/operations/active-cron-jobs.md`
 - Recovery ladder: `docs/operations/ibkr-recovery.md`
+- Mailgun infra checklist: `docs/setup/mailgun-infra-enable-checklist.md`
 
 ## Where things live
 
 | Concern | File |
 | --- | --- |
-| Identity / persona | `IDENTITY.md`, `SOUL.md`, `USER.md`, `AGENTS.md` |
-| Long-term memory | `MEMORY.md`, `memory/YYYY-MM-DD.md` |
 | Spec | `SPECIFICATION.md` |
 | Live plan | `CURRENT_PLAN.md` |
-| Active phase plan | none — see `CURRENT_PLAN.md` backlog view |
-
-| Operational runbooks | `docs/operations/*.md` |
-| Setup guides | `docs/setup/*.md` |
-| History | `archive/phase-plans/**` |
-| Daily working notes | `memory/YYYY-MM-DD.md` |
+| Operational truth | `STATUS.md` |
+| Repo map | `docs/operations/repo-map.md` |
+| Current runbooks / setup docs | `docs/operations/*.md`, `docs/setup/*.md` |
+| Historical phase plans | `archive/phase-plans/**` |
+| Historical audits / roadmaps | `archive/docs/**` |
+| Historical task notes / harvesters | `archive/tasks/**` |
+| Daily memory | `memory/YYYY-MM-DD.md` |

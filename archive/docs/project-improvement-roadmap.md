@@ -1,3 +1,7 @@
+# Historical roadmap - project improvement themes (archived)
+
+Superseded as a live planning surface by `CURRENT_PLAN.md` on 2026-06-02. Keep this file for historical context only.
+
 # Project Improvement Roadmap
 
 ## Goal

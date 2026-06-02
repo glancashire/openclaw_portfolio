@@ -3,7 +3,7 @@
 - **Status:** in progress
 - **Owner:** bb8 (subagent)
 - **Started:** 2026-05-27
-- **Wave:** W10 of `tasks/wave-plan-2026-05-27-closeout.md`
+- **Wave:** W10 of `archive/tasks/wave-plan-2026-05-27-closeout.md`
 
 ## Goal
 
