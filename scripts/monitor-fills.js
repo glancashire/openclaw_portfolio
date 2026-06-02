@@ -145,6 +145,7 @@ async function main() {
       },
       portfolio,
       openOrders: remainingOpen,
+      portfolioDir: DEFAULT_PORTFOLIO_DIR,
       notificationMode: isBackfill ? 'backfill' : 'live_fill',
     });
 
