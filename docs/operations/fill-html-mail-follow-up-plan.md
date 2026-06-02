@@ -2,7 +2,7 @@
 
 Date: 2026-06-02
 Scope: Investor-facing `... filled` HTML/text email
-Status: planned
+Status: completed (2026-06-02)
 
 ## Goal
 Remove the last low-trust fill-email states:
