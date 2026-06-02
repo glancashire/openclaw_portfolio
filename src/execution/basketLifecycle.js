@@ -134,14 +134,11 @@ async function runBasketLifecycle({
       orderId: exec.orderId,
       costChf: Number(exec.shares || exec.quantity || 0) * Number(exec.price || 0),
     };
-    try {
-      const r = await notifyTradeFill({ trade, portfolio: { name: `${portfolio.toUpperCase()} Portfolio`, totalValueChf: 0, cashChf: 0, holdings: [] }, openOrders: [], portfolioDir });
-      notifyResults.push({ orderId: exec.orderId, ok: true, result: r });
-      log(`Notified order ${exec.orderId}`);
-    } catch (error) {
-      notifyResults.push({ orderId: exec.orderId, ok: false, error: error.message });
-      log(`Notify ${exec.orderId} failed: ${error.message}`);
-    }
+    // Phase 1 fix: defer investor-facing email to the post-resync path (monitor-fills)
+    // which has access to real portfolio totals/holdings. Record the fill for downstream
+    // notification without sending a zero-placeholder investor email.
+    notifyResults.push({ orderId: exec.orderId, ok: true, result: { attempted: false, sent: false, reason: 'deferred_to_post_resync' }, trade });
+    log(`Fill recorded for order ${exec.orderId} (${trade.symbol} ${trade.action} ${trade.fillQty}@${trade.fillPrice} ${trade.currency}) — investor email deferred to post-resync path`);
   }
 
   try {

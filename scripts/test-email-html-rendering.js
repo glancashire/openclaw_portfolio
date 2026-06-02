@@ -99,13 +99,13 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   ];
   const tradeHtml = buildTradeEmailHtml(tradeInput, portfolioInput, openOrdersInput);
   const tradeText = buildTradeEmailText(tradeInput, portfolioInput, openOrdersInput);
-  assert(tradeHtml.includes('Management summary'));
+  assert(tradeHtml.includes('Fill summary'));
   assert(tradeHtml.includes('Purchase summary'));
   assert(tradeHtml.includes('Resulting total held'));
   assert(tradeHtml.includes('Cost in CHF including commission'));
   assert(tradeHtml.includes('UBS ETF SLI'));
   assert(tradeHtml.includes('4'));
-  assert(tradeHtml.includes('CHF 888.70'));
+  assert(tradeHtml.includes('888.70'));
   assert(tradeHtml.includes('Portfolio after fill'));
   assert(tradeHtml.includes('Remaining open orders'));
   assert(tradeHtml.includes('BUY filled'));

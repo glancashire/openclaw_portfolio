@@ -167,7 +167,69 @@ function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [], ap
   };
 }
 
-function normalizeFilledTrade({ trade = {}, holdingsRows = [] } = {}) {
+function normalizedIdentity(value) {
+  if (value == null) return null;
+  const raw = String(value).trim();
+  if (!raw || raw === '—') return null;
+  return raw.toUpperCase();
+}
+
+function identityValuesFromHolding(row = {}) {
+  return [
+    row.tickerOrIsin,
+    row.symbol,
+    row.name,
+    row.conid,
+    row.ibkrConid,
+    row.ibkrSymbol,
+    row.ibkrLocalSymbol,
+    row.localSymbol,
+  ].filter(Boolean);
+}
+
+function identityValuesFromInstrument(instrument = {}) {
+  return [
+    instrument.tickerOrIsin,
+    instrument.name,
+    instrument.ibkrConid,
+    instrument.ibkrSymbol,
+    instrument.ibkrLocalSymbol,
+  ].filter(Boolean);
+}
+
+function findApprovedInstrument({ trade = {}, holdingsRows = [], approvedInstruments = [] } = {}) {
+  const keys = new Set([
+    trade.symbol,
+    trade.tickerOrIsin,
+    trade.name,
+    trade.instrument,
+    trade.conid,
+    ...holdingsRows.flatMap((row) => identityValuesFromHolding(row)),
+  ].map(normalizedIdentity).filter(Boolean));
+
+  return (approvedInstruments || []).find((instrument) => identityValuesFromInstrument(instrument)
+    .some((value) => keys.has(normalizedIdentity(value)))) || null;
+}
+
+function findFilledTradeHolding({ trade = {}, holdingsRows = [], approvedInstrument = null } = {}) {
+  const keys = new Set([
+    trade.symbol,
+    trade.tickerOrIsin,
+    trade.name,
+    trade.instrument,
+    trade.conid,
+    approvedInstrument?.tickerOrIsin,
+    approvedInstrument?.ibkrConid,
+    approvedInstrument?.ibkrSymbol,
+    approvedInstrument?.ibkrLocalSymbol,
+    approvedInstrument?.name,
+  ].map(normalizedIdentity).filter(Boolean));
+
+  return (holdingsRows || []).find((row) => identityValuesFromHolding(row)
+    .some((value) => keys.has(normalizedIdentity(value)))) || null;
+}
+
+function normalizeFilledTrade({ trade = {}, holdingsRows = [], approvedInstruments = [] } = {}) {
   const quantityPurchased = parseNumber(trade.fillQty) ?? parseNumber(trade.qty);
   const unitPrice = parseNumber(trade.fillPrice) ?? parseNumber(trade.price);
   const totalCost = parseNumber(trade.costChf);
@@ -178,21 +240,22 @@ function normalizeFilledTrade({ trade = {}, holdingsRows = [] } = {}) {
     : totalCost != null
       ? Number((totalCost + fees).toFixed(2))
       : null;
-  const holdingsMatch = (holdingsRows || []).find((row) => String(row.tickerOrIsin || row.symbol) === String(trade.symbol || ''));
+  const approvedInstrument = findApprovedInstrument({ trade, holdingsRows, approvedInstruments });
+  const holdingsMatch = findFilledTradeHolding({ trade, holdingsRows, approvedInstrument });
   const resultingTotalHeld = holdingsMatch
-    ? (parseNumber(holdingsMatch.quantityHeld) ?? parseNumber(holdingsMatch.quantity) ?? null)
+    ? (parseNumber(holdingsMatch.quantityHeld) ?? parseNumber(holdingsMatch.quantity) ?? parseNumber(holdingsMatch.position) ?? null)
     : null;
 
   return {
-    symbol: trade.symbol || trade.tickerOrIsin || null,
-    name: trade.name || trade.instrument || holdingsMatch?.name || null,
+    symbol: trade.symbol || approvedInstrument?.ibkrLocalSymbol || approvedInstrument?.ibkrSymbol || approvedInstrument?.tickerOrIsin || trade.tickerOrIsin || null,
+    name: trade.name || trade.instrument || holdingsMatch?.name || approvedInstrument?.name || null,
     quantityPurchased,
     pricePerUnit: unitPrice,
     unitPrice,
     totalCost,
     costChfIncludingCommission,
     resultingTotalHeld,
-    currency: trade.currency || 'CHF',
+    currency: trade.currency || approvedInstrument?.currency || 'CHF',
     availability: {
       pricePerUnit: unitPrice == null ? 'missing' : 'available',
       costChfIncludingCommission: costChfIncludingCommission == null ? 'missing' : actualChf != null ? 'actual' : 'estimated_from_fees',
@@ -205,4 +268,6 @@ module.exports = {
   parseHoldingsTable,
   buildInvestorHoldingsSnapshot,
   normalizeFilledTrade,
+  findApprovedInstrument,
+  findFilledTradeHolding,
 };

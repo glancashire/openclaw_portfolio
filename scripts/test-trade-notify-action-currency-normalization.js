@@ -10,6 +10,10 @@
  * @ 694.9 CHF' (action=BOT, currency=CHF instead of EUR) because the
  * basketLifecycle notify path consumed raw exec.side and defaulted currency
  * to CHF when the broker dropped it.
+ *
+ * Updated Phase 1 (2026-06-02): lifecycle no longer calls notifyTradeFill
+ * directly — it defers to the post-resync path. Trade objects are still
+ * normalized and exposed via notifyResults[].trade for verification.
  */
 
 const assert = require('assert');
@@ -93,15 +97,9 @@ const path = require('path');
     return null;
   };
 
-  const captured = [];
-  const fakeNotify = async ({ trade }) => {
-    captured.push(trade);
-    return { attempted: true, sent: true, result: { id: 'mock' } };
-  };
-
   const { runBasketLifecycle } = require(path.join(realRoot, 'src/execution/basketLifecycle'));
 
-  await runBasketLifecycle({
+  const result = await runBasketLifecycle({
     portfolio: 'etf',
     approvalId,
     rootDir: root,
@@ -112,23 +110,24 @@ const path = require('path');
       skipMonitor: true,
       logger: () => {},
       ibkrJson: ibkrJsonStub,
-      notifyTradeFill: fakeNotify,
+      notifyTradeFill: async () => ({ attempted: false, sent: false, reason: 'stub' }),
       resyncHoldings: async () => 'noop',
     },
   });
 
-  assert.strictEqual(captured.length, 2, `expected 2 trade notifications, got ${captured.length}`);
+  // Phase 1: lifecycle defers investor email — trade objects exposed via notifyResults[].trade
+  assert.strictEqual(result.notifyResults.length, 2, `expected 2 fill records, got ${result.notifyResults.length}`);
 
-  const t1 = captured.find((t) => t.symbol === 'SXR8');
-  assert(t1, 'missing SXR8 trade notification');
-  assert.strictEqual(t1.action, 'BUY',   `SXR8 action must be normalised to 'BUY' (was ${t1.action})`);
-  assert.strictEqual(t1.currency, 'EUR', `SXR8 currency must be hydrated to 'EUR' from proposal (was ${t1.currency})`);
-  assert.strictEqual(t1.fillQty, 12);
+  const t1 = result.notifyResults.find((r) => r.trade && r.trade.symbol === 'SXR8');
+  assert(t1, 'missing SXR8 trade record');
+  assert.strictEqual(t1.trade.action, 'BUY',   `SXR8 action must be normalised to 'BUY' (was ${t1.trade.action})`);
+  assert.strictEqual(t1.trade.currency, 'EUR', `SXR8 currency must be hydrated to 'EUR' from proposal (was ${t1.trade.currency})`);
+  assert.strictEqual(t1.trade.fillQty, 12);
 
-  const t2 = captured.find((t) => t.symbol === 'SPMCHA');
-  assert(t2, 'missing SPMCHA trade notification');
-  assert.strictEqual(t2.action, 'BUY',   `SPMCHA action must be normalised to 'BUY' (was ${t2.action})`);
-  assert.strictEqual(t2.currency, 'CHF', `SPMCHA currency should remain 'CHF' (was ${t2.currency})`);
+  const t2 = result.notifyResults.find((r) => r.trade && r.trade.symbol === 'SPMCHA');
+  assert(t2, 'missing SPMCHA trade record');
+  assert.strictEqual(t2.trade.action, 'BUY',   `SPMCHA action must be normalised to 'BUY' (was ${t2.trade.action})`);
+  assert.strictEqual(t2.trade.currency, 'CHF', `SPMCHA currency should remain 'CHF' (was ${t2.trade.currency})`);
 
   console.log(JSON.stringify({ ok: true, asserted: 6 }));
 })().catch((err) => { console.error(err.stack || String(err)); process.exit(1); });

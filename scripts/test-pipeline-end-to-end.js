@@ -185,7 +185,7 @@ function setupFixture() {
   assert.strictEqual(lifecycleR2.reconciled.summary.filled, 1);
   assert.strictEqual(lifecycleR2.reconciled.summary.cancelled, 0);
   assert.strictEqual(lifecycleR2.mirror.appended, 1, 'one new fill row mirrored');
-  assert.strictEqual(lifecycleR2.notifyResults.length, 1, 'one fill notified');
+  assert.strictEqual(lifecycleR2.notifyResults.length, 1, 'one fill recorded');
   assert(!lifecycleR2.reproposal || lifecycleR2.reproposal.skipped, 'no further reproposal expected');
 
   // Trade log should now include the cancelled row from round 1 and the filled row from round 2
