@@ -3,30 +3,6 @@ const { effectiveDeliveryPolicy, reportDeliveryStatus } = require('./deliveryPol
 const { emailDeliveryReadiness, sendEmailMessage } = require('./emailDelivery');
 const { buildReportEmailSubject, buildReportEmailText, buildReportEmailHtml, loadSummaryEmailSource } = require('./reportEmail');
 
-function extractHealthHighlights(summaryMarkdown = '') {
-  const lines = String(summaryMarkdown || '').split(/\r?\n/);
-  let topBlocker = null;
-  let nextAction = null;
-
-  for (const line of lines) {
-    const blockerMatch = line.match(/^- \[([^\]]+)\]\s+(.+)$/);
-    if (!topBlocker && blockerMatch) {
-      topBlocker = `[${blockerMatch[1]}] ${blockerMatch[2]}`;
-      continue;
-    }
-    const actionMatch = line.match(/^- (.+)$/);
-    if (!nextAction && actionMatch && lines.includes('## Recommended next actions')) {
-      const sectionIndex = lines.indexOf('## Recommended next actions');
-      const lineIndex = lines.indexOf(line);
-      if (lineIndex > sectionIndex) {
-        nextAction = actionMatch[1];
-      }
-    }
-  }
-
-  return { topBlocker, nextAction };
-}
-
 async function deliverPortfolioSummaryEmail({ portfolioDir, period = 'summary', summaryPath, summaryHtmlPath = null, subject = null, sendEmailImpl = sendEmailMessage }) {
   const policy = effectiveDeliveryPolicy(portfolioDir);
   const deliveryStatus = reportDeliveryStatus({ portfolioDir });
@@ -55,10 +31,27 @@ async function deliverPortfolioSummaryEmail({ portfolioDir, period = 'summary', 
 
   const portfolioName = path.basename(portfolioDir);
   const { summaryMarkdown, summaryHtml, summary } = loadSummaryEmailSource({ summaryPath, summaryHtmlPath });
-  const { topBlocker, nextAction } = extractHealthHighlights(summaryMarkdown);
+  const investorDeliveryContext = { pendingActions: [] };
+  const investorNextAction = summary?.recommendedNextStep || null;
   const resolvedSubject = subject || buildReportEmailSubject({ portfolioName, period });
-  const text = buildReportEmailText({ portfolioName, period, summaryMarkdown, summary, deliveryStatus, topBlocker, nextAction });
-  const html = buildReportEmailHtml({ portfolioName, period, summaryHtml, summary, deliveryStatus, topBlocker, nextAction });
+  const text = buildReportEmailText({
+    portfolioName,
+    period,
+    summaryMarkdown,
+    summary,
+    deliveryStatus: investorDeliveryContext,
+    topBlocker: null,
+    nextAction: investorNextAction,
+  });
+  const html = buildReportEmailHtml({
+    portfolioName,
+    period,
+    summaryHtml,
+    summary,
+    deliveryStatus: investorDeliveryContext,
+    topBlocker: null,
+    nextAction: investorNextAction,
+  });
   const result = await sendEmailImpl({ policy, subject: resolvedSubject, text, html });
 
   return {

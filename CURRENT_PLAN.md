@@ -1,96 +1,266 @@
-# CURRENT_PLAN — What we're working on now
+# Email Dashboard Improvement Plan
 
-> The **only** living plan document. Status snapshot lives in `STATUS.md`.
-> Anything historical is under `archive/phase-plans/`.
+Date: 2026-06-02
+Scope: ETF portfolio email/dashboard reporting refresh
+Status: in_progress
 
-**Last refreshed:** 2026-06-01 22:55 UTC
+## Goal
+Improve the investor email dashboard so it is cleaner, simpler, more visual, and more decision-oriented.
 
----
+The redesign should:
+- use a minimal design with restrained color cues
+- be concise and easy to scan on desktop and mobile email clients
+- surface the most important portfolio facts first
+- make holdings-level recommendations obvious
+- end with a short human-readable analysis of risks, opportunities, and improvements
 
-## Visual roadmap
+## Requested UX shape
 
-```text
-Phase Cleanup-1 (1A 1B 1C 1D 1E 1F 1G 1H)  [DONE]       ██████████
-Mailgun inbound infra                       [WAITING]    ██░░░░░░░░
-Control UI direct embedding                 [BLOCKED]    ██████░░░░
-FX cash reconciliation                      [PARKED]     ██░░░░░░░░
-IBKR market-data subscriptions              [WAITING]    ██░░░░░░░░
-```
+### 1) Header / overall summary
+Put the focus on:
+- invested money
+- current value in CHF
+- remaining cash
+- status
+- core recommendation
 
-Legend: `DONE` = closed phase; `WAITING` = blocked on external access or operator decision; `BLOCKED` = implementation surface unavailable; `PARKED` = intentionally not taken over.
+### 2) Holdings detail table
+Put the focus on:
+- value in CHF
+- avg. cost CHF
+- gain CHF
+- gain %
+- holding %
+- recommendation: HOLD / BUY / SELL
 
----
+### 3) Footer / short analysis
+Include a short, plain-language analysis covering:
+- what could be improved
+- main risks
+- main opportunities
 
-## How this file works
+## Non-goals
+- No large increase in reporting complexity
+- No dense control-center/operator diagnostics in the investor email body
+- No heavy visual treatment that breaks across major email clients
+- No dependence on JavaScript in email rendering
 
-- **One active phase at a time.** Detail lives in `plans/<phase>.md`. This file points at it.
-- **Backlog** lists what's queued, in priority order, with one-line scopes.
-- **Decisions needed** lists explicit operator/Graham calls that gate progress.
-- **Blocked / parked** lists work that exists but cannot move autonomously.
-- When a phase commits + pushes, mark it done here, then archive the plan file under `archive/phase-plans/`.
+## Design direction
 
----
+### Principles
+- Minimal, clean, investor-readable
+- Strong visual hierarchy
+- Color used sparingly and semantically only
+- Short labels, short paragraphs, short tables
+- Prefer clarity over completeness in the email itself
 
-## Active phase
+### Color system (email-safe)
+Use a restrained palette with inline-safe styling:
+- neutral dark text for default values
+- green for positive gains / positive status
+- red for losses / warnings requiring attention
+- amber for caution / watch items
+- muted gray for secondary context
 
-_None._
+Do not rely on color alone; always pair with labels/text.
 
-Next pickup will create a fresh `plans/<phase>.md` and lift one of the backlog items into "Active phase".
+### Layout hierarchy
+1. Portfolio header card
+2. Core recommendation strip
+3. Holdings table
+4. Footer analysis block
 
----
+## Proposed content model
 
-## Backlog (queued, ordered)
+### A. Header card
+Fields to display prominently:
+- Portfolio name
+- Current value (CHF) — largest number on page
+- Invested money (CHF)
+- Remaining cash (CHF)
+- Status (e.g. On track / Attention needed / Rebalance needed)
+- Core recommendation (single sentence)
 
-| # | Lane | One-liner | Source |
-| --- | --- | --- | --- |
-| B1 | Reporting | Decide monthly-report file policy: track `.md` only and ignore `.html/.json/.pdf`, or track all four. **Auto-decided 2026-06-01:** track `.md` only, ignore deterministic derivatives. Closed by Phase Cleanup-1A. | (closed) |
-| B2 | Cron | Configure announce delivery target (Telegram `chatId`) so periodic outputs reach the operator, or formalize file-only via Phase Cleanup-1F (already documented). | open / operator |
-| B3 | IBKR | Verify market-data subscriptions on U25624150 from IBKR client portal — see `docs/operations/ibkr-recovery.md` Step 6. | open / operator |
-| B4 | Reporting | Investor weekly overview wording polish — currently synthesized; may need real-CHF-totals checks against management summary. | future |
-| B5 | Tests | Wire the new `test-cron-delivery-posture.js`, `test-readiness-bounded-stages.js`, `test-holdings-sync-perf-and-avg-cost.js`, `test-dashboard-delta-truth.js`, `test-ibkr-recovery-runbook.js` regressions into the `safe-lane` runner if not already discovered automatically. | future |
+Optional small secondary line:
+- date/time of snapshot
+- daily or since-last-report delta only if it is clean and trusted
 
-When a backlog item is picked up, lift it into "Active phase" with a dedicated `plans/<phase>.md`.
+### B. Holdings table
+Columns:
+- Instrument
+- Value CHF
+- Avg. cost CHF
+- Gain CHF
+- Gain %
+- Holding %
+- Recommendation
 
----
+Column priorities:
+- Keep Value CHF and Recommendation visually strongest
+- Keep Gain CHF / Gain % compact but easy to compare
+- Recommendation should render as a compact pill or bold label:
+  - HOLD
+  - BUY
+  - SELL
 
-## Decisions needed from Graham
+Recommendation semantics (initial version)
+- HOLD: position is near desired size or no action preferred
+- BUY: under target and preferred next deployment candidate
+- SELL: above target or risk concentration meaningfully above tolerance
 
-1. **Cron delivery target (B2)** — configure a Telegram `chatId` for announce, or accept the documented file-only posture? File-only is healthy today; this is an opt-in upgrade.
-2. **IBKR market-data subscription (B3)** — please confirm subscriptions on U25624150 via the IBKR Client Portal; runbook step 6 has the navigation and an `ib_insync` cross-check. Once subscriptions are confirmed active, live submission can be re-enabled.
+If recommendation confidence is weak, default to HOLD instead of over-signaling.
 
----
+### C. Footer analysis block
+Short 3-part text block:
+- Improve: one or two concrete improvements
+- Risks: one or two main risks
+- Opportunities: one or two main opportunities
 
-## Blocked / parked
+Tone:
+- plain English
+- concise
+- no operator jargon
+- no raw system state unless it changes investment meaning
 
-| Item | State | Why |
-| --- | --- | --- |
-| Live order submission | BLOCKED | Quote posture `unknown`; pending Decision #2 above. |
-| Mailgun inbound | WAITING | Code READY (`lib/mailgunInbound.js`); needs infra route for `c3po@mailgun.swift.ch`. |
-| Control UI direct embedding | BLOCKED | Editable app surface unavailable. |
-| FX cash reconciliation | PARKED | Graham-owned WIP, untouched on purpose. |
+## Likely code surfaces
+Primary likely files/modules:
+- `src/reporting/dashboardGenerator.js`
+- `src/reporting/summaryArtifacts.js`
+- email HTML/text rendering paths referenced by:
+  - `scripts/test-email-html-rendering.js`
+  - `scripts/test-report-email-rendering.js`
+  - `scripts/test-trade-notification-email.js`
+- any report-cycle wrappers calling dashboard regeneration:
+  - `scripts/run-report-cycle.js`
+  - `scripts/regenerate-dashboard.js`
 
----
+Need to identify the exact investor email template/render function before implementation.
 
-## Recently completed (last 30 days, summary)
+## Delivery plan
 
-Detailed close-out notes live in `memory/YYYY-MM-DD.md`. Plan files for these phases are under `archive/phase-plans/`.
+### Phase 1 — discovery and contract map
+1. Trace the current investor email generation path end-to-end.
+2. Identify:
+   - source data contract
+   - HTML renderer
+   - text fallback renderer
+   - tests covering rendering
+3. Capture current output example(s) for before/after comparison.
 
-- **Phase Cleanup-1 (1A–1H)** — 2026-06-01. End-of-day issue roundup; eight autonomous sub-phases; all green and pushed. Notable wins: holdings sync 124 s → 36 s, dashboard now distinguishes degraded posture from timeout, dashboard deltas no longer lie under unknown posture, cron health verified, IBKR subscription runbook step 6 documented.
-- **Plan/doc consolidation** — 2026-06-01. 16 root plan/overview files + 57 plan files in `plans/` collapsed into `STATUS.md` + `CURRENT_PLAN.md` + one active `plans/<phase>.md`.
-- **Phase UX-1** — IBKR fast-status, recovery runbook, sync-after-recovery, session retention policy. `openclaw status` 14.2 s → 2.4 s.
-- **Phase IBKR-B1** — Native account discovery + sync unblock.
-- **Phase IBKR-B2** — Sync guard lock + false-zero protection + last-known-good preservation.
-- **Phase 2B** — Config truth + IBKR default centralization.
-- **Phase 4B** — Test governance and manifest truth.
-- **Phase 5B** — Artifact hygiene + supported script surface.
-- **Phase 7B** — Cron health + guided remediation truth.
+Verification:
+- list exact source files/functions
+- produce one current sample HTML/text artifact path or test evidence
 
----
+### Phase 2 — redesign spec
+1. Define the exact email section order.
+2. Define header fields and wording.
+3. Define holdings columns and formatting rules.
+4. Define recommendation rules and fallback behavior.
+5. Define footer analysis generation rules.
 
-## Working agreements
+Verification:
+- short written spec/diff from current layout
+- example mock content block in markdown or HTML snippet
 
-- **Test-first**, plan-first, review-first per `skills/superpowers-openclaw/SKILL.md`.
-- **Per phase:** plan committed first → tests added/updated → focused regressions → clean commit (no generated churn) → push.
-- **Generated churn excluded** from commits: `portfolio/*/dashboard.md`, `holdings.md`, `holdings-avg-cost.json`, `runtime/events/runtime-events.jsonl`, monthly/weekly/quarterly report `.html/.json/.pdf` quartet (Phase Cleanup-1A locked this).
-- **Never restart `openclaw` daemon** without explicit confirmation (kills active session).
-- **Live submission stays blocked** until quote posture clears (operator-gated).
+### Phase 3 — implementation
+1. Refactor the email HTML renderer to the new minimal layout.
+2. Refactor the plain-text fallback to mirror the same information hierarchy.
+3. Remove or demote operator-only noise from the investor email body.
+4. Add semantic recommendation rendering for each holding.
+5. Add short footer analysis synthesis.
+
+Verification:
+- direct file diff inspection
+- sample generated HTML/text output
+
+### Phase 4 — tests and rendering hardening
+Add/update tests for:
+- header prioritizes current value / invested money / cash / status / recommendation
+- holdings table includes required columns
+- recommendation labels render correctly
+- positive/negative styling is applied safely
+- footer analysis renders concise improve/risk/opportunity sections
+- plain-text fallback preserves the same hierarchy
+- mobile-width / narrow layout sanity where testable by markup inspection
+
+Verification:
+- targeted tests pass
+
+### Phase 5 — polish and rollout
+1. Tighten holding-level recommendation rules so row signals do not fight the portfolio-level cash/risk posture.
+2. Slim the holdings table styling for cleaner mobile/desktop email scanning.
+3. Generate a fresh report artifact from live portfolio data and inspect HTML/text output for wording conflicts.
+4. Adjust labels where totals differ (for example holdings value vs. total portfolio value including cash).
+
+Verification:
+- generated artifact inspection
+- targeted renderer tests still pass
+- live sample uses aligned labels and calmer recommendation signals
+
+## Recommendation logic (initial practical rules)
+Use a simple first-pass ruleset to avoid misleading signals:
+- BUY:
+  - under target weight by a meaningful margin
+  - and in approved next-deployment set
+  - and no block/risk override active
+- SELL:
+  - over target weight by a meaningful margin
+  - or concentration/risk rule triggered
+- HOLD:
+  - default when position is roughly on target, newly established, blocked from action, or confidence is mixed
+
+Important:
+- In investor email, recommendation should be investment-oriented, not operator-workflow-oriented.
+- Avoid showing transient execution workflow states as portfolio recommendations.
+
+## Copy examples
+
+### Header examples
+- Status: On track
+- Core recommendation: Hold current positions; rebuild cash before adding more AI exposure.
+
+Alternative when action exists:
+- Status: Rebalance watch
+- Core recommendation: Prioritize cash rebuilding and non-AI diversification with the next inflow.
+
+### Footer examples
+- Improve: Cash is below the preferred buffer; rebuild dry powder with the next contribution.
+- Risks: The portfolio is now more sensitive to US large-cap and AI-theme drawdowns.
+- Opportunities: Future additions can diversify the portfolio through Japan or broader non-AI sleeves.
+
+## Open questions to resolve in implementation
+- Where should recommendation logic live: dashboard generator vs summary artifact layer?
+- Should SELL ever appear in email without an explicit approved reduction plan?
+- Should the footer analysis be deterministic/rules-based or lightly templated from portfolio state?
+- Which current warnings belong in operator-only surfaces and must be excluded from investor email?
+
+## Suggested execution order
+1. Discovery
+2. Short redesign spec/mock
+3. HTML/text renderer change
+4. Tests
+5. Live artifact inspection
+
+## Verification gates
+Minimum gates before calling this done:
+- targeted email rendering tests pass
+- one generated live HTML artifact inspected
+- one plain-text artifact inspected
+- header contains the requested five focus fields
+- holdings section contains the requested six focus columns plus recommendation
+- footer includes improve / risks / opportunities
+
+## Success criteria
+The new email dashboard should let Graham understand, within ~10 seconds:
+- how much is invested
+- what the portfolio is worth now in CHF
+- how much cash remains
+- whether the portfolio is on track
+- what the main recommendation is
+- which holdings are winners/losers and what action is suggested
+- what the main risk/opportunity summary is
+
+## Nice-to-have follow-ups
+- compact badges for sleeve classification (core / thematic / cash)
+- small sparkline or mini-delta chip if email compatibility allows
+- optional “Why this recommendation?” note behind BUY/SELL labels in a secondary column or tooltip-free text fallback

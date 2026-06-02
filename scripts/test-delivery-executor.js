@@ -17,6 +17,40 @@ function seedPortfolio(repoRoot, deliveryPolicy) {
   fs.writeFileSync(path.join(portfolioDir, 'dashboard.md'), '# Dashboard\n');
   fs.writeFileSync(path.join(portfolioDir, 'summary.md'), '# Demo summary\n\nEverything looks good.\n');
   fs.writeFileSync(path.join(portfolioDir, 'summary.html'), '<h1>Demo summary</h1><p>Everything looks good.</p>');
+  fs.writeFileSync(path.join(portfolioDir, 'summary.json'), JSON.stringify({
+    holdings: {
+      totalValueChf: 5000,
+      investedChf: 1000,
+      cashChf: 4000,
+      holdingCount: 1,
+      latestSnapshotDate: '2026-05-15',
+    },
+    investorHoldings: {
+      rows: [
+        {
+          symbol: 'DEMO',
+          name: 'Demo ETF',
+          quantityHeld: 1,
+          valueChf: 1000,
+          averageBuyPrice: 950,
+          gainSincePurchaseChf: 50,
+          gainSincePurchasePct: 5,
+          allocationPct: 20,
+          targetPct: 25,
+          driftPct: -5,
+        },
+      ],
+      totals: {
+        rowCount: 1,
+        totalValueChf: 1000,
+        totalGainChf: 50,
+      },
+    },
+    status: {
+      health: 'healthy',
+    },
+    recommendedNextStep: 'Add gradually to DEMO with fresh cash while leaving the rest unchanged.',
+  }, null, 2));
   return portfolioDir;
 }
 
@@ -54,6 +88,8 @@ function seedPortfolio(repoRoot, deliveryPolicy) {
   assert(sentPayload, 'Expected stub send payload');
   assert(sentPayload.subject.includes('weekly overview'));
   assert(sentPayload.html.includes('investor overview'));
+  assert(sentPayload.text.includes('Core recommendation: Add gradually to DEMO with fresh cash while leaving the rest unchanged.'));
+  assert(!sentPayload.text.includes('needs_operator_attention'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {

@@ -33,6 +33,9 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
           ytdPct: 4.2,
           valueChf: 1050,
           gainSincePurchaseChf: 100,
+          allocationPct: 19.8,
+          targetPct: 20,
+          driftPct: -0.2,
           availability: { averageBuyPrice: 'available', gainSincePurchaseChf: 'available', ytd: 'available' },
         },
         {
@@ -46,6 +49,9 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
           ytdPct: null,
           valueChf: 980,
           gainSincePurchaseChf: null,
+          allocationPct: 4,
+          targetPct: 6,
+          driftPct: -2,
           availability: { averageBuyPrice: 'missing', gainSincePurchaseChf: 'missing', ytd: 'missing' },
         },
       ],
@@ -69,17 +75,21 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     nextAction: summary.recommendedNextStep,
   });
 
-  assert(html.includes('Held instruments'));
+  assert(html.includes('Holdings'));
   assert(html.includes('Vanguard Total World Stock ETF'));
   assert(html.includes('iShares Core SPI'));
-  assert(html.includes('Average buy price'));
-  assert(html.includes('Latest price'));
-  assert(html.includes('Gain since purchase'));
-  assert(html.includes('Next step to improve the portfolio'));
-  assert(html.includes('What matters now'));
-  assert(html.includes('Total held instruments'));
-  assert(html.includes('Cost basis unavailable'));
-  assert(html.includes('YTD unavailable'));
+  assert(html.includes('Value CHF'));
+  assert(html.includes('Avg. cost CHF'));
+  assert(html.includes('Gain CHF'));
+  assert(html.includes('Gain %'));
+  assert(html.includes('Holding %'));
+  assert(html.includes('Recommendation'));
+  assert(html.includes('Overall analysis'));
+  assert(html.includes('Improve:'));
+  assert(html.includes('Risks:'));
+  assert(html.includes('Opportunities:'));
+  assert(html.includes('HOLD'));
+  assert(html.includes('BUY'));
 
   const text = buildReportEmailText({
     portfolioName: 'etf',
@@ -91,13 +101,42 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     nextAction: summary.recommendedNextStep,
   });
 
-  assert(text.includes('Held instruments'));
+  assert(text.includes('Holdings'));
   assert(text.includes('VT — Vanguard Total World Stock ETF'));
-  assert(text.includes('Average buy price: CHF 190.00'));
-  assert(text.includes('Average buy price: unavailable'));
-  assert(text.includes('Next step to improve the portfolio'));
-  assert(text.includes('What matters now: Add gradually to the underweight global equity position while keeping some CHF cash in reserve.'));
-  assert(text.includes('Total held instruments: 2'));
+  assert(text.includes('Value CHF: CHF 1\'050.00'));
+  assert(text.includes('Avg. cost CHF: CHF 950.00'));
+  assert(text.includes('Avg. cost CHF: —'));
+  assert(text.includes('Core recommendation: Add gradually to CHSPI with fresh cash while leaving the rest unchanged.'));
+  assert(text.includes('Recommendation: HOLD'));
+  assert(text.includes('Recommendation: BUY'));
+  assert(text.includes('Holdings count: 2'));
+  assert(text.includes('Holdings value: CHF 12\'000.00'));
+
+  const lowCashSummary = {
+    ...summary,
+    holdings: {
+      ...summary.holdings,
+      cashChf: 150,
+    },
+    status: {
+      ...summary.status,
+      health: 'attention_needed',
+    },
+    recommendedNextStep: null,
+  };
+
+  const lowCashText = buildReportEmailText({
+    portfolioName: 'etf',
+    period: 'summary',
+    summaryMarkdown: '# Details',
+    summary: lowCashSummary,
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: null,
+    nextAction: null,
+  });
+
+  assert(lowCashText.includes('Core recommendation: Hold current positions; rebuild cash before adding more equity risk.'));
+  assert(!lowCashText.includes('Recommendation: BUY'));
 
   const sparseSummary = {
     holdings: {},
@@ -126,11 +165,11 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     nextAction: null,
   });
 
-  assert(sparseHtml.includes('etf has a fresh weekly report ready'));
-  assert(sparseHtml.includes('Held instruments data is not available in this sample yet.'));
+  assert(sparseHtml.includes('Current value'));
+  assert(sparseHtml.includes('Holdings data is not available yet.'));
   assert(!sparseHtml.includes('Supporting detail'));
-  assert(sparseText.includes('etf has a fresh weekly report ready'));
-  assert(sparseText.includes('Held instruments data is not available in this sample yet.'));
+  assert(sparseText.includes('Current value: —'));
+  assert(sparseText.includes('Holdings data is not available yet.'));
   assert(!sparseText.includes('Supporting detail'));
   assert(!sparseText.includes('Should not render in investor email'));
 
@@ -196,8 +235,9 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
   assert(generatedHtml.includes('22&#39;209.48'));
   assert(generatedHtml.includes('SXR8'));
   assert(generatedHtml.includes('EMUAA'));
-  assert(generatedText.includes("etf is worth CHF 22'209.48"));
-  assert(generatedText.includes('Total held instruments: 3'));
+  assert(generatedText.includes("Current value: CHF 22'209.48"));
+  assert(generatedText.includes('Holdings count: 3'));
+  assert(generatedText.includes('Holdings value: CHF 22\'209.48'));
   assert(generatedText.includes('SXR8'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));

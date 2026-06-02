@@ -470,7 +470,6 @@ async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, ho
   const portfolioText = fs.existsSync(portfolioPath) ? fs.readFileSync(portfolioPath, 'utf8') : '';
   const depositedCapitalChf = parsePortfolioDepositedCapital(portfolioText);
   const holdingCount = countHoldingRows(holdingsText);
-  const investorHoldings = buildInvestorHoldingsSnapshot({ holdingsText, historyRows: historySeries, approvedInstruments });
   // Cost-basis enrichment (P2: profit/loss rework).
   // Source hybrid: trades.md filled-buy legs (incl. "Execution reconciliation:
   // broker status Filled" notes embedded in inactive rows) -> IBKR AvgCost fallback.
@@ -492,6 +491,13 @@ async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, ho
     tradesText: tradesTextForCostBasis,
     approvedInstruments,
     avgCostByKey,
+  });
+  const investorHoldings = buildInvestorHoldingsSnapshot({
+    holdingsText,
+    historyRows: historySeries,
+    approvedInstruments,
+    profitLossRows: profitLoss.rows,
+    totalValueChf: totalValue,
   });
   const blockers = safetyDiagnostics?.blockers || [];
   const tradeStateSummary = summarizeTradeStateRows(tradesPath);

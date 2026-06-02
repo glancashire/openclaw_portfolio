@@ -43,36 +43,32 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   });
 
   assert(reportHtml.includes('OpenClaw Portfolio Report'));
-  assert(reportHtml.includes('Management summary'));
-  assert(reportHtml.includes('Investor take'));
-  assert(reportHtml.includes('Portfolio value'));
-  assert(reportHtml.includes('Gain since purchase'));
-  assert(reportHtml.includes('max-width:720px'));
-  assert(reportHtml.includes('display:inline-block;vertical-align:top;width:calc(50% - 10px)'));
+  assert(reportHtml.includes('Minimal portfolio snapshot with the key numbers, recommendations, and risks first.'));
+  assert(reportHtml.includes('Current value'));
+  assert(reportHtml.includes('Invested money'));
+  assert(reportHtml.includes('Remaining cash'));
+  assert(reportHtml.includes('Core recommendation'));
+  assert(reportHtml.includes('Holdings'));
+  assert(reportHtml.includes('Overall analysis'));
+  assert(reportHtml.includes('Improve:'));
+  assert(reportHtml.includes('Risks:'));
+  assert(reportHtml.includes('Opportunities:'));
   assert(reportHtml.includes('linear-gradient(135deg'));
   assert(reportHtml.includes('CHF 5&#39;327.03') || reportHtml.includes('CHF 5,327.03'));
-  assert(reportHtml.includes('Cost basis unavailable'));
-  assert(!reportHtml.includes('+2.2%'));
-  assert(reportHtml.includes('Immediate priorities'));
-  assert(reportHtml.includes('What matters now'));
-  assert(reportHtml.includes('Status snapshot'));
-  assert(reportHtml.includes('Workflow items'));
   assert(!reportHtml.includes('Supporting detail'));
   assert(!reportHtml.includes('report-email-summary'));
   assert(reportHtml.includes('Restore broker connectivity first.'));
-  assert(reportHtml.includes('[broker_unready] Broker connectivity is degraded.'));
-  assert(reportHtml.includes('1 delivery item needs review'));
-  assert(!reportHtml.includes('No active blocker is currently surfaced.'));
-  assert(reportHtml.includes('Management summary'));
+  assert(reportHtml.includes('Attention needed'));
 
-  assert(reportText.includes('Management summary'));
-  assert(reportText.includes('Headline metrics'));
-  assert(reportText.includes('Portfolio value (CHF): CHF'));
-  assert(reportText.includes('Gain since purchase (CHF): —'));
-  assert(reportText.includes('Gain since purchase (%): —'));
-  assert(reportText.includes('Top blocker: [broker_unready] Broker connectivity is degraded.'));
-  assert(reportText.includes('What matters now: Restore broker connectivity first.'));
-  assert(reportText.includes('Next action: Restore broker connectivity first.'));
+  assert(reportText.includes('Current value: CHF'));
+  assert(reportText.includes('Invested money: CHF'));
+  assert(reportText.includes('Remaining cash: CHF'));
+  assert(reportText.includes('Status: Attention needed'));
+  assert(reportText.includes('Core recommendation: Restore broker connectivity first.'));
+  assert(reportText.includes('Holdings'));
+  assert(reportText.includes('Improve'));
+  assert(reportText.includes('Risks'));
+  assert(reportText.includes('Opportunities'));
   assert(!reportText.includes('Supporting detail'));
 
   const tradeInput = {
