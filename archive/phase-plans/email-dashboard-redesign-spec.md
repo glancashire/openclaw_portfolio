@@ -1,7 +1,7 @@
 # Email Dashboard Redesign Spec
 
 Date: 2026-06-02 08:21 UTC
-Status: draft-ready
+Status: complete (shipped 2026-06-02)
 Related plan: `CURRENT_PLAN.md`
 
 ## Objective

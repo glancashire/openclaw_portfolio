@@ -1,7 +1,8 @@
 # Phase T1 — Plan/Status Truth Closeout
 
 Date: 2026-06-02
-Status: planned
+Status: complete
+Completed: 2026-06-02
 
 ## Objectives
 - Restore `CURRENT_PLAN.md` as the actual living plan/control file used by repo surfaces.
