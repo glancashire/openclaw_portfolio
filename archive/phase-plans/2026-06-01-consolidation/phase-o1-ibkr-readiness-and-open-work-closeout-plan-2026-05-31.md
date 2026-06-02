@@ -1,7 +1,7 @@
 # Phase O1 — IBKR readiness and open-work closeout plan
 
-Status: active  
-Last updated: 2026-05-31 UTC
+Status: complete  
+Completed: 2026-06-01 UTC
 
 ## Objectives
 - Tighten operator-visible IBKR readiness classification so hidden login / 2FA / socket states are surfaced more explicitly.

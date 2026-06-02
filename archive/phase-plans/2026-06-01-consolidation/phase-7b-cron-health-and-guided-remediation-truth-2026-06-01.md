@@ -1,7 +1,7 @@
 # Phase 7B — Cron health and guided remediation truth
 
-Status: active  
-Last updated: 2026-06-01 UTC
+Status: complete  
+Completed: 2026-06-01 UTC
 
 ## Objectives
 - Make cron-health surfaces truthful even when gateway cron inspection fails or returns partial data.

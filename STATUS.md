@@ -4,9 +4,8 @@
 > **Live planning lives in `CURRENT_PLAN.md`.** Spec lives in `SPECIFICATION.md`.
 > Everything historical is under `archive/phase-plans/`.
 
-**Last refreshed:** 2026-06-01 22:55 UTC
-**OpenClaw:** 2026.5.28 (e932160)
-**Repo head:** `d976da8` — phase cleanup-1h: ibkr quote-posture investigation runbook (operator-gated)
+**Last refreshed:** 2026-06-02 15:45 UTC
+**Repo head:** current `master` (see `git log -1 --oneline` for exact head)
 
 ---
 
@@ -76,7 +75,8 @@
 | Long-term memory | `MEMORY.md`, `memory/YYYY-MM-DD.md` |
 | Spec | `SPECIFICATION.md` |
 | Live plan | `CURRENT_PLAN.md` |
-| Active phase plan | `plans/phase-cleanup-1-end-of-day-issue-roundup-2026-06-01.md` |
+| Active phase plan | none — see `CURRENT_PLAN.md` backlog view |
+
 | Operational runbooks | `docs/operations/*.md` |
 | Setup guides | `docs/setup/*.md` |
 | History | `archive/phase-plans/**` |

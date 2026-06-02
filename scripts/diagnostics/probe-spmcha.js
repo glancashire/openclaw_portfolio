@@ -4,7 +4,7 @@
 /* SPMCHA diagnostic probe — runs through the same native client the runner uses. */
 
 const path = require('path');
-const { InteractiveBrokersClient } = require(path.join(__dirname, '..', 'src/brokers/interactive-brokers/client'));
+const { InteractiveBrokersClient } = require(path.join(__dirname, '..', '..', 'src/brokers/interactive-brokers/client'));
 
 (async () => {
   const client = new InteractiveBrokersClient({ portfolio: 'etf' });

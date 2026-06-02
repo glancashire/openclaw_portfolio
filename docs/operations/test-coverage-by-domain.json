@@ -1,10 +1,10 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-01T07:59:14.990Z",
+  "generatedAt": "2026-06-02T15:58:40.408Z",
   "counts": {
-    "totalTests": 296,
-    "domains": 109
+    "totalTests": 310,
+    "domains": 113
   },
   "domains": [
     {
@@ -20,6 +20,36 @@
         "scripts/test-basket-approval-envelope.js",
         "scripts/test-basket-execution-runner.js",
         "scripts/test-basket-lifecycle.js"
+      ]
+    },
+    {
+      "domain": "dashboard",
+      "total": 13,
+      "safe": 8,
+      "integration": 5,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 3,
+      "examples": [
+        "scripts/test-dashboard-best-next-step-priority.js",
+        "scripts/test-dashboard-command-center.js",
+        "scripts/test-dashboard-delivery-backfill-dedup.js"
+      ]
+    },
+    {
+      "domain": "ibkr",
+      "total": 13,
+      "safe": 11,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-ibkr-accounting-preserve-last-good.js",
+        "scripts/test-ibkr-cli-tzdata-hardening.js",
+        "scripts/test-ibkr-config-defaults-native.js"
       ]
     },
     {
@@ -50,21 +80,6 @@
         "scripts/test-trade-blocking-safety-hardening.js",
         "scripts/test-trade-cli-surface.js",
         "scripts/test-trade-cli-venue-aware-market-message.js"
-      ]
-    },
-    {
-      "domain": "dashboard",
-      "total": 12,
-      "safe": 7,
-      "integration": 5,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 3,
-      "examples": [
-        "scripts/test-dashboard-best-next-step-priority.js",
-        "scripts/test-dashboard-command-center.js",
-        "scripts/test-dashboard-delivery-backfill-dedup.js"
       ]
     },
     {
@@ -110,21 +125,6 @@
         "scripts/test-live-order-guard.js",
         "scripts/test-live-preflight-diagnostic-artifact.js",
         "scripts/test-live-preflight-no-hardcoded-ebs-market-window.js"
-      ]
-    },
-    {
-      "domain": "ibkr",
-      "total": 8,
-      "safe": 7,
-      "integration": 1,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-ibkr-cli-tzdata-hardening.js",
-        "scripts/test-ibkr-config-defaults-native.js",
-        "scripts/test-ibkr-config-helpers.js"
       ]
     },
     {
@@ -233,6 +233,21 @@
       ]
     },
     {
+      "domain": "cron",
+      "total": 5,
+      "safe": 4,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-cron-delivery-posture.js",
+        "scripts/test-cron-health-fetch-status.js",
+        "scripts/test-cron-job-policy.js"
+      ]
+    },
+    {
       "domain": "email",
       "total": 5,
       "safe": 2,
@@ -245,6 +260,21 @@
         "scripts/test-email-dedup.js",
         "scripts/test-email-delivery-policy.js",
         "scripts/test-email-html-rendering.js"
+      ]
+    },
+    {
+      "domain": "holdings",
+      "total": 5,
+      "safe": 5,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-holdings-approved-instrument-mapping.js",
+        "scripts/test-holdings-fx-reconciliation.js",
+        "scripts/test-holdings-snapshot-matching.js"
       ]
     },
     {
@@ -275,21 +305,6 @@
         "scripts/test-runtime-broker-error-state.js",
         "scripts/test-runtime-cleanup.js",
         "scripts/test-runtime-ephemeral-policy.js"
-      ]
-    },
-    {
-      "domain": "holdings",
-      "total": 4,
-      "safe": 4,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-holdings-approved-instrument-mapping.js",
-        "scripts/test-holdings-fx-reconciliation.js",
-        "scripts/test-holdings-snapshot-matching.js"
       ]
     },
     {
@@ -440,21 +455,6 @@
         "scripts/test-contract-cache.js",
         "scripts/test-contract-intelligence-observability.js",
         "scripts/test-contract-intelligence.js"
-      ]
-    },
-    {
-      "domain": "cron",
-      "total": 3,
-      "safe": 3,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 2,
-      "examples": [
-        "scripts/test-cron-job-policy.js",
-        "scripts/test-cron-jobs-cache.js",
-        "scripts/test-cron-non-docker-defaults.js"
       ]
     },
     {
@@ -642,6 +642,20 @@
       "examples": [
         "scripts/test-quote-quality-classifier.js",
         "scripts/test-quote-resolution.js"
+      ]
+    },
+    {
+      "domain": "readiness",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-readiness-bounded-stages.js",
+        "scripts/test-readiness-surface-integration.js"
       ]
     },
     {
@@ -978,6 +992,32 @@
       ]
     },
     {
+      "domain": "gitignore",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-gitignore-policy.js"
+      ]
+    },
+    {
+      "domain": "guided",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-guided-remediation-wording.js"
+      ]
+    },
+    {
       "domain": "inactive",
       "total": 1,
       "safe": 1,
@@ -1134,6 +1174,19 @@
       ]
     },
     {
+      "domain": "plan",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-plan-doc-truth.js"
+      ]
+    },
+    {
       "domain": "portfolioexecution",
       "total": 1,
       "safe": 1,
@@ -1186,19 +1239,6 @@
       ]
     },
     {
-      "domain": "readiness",
-      "total": 1,
-      "safe": 1,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-readiness-surface-integration.js"
-      ]
-    },
-    {
       "domain": "rebalance",
       "total": 1,
       "safe": 0,
@@ -1222,6 +1262,19 @@
       "inVerifyRepoChecks": 1,
       "examples": [
         "scripts/test-recovery-ladder.js"
+      ]
+    },
+    {
+      "domain": "regenerate",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-regenerate-dashboard-cli.js"
       ]
     },
     {

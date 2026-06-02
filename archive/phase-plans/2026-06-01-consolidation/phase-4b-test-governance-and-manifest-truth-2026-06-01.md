@@ -1,7 +1,7 @@
 # Phase 4B — test governance and manifest truth
 
-Status: active  
-Last updated: 2026-06-01 UTC
+Status: complete  
+Completed: 2026-06-01 UTC
 
 ## Objectives
 - Finish the existing discovered-test infrastructure by making governance and quarantine policy explicit, versioned, and easy to audit.

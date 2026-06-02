@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 296,
-    "safe": 228,
-    "integration": 63,
+    "total": 310,
+    "safe": 238,
+    "integration": 67,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 51,
@@ -376,6 +376,20 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-cron-delivery-posture.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-cron-health-fetch-status.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-cron-job-policy.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -419,6 +433,13 @@
     },
     {
       "path": "scripts/test-dashboard-delivery-backfill-dedup.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-dashboard-delta-truth.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -699,6 +720,20 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-gitignore-policy.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-guided-remediation-wording.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-health-check-cli.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
@@ -784,6 +819,20 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-holdings-sync-perf-and-avg-cost.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-accounting-preserve-last-good.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-ibkr-cli-tzdata-hardening.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -799,6 +848,13 @@
     },
     {
       "path": "scripts/test-ibkr-config-helpers.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-holdings-preserve-last-good.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -826,7 +882,28 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-ibkr-native-managed-accounts.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-recovery-runbook.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-ibkr-skill-client-config-load.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-sync-guard.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -1337,6 +1414,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-plan-doc-truth.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-portfolio-creation-hardening.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -1436,6 +1520,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-readiness-bounded-stages.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-readiness-surface-integration.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -1468,6 +1559,13 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": true,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-regenerate-dashboard-cli.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
       "quarantined": false
     },
     {

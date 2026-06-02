@@ -2,7 +2,8 @@
 
 Date: 2026-06-02
 Scope: Trade/fill confirmation email (`BUY/SELL ... filled`) sent after live executions
-Status: planned
+Status: complete
+Completed: 2026-06-02
 
 ## Goal
 Make the fill-confirmation email investor-usable:

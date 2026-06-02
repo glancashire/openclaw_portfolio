@@ -56,6 +56,7 @@ workspace. Updated 2026-05-25 (Phase S4).
 
 | Path | When to read it |
 |---|---|
+| `docs/test-governance.md` | Human-facing entry point for test lanes, manifest, and quarantine policy |
 | `docs/operations/cron.md` | Adding, editing, or debugging cron jobs |
 | `docs/operations/active-cron-jobs.md` | Snapshot of what's scheduled right now |
 | `docs/operations/active-cron-jobs.json` | Machine-readable mirror used by `test-cron-job-policy.js` |

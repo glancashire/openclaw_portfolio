@@ -1,49 +1,33 @@
 # Current Plan
 
 Date: 2026-06-02
-Status: started
+Status: waiting
 
 ## Goal
-Close the remaining plan/doc truth drift so repo-facing control files reflect the work that has already shipped.
+There is no active in-repo implementation phase right now. The remaining work is operator-gated or external, plus periodic truth maintenance when the repo drifts.
 
 ## Visual roadmap
 
 ```text
-Phase T1 plan/status truth closeout   [STARTED]   ██░░░░░░░░
+Operator-gated backlog and periodic truth maintenance   [WAITING]   ██░░░░░░░░
 ```
 
 ---
 
-## Phase T1 — Plan/status truth closeout
-**Status:** STARTED
+## Operator-gated backlog and periodic truth maintenance
+**Status:** WAITING
 
-### Objectives
-- restore `CURRENT_PLAN.md` as the real living plan/control file
-- add the missing human-facing test governance entry point
-- mark stale `active` / `planned` phase docs complete or superseded where the repo already satisfies them
-- add regression coverage for the doc/control-file truth surfaces
+### Already closed in repo
+- [x] Investor dashboard email redesign shipped and verified
+- [x] Fill HTML mail hardening shipped and verified
+- [x] Phase/doc truth drift reconciled
 
-### Risks / dependencies
-- `CURRENT_PLAN.md` is parsed by `src/reporting/openPhasesCard.js`
-- adding a new `scripts/test-*.js` file will require manifest regeneration
-- the repo is dirty with generated artifacts, so staging must stay narrow
+### Still open
+- [ ] Resolve IBKR quote-posture degradation when subscription or data-farm state is broken on the broker side
+- [ ] Complete Mailgun inbound routing/config outside the repo
+- [ ] Re-run periodic plan/doc truth maintenance when new phases land
 
-### Checklist
-- [x] Audit current phase/doc truth against shipped repo state
-- [ ] Add `docs/test-governance.md`
-- [ ] Add regression coverage for governance/current-plan truth
-- [ ] Regenerate manifest/domain-summary artifacts if needed
-- [ ] Mark stale active/planned phase docs complete or superseded
-- [ ] Run focused tests
-- [ ] Run safe-lane verification
-- [ ] Commit and push completed closeout
+### Notes
+- In-repo verification is green; external/operator-gated items remain intentionally outside autonomous implementation.
+- Detailed historical plans live under `archive/phase-plans/`.
 
-### Acceptance criteria
-- `CURRENT_PLAN.md` is parseable and truthful again
-- governance docs point to the real lane/policy/manifest sources
-- stale active/planned phase docs are reconciled with shipped reality
-- focused tests and the safe lane pass
-
-## Backlog / external-only items
-- IBKR quote posture remains operator-gated when subscriptions/data-farm state is degraded.
-- Mailgun inbound remains external-service work, not an in-repo closeout item.

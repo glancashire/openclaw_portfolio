@@ -4,7 +4,7 @@
 /* SPMCHA quote retry — try multiple market-data tactics. */
 
 const path = require('path');
-const ROOT = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..', '..');
 const { InteractiveBrokersClient } = require(path.join(ROOT, 'src/brokers/interactive-brokers/client'));
 
 (async () => {
