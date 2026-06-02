@@ -82,7 +82,7 @@ const {
     approvedInstruments: [{ tickerOrIsin: 'IE00B5BMR087', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', ibkrConid: '75776072', ibkrLocalSymbol: 'SXR8', ibkrSymbol: 'SXR8' }],
     historyRows: [],
   });
-  assert.strictEqual(mappedSnapshot.rows[0].symbol, 'IE00B5BMR087');
+  assert.strictEqual(mappedSnapshot.rows[0].symbol, 'SXR8');
   assert.strictEqual(mappedSnapshot.rows[0].name, 'iShares Core S&P 500 UCITS ETF USD (Acc)');
 
   const filledTrade = normalizeFilledTrade({
