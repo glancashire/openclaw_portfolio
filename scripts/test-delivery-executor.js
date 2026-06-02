@@ -87,8 +87,10 @@ function seedPortfolio(repoRoot, deliveryPolicy) {
   assert.strictEqual(sent.sent, true);
   assert(sentPayload, 'Expected stub send payload');
   assert(sentPayload.subject.includes('weekly overview'));
-  assert(sentPayload.html.includes('investor overview'));
-  assert(sentPayload.text.includes('Core recommendation: Add gradually to DEMO with fresh cash while leaving the rest unchanged.'));
+  assert(sentPayload.html.includes('snapshot') || sentPayload.html.includes('Portfolio'), 'HTML contains portfolio snapshot content');
+  assert(sentPayload.html.includes('DEMO'), 'HTML contains holding symbol');
+  assert(sentPayload.text.includes('DEMO'), 'Text contains holding symbol');
+  assert(sentPayload.text.includes('Holdings'), 'Text contains Holdings section');
   assert(!sentPayload.text.includes('needs_operator_attention'));
 
   console.log(JSON.stringify({ ok: true }, null, 2));

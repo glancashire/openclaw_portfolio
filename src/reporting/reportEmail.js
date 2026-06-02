@@ -334,85 +334,163 @@ function buildFooterAnalysis(summary = null, nextAction = null) {
 }
 
 function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary = null, deliveryStatus = null, topBlocker = null, nextAction = null }) {
-  const header = buildHeaderSummary(summary, deliveryStatus, topBlocker, nextAction);
-  const footer = buildFooterAnalysis(summary, nextAction);
-  return [
-    `${portfolioName} ${period} investor overview`,
+  const metrics = buildInvestorMetrics(summary);
+  const profitLoss = summary?.profitLoss?.totals || {};
+  const rows = investorHoldingRows(summary);
+  const investedChf = Number.isFinite(metrics.investedChf) ? metrics.investedChf : null;
+
+  const lines = [
+    `${portfolioName} ${period} portfolio snapshot`,
     '',
-    `Current value: ${header.currentValue}`,
-    `Invested money: ${header.investedMoney}`,
-    `Remaining cash: ${header.remainingCash}`,
-    `Status: ${header.statusLabel}`,
-    `Core recommendation: ${header.coreRecommendation}`,
-    header.snapshotLabel ? `Snapshot: ${header.snapshotLabel}` : null,
+    'Portfolio Value',
+    `Total value: ${formatCurrency(metrics.totalValueChf, 'CHF')}`,
+    `Cash: ${formatCurrency(metrics.cashChf, 'CHF')}`,
+    `Invested: ${formatCurrency(metrics.investedChf, 'CHF')}`,
     '',
-    buildInvestorHoldingsText(summary),
+    'Profit / Loss',
+    `Unrealized profit: ${profitLoss.totalProfitChf == null ? '\u2014' : formatSignedCurrency(profitLoss.totalProfitChf, 'CHF')}`,
+    `Unrealized profit %: ${profitLoss.totalProfitPct == null && metrics.sincePurchasePct == null ? '\u2014' : formatPercent(profitLoss.totalProfitPct ?? metrics.sincePurchasePct)}`,
     '',
-    'Improve',
-    `${footer.improve}`,
-    'Risks',
-    `${footer.risks}`,
-    'Opportunities',
-    `${footer.opportunities}`,
-  ].filter(Boolean).join('\n');
+    'Holdings',
+  ];
+
+  if (!rows.length) {
+    lines.push('No holdings data available.');
+  } else {
+    lines.push('Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Weight %');
+    lines.push('---|---|---|---|---|---');
+    let totalValue = 0;
+    let totalCost = 0;
+    let totalProfit = 0;
+    for (const row of rows) {
+      const costBasis = holdingCostBasisChf(row);
+      const gainChf = Number(row.gainSincePurchaseChf);
+      const gainPct = Number(row.gainSincePurchasePct);
+      const valueChf = Number(row.valueChf || 0);
+      const weight = investedChf && investedChf > 0 ? Number(((valueChf / investedChf) * 100).toFixed(1)) : null;
+      totalValue += valueChf;
+      if (Number.isFinite(costBasis)) totalCost += costBasis;
+      if (Number.isFinite(gainChf)) totalProfit += gainChf;
+      lines.push(`${row.symbol || '\u2014'} | ${formatCurrency(row.valueChf, 'CHF')} | ${costBasis == null ? '\u2014' : formatCurrency(costBasis, 'CHF')} | ${!Number.isFinite(gainChf) ? '\u2014' : formatSignedCurrency(gainChf, 'CHF')} | ${!Number.isFinite(gainPct) ? '\u2014' : formatPercent(gainPct)} | ${weight == null ? '\u2014' : `${weight}%`}`);
+    }
+    const totalProfitPct = totalCost > 0 ? Number(((totalProfit / totalCost) * 100).toFixed(1)) : null;
+    lines.push(`TOTAL | ${formatCurrency(totalValue, 'CHF')} | ${formatCurrency(totalCost, 'CHF')} | ${formatSignedCurrency(totalProfit, 'CHF')} | ${totalProfitPct == null ? '\u2014' : formatPercent(totalProfitPct)} | 100%`);
+  }
+
+  lines.push('');
+  lines.push(`Generated ${new Date().toISOString().slice(0, 16)} UTC`);
+  lines.push('Automated portfolio snapshot — OpenClaw Portfolio Manager');
+  return lines.join('\n');
 }
 
 function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = null, deliveryStatus = null, topBlocker = null, nextAction = null }) {
-  const header = buildHeaderSummary(summary, deliveryStatus, topBlocker, nextAction);
-  const footer = buildFooterAnalysis(summary, nextAction);
+  const metrics = buildInvestorMetrics(summary);
+  const profitLoss = summary?.profitLoss?.totals || {};
+  const rows = investorHoldingRows(summary);
+  const investedChf = Number.isFinite(metrics.investedChf) ? metrics.investedChf : null;
+  const profitChf = profitLoss.totalProfitChf ?? metrics.sincePurchaseChf;
+  const profitPct = profitLoss.totalProfitPct ?? metrics.sincePurchasePct;
+  const profitPositive = Number(profitChf) >= 0;
 
-  const summaryCard = card({
-    tone: 'surface',
-    contentHtml: `
-      <div style="font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;margin-bottom:8px;">${escapeHtml(portfolioName)} portfolio</div>
-      <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;margin-bottom:4px;">Current value</div>
-      <div style="font-size:34px;line-height:1.1;color:#0f172a;font-weight:800;margin-bottom:10px;">${escapeHtml(header.currentValue)}</div>
-      <div style="font-size:0;margin-bottom:10px;">
-        <div style="display:inline-block;vertical-align:top;width:50%;min-width:220px;box-sizing:border-box;padding-right:8px;">
-          <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;">Invested money</div>
-          <div style="font-size:18px;font-weight:800;color:#0f172a;">${escapeHtml(header.investedMoney)}</div>
-        </div>
-        <div style="display:inline-block;vertical-align:top;width:50%;min-width:220px;box-sizing:border-box;padding-left:8px;">
-          <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;">Remaining cash</div>
-          <div style="font-size:18px;font-weight:800;color:#0f172a;">${escapeHtml(header.remainingCash)}</div>
-        </div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">${badge({ label: header.statusLabel, tone: header.statusTone })}${header.snapshotLabel ? `<span style="font-size:12px;color:#64748b;">${escapeHtml(header.snapshotLabel)}</span>` : ''}</div>
-    `,
-  });
+  // Hero card — portfolio value snapshot
+  const heroCard = `
+    <div style="margin:0 0 16px;padding:28px 24px 24px;background:linear-gradient(135deg, #1e293b 0%, #334155 100%);border-radius:16px;color:#f1f5f9;">
+      <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.7;font-weight:700;margin-bottom:6px;">Total portfolio value</div>
+      <div style="font-size:38px;line-height:1.1;font-weight:800;color:#ffffff;margin-bottom:16px;">${escapeHtml(formatCurrency(metrics.totalValueChf, 'CHF'))}</div>
+      <table role="presentation" style="width:100%;border-collapse:collapse;"><tr>
+        <td style="padding:0 16px 0 0;vertical-align:top;">
+          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;opacity:0.65;font-weight:700;margin-bottom:4px;">Cash</div>
+          <div style="font-size:20px;font-weight:800;color:#ffffff;">${escapeHtml(formatCurrency(metrics.cashChf, 'CHF'))}</div>
+        </td>
+        <td style="padding:0;vertical-align:top;">
+          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;opacity:0.65;font-weight:700;margin-bottom:4px;">Invested</div>
+          <div style="font-size:20px;font-weight:800;color:#ffffff;">${escapeHtml(formatCurrency(metrics.investedChf, 'CHF'))}</div>
+        </td>
+      </tr></table>
+    </div>`;
 
-  const recommendationCard = card({
-    tone: 'info',
-    contentHtml: `
-      <div style="font-size:11px;color:#1d4ed8;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;margin-bottom:6px;">Core recommendation</div>
-      <div style="font-size:17px;line-height:1.55;color:#0f172a;font-weight:700;">${escapeHtml(header.coreRecommendation)}</div>
-    `,
-  });
+  // Profit/loss strip
+  const profitStripBg = profitPositive ? '#f0fdf4' : '#fef2f2';
+  const profitStripBorder = profitPositive ? '#86efac' : '#fecaca';
+  const profitStripColor = profitPositive ? '#166534' : '#991b1b';
+  const profitStrip = `
+    <div style="margin:0 0 16px;padding:18px 22px;background:${profitStripBg};border:1px solid ${profitStripBorder};border-radius:14px;">
+      <table role="presentation" style="width:100%;border-collapse:collapse;"><tr>
+        <td style="padding:0;vertical-align:middle;">
+          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:${profitStripColor};font-weight:700;margin-bottom:4px;">Unrealized Profit / Loss</div>
+          <div style="font-size:26px;font-weight:800;color:${profitStripColor};line-height:1.15;">${escapeHtml(profitChf == null ? '\u2014' : formatSignedCurrency(profitChf, 'CHF'))}</div>
+        </td>
+        <td style="padding:0;vertical-align:middle;text-align:right;">
+          <div style="font-size:26px;font-weight:800;color:${profitStripColor};line-height:1.15;">${escapeHtml(profitPct == null ? '' : formatPercent(profitPct))}</div>
+        </td>
+      </tr></table>
+    </div>`;
 
-  const holdingsCard = card({
-    title: 'Holdings',
-    contentHtml: buildInvestorHoldingsTable(summary),
-  });
+  // Holdings table
+  let holdingsTable;
+  if (!rows.length) {
+    holdingsTable = '<div style="padding:14px 15px;background:#ffffff;border:1px solid #dbe4f0;border-radius:14px;color:#475569;line-height:1.6;">No holdings data available.</div>';
+  } else {
+    const headerRow = `<tr style="background:#f8fafc;">
+      <th style="padding:12px 10px 10px 0;text-align:left;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Instrument</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Value CHF</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Cost basis CHF</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Profit CHF</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Profit %</th>
+      <th style="padding:12px 0 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Weight %</th>
+    </tr>`;
 
-  const analysisCard = card({
-    title: 'Overall analysis',
-    tone: 'surface',
-    contentHtml: `
-      <div style="font-size:14px;line-height:1.7;color:#0f172a;">
-        <div style="margin-bottom:8px;"><strong>Improve:</strong> ${escapeHtml(footer.improve)}</div>
-        <div style="margin-bottom:8px;"><strong>Risks:</strong> ${escapeHtml(footer.risks)}</div>
-        <div><strong>Opportunities:</strong> ${escapeHtml(footer.opportunities)}</div>
-      </div>
-    `,
-  });
+    let totalValue = 0;
+    let totalCost = 0;
+    let totalProfit = 0;
+    const bodyRows = rows.map((row, index) => {
+      const costBasis = holdingCostBasisChf(row);
+      const gainChf = Number(row.gainSincePurchaseChf);
+      const gainPct = Number(row.gainSincePurchasePct);
+      const valueChf = Number(row.valueChf || 0);
+      const weight = investedChf && investedChf > 0 ? Number(((valueChf / investedChf) * 100).toFixed(1)) : null;
+      const gainColor = gainChf > 0 || gainPct > 0 ? '#166534' : gainChf < 0 || gainPct < 0 ? '#991b1b' : '#334155';
+      const rowBg = index % 2 === 1 ? '#f8fafc' : '#ffffff';
+      totalValue += valueChf;
+      if (Number.isFinite(costBasis)) totalCost += costBasis;
+      if (Number.isFinite(gainChf)) totalProfit += gainChf;
+      return `<tr style="background:${rowBg};">
+        <td style="padding:11px 10px 11px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+          <div style="font-size:13px;font-weight:700;color:#0f172a;">${escapeHtml(row.symbol || '\u2014')}</div>
+          <div style="margin-top:2px;font-size:11px;line-height:1.4;color:#64748b;">${escapeHtml(row.name || '')}</div>
+        </td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:#0f172a;white-space:nowrap;">${escapeHtml(formatCurrency(row.valueChf, 'CHF'))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#475569;white-space:nowrap;">${escapeHtml(costBasis == null ? '\u2014' : formatCurrency(costBasis, 'CHF'))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:${gainColor};white-space:nowrap;">${escapeHtml(!Number.isFinite(gainChf) ? '\u2014' : formatSignedCurrency(gainChf, 'CHF'))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:${gainColor};white-space:nowrap;">${escapeHtml(!Number.isFinite(gainPct) ? '\u2014' : formatPercent(gainPct))}</td>
+        <td style="padding:11px 0 11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#0f172a;white-space:nowrap;">${escapeHtml(weight == null ? '\u2014' : `${weight}%`)}</td>
+      </tr>`;
+    }).join('');
+
+    const totalProfitPct = totalCost > 0 ? Number(((totalProfit / totalCost) * 100).toFixed(1)) : null;
+    const totalGainColor = totalProfit >= 0 ? '#166534' : '#991b1b';
+    const sumRow = `<tr style="background:#f8fafc;">
+      <td style="padding:12px 10px 12px 0;border-top:2px solid #cbd5e1;font-size:13px;font-weight:800;color:#0f172a;">TOTAL</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:#0f172a;white-space:nowrap;">${escapeHtml(formatCurrency(totalValue, 'CHF'))}</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:700;color:#475569;white-space:nowrap;">${escapeHtml(formatCurrency(totalCost, 'CHF'))}</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:${totalGainColor};white-space:nowrap;">${escapeHtml(formatSignedCurrency(totalProfit, 'CHF'))}</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:${totalGainColor};white-space:nowrap;">${escapeHtml(totalProfitPct == null ? '\u2014' : formatPercent(totalProfitPct))}</td>
+      <td style="padding:12px 0 12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:#0f172a;">100%</td>
+    </tr>`;
+
+    holdingsTable = `<div style="margin:0 0 16px;overflow-x:auto;"><table style="width:100%;min-width:600px;border-collapse:collapse;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">${headerRow}${bodyRows}${sumRow}</table></div>`;
+  }
+
+  const generatedAt = new Date().toISOString().slice(0, 16);
+  const footer = `<div style="padding:14px 0;text-align:center;font-size:12px;color:#94a3b8;line-height:1.6;">Generated ${escapeHtml(generatedAt)} UTC &nbsp;•&nbsp; Automated portfolio snapshot</div>`;
 
   return page({
-    eyebrow: 'OpenClaw Portfolio Report',
-    title: `${portfolioName} ${period} investor overview`,
-    subtitle: 'Minimal portfolio snapshot with the key numbers, recommendations, and risks first.',
-    accent: '#1e3a8a',
-    bodyHtml: `${summaryCard}${recommendationCard}${holdingsCard}${analysisCard}`,
-    footer: 'OpenClaw Portfolio Manager • Investor email summary',
+    eyebrow: `${portfolioName} Portfolio`,
+    title: `${period} snapshot`,
+    subtitle: `${formatCurrency(metrics.totalValueChf, 'CHF')} total value`,
+    accent: '#1e293b',
+    bodyHtml: `${heroCard}${profitStrip}${holdingsTable}${footer}`,
+    footer: 'OpenClaw Portfolio Manager',
   });
 }
 

@@ -15,62 +15,95 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
       dailyChangeChf: 0,
       dailyChangePct: 0,
     },
+    profitLoss: {
+      totals: { totalProfitChf: -45.20, totalProfitPct: -0.87, totalCostBasisChf: 5255.59, coveredCount: 2 },
+    },
+    investorHoldings: {
+      rows: [
+        { symbol: 'SXR8', name: 'iShares Core S&P 500', quantityHeld: 5, valueChf: 3500, gainSincePurchaseChf: 20, gainSincePurchasePct: 0.6, allocationPct: 67, averageBuyPrice: 696 },
+        { symbol: 'CHSPI', name: 'iShares Core SPI', quantityHeld: 10, valueChf: 1710, gainSincePurchaseChf: -65, gainSincePurchasePct: -3.7, allocationPct: 33, averageBuyPrice: 177 },
+      ],
+      totals: { rowCount: 2, totalValueChf: 5210.39, totalGainChf: -45.20 },
+    },
     status: {
       health: 'attention_needed',
       executionPosture: 'ready_for_review',
       brokerHealth: 'healthy',
-      brokerMessage: 'Interactive Brokers read-only connectivity and live/realtime market data are available.',
     },
   };
 
+  // === Report email: HTML ===
   const reportHtml = buildReportEmailHtml({
     portfolioName: 'etf',
     period: 'weekly',
     summary,
     summaryHtml: '<h1>Demo summary</h1><p>Everything looks good.</p>',
-    deliveryStatus: { pendingActions: ['1 delivery item needs review'] },
-    topBlocker: '[broker_unready] Broker connectivity is degraded.',
-    nextAction: 'Restore broker connectivity first.',
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: null,
+    nextAction: null,
   });
+
+  // Block 1: Portfolio Value Snapshot (hero card)
+  assert(reportHtml.includes('Total portfolio value'), 'HTML has hero label');
+  assert(reportHtml.includes('5&#39;327.03') || reportHtml.includes("5'327.03"), 'HTML has total value');
+  assert(reportHtml.includes('Cash'), 'HTML has cash');
+  assert(reportHtml.includes('116.64'), 'HTML has cash value');
+  assert(reportHtml.includes('Invested'), 'HTML has invested');
+  assert(reportHtml.includes('5&#39;210.39') || reportHtml.includes("5'210.39"), 'HTML has invested value');
+
+  // Block 2: Profit / Loss strip
+  assert(reportHtml.includes('Unrealized Profit'), 'HTML has P/L strip');
+  assert(reportHtml.includes('#991b1b') || reportHtml.includes('991b1b'), 'Negative profit uses red');
+
+  // Block 3: Holdings table
+  assert(reportHtml.includes('Instrument'), 'HTML has Instrument header');
+  assert(reportHtml.includes('Value CHF'), 'HTML has Value CHF header');
+  assert(reportHtml.includes('Cost basis CHF'), 'HTML has Cost basis header');
+  assert(reportHtml.includes('Profit CHF'), 'HTML has Profit CHF header');
+  assert(reportHtml.includes('Profit %'), 'HTML has Profit % header');
+  assert(reportHtml.includes('Weight %'), 'HTML has Weight % header');
+  assert(reportHtml.includes('SXR8'), 'HTML has SXR8');
+  assert(reportHtml.includes('CHSPI'), 'HTML has CHSPI');
+  assert(reportHtml.includes('TOTAL'), 'HTML has sum row');
+  assert(reportHtml.includes('100%'), 'HTML sum row has 100%');
+
+  // Removed sections
+  assert(!reportHtml.includes('Overall analysis'), 'No Overall analysis section');
+  assert(!reportHtml.includes('Core recommendation'), 'No Core recommendation');
+  assert(!reportHtml.includes('Improve:'), 'No Improve label');
+  assert(!reportHtml.includes('Recommendation'), 'No per-row Recommendation column');
+  assert(!reportHtml.includes('Supporting detail'), 'No supporting detail');
+  assert(!reportHtml.includes('Demo summary'), 'Raw summary not embedded');
+
+  // Design characteristics
+  assert(reportHtml.includes('linear-gradient(135deg'), 'Hero uses gradient');
+  assert(reportHtml.includes('#1e293b'), 'Hero uses dark slate');
+
+  // === Report email: Text ===
   const reportText = buildReportEmailText({
     portfolioName: 'etf',
     period: 'weekly',
     summary,
-    summaryMarkdown: '# Demo summary\n\nEverything looks good.',
-    deliveryStatus: { pendingActions: ['1 delivery item needs review'] },
-    topBlocker: '[broker_unready] Broker connectivity is degraded.',
-    nextAction: 'Restore broker connectivity first.',
+    summaryMarkdown: '# Demo summary',
+    deliveryStatus: { pendingActions: [] },
+    topBlocker: null,
+    nextAction: null,
   });
 
-  assert(reportHtml.includes('OpenClaw Portfolio Report'));
-  assert(reportHtml.includes('Minimal portfolio snapshot with the key numbers, recommendations, and risks first.'));
-  assert(reportHtml.includes('Current value'));
-  assert(reportHtml.includes('Invested money'));
-  assert(reportHtml.includes('Remaining cash'));
-  assert(reportHtml.includes('Core recommendation'));
-  assert(reportHtml.includes('Holdings'));
-  assert(reportHtml.includes('Overall analysis'));
-  assert(reportHtml.includes('Improve:'));
-  assert(reportHtml.includes('Risks:'));
-  assert(reportHtml.includes('Opportunities:'));
-  assert(reportHtml.includes('linear-gradient(135deg'));
-  assert(reportHtml.includes('CHF 5&#39;327.03') || reportHtml.includes('CHF 5,327.03'));
-  assert(!reportHtml.includes('Supporting detail'));
-  assert(!reportHtml.includes('report-email-summary'));
-  assert(reportHtml.includes('Restore broker connectivity first.'));
-  assert(reportHtml.includes('Attention needed'));
+  assert(reportText.includes('Portfolio Value'), 'Text has portfolio value section');
+  assert(reportText.includes("Total value: CHF 5'327.03"), 'Text has total value');
+  assert(reportText.includes('Cash: CHF 116.64'), 'Text has cash');
+  assert(reportText.includes("Invested: CHF 5'210.39"), 'Text has invested');
+  assert(reportText.includes('Profit / Loss'), 'Text has P/L section');
+  assert(reportText.includes('Holdings'), 'Text has holdings section');
+  assert(reportText.includes('SXR8'), 'Text has SXR8');
+  assert(reportText.includes('CHSPI'), 'Text has CHSPI');
+  assert(reportText.includes('TOTAL'), 'Text has sum row');
+  assert(reportText.includes('Weight %'), 'Text has weight header');
+  assert(!reportText.includes('Core recommendation'), 'Text has no recommendation');
+  assert(!reportText.includes('Demo summary'), 'Text does not embed raw summary');
 
-  assert(reportText.includes('Current value: CHF'));
-  assert(reportText.includes('Invested money: CHF'));
-  assert(reportText.includes('Remaining cash: CHF'));
-  assert(reportText.includes('Status: Attention needed'));
-  assert(reportText.includes('Core recommendation: Restore broker connectivity first.'));
-  assert(reportText.includes('Holdings'));
-  assert(reportText.includes('Improve'));
-  assert(reportText.includes('Risks'));
-  assert(reportText.includes('Opportunities'));
-  assert(!reportText.includes('Supporting detail'));
-
+  // === Trade notification email ===
   const tradeInput = {
     symbol: 'SLICHA',
     name: 'UBS ETF SLI',

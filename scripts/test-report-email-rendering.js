@@ -14,6 +14,14 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
       lastSyncAt: '2026-05-24 09:00:00',
       baseCurrency: 'CHF',
     },
+    profitLoss: {
+      totals: {
+        totalProfitChf: 800,
+        totalProfitPct: 8.0,
+        totalCostBasisChf: 10000,
+        coveredCount: 2,
+      },
+    },
     investorHoldings: {
       totals: {
         totalValueChf: 12000,
@@ -59,15 +67,14 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     status: {
       health: 'healthy',
       executionPosture: 'ready',
-      brokerHealth: 'ready',
-      brokerMessage: 'Broker connectivity healthy',
     },
-    recommendedNextStep: 'Add gradually to the underweight global equity position while keeping some CHF cash in reserve.',
+    recommendedNextStep: 'Add gradually to the underweight global equity position.',
   };
 
+  // === HTML output ===
   const html = buildReportEmailHtml({
     portfolioName: 'etf',
-    period: 'summary',
+    period: 'weekly',
     summaryHtml: '<p>detail</p>',
     summary,
     deliveryStatus: { pendingActions: [] },
@@ -75,25 +82,43 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     nextAction: summary.recommendedNextStep,
   });
 
-  assert(html.includes('Holdings'));
-  assert(html.includes('Vanguard Total World Stock ETF'));
-  assert(html.includes('iShares Core SPI'));
-  assert(html.includes('Value CHF'));
-  assert(html.includes('Avg. cost CHF'));
-  assert(html.includes('Gain CHF'));
-  assert(html.includes('Gain %'));
-  assert(html.includes('Holding %'));
-  assert(html.includes('Recommendation'));
-  assert(html.includes('Overall analysis'));
-  assert(html.includes('Improve:'));
-  assert(html.includes('Risks:'));
-  assert(html.includes('Opportunities:'));
-  assert(html.includes('HOLD'));
-  assert(html.includes('BUY'));
+  // Block 1: Portfolio Value Snapshot
+  assert(html.includes('Total portfolio value'), 'HTML has hero label');
+  assert(html.includes('12&#39;000.00') || html.includes("12'000.00"), 'HTML contains total value');
+  assert(html.includes('Cash'), 'HTML has cash label');
+  assert(html.includes('2&#39;000.00') || html.includes("2'000.00"), 'HTML contains cash value');
+  assert(html.includes('Invested'), 'HTML has invested label');
+  assert(html.includes('10&#39;000.00') || html.includes("10'000.00"), 'HTML contains invested value');
 
+  // Block 2: Profit / Loss
+  assert(html.includes('Unrealized Profit'), 'HTML has profit/loss strip');
+  assert(html.includes('+') || html.includes('800'), 'HTML contains profit amount');
+
+  // Block 3: Holdings table
+  assert(html.includes('Instrument'), 'HTML has Instrument column');
+  assert(html.includes('Value CHF'), 'HTML has Value CHF column');
+  assert(html.includes('Cost basis CHF'), 'HTML has Cost basis column');
+  assert(html.includes('Profit CHF'), 'HTML has Profit CHF column');
+  assert(html.includes('Profit %'), 'HTML has Profit % column');
+  assert(html.includes('Weight %'), 'HTML has Weight % column');
+  assert(html.includes('Vanguard Total World Stock ETF'), 'HTML contains VT name');
+  assert(html.includes('iShares Core SPI'), 'HTML contains CHSPI name');
+  assert(html.includes('VT'), 'HTML contains VT symbol');
+  assert(html.includes('CHSPI'), 'HTML contains CHSPI symbol');
+  assert(html.includes('TOTAL'), 'HTML has sum row');
+
+  // Should NOT contain old sections
+  assert(!html.includes('Overall analysis'), 'HTML does NOT have analysis section');
+  assert(!html.includes('Core recommendation'), 'HTML does NOT have recommendation');
+  assert(!html.includes('Improve:'), 'HTML does NOT have Improve label');
+  assert(!html.includes('Recommendation'), 'HTML does NOT have per-row recommendation column');
+  assert(!html.includes('HOLD'), 'HTML does NOT have HOLD badges');
+  assert(!html.includes('Holding %'), 'HTML uses Weight % not Holding %');
+
+  // === Text output ===
   const text = buildReportEmailText({
     portfolioName: 'etf',
-    period: 'summary',
+    period: 'weekly',
     summaryMarkdown: '# Details',
     summary,
     deliveryStatus: { pendingActions: [] },
@@ -101,43 +126,21 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     nextAction: summary.recommendedNextStep,
   });
 
-  assert(text.includes('Holdings'));
-  assert(text.includes('VT — Vanguard Total World Stock ETF'));
-  assert(text.includes('Value CHF: CHF 1\'050.00'));
-  assert(text.includes('Avg. cost CHF: CHF 950.00'));
-  assert(text.includes('Avg. cost CHF: —'));
-  assert(text.includes('Core recommendation: Add gradually to CHSPI with fresh cash while leaving the rest unchanged.'));
-  assert(text.includes('Recommendation: HOLD'));
-  assert(text.includes('Recommendation: BUY'));
-  assert(text.includes('Holdings count: 2'));
-  assert(text.includes('Holdings value: CHF 12\'000.00'));
+  assert(text.includes('Portfolio Value'), 'Text has portfolio value section');
+  assert(text.includes("Total value: CHF 12'000.00"), 'Text has total value');
+  assert(text.includes("Cash: CHF 2'000.00"), 'Text has cash');
+  assert(text.includes("Invested: CHF 10'000.00"), 'Text has invested');
+  assert(text.includes('Profit / Loss'), 'Text has profit/loss section');
+  assert(text.includes('Holdings'), 'Text has holdings section');
+  assert(text.includes('VT'), 'Text contains VT symbol');
+  assert(text.includes('CHSPI'), 'Text contains CHSPI symbol');
+  assert(text.includes('TOTAL'), 'Text has sum row');
+  assert(text.includes('Weight %'), 'Text has weight % header');
+  assert(!text.includes('Core recommendation'), 'Text does NOT have recommendation');
+  assert(!text.includes('Overall analysis'), 'Text does NOT have analysis');
+  assert(!text.includes('Improve'), 'Text does NOT have Improve section');
 
-  const lowCashSummary = {
-    ...summary,
-    holdings: {
-      ...summary.holdings,
-      cashChf: 150,
-    },
-    status: {
-      ...summary.status,
-      health: 'attention_needed',
-    },
-    recommendedNextStep: null,
-  };
-
-  const lowCashText = buildReportEmailText({
-    portfolioName: 'etf',
-    period: 'summary',
-    summaryMarkdown: '# Details',
-    summary: lowCashSummary,
-    deliveryStatus: { pendingActions: [] },
-    topBlocker: null,
-    nextAction: null,
-  });
-
-  assert(lowCashText.includes('Core recommendation: Hold current positions; rebuild cash before adding more equity risk.'));
-  assert(!lowCashText.includes('Recommendation: BUY'));
-
+  // === Sparse/empty summary ===
   const sparseSummary = {
     holdings: {},
     investorHoldings: { rows: [], totals: {} },
@@ -148,7 +151,7 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
   const sparseHtml = buildReportEmailHtml({
     portfolioName: 'etf',
     period: 'weekly',
-    summaryHtml: '<p>Should not render in investor email</p>',
+    summaryHtml: '<p>Should not render</p>',
     summary: sparseSummary,
     deliveryStatus: { pendingActions: [] },
     topBlocker: null,
@@ -158,21 +161,19 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
   const sparseText = buildReportEmailText({
     portfolioName: 'etf',
     period: 'weekly',
-    summaryMarkdown: 'Should not render in investor email',
+    summaryMarkdown: 'Should not render',
     summary: sparseSummary,
     deliveryStatus: { pendingActions: [] },
     topBlocker: null,
     nextAction: null,
   });
 
-  assert(sparseHtml.includes('Current value'));
-  assert(sparseHtml.includes('Holdings data is not available yet.'));
-  assert(!sparseHtml.includes('Supporting detail'));
-  assert(sparseText.includes('Current value: —'));
-  assert(sparseText.includes('Holdings data is not available yet.'));
-  assert(!sparseText.includes('Supporting detail'));
-  assert(!sparseText.includes('Should not render in investor email'));
+  assert(sparseHtml.includes('No holdings data available'), 'Sparse HTML shows no-data message');
+  assert(!sparseHtml.includes('Should not render'), 'Sparse HTML does not embed raw summary');
+  assert(sparseText.includes('No holdings data available'), 'Sparse text shows no-data message');
+  assert(!sparseText.includes('Should not render'), 'Sparse text does not embed raw summary');
 
+  // === loadSummaryEmailSource ===
   const tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'report-email-'));
   const reportMarkdownPath = path.join(tmpDir, 'portfolio_report_etf_weekly_20260524.md');
   const reportHtmlPath = path.join(tmpDir, 'portfolio_report_etf_weekly_20260524.html');
@@ -185,24 +186,19 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
       holdingCount: 3,
       latestSnapshotDate: '2026-05-23',
     },
+    profitLoss: {
+      totals: { totalProfitChf: -120.50, totalProfitPct: -0.54, totalCostBasisChf: 22330, coveredCount: 3 },
+    },
     investorHoldings: {
       rows: [
-        { symbol: 'SXR8', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', quantityHeld: 18, valueChf: 12439.53, currency: 'EUR' },
-        { symbol: 'EMUAA', name: 'UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc', quantityHeld: 151, valueChf: 6052.12, currency: 'EUR' },
-        { symbol: 'CHSPI', name: 'UBS SLI ETF (SMI gleichgewichtet)', quantityHeld: 23, valueChf: 3717.83, currency: 'CHF' },
+        { symbol: 'SXR8', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', quantityHeld: 18, valueChf: 12439.53, gainSincePurchaseChf: 50, gainSincePurchasePct: 0.4 },
+        { symbol: 'EMUAA', name: 'UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc', quantityHeld: 151, valueChf: 6052.12, gainSincePurchaseChf: -100, gainSincePurchasePct: -1.6 },
+        { symbol: 'CHSPI', name: 'UBS SLI ETF (SMI gleichgewichtet)', quantityHeld: 23, valueChf: 3717.83, gainSincePurchaseChf: -70, gainSincePurchasePct: -1.9 },
       ],
-      totals: {
-        rowCount: 3,
-        totalValueChf: 22209.48,
-        totalGainChf: null,
-      },
+      totals: { rowCount: 3, totalValueChf: 22209.48, totalGainChf: -120 },
     },
-    status: {
-      health: 'attention_needed',
-      executionPosture: 'ready_for_review',
-    },
+    status: { health: 'attention_needed' },
     recommendedNextStep: 'Review the current dry-run proposal set.',
-    topBlocker: 'No urgent blocker surfaced.',
   };
   fs.writeFileSync(reportMarkdownPath, '# sample report\n');
   fs.writeFileSync(reportHtmlPath, '<p>sample report</p>');
@@ -219,7 +215,7 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     summaryHtml: loaded.summaryHtml,
     summary: loaded.summary,
     deliveryStatus: { pendingActions: [] },
-    topBlocker: loaded.summary.topBlocker,
+    topBlocker: null,
     nextAction: loaded.summary.recommendedNextStep,
   });
   const generatedText = buildReportEmailText({
@@ -228,17 +224,21 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     summaryMarkdown: loaded.summaryMarkdown,
     summary: loaded.summary,
     deliveryStatus: { pendingActions: [] },
-    topBlocker: loaded.summary.topBlocker,
+    topBlocker: null,
     nextAction: loaded.summary.recommendedNextStep,
   });
 
-  assert(generatedHtml.includes('22&#39;209.48'));
-  assert(generatedHtml.includes('SXR8'));
-  assert(generatedHtml.includes('EMUAA'));
-  assert(generatedText.includes("Current value: CHF 22'209.48"));
-  assert(generatedText.includes('Holdings count: 3'));
-  assert(generatedText.includes('Holdings value: CHF 22\'209.48'));
-  assert(generatedText.includes('SXR8'));
+  assert(generatedHtml.includes('22&#39;209.48') || generatedHtml.includes("22'209.48"), 'Generated HTML has total value');
+  assert(generatedHtml.includes('SXR8'), 'Generated HTML has SXR8');
+  assert(generatedHtml.includes('EMUAA'), 'Generated HTML has EMUAA');
+  assert(generatedHtml.includes('TOTAL'), 'Generated HTML has sum row');
+  assert(generatedText.includes("22'209.48"), 'Generated text has total value');
+  assert(generatedText.includes('SXR8'), 'Generated text has SXR8');
+  assert(generatedText.includes('TOTAL'), 'Generated text has sum row');
+  assert(generatedText.includes('Weight %'), 'Generated text has weight column');
+
+  // Profit/loss direction: negative
+  assert(generatedHtml.includes('#991b1b') || generatedHtml.includes('991b1b'), 'Negative profit uses red color');
 
   console.log(JSON.stringify({ ok: true }, null, 2));
 })();
