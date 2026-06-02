@@ -1,33 +1,35 @@
 # Current Plan
 
 Date: 2026-06-02
-Status: waiting
+Status: started
 
 ## Goal
-There is no active in-repo implementation phase right now. The remaining work is operator-gated or external, plus periodic truth maintenance when the repo drifts.
+Consolidate the live planning docs into one clean current plan, archive stale planning artifacts, and leave only real open work visible.
 
 ## Visual roadmap
 
 ```text
-Operator-gated backlog and periodic truth maintenance   [WAITING]   ██░░░░░░░░
+Phase C2 current-docs consolidation and open-work reset   [STARTED]   ██░░░░░░░░
 ```
 
 ---
 
-## Operator-gated backlog and periodic truth maintenance
-**Status:** WAITING
+## Phase C2 — Current docs consolidation and open-work reset
+**Status:** STARTED
 
-### Already closed in repo
-- [x] Investor dashboard email redesign shipped and verified
-- [x] Fill HTML mail hardening shipped and verified
-- [x] Phase/doc truth drift reconciled
+### Completed
+- [x] Audited the live planning/status surfaces outside `archive/`
+- [x] Identified stale current-looking plan docs in `tasks/` and `docs/`
+- [x] Separated real open work from historical/completed execution phases
 
 ### Still open
-- [ ] Resolve IBKR quote-posture degradation when subscription or data-farm state is broken on the broker side
-- [ ] Complete Mailgun inbound routing/config outside the repo
-- [ ] Re-run periodic plan/doc truth maintenance when new phases land
+- [ ] Rewrite `CURRENT_PLAN.md` around only real open phases and decisions
+- [ ] Refresh `STATUS.md` and `docs/operations/repo-map.md`
+- [ ] Move stale current-looking audit/plan docs into archive buckets
+- [ ] Verify plan parsing / cleanliness / repo checks
+- [ ] Commit and push the consolidation
 
 ### Notes
-- In-repo verification is green; external/operator-gated items remain intentionally outside autonomous implementation.
-- Detailed historical plans live under `archive/phase-plans/`.
+- Generated portfolio/runtime artifacts are intentionally out of scope.
+- The result should be a steady-state live plan, not another historical rollup.
 
