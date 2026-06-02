@@ -1,17 +1,10 @@
 # Email Digest
 
-_Last updated: Phase 212 — periodic HTML digest for daily/weekly portfolio operations._
+_Last updated: Phase 1 operator surface cleanup, 2026-06-02._
 
 ## Purpose
 
-The email digest is the lightweight operator summary for recurring review. It reuses the reporting stack to deliver a compact HTML email with:
-
-- top-level portfolio KPIs
-- net-liq trend sparkline
-- allocation drift
-- instrument health
-- cron health
-- open workflow/issues
+The active digest CLI sends the redesigned three-block portfolio email used for recurring review.
 
 Primary CLI:
 
@@ -20,6 +13,22 @@ node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily --dry-ru
 node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily
 node scripts/send-dashboard-digest.js --portfolio=etf --frequency=weekly
 ```
+
+## Current rendering path
+
+The active send path is:
+- `scripts/send-dashboard-digest.js`
+- `collectPortfolioSummary()` from `src/reporting/summaryArtifacts.js`
+- `buildReportEmailHtml()` / `buildReportEmailText()` from `src/reporting/reportEmail.js`
+
+The active digest send path does **not** use the older multi-card `src/reporting/dashboardDigest.js` renderer.
+
+## Body blocks
+
+The email body now contains only:
+1. `Portfolio Value Snapshot`
+2. `Profit / Loss`
+3. holdings table sorted by CHF value descending, including `Weight %` and a sum row
 
 ## CLI arguments
 
@@ -30,7 +39,7 @@ Default:
 - `etf`
 
 ### `--frequency=daily|weekly`
-Controls subject line and operator framing.
+Controls subject line and framing.
 
 Default:
 - `daily`
@@ -52,9 +61,7 @@ Builds the digest and reports the subject/recipients without sending email.
 
 ## Recipient resolution
 
-Digest delivery uses the report delivery policy first, then falls back to environment configuration.
-
-Resolution order:
+Digest delivery resolves recipients in this order:
 1. `emailRecipients` from the effective delivery policy
 2. `MAILGUN_RECIPIENT` environment variable fallback
 
@@ -63,89 +70,11 @@ If no recipients resolve, the digest reports:
 - `sent: false`
 - `reason: "no_recipients_configured"`
 
-## Body sections
+## Output contract
 
-### Digest summary
-Contains:
-- portfolio value
-- cash
-- pending approvals
-- operator queue count
-- health/execution posture badges
+The digest CLI always writes JSON to stdout.
 
-### Portfolio trend
-Uses the end-of-day net-liq history sparkline.
-
-### Allocation drift
-Shows sleeve-level current vs target vs drift status.
-
-### Instrument health
-Shows the key instrument rows with:
-- sleeve
-- drift
-- proposal state
-- approval state
-- block reason / note
-
-### Cron health
-Shows:
-- healthy/failing job counts
-- per-job severity
-- consecutive errors
-- last run age
-- last error summary
-
-### Open issues and workflow
-Combines:
-- recommended next step
-- pending action items
-- delivery-status pending actions
-
-## Rendering notes
-
-- HTML uses the shared email page/card helpers from `src/reporting/emailHtml.js`
-- the sparkline is inline SVG and intended to be email-safe
-- the digest is image-free and should degrade cleanly in Gmail / Apple Mail style clients
-
-## Relationship to other reporting paths
-
-### Health report
-Use the health report when you want:
-- issue classification
-- self-heal output
-- operator commands
-- recent health trends
-
-Command:
-```bash
-node scripts/run-health-check.js portfolio/etf --send-email
-```
-
-### Digest
-Use the digest when you want:
-- routine daily or weekly operator review
-- a compact summary rather than a full incident/health report
-
-Command:
-```bash
-node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily
-```
-
-## Suggested schedule
-
-Roadmap intent for recurring use:
-- daily digest before market open review
-- weekly digest after the Friday close / end-of-week review
-
-Exact cron wiring can vary by host/channel setup.
-
-## Dry-run example
-
-```bash
-node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily --dry-run
-```
-
-Expected result shape:
+### Dry-run result shape
 - `ok: true`
 - `portfolio`
 - `frequency`
@@ -155,14 +84,43 @@ Expected result shape:
 - `attempted: false`
 - `sent: false`
 
-## Failure / not-ready behavior
+### Live-send result shape
+- `ok: true`
+- `portfolio`
+- `frequency`
+- `dryRun: false`
+- `attempted: true`
+- `sent: true`
+- `subject`
+- `recipients`
+- `provider`
 
-Typical reasons for non-send:
-- no recipients configured
-- delivery policy disabled
-- email provider not ready
+## Related surfaces
 
-The digest path is intentionally explicit: it reports why mail was not sent instead of pretending delivery succeeded.
+### Console dashboard
+Use when you want a quick human readout:
+```bash
+node scripts/show-dashboard.js etf
+```
+
+### Dated report artifacts
+Use when you want saved weekly/monthly/quarterly report files:
+```bash
+node scripts/generate-report.js portfolio/etf weekly
+```
+
+### Health report
+Use when you want issue classification and optional email delivery:
+```bash
+node scripts/run-health-check.js portfolio/etf --dry-run
+node scripts/run-health-check.js portfolio/etf --send-email
+```
+
+## Suggested schedule
+
+Roadmap intent for recurring use:
+- daily digest before market open review
+- weekly digest after the Friday close / end-of-week review
 
 ## Safety posture
 
@@ -173,10 +131,3 @@ It does not:
 - transmit trades
 - bypass execution or broker gates
 - hide broker/readiness degradation
-
-If the digest and the live dashboard disagree, rerun the health/reporting generation path and trust the newest broker-readiness-backed surface.
-
-
-## Stable-state note
-
-The digest is generated through the same conditional artifact-writing path as the summary/dashboard surfaces, so repeated regeneration should not create content-only churn.

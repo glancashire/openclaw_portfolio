@@ -7,6 +7,7 @@ Historical material that should not read like live work.
 - `archive/phase-plans/` - completed phase plans, old implementation roadmaps, legacy specifications, and other per-phase build history
 - `archive/docs/` - historical audits, superseded roadmaps, and retired current-looking docs
 - `archive/tasks/` - archived harvesters, wave plans, and working-memory task notes
+- `archive/scripts/` - retired helper scripts preserved for audit/history only
 
 ## Rules
 

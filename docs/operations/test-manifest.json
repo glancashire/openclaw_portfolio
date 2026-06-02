@@ -9,12 +9,12 @@
     "external"
   ],
   "counts": {
-    "total": 309,
-    "safe": 237,
+    "total": 311,
+    "safe": 239,
     "integration": 67,
     "live-smoke": 3,
     "external": 2,
-    "inVerifyRepoChecks": 50,
+    "inVerifyRepoChecks": 52,
     "quarantined": 3
   },
   "entries": [
@@ -598,6 +598,13 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-email-digest-doc.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": true,
       "quarantined": false
     },
     {
@@ -1601,6 +1608,13 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-reporting-command-surface-doc.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": true,
       "quarantined": false
     },
     {

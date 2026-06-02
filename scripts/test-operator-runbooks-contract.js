@@ -20,6 +20,10 @@ function main() {
   assert(text.includes('trade.js config'), 'Expected canonical config command reference');
   assert(text.includes('trade.js delivery'), 'Expected canonical delivery command reference');
   assert(text.includes('scripts/operator-incident-summary.js') || text.includes('operator incident summary'), 'Expected operator incident surface reference');
+  assert(text.includes('docs/reporting-command-surface.md'), 'Expected reporting command surface reference');
+  assert(text.includes('show-dashboard.js'), 'Expected console dashboard reference');
+  assert(text.includes('run-health-check.js'), 'Expected health-check reference');
+  assert(text.includes('send-dashboard-digest.js'), 'Expected digest surface reference');
   assert(text.includes('runtime/events/runtime-events.jsonl'), 'Expected runtime events evidence reference');
   assert(text.includes('check-transmitted-live-readiness.js'), 'Expected transmitted live readiness command reference');
 

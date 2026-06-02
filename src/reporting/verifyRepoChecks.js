@@ -18,6 +18,8 @@ const checks = [
   ['test:artifact-policy-contract', ['scripts/test-artifact-policy-contract.js']],
   ['test:operator-incident-summary', ['scripts/test-operator-incident-summary.js']],
   ['test:operator-runbooks-contract', ['scripts/test-operator-runbooks-contract.js']],
+  ['test:reporting-command-surface-doc', ['scripts/test-reporting-command-surface-doc.js']],
+  ['test:email-digest-doc', ['scripts/test-email-digest-doc.js']],
   ['test:observability-doc-contract', ['scripts/test-observability-doc-contract.js']],
   ['test:trading-workflow-doc-contract', ['scripts/test-trading-workflow-doc-contract.js']],
   ['test:transmitted-live-operations-doc-contract', ['scripts/test-transmitted-live-operations-doc-contract.js']],

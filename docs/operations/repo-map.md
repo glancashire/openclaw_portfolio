@@ -51,6 +51,7 @@ A 60-second orientation for the live repo. Updated 2026-06-02 during current-doc
 | `docs/operations/ibkr-recovery.md` | IBKR quote posture or readiness is degraded |
 | `docs/basket-execution-runbook.md` | You are placing or reconciling baskets |
 | `docs/execution-command-surface.md` | You need the canonical execution CLI surface |
+| `docs/reporting-command-surface.md` | You need the canonical dashboard/report/email CLI surface |
 | `docs/trading-workflow.md` | You want the end-to-end trading lifecycle |
 
 ## Archive layout
@@ -58,6 +59,7 @@ A 60-second orientation for the live repo. Updated 2026-06-02 during current-doc
 - `archive/phase-plans/` - completed phase plans and historical roadmaps/specs
 - `archive/docs/` - archived audits and superseded current-looking docs
 - `archive/tasks/` - archived harvesters, wave plans, and working notes
+- `archive/scripts/` - retired helper scripts that are no longer part of the active operator surface
 - `archive/README.md` - archive rules and search tips
 
 ## Where to start, by question

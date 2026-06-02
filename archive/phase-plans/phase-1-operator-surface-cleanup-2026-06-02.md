@@ -1,7 +1,8 @@
 # Phase 1 - Operator surface cleanup and dashboard path cleanup
 
 Date: 2026-06-02
-Status: planned
+Status: complete
+Completed: 2026-06-02
 
 ## Objectives
 - Retire the orphan dashboard-email helper trio from the active `scripts/` surface without losing the historical code.

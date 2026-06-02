@@ -9,7 +9,7 @@ Keep the live doc set small and truthful. Completed engineering phases stay in `
 ## Visual roadmap
 
 ```text
-Phase 1 operator surface cleanup and dashboard path cleanup   [OPEN]     ███░░░░░░░
+Phase 1 operator surface cleanup and dashboard path cleanup   [DONE]     ██████████
 Phase 2 artifact hygiene and legacy surface retirement        [OPEN]     ██░░░░░░░░
 Phase 3 usage and decision-support reporting                  [OPEN]     █░░░░░░░░░
 Phase 4 OpenClaw maintainer contract                          [OPEN]     █░░░░░░░░░
@@ -40,22 +40,25 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 ---
 
 ## Phase 1 - Operator surface cleanup and dashboard path cleanup
-**Status:** OPEN
+**Status:** COMPLETE (2026-06-02)
 
 ### Completed
 - [x] Weekly/monthly investor report email uses the redesigned three-block template.
 - [x] Daily digest email now uses the redesigned three-block template as well.
 - [x] Test-governance, status, and repo-truth surfaces now exist and are green.
+- [x] Retired the orphan dashboard-email helper trio to `archive/scripts/legacy-dashboard-email/`.
+- [x] Added `docs/reporting-command-surface.md` as the canonical dashboard/report/email command surface.
+- [x] Tightened `docs/operator-runbooks.md` into a shorter golden path with expected artifact checks.
+- [x] Updated digest docs to the current `reportEmail.js` rendering path and explicit JSON/dry-run behavior.
+- [x] Added regression coverage for the reporting command surface and digest docs.
 
 ### Started / already true
-- [x] The legacy dashboard email path has been identified as a separate surface.
-- [x] The main execution/reporting command surfaces are already documented.
+- [x] The legacy dashboard email path had already been identified as a separate surface.
+- [x] The main execution/reporting command surfaces were already partially documented.
+- [x] Decision made: retire the orphan dashboard helper trio rather than rewrite it.
 
 ### Still open
-- [ ] Decide whether legacy dashboard mail helpers (`send-portfolio-dashboard-email.js` and its wrappers) should be kept, rewritten, or retired.
-- [ ] Write a short operator golden-path doc for the top day-to-day commands and expected artifacts.
-- [ ] Reduce overlapping helper scripts or mark them diagnostics-only.
-- [ ] Add explicit output-contract notes where operators still have to guess between human and JSON surfaces.
+- [x] None - phase closed 2026-06-02.
 
 ---
 
@@ -130,16 +133,14 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 
 ## Recommended execution order when Graham says go
 
-1. Phase 1 - operator surface cleanup and dashboard path cleanup
-2. Phase 2 - artifact hygiene and legacy surface retirement
-3. Phase 4 - OpenClaw maintainer contract
-4. Phase 3 - usage and decision-support reporting
-5. Phase 0 - external unblockers as soon as operator inputs are available
-6. Phase 5 - only if explicitly reactivated
+1. Phase 2 - artifact hygiene and legacy surface retirement
+2. Phase 4 - OpenClaw maintainer contract
+3. Phase 3 - usage and decision-support reporting
+4. Phase 0 - external unblockers as soon as operator inputs are available
+5. Phase 5 - only if explicitly reactivated
 
 ## Open decisions for Graham
 
 1. IBKR quote posture: recommend doing runbook Step 6 first if live trading matters in the next session.
-2. Legacy dashboard mail helpers: recommend retiring or archiving them unless there is a real event-driven use case to preserve.
-3. `scripts/execute-trades.js`: recommend keeping it as an explicit failure shim until a path-dependence audit is done, then remove it cleanly.
-4. FX cash reconciliation: recommend reopening it only if current live operator use is still materially confused by cash/value math.
+2. `scripts/execute-trades.js`: recommend keeping it as an explicit failure shim until a path-dependence audit is done, then remove it cleanly.
+3. FX cash reconciliation: recommend reopening it only if current live operator use is still materially confused by cash/value math.
