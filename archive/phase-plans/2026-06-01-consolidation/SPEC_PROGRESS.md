@@ -100,7 +100,7 @@ The most relevant still-open work is now tracked in the maintained roll-up plan 
 
 At the time of this update, there is no remaining major unfinished core engineering lane inside Spec §1. The highest-signal open work is now operational:
 - Roll-up D automation-boundary decision
-- Mailgun inbound infrastructure enablement
+- Retired email-reply approval infrastructure lane
 - native IBKR login / 2FA readiness dependency
 - optional direct Control UI embedding once editable source is accessible
 

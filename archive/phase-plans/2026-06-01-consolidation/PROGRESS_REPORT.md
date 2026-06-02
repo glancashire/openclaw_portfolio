@@ -16,7 +16,7 @@ Last updated: 2026-05-28 UTC
 
 ## 2026-05-26 — Phases A–H + stabilization closeout
 
-- Phases A through H all committed and pushed: live-order guard, rebalance analyzer, daily monitoring digest with AI assessment, code-level approval gate (safe-word + PIN), approve-and-execute wrapper, Mailgun inbound handler (code-only), cron TTL cache, OpenClaw CLI as model provider.
+- Phases A through H all committed and pushed: live-order guard, rebalance analyzer, daily monitoring digest with AI assessment, code-level approval gate (safe-word + PIN), approve-and-execute wrapper, retired email-reply approval lane, cron TTL cache, OpenClaw CLI as model provider.
 - S1–S5 stabilization all marked done. System entered soak posture.
 - ETF basket Tuesday cron aborted twice due to market-data gaps (SIX L1 subscription + probe path bug).
 
@@ -76,7 +76,7 @@ Recent work materially expanded the user-facing product surface with:
 
 The highest-signal open work is now mostly operational rather than unfinished core engineering:
 1. decide whether any bounded self-heal actions should be promoted beyond guidance
-2. complete Mailgun inbound infrastructure if email-reply approval flow is needed
+2. email-reply approval infrastructure was later removed from the live repo; no further action is needed on that lane
 3. keep native IBKR login/2FA readiness healthy
 4. embed the open-phases dashboard card directly in the real Control UI only if the editable app source becomes available
 

@@ -253,7 +253,7 @@ Each phase ends with: focused tests → `git status` verification → clean comm
 ## 4. Out of scope for this plan
 
 - FX cash reconciliation (PARKED).
-- Mailgun inbound (WAITING).
+- Retired email-reply approval lane (DROPPED).
 - Control UI direct embedding (BLOCKED).
 - Live order submission (gated by 1H).
 

@@ -1,7 +1,8 @@
 # Phase M0 - Mailgun inbound removal and surface scrub
 
 Date: 2026-06-02
-Status: planned
+Status: complete
+Completed: 2026-06-02
 
 ## Objectives
 - Remove the unused Mailgun inbound approval/webhook surface from the live repo.

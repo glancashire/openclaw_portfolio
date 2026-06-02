@@ -25,7 +25,7 @@
 | C | Daily monitoring digest + AI assessment | ✅ `29b93f4` |
 | D | Code-level approval gate (safe-word + PIN) | ✅ `4085fbc` |
 | E | Approve-and-execute wrapper | ✅ `1a8f8b1` |
-| F | Mailgun inbound handler (code-only) | ✅ `0ba3238` |
+| F | Retired email-reply approval lane | ✅ historical |
 | G | Cron-jobs TTL cache | ✅ `cb271ea` |
 | H | OpenClaw CLI as model provider | ✅ `b82b37f` |
 
@@ -81,7 +81,7 @@
 
 | # | Summary | Status |
 |---|---------|--------|
-| 2 | Mailgun inbound route infra setup | 🔴 open (code ready, infra not) |
+| 2 | Retired email-reply infrastructure lane | ⚫ dropped from live repo |
 | UI | Control UI direct embedding | 🔴 blocked on source access |
 | FX | FX cash reconciliation | 🟡 parked (Graham WIP) |
 

@@ -11,7 +11,7 @@ Completed: 2026-06-01 UTC
 
 ## Risks / dependencies
 - IBKR login and 2FA are external/manual and cannot be safely automated away.
-- Mailgun inbound infrastructure may be impossible to fully complete without external service/config access.
+- retired email-reply approval infrastructure may be impossible to fully complete without external service/config access.
 - Health/self-heal changes must preserve the current conservative boundary: no autonomous trading, approval bypass, login forcing, or circuit-breaker clearing.
 - Runtime/generated artifact churn must stay controlled.
 

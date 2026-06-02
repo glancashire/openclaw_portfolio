@@ -27,7 +27,7 @@ then move on. No user prompts between waves. This file is the source of truth.
 
 | Lane | Decision |
 |---|---|
-| Mailgun inbound (F) | **Drop.** Console = trusted approval channel. |
+| Retired email-reply approval lane (F) | **Drop.** Console = trusted approval channel. |
 | Historical roadmap docs (B) | **Move to `archive/`** (not annotate). |
 | Cron consolidation (C) | **Autonomous cleanup.** |
 | Health/self-heal (D) | **Tighten** + proceed per bb8's recommendation (i.e. promote safe steps cautiously, gated on soak evidence — implement the tighten step now). |
@@ -62,7 +62,7 @@ Each wave: plan committed → implementation → tests → suite green → commi
 
 ### Out of scope
 
-- Mailgun inbound route work (dropped).
+- email-reply approval route work (dropped).
 - SPMCHA unwind (Graham chose keep).
 - New feature work outside the 10 enumerated waves.
 

@@ -23,21 +23,9 @@ Original action plan (kept for context):
 
 ---
 
-## 2. No Mailgun inbound route for `c3po@mailgun.swift.ch` (medium priority — code-side READY, infra still required)
-**Code-side status (2026-05-26, Phase F):** `lib/mailgunInbound.js` provides signature
-verification, payload extraction, sender allowlist, replay prevention (via Mailgun token,
-24h retention), and a 5-minute timestamp window. See `docs/setup/mailgun-inbound.md` for
-the API contract. 41 unit assertions green.
+## 2. Retired email-reply approval lane (historical note)
 
-**Still required (infra, NOT in autonomous scope):**
-**Identified:** 2026-05-26, when Graham was asked to "reply to the email" as an approval path.  
-**Symptom:** Mailgun `events` API returns zero inbound events for that address; there is no configured route in Mailgun's Receiving panel.  
-**Impact:** "Reply to my email" cannot be used as an approval/auth signal until a route is set up.  
-**Action needed:**  
-1. In Mailgun dashboard → Receiving → Create route: expression `match_recipient("c3po@mailgun.swift.ch")`, action `forward("https://<openclaw-host>/webhooks/mailgun")` (or a webhook URL the gateway can handle).  
-2. Verify the gateway's `mailgun.inboundWebhookSecret` config field is set.  
-3. Write a small integration test that POSTs a Mailgun-signed inbound payload to the webhook and verifies the gateway parses it.  
-**When to fix:** Before "reply to email" is offered as an approval path to the user.
+This former provider-specific inbound email approval lane was later removed from the live repo. The original code-side work and the planned public-route follow-up are no longer part of the supported operator surface.
 
 ---
 

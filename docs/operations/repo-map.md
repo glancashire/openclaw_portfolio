@@ -52,7 +52,6 @@ A 60-second orientation for the live repo. Updated 2026-06-02 during current-doc
 | `docs/basket-execution-runbook.md` | You are placing or reconciling baskets |
 | `docs/execution-command-surface.md` | You need the canonical execution CLI surface |
 | `docs/trading-workflow.md` | You want the end-to-end trading lifecycle |
-| `docs/setup/mailgun-infra-enable-checklist.md` | You are unblocking Mailgun inbound |
 
 ## Archive layout
 

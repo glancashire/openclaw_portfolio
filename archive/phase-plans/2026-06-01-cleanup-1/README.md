@@ -19,7 +19,7 @@ Phase Cleanup-1 ran end-of-day on 2026-06-01 and closed the same evening. It sur
 
 - Live submission remains blocked. Step 6 of `docs/operations/ibkr-recovery.md` describes the operator-side investigation needed to clear `marketDataMode=unknown`.
 - Configuring announce delivery (Telegram chatId) is operator-personal and intentionally not auto-applied.
-- Mailgun inbound, Control UI direct embedding, and FX cash reconciliation remain in their pre-existing waiting/blocked/parked states.
+- The retired email-reply approval lane, Control UI direct embedding, and FX cash reconciliation remain in their pre-existing dropped/blocked/parked states.
 
 ## See also
 

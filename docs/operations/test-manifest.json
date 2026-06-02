@@ -9,12 +9,12 @@
     "external"
   ],
   "counts": {
-    "total": 310,
-    "safe": 238,
+    "total": 309,
+    "safe": 237,
     "integration": 67,
     "live-smoke": 3,
     "external": 2,
-    "inVerifyRepoChecks": 51,
+    "inVerifyRepoChecks": 50,
     "quarantined": 3
   },
   "entries": [
@@ -1082,13 +1082,6 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
-      "quarantined": false
-    },
-    {
-      "path": "scripts/test-mailgun-inbound.js",
-      "lane": "safe",
-      "reason": "unit test of inbound parser, no network",
-      "inVerifyRepoChecks": true,
       "quarantined": false
     },
     {

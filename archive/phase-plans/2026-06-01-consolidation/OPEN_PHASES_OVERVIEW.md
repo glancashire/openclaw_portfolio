@@ -16,7 +16,7 @@ Phase 2 config/env hardening            [READY]      █████████
 Phase 4 test governance                 [READY]      ██████████
 Phase 7 cron/remediation realism        [READY]      ██████████
 Phase 5 artifact hygiene                [READY]      ██████████
-Mailgun inbound infra                   [WAITING]    ██░░░░░░░░
+Retired email-reply approval lane        [DROPPED]    ██░░░░░░░░
 Control UI direct embedding             [BLOCKED]    ██████░░░░
 FX cash reconciliation (Graham WIP)     [PARKED]     ██░░░░░░░░
 ```
@@ -50,7 +50,7 @@ Legend:
 2. **Phase 4 — Test governance and coverage transparency**
 3. **Phase 7 — Cron health / guided remediation realism**
 4. **Phase 5 — Artifact hygiene and dead-code retirement**
-5. **Mailgun inbound infra** (external access gap)
+5. **Retired email-reply approval lane** (removed from the live repo later)
 6. **Control UI direct embedding** (blocked until editable app source is available)
 7. **FX cash reconciliation** remains Graham-owned WIP and untouched
 
@@ -108,14 +108,11 @@ Legend:
 
 ---
 
-### Follow-up #2 — Mailgun inbound infra
-**Status:** WAITING ON EXTERNAL ACCESS
+### Follow-up #2 — Retired email-reply approval lane
+**Status:** DROPPED FROM LIVE REPO
 
-#### Still open
-- [ ] Create Mailgun receiving route
-- [ ] Expose public webhook endpoint/tunnel
-- [ ] Set webhook secret in gateway config
-- [ ] Run signed inbound integration test
+#### Historical note
+- [x] This follow-up was later removed from the live repo during the inbound email retirement pass.
 
 ---
 

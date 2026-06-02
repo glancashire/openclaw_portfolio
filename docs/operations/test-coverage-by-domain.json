@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-02T15:58:40.408Z",
+  "generatedAt": "2026-06-02T22:09:30.578Z",
   "counts": {
-    "totalTests": 310,
+    "totalTests": 309,
     "domains": 113
   },
   "domains": [
@@ -603,20 +603,6 @@
       ]
     },
     {
-      "domain": "mailgun",
-      "total": 2,
-      "safe": 1,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 1,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-mailgun-inbound.js",
-        "scripts/test-mailgun.js"
-      ]
-    },
-    {
       "domain": "proposal",
       "total": 2,
       "safe": 2,
@@ -1080,6 +1066,19 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "scripts/test-lifecycle-status-normalization.js"
+      ]
+    },
+    {
+      "domain": "mailgun",
+      "total": 1,
+      "safe": 0,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 1,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-mailgun.js"
       ]
     },
     {

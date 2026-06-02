@@ -13,10 +13,6 @@
       "lane": "external",
       "reason": "sends real Mailgun email"
     },
-    "scripts/test-mailgun-inbound.js": {
-      "lane": "safe",
-      "reason": "unit test of inbound parser, no network"
-    },
     "scripts/test-trade-notification-email.js": {
       "lane": "external",
       "reason": "sends real trade notification email"

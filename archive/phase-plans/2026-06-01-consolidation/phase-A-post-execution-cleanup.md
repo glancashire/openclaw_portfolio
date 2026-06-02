@@ -3,7 +3,7 @@
 ## Objectives
 - Eliminate the class of bug that produced this morning's duplicate SPMCHA fill: make live-order scripts idempotent / explicit so a second invocation cannot silently re-transmit.
 - Silence the ib_insync `ModuleNotFoundError: tzdata` traceback noise observed during basket execution, so future execution logs are not littered with red herrings.
-- Document the open follow-ups identified today (multi-portfolio test slow path, no Mailgun inbound route) so they are visible without acting on them prematurely.
+- Document the open follow-ups identified today (multi-portfolio test slow path, later-retired email-reply approval lane) so they are visible without acting on them prematurely.
 
 ## Risks / dependencies
 - The live-order idempotency guard is a runtime-behaviour change for the IBKR client wrapper. Risk of breaking existing happy-path execution — mitigate with opt-in idempotency key (off by default) and unit-test coverage of both branches.

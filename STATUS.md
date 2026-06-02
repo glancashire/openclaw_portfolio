@@ -38,7 +38,6 @@
 ## What is blocked or parked
 
 - **Live order submission** - blocked by quote posture, not by the readonly/reporting path.
-- **Mailgun inbound** - code-side ready, infrastructure-side incomplete.
 - **Control UI direct embedding** - target exists, editable source remains undiscovered or unavailable.
 - **FX cash reconciliation** - parked as Graham-owned WIP unless explicitly reactivated.
 - **Spitex exploration** - concept only; not active implementation work.
@@ -56,7 +55,6 @@
 - Compact dashboard: `node scripts/show-dashboard.js etf`
 - Cron snapshot: `docs/operations/active-cron-jobs.md`
 - Recovery ladder: `docs/operations/ibkr-recovery.md`
-- Mailgun infra checklist: `docs/setup/mailgun-infra-enable-checklist.md`
 
 ## Where things live
 

@@ -25,16 +25,13 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 ### Completed
 - [x] IBKR readonly reporting and holdings-sync paths are stable enough for normal read/report operations.
 - [x] Recovery guidance exists in `docs/operations/ibkr-recovery.md`.
-- [x] Mailgun inbound verification/parsing logic and regression tests already exist in repo.
 
 ### Started / already true
 - [x] The quote-posture failure has been narrowed to subscription/data-farm/operator-side diagnosis, not a generic read-path outage.
-- [x] The Mailgun infra handoff exists in `docs/setup/mailgun-infra-enable-checklist.md`.
 
 ### Still open
 - [ ] Complete IBKR runbook Step 6 and verify quote posture moves out of `unknown`.
 - [ ] Re-test live order submission only after quote posture is healthy.
-- [ ] Stand up the Mailgun public endpoint, signing key, and signed end-to-end verification path.
 - [ ] Decide whether Control UI direct embedding is truly blocked or simply still-undiscovered source territory.
 
 ### Notes
@@ -143,7 +140,6 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 ## Open decisions for Graham
 
 1. IBKR quote posture: recommend doing runbook Step 6 first if live trading matters in the next session.
-2. Mailgun inbound: recommend keeping this blocked until a real public endpoint exists; do not spend more code time first.
-3. Legacy dashboard mail helpers: recommend retiring or archiving them unless there is a real event-driven use case to preserve.
-4. `scripts/execute-trades.js`: recommend keeping it as an explicit failure shim until a path-dependence audit is done, then remove it cleanly.
-5. FX cash reconciliation: recommend reopening it only if current live operator use is still materially confused by cash/value math.
+2. Legacy dashboard mail helpers: recommend retiring or archiving them unless there is a real event-driven use case to preserve.
+3. `scripts/execute-trades.js`: recommend keeping it as an explicit failure shim until a path-dependence audit is done, then remove it cleanly.
+4. FX cash reconciliation: recommend reopening it only if current live operator use is still materially confused by cash/value math.
