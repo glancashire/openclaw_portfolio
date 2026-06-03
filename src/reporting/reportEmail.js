@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { loadDepositsLedger } = require('../../lib/depositsLedger');
 const {
   escapeHtml,
   page,
@@ -333,11 +334,26 @@ function buildFooterAnalysis(summary = null, nextAction = null) {
   return { improve, risks, opportunities };
 }
 
-function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary = null, deliveryStatus = null, topBlocker = null, nextAction = null }) {
+function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary = null, deliveryStatus = null, topBlocker = null, nextAction = null, portfolioDir = null }) {
   const metrics = buildInvestorMetrics(summary);
   const profitLoss = summary?.profitLoss?.totals || {};
   const rows = investorHoldingRows(summary);
   const investedChf = Number.isFinite(metrics.investedChf) ? metrics.investedChf : null;
+
+  let netDepositedChf = null;
+  if (portfolioDir) {
+    try {
+      const dl = loadDepositsLedger(portfolioDir);
+      if (dl && !dl.missing) netDepositedChf = Number(dl.totals.netDepositedChf);
+    } catch (_err) { /* ignore */ }
+  }
+  const hasNetDeposits = Number.isFinite(netDepositedChf) && netDepositedChf > 0;
+  const totalReturnChf = hasNetDeposits && Number.isFinite(metrics.totalValueChf)
+    ? Number((metrics.totalValueChf - netDepositedChf).toFixed(2))
+    : null;
+  const totalReturnPct = hasNetDeposits && totalReturnChf != null
+    ? Number(((totalReturnChf / netDepositedChf) * 100).toFixed(2))
+    : null;
 
   const lines = [
     `${portfolioName} ${period} portfolio snapshot`,
@@ -345,11 +361,20 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
     'Portfolio Value',
     `Total value: ${formatCurrency(metrics.totalValueChf, 'CHF')}`,
     `Cash: ${formatCurrency(metrics.cashChf, 'CHF')}`,
-    `Invested: ${formatCurrency(metrics.investedChf, 'CHF')}`,
+    ...(hasNetDeposits
+      ? [`Net deposited: ${formatCurrency(netDepositedChf, 'CHF')}`]
+      : [`Invested: ${formatCurrency(metrics.investedChf, 'CHF')}`]),
     '',
     'Profit / Loss',
-    `Unrealized profit: ${profitLoss.totalProfitChf == null ? '\u2014' : formatSignedCurrency(profitLoss.totalProfitChf, 'CHF')}`,
-    `Unrealized profit %: ${profitLoss.totalProfitPct == null && metrics.sincePurchasePct == null ? '\u2014' : formatPercent(profitLoss.totalProfitPct ?? metrics.sincePurchasePct)}`,
+    ...(hasNetDeposits
+      ? [
+          `Total return vs deposits: ${totalReturnChf >= 0 ? '+' : ''}${formatCurrency(totalReturnChf, 'CHF')}${totalReturnPct != null ? ` (${totalReturnPct >= 0 ? '+' : ''}${totalReturnPct.toFixed(2)}%)` : ''}`,
+          `Unrealized on held positions: ${profitLoss.totalProfitChf == null ? '\u2014' : formatSignedCurrency(profitLoss.totalProfitChf, 'CHF')}${profitLoss.totalProfitPct != null ? ` (${formatPercent(profitLoss.totalProfitPct)})` : ''}`,
+        ]
+      : [
+          `Unrealized profit: ${profitLoss.totalProfitChf == null ? '\u2014' : formatSignedCurrency(profitLoss.totalProfitChf, 'CHF')}`,
+          `Unrealized profit %: ${profitLoss.totalProfitPct == null && metrics.sincePurchasePct == null ? '\u2014' : formatPercent(profitLoss.totalProfitPct ?? metrics.sincePurchasePct)}`,
+        ]),
     '',
     'Holdings',
   ];
@@ -383,16 +408,40 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
   return lines.join('\n');
 }
 
-function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = null, deliveryStatus = null, topBlocker = null, nextAction = null }) {
+function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = null, deliveryStatus = null, topBlocker = null, nextAction = null, portfolioDir = null }) {
   const metrics = buildInvestorMetrics(summary);
   const profitLoss = summary?.profitLoss?.totals || {};
   const rows = investorHoldingRows(summary);
   const investedChf = Number.isFinite(metrics.investedChf) ? metrics.investedChf : null;
-  const profitChf = profitLoss.totalProfitChf ?? metrics.sincePurchaseChf;
-  const profitPct = profitLoss.totalProfitPct ?? metrics.sincePurchasePct;
-  const profitPositive = Number(profitChf) >= 0;
 
-  // Hero card — portfolio value snapshot
+  // Load deposits ledger for true "total return vs net deposited capital".
+  let netDepositedChf = null;
+  if (portfolioDir) {
+    try {
+      const dl = loadDepositsLedger(portfolioDir);
+      if (dl && !dl.missing) netDepositedChf = Number(dl.totals.netDepositedChf);
+    } catch (_err) { /* ignore */ }
+  }
+  const hasNetDeposits = Number.isFinite(netDepositedChf) && netDepositedChf > 0;
+  const totalReturnChf = hasNetDeposits && Number.isFinite(metrics.totalValueChf)
+    ? Number((metrics.totalValueChf - netDepositedChf).toFixed(2))
+    : null;
+  const totalReturnPct = hasNetDeposits && totalReturnChf != null
+    ? Number(((totalReturnChf / netDepositedChf) * 100).toFixed(2))
+    : null;
+
+  // Headline P/L — prefer total return vs deposits when ledger is present;
+  // fall back to unrealized cost-basis P/L when the ledger isn't wired up yet.
+  const headlineLabel = hasNetDeposits ? 'Total return vs deposits' : 'Unrealized Profit / Loss';
+  const headlineChf = hasNetDeposits ? totalReturnChf : (profitLoss.totalProfitChf ?? metrics.sincePurchaseChf);
+  const headlinePct = hasNetDeposits ? totalReturnPct : (profitLoss.totalProfitPct ?? metrics.sincePurchasePct);
+  const headlinePositive = Number(headlineChf) >= 0;
+
+  // Hero card — portfolio value snapshot. When the ledger is present, show
+  // "Net deposited" instead of "Invested" (current-position cost basis), so
+  // the operator-visible math reconciles with money actually put in.
+  const investedLabel = hasNetDeposits ? 'Net deposited' : 'Invested';
+  const investedDisplay = hasNetDeposits ? netDepositedChf : metrics.investedChf;
   const heroCard = `
     <div style="margin:0 0 16px;padding:28px 24px 24px;background:linear-gradient(135deg, #1e293b 0%, #334155 100%);border-radius:16px;color:#f1f5f9;">
       <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.7;font-weight:700;margin-bottom:6px;">Total portfolio value</div>
@@ -403,25 +452,26 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
           <div style="font-size:20px;font-weight:800;color:#ffffff;">${escapeHtml(formatCurrency(metrics.cashChf, 'CHF'))}</div>
         </td>
         <td style="padding:0;vertical-align:top;">
-          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;opacity:0.65;font-weight:700;margin-bottom:4px;">Invested</div>
-          <div style="font-size:20px;font-weight:800;color:#ffffff;">${escapeHtml(formatCurrency(metrics.investedChf, 'CHF'))}</div>
+          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;opacity:0.65;font-weight:700;margin-bottom:4px;">${escapeHtml(investedLabel)}</div>
+          <div style="font-size:20px;font-weight:800;color:#ffffff;">${escapeHtml(formatCurrency(investedDisplay, 'CHF'))}</div>
         </td>
       </tr></table>
     </div>`;
 
-  // Profit/loss strip
-  const profitStripBg = profitPositive ? '#f0fdf4' : '#fef2f2';
-  const profitStripBorder = profitPositive ? '#86efac' : '#fecaca';
-  const profitStripColor = profitPositive ? '#166534' : '#991b1b';
+  // Profit/loss strip — reflects total return when the deposits ledger is wired in.
+  const profitStripBg = headlinePositive ? '#f0fdf4' : '#fef2f2';
+  const profitStripBorder = headlinePositive ? '#86efac' : '#fecaca';
+  const profitStripColor = headlinePositive ? '#166534' : '#991b1b';
   const profitStrip = `
     <div style="margin:0 0 16px;padding:18px 22px;background:${profitStripBg};border:1px solid ${profitStripBorder};border-radius:14px;">
       <table role="presentation" style="width:100%;border-collapse:collapse;"><tr>
         <td style="padding:0;vertical-align:middle;">
-          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:${profitStripColor};font-weight:700;margin-bottom:4px;">Unrealized Profit / Loss</div>
-          <div style="font-size:26px;font-weight:800;color:${profitStripColor};line-height:1.15;">${escapeHtml(profitChf == null ? '\u2014' : formatSignedCurrency(profitChf, 'CHF'))}</div>
+          <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:${profitStripColor};font-weight:700;margin-bottom:4px;">${escapeHtml(headlineLabel)}</div>
+          <div style="font-size:26px;font-weight:800;color:${profitStripColor};line-height:1.15;">${escapeHtml(headlineChf == null ? '\u2014' : formatSignedCurrency(headlineChf, 'CHF'))}</div>
+          ${hasNetDeposits ? `<div style="margin-top:6px;font-size:12px;color:${profitStripColor};opacity:0.8;">on net deposited ${escapeHtml(formatCurrency(netDepositedChf, 'CHF'))}${profitLoss.totalProfitChf != null ? ` — of which ${escapeHtml(formatSignedCurrency(profitLoss.totalProfitChf, 'CHF'))} unrealized on held positions` : ''}</div>` : ''}
         </td>
         <td style="padding:0;vertical-align:middle;text-align:right;">
-          <div style="font-size:26px;font-weight:800;color:${profitStripColor};line-height:1.15;">${escapeHtml(profitPct == null ? '' : formatPercent(profitPct))}</div>
+          <div style="font-size:26px;font-weight:800;color:${profitStripColor};line-height:1.15;">${escapeHtml(headlinePct == null ? '' : formatPercent(headlinePct))}</div>
         </td>
       </tr></table>
     </div>`;

@@ -42,6 +42,7 @@ async function deliverPortfolioSummaryEmail({ portfolioDir, period = 'summary', 
     deliveryStatus: investorDeliveryContext,
     topBlocker: null,
     nextAction: investorNextAction,
+    portfolioDir,
   });
   const html = buildReportEmailHtml({
     portfolioName,
@@ -51,6 +52,7 @@ async function deliverPortfolioSummaryEmail({ portfolioDir, period = 'summary', 
     deliveryStatus: investorDeliveryContext,
     topBlocker: null,
     nextAction: investorNextAction,
+    portfolioDir,
   });
   const result = await sendEmailImpl({ policy, subject: resolvedSubject, text, html });
 

@@ -62,6 +62,7 @@ async function main() {
     period,
     summaryHtml: '',
     summary,
+    portfolioDir,
   });
 
   const text = buildReportEmailText({
@@ -69,6 +70,7 @@ async function main() {
     period,
     summaryMarkdown: '',
     summary,
+    portfolioDir,
   });
 
   const subject = buildDigestSubject({ portfolioName, frequency, generatedAt });
