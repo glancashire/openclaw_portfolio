@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+const { loadDepositsLedger, netDepositedAsOf } = require('../../lib/depositsLedger');
 
 const EXECUTION_SNAPSHOT_TYPES = new Set([
   'execution_approved',
@@ -29,7 +31,21 @@ function appendHistorySnapshot(historyPath, holdingsPath, snapshot = 'end_of_day
   const summary = parseHoldingSummary(holdingsText);
   const date = new Date().toISOString().slice(0, 10);
   const normalizedSnapshot = normalizeSnapshotType(snapshot, notes, options);
-  const row = `| ${date} | ${normalizedSnapshot} | ${summary.total} | ${summary.invested} | ${summary.cash} | 0 | 0 | ${notes} |`;
+
+  // Net deposited CHF as-of the snapshot date. Walks the deposits ledger if
+  // present in the same portfolio directory as the history file. Empty string
+  // when no ledger exists (back-compat for portfolios without deposits.md).
+  const portfolioDir = path.dirname(path.resolve(historyPath));
+  let netDepositedCell = '';
+  try {
+    const ledger = loadDepositsLedger(portfolioDir);
+    if (ledger && !ledger.missing) {
+      const net = netDepositedAsOf(ledger.entries, date);
+      netDepositedCell = String(net);
+    }
+  } catch (_err) { /* ignore: keep cell empty */ }
+
+  const row = `| ${date} | ${normalizedSnapshot} | ${summary.total} | ${summary.invested} | ${netDepositedCell} | ${summary.cash} | 0 | 0 | ${notes} |`;
 
   let text = fs.readFileSync(historyPath, 'utf8').trimEnd();
   const lines = text.split(/\r?\n/);

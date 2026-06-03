@@ -40,7 +40,7 @@ const CONTRACTS = {
     requiredStrings: [
       '# History:',
       '## Daily Valuation History',
-      '| Date | Snapshot | Total value CHF | Invested CHF | Cash CHF | Daily change CHF | Daily change % | Notes |',
+      '| Date | Snapshot | Total value CHF | Invested CHF | Net deposited CHF | Cash CHF | Daily change CHF | Daily change % | Notes |',
     ],
   },
   'dashboard.md': {

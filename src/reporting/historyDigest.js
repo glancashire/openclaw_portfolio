@@ -10,17 +10,43 @@ const fs = require('fs');
 const path = require('path');
 
 function parseHistoryRow(line) {
-  // | date | snapshot | total | invested | cash | dailyChange | dailyChange% | notes |
+  // Legacy 8-column layout (no Net deposited):
+  //   | date | snapshot | total | invested | cash | dailyChange | dailyChange% | notes |
+  // Current 9-column layout:
+  //   | date | snapshot | total | invested | netDeposited | cash | dailyChange | dailyChange% | notes |
   const cells = line.split('|').map((c) => c.trim());
   if (cells.length < 8) return null;
   const date = cells[1];
   const snapshot = cells[2];
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+
+  // The split-by-pipe yields cells.length = data_columns + 2 (empty leading
+  // and trailing entries from the bordering pipes).
+  // Legacy 8-column layout  -> cells.length === 10
+  // New 9-column layout     -> cells.length === 11
+  const isNewLayout = cells.length >= 11;
+
+  if (isNewLayout) {
+    return {
+      date,
+      snapshot,
+      totalChf: Number(cells[3]) || 0,
+      investedChf: Number(cells[4]) || 0,
+      netDepositedChf: cells[5] === '' ? null : (Number(cells[5]) || 0),
+      cashChf: Number(cells[6]) || 0,
+      dailyChangeChf: Number(cells[7]) || 0,
+      dailyChangePct: Number(cells[8]) || 0,
+      notes: cells[9] || '',
+    };
+  }
+
+  // Legacy layout — no net-deposited column. Field is null.
   return {
     date,
     snapshot,
     totalChf: Number(cells[3]) || 0,
     investedChf: Number(cells[4]) || 0,
+    netDepositedChf: null,
     cashChf: Number(cells[5]) || 0,
     dailyChangeChf: Number(cells[6]) || 0,
     dailyChangePct: Number(cells[7]) || 0,
@@ -29,9 +55,11 @@ function parseHistoryRow(line) {
 }
 
 /**
- * @returns {Array<{date,totalChf,investedChf,cashChf,dailyChangeChf,dailyChangePct,notes}>}
+ * @returns {Array<{date,totalChf,investedChf,netDepositedChf,cashChf,dailyChangeChf,dailyChangePct,notes}>}
  *   Sorted ascending by date. One row per date — the *last* snapshot in that day wins
  *   (this matches operator intent: end_of_day is canonical, start_of_day is a checkpoint).
+ *
+ *   netDepositedChf is `null` when the row is from the legacy 8-column layout.
  */
 function readNetLiqHistory(portfolioDir) {
   const file = path.join(portfolioDir, 'history.md');

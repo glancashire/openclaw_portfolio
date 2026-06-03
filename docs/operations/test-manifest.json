@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 318,
+    "total": 319,
     "safe": 241,
-    "integration": 72,
+    "integration": 73,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -815,6 +815,13 @@
       "path": "scripts/test-history-material-events.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-history-net-deposited-column.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
