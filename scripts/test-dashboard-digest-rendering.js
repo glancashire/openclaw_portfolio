@@ -62,7 +62,13 @@ function seed(repoRoot) {
   assert(digest.html.includes('Cron health'));
   assert(digest.html.includes('Next steps'));
   assert(digest.html.includes('max-width:720px'));
-  assert(digest.html.includes('linear-gradient(135deg'));
+  // Redesigned digest no longer uses a gradient hero — confirm it's gone
+  // and the new dark-mode-adaptive theme infrastructure is present instead.
+  assert(!digest.html.includes('linear-gradient(135deg'), 'No gradient hero (replaced with clean header)');
+  assert(digest.html.includes('prefers-color-scheme: dark'), 'Has prefers-color-scheme dark media query');
+  assert(digest.html.includes('color-scheme'), 'Has color-scheme meta');
+  assert(digest.html.includes('[data-ogsc]'), 'Has Outlook dark mode hooks');
+  assert(digest.html.includes('class="t-page'), 'Has theme class hooks');
   assert(digest.html.includes('health-monitor'));
   assert(digest.text.includes('Cron health: 1/2 healthy, 1 failing'));
   assert(digest.text.includes('Portfolio value (incl cash):'));

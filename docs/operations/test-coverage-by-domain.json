@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-02T22:35:02.353Z",
+  "generatedAt": "2026-06-03T08:04:44.658Z",
   "counts": {
-    "totalTests": 311,
+    "totalTests": 312,
     "domains": 113
   },
   "domains": [
@@ -158,6 +158,21 @@
       ]
     },
     {
+      "domain": "email",
+      "total": 7,
+      "safe": 4,
+      "integration": 3,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-email-dedup.js",
+        "scripts/test-email-delivery-policy.js",
+        "scripts/test-email-digest-doc.js"
+      ]
+    },
+    {
       "domain": "broker",
       "total": 6,
       "safe": 6,
@@ -185,21 +200,6 @@
         "scripts/test-delivery-backfill-next-action.js",
         "scripts/test-delivery-backfill-review-readiness.js",
         "scripts/test-delivery-diagnostic-broker-block-context.js"
-      ]
-    },
-    {
-      "domain": "email",
-      "total": 6,
-      "safe": 3,
-      "integration": 3,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 2,
-      "examples": [
-        "scripts/test-email-dedup.js",
-        "scripts/test-email-delivery-policy.js",
-        "scripts/test-email-digest-doc.js"
       ]
     },
     {
