@@ -3,7 +3,7 @@
 > Single source of truth for the current operational state.
 > Live work lives in `CURRENT_PLAN.md`. Historical plans, audits, and task notes live under `archive/`.
 
-**Last refreshed:** 2026-06-02 22:20 UTC
+**Last refreshed:** 2026-06-03 10:30 UTC
 **Repo head:** current `master` (see `git log -1 --oneline` for exact head)
 
 ---
@@ -16,8 +16,9 @@
 | IBKR socket / auth / read | green | readonly access and reporting flows are healthy |
 | IBKR quote posture | degraded | `marketDataMode=unknown`; live submission stays blocked pending operator-side diagnosis |
 | Holdings sync | functional | sync is truthful and usable, though still not especially fast |
-| Dashboard / report emails | healthy | digest + investor emails now share the cleaned-up three-block visual template |
-| Safe-lane verification | green | last run: 235 passed, 0 failed, 3 quarantined |
+| Dashboard / report emails | healthy | light-only theme; digest hero now shows Net deposited and Total return vs deposits |
+| Deposits ledger | wired | `portfolio/etf/deposits.md` (8 deposits, 120k CHF net) drives the digest headline |
+| Safe-lane verification | green | last run: 238 passed, 0 failed, 3 quarantined |
 | Cron jobs | healthy snapshot | latest tracked cron snapshot is healthy; see `docs/operations/active-cron-jobs.md` |
 | OpenClaw control UI | healthy | session-retention cleanup and current repo surfaces are in place |
 
@@ -44,10 +45,12 @@
 
 ## Current open-work buckets
 
-- **Autonomous engineering backlog** - see `CURRENT_PLAN.md` Phases 1-4.
-- **Operator / external unblockers** - see `CURRENT_PLAN.md` Phase 0.
-- **Parked or decision-led work** - see `CURRENT_PLAN.md` Phase 5.
+- **Phase A — Deposits ledger maturity** - small follow-ups (history backfill, auto-import CLI, withdrawal display).
+- **Phase B — Operator/external unblockers** - IBKR runbook Step 6, then re-test live submission.
+- **Phase C — Counter freshness wiring** - decide auto-regen strategy for `usage-counters.json`.
+- **Phase D — Parked product/domain explorations** - FX recon, Control UI embedding, Spitex.
 
+Full breakdown and recommended order in `CURRENT_PLAN.md`.
 ## Operator quick refs
 
 - IBKR live status: `node scripts/ibkr-fast-status.js`

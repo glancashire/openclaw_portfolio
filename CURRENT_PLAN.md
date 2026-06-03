@@ -1,143 +1,128 @@
 # Current Plan
 
-Date: 2026-06-02
-Status: waiting
+**Date:** 2026-06-03
+**Status:** waiting on operator inputs + a few open decisions
+**Repo head:** see `git log -1 --oneline` for the exact head
 
 ## Goal
-Keep the live doc set small and truthful. Completed engineering phases stay in `archive/`; this file tracks only real open work, open decisions, and the order to resume when Graham says go.
+
+Keep one short, truthful doc that captures **only the work that is still open or waiting**. Completed phases live in `archive/phase-plans/`. Historical roadmaps live in `archive/docs/`.
+
+When Graham says "go", an autonomous run can pick up from this file alone.
+
+---
 
 ## Visual roadmap
 
 ```text
-Phase 1 operator surface cleanup and dashboard path cleanup   [DONE]     ██████████
-Phase 2 artifact hygiene and legacy surface retirement        [DONE]     ██████████
-Phase 3 usage and decision-support reporting                  [DONE]     ██████████
-Phase 4 OpenClaw maintainer contract                          [DONE]     ██████████
-Phase 0 external unblockers and operator-owned gates          [WAITING]  ███░░░░░░░
-Phase 5 parked product and domain explorations                [PARKED]   █░░░░░░░░░
+Phase A  Deposits ledger maturity                       [ACTIVE / waiting decisions]  ████░░░░░░
+Phase B  External unblockers (operator-owned gates)     [WAITING]                     ███░░░░░░░
+Phase C  Counter freshness wiring                       [OPEN / small]                █░░░░░░░░░
+Phase D  Parked product and domain explorations         [PARKED]                      █░░░░░░░░░
 ```
 
+Completed phases (filtered out of the live roadmap, archived in full):
+
+- Phase 1 — Operator surface cleanup and dashboard path cleanup ✅ 2026-06-02
+- Phase 2 — Artifact hygiene and legacy surface retirement ✅ 2026-06-03
+- Phase 3 — Usage and decision-support reporting ✅ 2026-06-03
+- Phase 4 — OpenClaw maintainer contract ✅ 2026-06-03
+- Email redesign (Themeforest light/dark, then forced light-only) ✅ 2026-06-03
+- Deposits ledger initial wiring (digest hero + P/L strip uses `deposits.md`) ✅ 2026-06-03
+
+Archive index: `archive/phase-plans/2026-06-03-completed/`.
+
 ---
 
-## Phase 0 - External unblockers and operator-owned gates
-**Status:** WAITING
+## Phase A — Deposits ledger maturity
+**Status:** ACTIVE (initial wiring landed; follow-ups open)
 
 ### Completed
-- [x] IBKR readonly reporting and holdings-sync paths are stable enough for normal read/report operations.
-- [x] Recovery guidance exists in `docs/operations/ibkr-recovery.md`.
+- [x] `portfolio/etf/deposits.md` ledger imported from IBKR transactions report (8 deposits totaling 120,000 CHF).
+- [x] `lib/depositsLedger.js` parser supports deposits + withdrawals.
+- [x] Daily/weekly digest hero card now shows **Net deposited** instead of cost-basis "Invested" when ledger present.
+- [x] P/L strip now shows **Total return vs deposits** (`value − net deposited`) with secondary line for unrealized-on-held-positions.
+- [x] `dashboardDigest.js` (alternate render path) also wired to the ledger for parity.
+- [x] Regression test `scripts/test-deposits-ledger.js` (8 entries, withdrawals, missing-file path).
+- [x] All callers of `buildReportEmailHtml`/`Text` pass `portfolioDir` through (`send-dashboard-digest.js`, `deliveryExecutor.js`).
 
-### Started / already true
-- [x] The quote-posture failure has been narrowed to subscription/data-farm/operator-side diagnosis, not a generic read-path outage.
+### Started / partially complete
+- [ ] Backfill `history.md` "Invested CHF" column to use net-deposited instead of cost-basis. Currently the column shows held-positions cost basis (e.g. `121,633.74` on 2026-06-03) which is misleading once a ledger exists.
 
 ### Still open
-- [ ] Complete IBKR runbook Step 6 and verify quote posture moves out of `unknown`.
-- [ ] Re-test live order submission only after quote posture is healthy.
-- [ ] Decide whether Control UI direct embedding is truly blocked or simply still-undiscovered source territory.
-
-### Notes
-- This phase is not autonomous until operator/external inputs land.
+- [ ] **Decision:** does the weekly/monthly investor email keep the same headline (Total return vs deposits) or do we want a different presentation for investors? Current default: same as digest.
+- [ ] Multi-portfolio support: only `portfolio/etf/deposits.md` exists. If/when other portfolios become live, each one needs its own `deposits.md` (parser is portfolio-agnostic).
+- [ ] Auto-import script: a small CLI that reads a fresh IBKR transactions XLS, dedups against existing references in `deposits.md`, appends new rows. Manual append works today; this is convenience.
+- [ ] Withdrawal handling end-to-end test (no withdrawals exist yet in real data; library code path is covered by unit test only).
+- [ ] Display: when a withdrawal exists, surface it explicitly in the digest ("Cumulative deposits 130k − withdrawals 10k = net 120k") rather than just showing net.
 
 ---
 
-## Phase 1 - Operator surface cleanup and dashboard path cleanup
-**Status:** COMPLETE (2026-06-02)
+## Phase B — External unblockers and operator-owned gates
+**Status:** WAITING (operator-side actions; not autonomous)
 
 ### Completed
-- [x] Weekly/monthly investor report email uses the redesigned three-block template.
-- [x] Daily digest email now uses the redesigned three-block template as well.
-- [x] Test-governance, status, and repo-truth surfaces now exist and are green.
-- [x] Retired the orphan dashboard-email helper trio to `archive/scripts/legacy-dashboard-email/`.
-- [x] Added `docs/reporting-command-surface.md` as the canonical dashboard/report/email command surface.
-- [x] Tightened `docs/operator-runbooks.md` into a shorter golden path with expected artifact checks.
-- [x] Updated digest docs to the current `reportEmail.js` rendering path and explicit JSON/dry-run behavior.
-- [x] Added regression coverage for the reporting command surface and digest docs.
-
-### Started / already true
-- [x] The legacy dashboard email path had already been identified as a separate surface.
-- [x] The main execution/reporting command surfaces were already partially documented.
-- [x] Decision made: retire the orphan dashboard helper trio rather than rewrite it.
+- [x] IBKR readonly reporting and holdings-sync paths are stable for normal read/report operations.
+- [x] Recovery guidance lives in `docs/operations/ibkr-recovery.md`.
+- [x] Quote-posture failure narrowed to subscription/data-farm/operator-side diagnosis (not a generic read-path outage).
 
 ### Still open
-- [x] None - phase closed 2026-06-02.
+- [ ] **Operator action:** complete IBKR runbook Step 6 and verify quote posture moves out of `unknown`.
+- [ ] **Operator action:** re-test live order submission only after quote posture is healthy.
+- [ ] **Decision:** Control UI direct embedding — truly blocked, or just still-undiscovered source territory? See `archive/docs/post-mvp-roadmap.md` for original scope.
 
 ---
 
-## Phase 2 - Artifact hygiene and legacy surface retirement
-**Status:** COMPLETE (2026-06-03)
+## Phase C — Counter freshness wiring
+**Status:** OPEN (small, ready for autonomous execution)
 
-### Completed
-- [x] Historical phase plans live under `archive/phase-plans/`.
-- [x] Repo-root cleanliness and plan/doc-truth tests exist.
-- [x] Generated test-manifest and domain-summary artifacts already exist.
-- [x] Decided to keep `scripts/execute-trades.js` as a deliberate failure shim. Rationale block added in-file. New regression test `scripts/test-execute-trades-shim-contract.js` locks in the exit-1 + obsolescence-message contract.
-- [x] Tracked wrapper/compatibility scripts blessed in `docs/operations/wrappers-and-shims.md`. The 14 diagnostic-script forwarders are kept (locked in by `scripts/test-diagnostics-script-compat.js`).
-- [x] Decision recorded: defer naming a separate generated-artifact idempotence verification lane. Existing checks already cover the surface.
-
-### Started / already true
-- [x] Current docs consolidation moved stale audit/task notes out of the live surfaces.
-- [x] Diagnostic scripts already live under `scripts/diagnostics/` with compatibility coverage.
-
----
-
-## Phase 3 - Usage and decision-support reporting
-**Status:** COMPLETE (2026-06-03)
-
-### Completed
-- [x] Dashboard, overview, health, fill, digest, and investor email surfaces already exist.
-- [x] Cron health and guided-remediation truth already surface degraded states honestly.
-- [x] Added `src/reporting/usageCounters.js` — build/read/summarize rolling usage counters from evidence on disk.
-- [x] Added `src/reporting/usageKpiArtifact.js` — generates the usage-kpi triplet (JSON/MD/HTML).
-- [x] Added `scripts/regenerate-usage-counters.js` + `scripts/regenerate-usage-kpi.js`.
-- [x] Wired an "Operations KPI" card into the daily digest (operator-facing only). Absent gracefully when no counters file exists.
-- [x] Decision made: all KPI counters are operator-facing only. Investor reports stay focused on portfolio outcomes.
-- [x] New tests: `scripts/test-usage-counters.js` (17 assertions), `scripts/test-usage-kpi-artifact.js`, `scripts/test-dashboard-digest-kpi-card.js`.
-- [x] Updated `docs/reporting-command-surface.md` and `playbook.md` with new commands.
-
-### Started / already true
-- [x] Usage/KPI themes were already identified in the 2026-05-30 project audit and roadmap work.
-
----
-
-## Phase 4 - OpenClaw maintainer contract
-**Status:** COMPLETE (2026-06-03)
-
-### Completed
-- [x] Host-specific invariants are captured in `TOOLS.md`.
-- [x] Repo orientation and test-governance docs exist.
-- [x] Wrote canonical host contract `docs/operations/openclaw-host-contract.md` with a one-page matrix of channels / sandbox / cron delivery / restarts / approvals.
-- [x] Top-of-file pointers added to `TOOLS.md`, `AGENTS.md`, `playbook.md`, and `docs/operations/repo-map.md`.
-- [x] New regression `scripts/test-openclaw-host-contract.js` locks the contract surface (rows + cross-links + pointer presence).
-
-### Started / already true
-- [x] Current-vs-archive boundaries are now explicit in the doc set.
-
----
-
-## Phase 5 - Parked product and domain explorations
-**Status:** PARKED
-
-### Completed
-- [x] FX cash reconciliation root cause was documented.
-- [x] Control UI embedding was identified as a valid target but not an editable one.
-- [x] Spitex transfer themes were explored at a strategy level.
+The Phase 3 usage counters live at `runtime/overview/usage-counters.json` and feed the digest's Operations KPI card. Today they're regenerated only on manual `node scripts/regenerate-usage-counters.js`. The digest reads the cached file. So if no one regenerates, the card slowly goes stale.
 
 ### Still open
-- [ ] Decide whether FX cash reconciliation should be reactivated for autonomous implementation or remain Graham-owned WIP.
-- [ ] Decide whether Control UI direct embedding becomes real backlog once editable source is available.
-- [ ] Decide whether the Spitex exploration track is a real product lane or archive-only research.
+- [ ] **Decision needed:** how should counters refresh?
+  - Option (a): wire `regenerateUsageCounters()` into `send-dashboard-digest.js` so each daily send regenerates first. Simplest. Adds ~2s to the send.
+  - Option (b): add a small cron job that regenerates 1×/day at 06:00 UTC, separate from the digest send. Cleaner separation of concerns. Adds one more cron job.
+  - Option (c): leave manual. Document the helper in playbook and call it good. Lowest cost, slight risk of stale data.
+- [ ] Implement chosen option, run safe lane, commit.
+
+**Recommendation:** Option (a). One less cron job, deterministic with each send, the cost is trivial.
+
+---
+
+## Phase D — Parked product and domain explorations
+**Status:** PARKED (not autonomous; operator owns reactivation)
+
+### Items parked
+- [ ] **Decision:** FX cash reconciliation — reactivate for autonomous implementation, or keep as Graham-owned WIP? Root cause was documented; no fix is staged.
+- [ ] **Decision:** Control UI direct embedding — real backlog if editable source becomes available, otherwise stays parked.
+- [ ] **Decision:** Spitex transfer themes — real product lane, or archive-only research?
 
 ---
 
 ## Recommended execution order when Graham says go
 
-1. Phase 2 - artifact hygiene and legacy surface retirement
-2. Phase 4 - OpenClaw maintainer contract
-3. Phase 3 - usage and decision-support reporting
-4. Phase 0 - external unblockers as soon as operator inputs are available
-5. Phase 5 - only if explicitly reactivated
+1. **Phase A.history-backfill** (concrete, small, no external blockers).
+2. **Phase A.auto-import** (small CLI; convenience).
+3. **Phase C** (counter freshness; pick option a).
+4. **Phase A.withdrawal-display** (only relevant once a withdrawal happens; defer otherwise).
+5. **Phase B** (only after operator inputs land).
+6. **Phase D** (only on explicit reactivation).
 
-## Open decisions for Graham
+---
 
-1. IBKR quote posture: recommend doing runbook Step 6 first if live trading matters in the next session.
-2. `scripts/execute-trades.js`: recommend keeping it as an explicit failure shim until a path-dependence audit is done, then remove it cleanly.
-3. FX cash reconciliation: recommend reopening it only if current live operator use is still materially confused by cash/value math.
+## Open decisions Graham must make
+
+1. **Phase A — investor email headline.** Should weekly/monthly investor email match the daily digest's "Total return vs deposits" headline?
+   - **Recommend:** YES — consistent headline reduces confusion. Investor email already shares the same `reportEmail.js` builder, so it's free.
+
+2. **Phase A — auto-import CLI scope.** Should a small CLI auto-merge fresh IBKR XLS deposit reports into `deposits.md`?
+   - **Recommend:** YES — mark as Phase A.auto-import. Parses XLS, dedups by reference, appends. Saves manual edits.
+
+3. **Phase C — counter freshness.** Pick option (a), (b), or (c).
+   - **Recommend:** (a) — wire `regenerateUsageCounters()` into the digest send. Simplest, deterministic, ~2s overhead.
+
+4. **Phase D — Spitex / FX-recon / Control UI embedding.** Reactivate any of these as live work, or keep parked?
+   - **Recommend:** keep all three PARKED until you have real motivation to ship. The repo is currently clean; reactivating without a concrete need adds clutter.
+
+5. **Phase B — IBKR runbook Step 6.** Operator action only. Until done, live trading stays gated.
+   - **Recommend:** schedule a 30-minute slot to complete the runbook step. After that, autonomous lane can resume live-trade verification.

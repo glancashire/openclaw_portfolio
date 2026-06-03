@@ -11,7 +11,7 @@
  * - light fallback colors are inlined on key elements
  * - card / badge / dataTable / metricGrid / kvTable / bulletList still render
  *
- * Spec: docs/email-dashboard-light-dark-spec.md
+ * Spec (archived): archive/phase-plans/2026-06-03-completed/email-dashboard-light-dark-spec.md
  */
 
 const assert = require('assert');
