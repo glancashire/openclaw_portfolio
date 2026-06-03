@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 325,
-    "safe": 247,
+    "total": 326,
+    "safe": 248,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -786,6 +786,13 @@
       "path": "scripts/test-guided-remediation-wording.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-h1-allocation-baseline.js",
+      "lane": "safe",
+      "reason": "static read of runtime JSON baseline artifact, no execution",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
