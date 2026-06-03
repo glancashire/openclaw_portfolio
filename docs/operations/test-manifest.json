@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 323,
-    "safe": 245,
+    "total": 324,
+    "safe": 246,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -562,6 +562,13 @@
       "path": "scripts/test-deposits-ledger.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-deposits-runbook.js",
+      "lane": "safe",
+      "reason": "static read of docs/operator-runbooks.md, no execution",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

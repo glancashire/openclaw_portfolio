@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T15:46:19.828Z",
+  "generatedAt": "2026-06-03T16:48:29.084Z",
   "counts": {
-    "totalTests": 323,
+    "totalTests": 324,
     "domains": 119
   },
   "domains": [
@@ -458,6 +458,21 @@
       ]
     },
     {
+      "domain": "deposits",
+      "total": 3,
+      "safe": 2,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-deposits-ledger.js",
+        "scripts/test-deposits-runbook.js",
+        "scripts/test-deposits-withdrawal-display.js"
+      ]
+    },
+    {
       "domain": "etf",
       "total": 3,
       "safe": 2,
@@ -573,20 +588,6 @@
       "examples": [
         "scripts/test-approved-instruments-metadata.js",
         "scripts/test-approved-instruments-sentinel-identity.js"
-      ]
-    },
-    {
-      "domain": "deposits",
-      "total": 2,
-      "safe": 1,
-      "integration": 1,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-deposits-ledger.js",
-        "scripts/test-deposits-withdrawal-display.js"
       ]
     },
     {
