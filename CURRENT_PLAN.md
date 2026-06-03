@@ -93,9 +93,9 @@ The Phase 3 usage counters live at `runtime/overview/usage-counters.json` and fe
 **Status:** PARKED (not autonomous; operator owns reactivation)
 
 ### Items parked
-- [ ] **Decision:** FX cash reconciliation — reactivate for autonomous implementation, or keep as Graham-owned WIP? Root cause was documented; no fix is staged.
-- [ ] **Decision:** Control UI direct embedding — real backlog if editable source becomes available, otherwise stays parked.
-- [ ] **Decision:** Spitex transfer themes — real product lane, or archive-only research?
+- [ ] **Decision LOCKED 2026-06-03 — keep parked.** FX cash reconciliation: documented root cause; no fix staged. Reactivate only if live operator use becomes materially confused.
+- [ ] **Decision LOCKED 2026-06-03 — keep parked.** Control UI direct embedding: target identified, editable source not yet available.
+- ~~Spitex transfer themes~~ — out of scope for this repo (separate surface).
 
 ---
 
@@ -112,17 +112,11 @@ The Phase 3 usage counters live at `runtime/overview/usage-counters.json` and fe
 
 ## Open decisions Graham must make
 
-1. **Phase A — investor email headline.** Should weekly/monthly investor email match the daily digest's "Total return vs deposits" headline?
-   - **Recommend:** YES — consistent headline reduces confusion. Investor email already shares the same `reportEmail.js` builder, so it's free.
+_All initially-open decisions were resolved on 2026-06-03 10:54 UTC; recommended
+options accepted, Spitex removed as out-of-scope. Recorded here for audit trail._
 
-2. **Phase A — auto-import CLI scope.** Should a small CLI auto-merge fresh IBKR XLS deposit reports into `deposits.md`?
-   - **Recommend:** YES — mark as Phase A.auto-import. Parses XLS, dedups by reference, appends. Saves manual edits.
-
-3. **Phase C — counter freshness.** Pick option (a), (b), or (c).
-   - **Recommend:** (a) — wire `regenerateUsageCounters()` into the digest send. Simplest, deterministic, ~2s overhead.
-
-4. **Phase D — Spitex / FX-recon / Control UI embedding.** Reactivate any of these as live work, or keep parked?
-   - **Recommend:** keep all three PARKED until you have real motivation to ship. The repo is currently clean; reactivating without a concrete need adds clutter.
-
-5. **Phase B — IBKR runbook Step 6.** Operator action only. Until done, live trading stays gated.
-   - **Recommend:** schedule a 30-minute slot to complete the runbook step. After that, autonomous lane can resume live-trade verification.
+1. **Phase A — investor email headline.** ✅ ACCEPTED — investor weekly/monthly inherits the same `reportEmail.js` builder; headline aligns automatically with the daily digest.
+2. **Phase A — auto-import CLI scope.** ✅ ACCEPTED — build a small CLI to dedup/append fresh IBKR XLS deposit reports into `deposits.md`.
+3. **Phase C — counter freshness.** ✅ ACCEPTED — option (a): wire `regenerateUsageCounters()` into `send-dashboard-digest.js`.
+4. **Phase D — parked items.** ✅ ACCEPTED — keep all three parked. Spitex removed (out of scope).
+5. **Phase B — IBKR runbook Step 6.** ✅ ACCEPTED — operator handles separately.
