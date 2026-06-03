@@ -31,10 +31,10 @@ const html = require('../src/reporting/emailHtml');
   }
   // TOKENS shape
   assert(html.TOKENS.light && html.TOKENS.dark, 'TOKENS has light + dark');
-  assert.strictEqual(html.TOKENS.light.bg, '#f7f8fb');
+  assert.strictEqual(html.TOKENS.light.bg, '#ffffff');
   assert.strictEqual(html.TOKENS.dark.bg, '#0b1220');
-  assert.strictEqual(html.TOKENS.light.positive, '#15803d');
-  assert.strictEqual(html.TOKENS.light.negative, '#b91c1c');
+  assert.strictEqual(html.TOKENS.light.positive, '#166534');
+  assert.strictEqual(html.TOKENS.light.negative, '#991b1b');
   assert.strictEqual(html.TOKENS.dark.positive, '#34d399');
   assert.strictEqual(html.TOKENS.dark.negative, '#f87171');
 })();
@@ -68,9 +68,8 @@ const html = require('../src/reporting/emailHtml');
   assert(!out.includes('linear-gradient'), 'no gradient hero');
 
   // light fallbacks inlined (key colors)
-  assert(out.includes('#f7f8fb'), 'page bg inline fallback');
-  assert(out.includes('#ffffff'), 'card surface inline fallback');
-  assert(out.includes('#1a1a2e'), 'text inline fallback');
+  assert(out.includes('#ffffff'), 'white surface inline fallback');
+  assert(out.includes('#0f172a'), 'text inline fallback');
 
   // contains dark token in the <style> block (so the block is real, not stub)
   assert(out.includes('#0b1220'), 'dark bg defined in <style> block');
@@ -93,7 +92,7 @@ const html = require('../src/reporting/emailHtml');
   assert(c.includes('#ffffff'), 'card light fallback');
 
   const cWarn = html.card({ title: 'W', contentHtml: '<p>x</p>', tone: 'warn' });
-  assert(cWarn.includes('#fff7ed'), 'warn tone uses subtle warn surface');
+  assert(cWarn.includes('#ffedd5'), 'warn tone uses subtle warn surface');
 
   const b = html.badge({ label: 'OK', tone: 'success' });
   assert(b.includes('OK'));
