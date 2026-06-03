@@ -37,6 +37,72 @@ function toneForCronSeverity(severity = 'ok') {
   return 'success';
 }
 
+// Plain-English one-liners for each ETF / cash line in the dashboard email.
+// Keyed primarily by IBKR symbol because that is what surfaces in the holdings
+// rows; ISIN keys are kept as a fallback for rows that come through with the
+// ISIN intact. Descriptions are non-promotional, factual, and short enough to
+// read at a glance under the ticker label.
+const INSTRUMENT_DESCRIPTIONS = {
+  // US large-cap core
+  SXR8: 'iShares S&P 500 — broad US large-cap exposure (500 names, market-cap weighted, EUR-listed accumulating share class).',
+  IE00B5BMR087: 'iShares S&P 500 — broad US large-cap exposure (500 names, market-cap weighted, EUR-listed accumulating share class).',
+  // US deconcentration
+  XDEW: 'Xtrackers S&P 500 Equal Weight — same 500 US names but each at ~0.2%, dialing down Mag-7 concentration.',
+  IE00BLNMYC90: 'Xtrackers S&P 500 Equal Weight — same 500 US names but each at ~0.2%, dialing down Mag-7 concentration.',
+  // Eurozone large-cap
+  EMUAA: 'UBS MSCI EMU — Eurozone large/mid-cap exposure (Germany, France, Netherlands, Italy, Spain, …).',
+  LU0950668870: 'UBS MSCI EMU — Eurozone large/mid-cap exposure (Germany, France, Netherlands, Italy, Spain, …).',
+  // Eurozone mid-cap deconcentration
+  IS3H: 'iShares MSCI EMU Mid Cap — Eurozone mid-cap sleeve to dial back ASML/SAP/LVMH mega-cap concentration.',
+  IE00BCLWRD08: 'iShares MSCI EMU Mid Cap — Eurozone mid-cap sleeve to dial back ASML/SAP/LVMH mega-cap concentration.',
+  // Global equal weight
+  MWEQ: 'Invesco MSCI World Equal Weight — ~1,400 developed-market names equally weighted, diluting US mega-cap dominance.',
+  IE000OEF25S1: 'Invesco MSCI World Equal Weight — ~1,400 developed-market names equally weighted, diluting US mega-cap dominance.',
+  // Switzerland — SMI gleichgewichtet (UBS SLI)
+  UBSSLI: 'UBS SLI — Swiss large-cap, equal-weight version of the SMI to limit Nestlé/Roche/Novartis dominance.',
+  CHSPI: 'UBS SLI — Swiss large-cap, equal-weight version of the SMI to limit Nestlé/Roche/Novartis dominance.',
+  CH0032912732: 'UBS SLI — Swiss large-cap, equal-weight version of the SMI to limit Nestlé/Roche/Novartis dominance.',
+  // Switzerland — Xtrackers SLI 1D (distributing)
+  DXS0: 'Xtrackers SLI 1D — Swiss capped large-cap; SLI methodology caps the top four names at 9% each. Distributing share class.',
+  LU0322248146: 'Xtrackers SLI 1D — Swiss capped large-cap; SLI methodology caps the top four names at 9% each. Distributing share class.',
+  // Switzerland mid-cap
+  SPMCHA: 'UBS SPI Mid — Swiss mid-cap complement (SPI ex SMI), broadens the Swiss sleeve beyond the top 20 names.',
+  CH0130595124: 'UBS SPI Mid — Swiss mid-cap complement (SPI ex SMI), broadens the Swiss sleeve beyond the top 20 names.',
+  // UK
+  UKGBPB: 'UBS MSCI United Kingdom — UK large-cap sleeve in GBP (BP, Shell, AstraZeneca, HSBC, Unilever, …).',
+  LU0950670850: 'UBS MSCI United Kingdom — UK large-cap sleeve in GBP (BP, Shell, AstraZeneca, HSBC, Unilever, …).',
+  // China
+  HMCD: 'HSBC MSCI China — broad China A/H/ADR exposure (Tencent, Alibaba, Meituan, BYD, …).',
+  IE00B44T3H88: 'HSBC MSCI China — broad China A/H/ADR exposure (Tencent, Alibaba, Meituan, BYD, …).',
+  // EM Asia
+  CEBL: 'iShares MSCI EM Asia — broad emerging Asia (India, Korea, Taiwan, ASEAN); does NOT include China to avoid double-counting with HMCD.',
+  IE00B5L8K969: 'iShares MSCI EM Asia — broad emerging Asia (India, Korea, Taiwan, ASEAN); does NOT include China to avoid double-counting with HMCD.',
+  // Japan
+  LCUJ: 'Amundi MSCI Japan — Japanese large/mid-cap sleeve (Toyota, Sony, Mitsubishi UFJ, Keyence, …).',
+  LU1781541252: 'Amundi MSCI Japan — Japanese large/mid-cap sleeve (Toyota, Sony, Mitsubishi UFJ, Keyence, …).',
+  // Semiconductors
+  SEC0: 'iShares MSCI Global Semiconductors — semis-only sleeve (NVIDIA, TSMC, ASML, Broadcom, …); concentrated AI-infrastructure tilt.',
+  IE000I8KRLL9: 'iShares MSCI Global Semiconductors — semis-only sleeve (NVIDIA, TSMC, ASML, Broadcom, …); concentrated AI-infrastructure tilt.',
+  // AI infrastructure
+  AINF: 'iShares AI Infrastructure — AI compute / network / data-center theme; complements SEC0 with broader infrastructure scope.',
+  AIFS: 'iShares AI Infrastructure — AI compute / network / data-center theme; complements SEC0 with broader infrastructure scope.',
+  IE000X59ZHE2: 'iShares AI Infrastructure — AI compute / network / data-center theme; complements SEC0 with broader infrastructure scope.',
+  // AI / Big Data
+  XAIX: 'Xtrackers Artificial Intelligence & Big Data — broader AI / big-data thematic; software, hardware, and platform names.',
+  IE00BGV5VN51: 'Xtrackers Artificial Intelligence & Big Data — broader AI / big-data thematic; software, hardware, and platform names.',
+  // Cash
+  'CASH-CHF': 'CHF cash balance held at IBKR — dry powder for the next deployment; small reserve only.',
+};
+
+function describeInstrument(row = {}) {
+  const candidates = [row.symbol, row.tickerOrIsin, row.name].filter(Boolean);
+  for (const key of candidates) {
+    const upper = String(key).trim().toUpperCase();
+    if (INSTRUMENT_DESCRIPTIONS[upper]) return INSTRUMENT_DESCRIPTIONS[upper];
+  }
+  return null;
+}
+
 function summarizeInstrumentHealth(summary = {}) {
   const allocationRows = Array.isArray(summary.allocation) ? summary.allocation : [];
   const allocationByAssetClass = new Map(allocationRows.map((row) => [String(row.assetClass || ''), row]));
@@ -232,8 +298,13 @@ function renderProfitLossCard(summary = {}) {
     const profitCell = profit == null
       ? '<span style="color:#6b7280;">—</span>'
       : `<span style="color:${profitColor};font-weight:600;">${formatCurrency(profit, 'CHF')}${profitPct != null ? ` (${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}</span>`;
+    const label = r.name || r.symbol || r.tickerOrIsin || '—';
+    const description = describeInstrument(r);
+    const labelCell = description
+      ? `<div style="font-weight:600;color:#0f172a;">${escapeHtml(label)}</div><div style="font-size:12px;color:#64748b;line-height:1.45;margin-top:3px;">${escapeHtml(description)}</div>`
+      : escapeHtml(label);
     return [
-      escapeHtml(r.name || r.symbol || r.tickerOrIsin || '—'),
+      labelCell,
       escapeHtml(formatCurrency(r.valueChf, 'CHF')),
       escapeHtml(r.costBasisChf == null ? '—' : formatCurrency(r.costBasisChf, 'CHF')),
       profitCell,
