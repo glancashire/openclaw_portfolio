@@ -133,6 +133,7 @@ async function main() {
     const notification = await notifyTradeFill({
       trade: {
         symbol: order.symbol,
+        name: order.name || undefined,
         action: order.action,
         qty: order.qty,
         price: order.limit,

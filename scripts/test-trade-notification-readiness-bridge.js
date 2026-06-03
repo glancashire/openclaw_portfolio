@@ -193,11 +193,57 @@ function runUnrelatedSymbolStillFailsClosed() {
   });
 }
 
+function runCanonicalNameResolution() {
+  // After ISIN<->conid bridge: investorTrade.name AND the enriched holdings
+  // row name must come from approvedInstruments (canonical) when the only
+  // alternative is the polluted IBKR-positions name (local symbol). This is
+  // the exact pre-fix bug the user surfaced 2026-06-03 15:50 UTC: emails
+  // showed "Name: XDEW" instead of "Name: Xtrackers S&P 500 Equal Weight
+  // UCITS ETF 1C".
+  withTempPortfolio((dir) => {
+    writeApprovedRow(dir, [
+      '| IE00BLNMYC90 | Xtrackers S&P 500 Equal Weight UCITS ETF 1C | Global equities | 6 | 0 | 10 | IBIS2 | EUR | ibkr_symbol=XDEW; ibkr_conid=163606923 |',
+    ]);
+
+    const trade = {
+      symbol: 'IE00BLNMYC90',
+      tickerOrIsin: 'IE00BLNMYC90',
+      action: 'BUY',
+      qty: 82,
+      fillQty: 82,
+      fillPrice: 100.14,
+      currency: 'EUR',
+      costChf: 7489.39,
+      orderId: '9165',
+      // No `trade.name` supplied: the bug appeared exactly when monitor-fills
+      // forwarded only the symbol and let downstream resolve the name.
+    };
+    const portfolio = {
+      name: 'ETF Portfolio',
+      totalValueChf: 141621.37,
+      cashChf: 1468.66,
+      holdings: [
+        // IBKR positions feed: name comes back as the local symbol (XDEW).
+        { symbol: '163606923', name: 'XDEW', conid: '163606923', quantityHeld: 82, valueChf: 7489.39 },
+      ],
+    };
+
+    const context = buildNormalizedTradeContext(trade, portfolio, { portfolioDir: dir });
+    assert.strictEqual(context.investorTrade.name,
+      'Xtrackers S&P 500 Equal Weight UCITS ETF 1C',
+      'investorTrade.name must come from approvedInstruments when only IBKR positions name (local symbol) is available locally');
+    assert.strictEqual(context.portfolio.holdings[0].name,
+      'Xtrackers S&P 500 Equal Weight UCITS ETF 1C',
+      'enriched holdings row name must come from approvedInstruments, not the IBKR positions "local symbol" name');
+  });
+}
+
 function main() {
   runIsinTradeMatchesConidHoldingScenario();
   runConidTradeMatchesIsinHoldingScenario();
   runUnrelatedSymbolStillFailsClosed();
-  console.log(JSON.stringify({ ok: true, tests: 3 }, null, 2));
+  runCanonicalNameResolution();
+  console.log(JSON.stringify({ ok: true, tests: 4 }, null, 2));
 }
 
 main();

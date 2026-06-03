@@ -253,7 +253,7 @@ function normalizeFilledTrade({ trade = {}, holdingsRows = [], approvedInstrumen
 
   return {
     symbol: trade.symbol || approvedInstrument?.ibkrLocalSymbol || approvedInstrument?.ibkrSymbol || approvedInstrument?.tickerOrIsin || trade.tickerOrIsin || null,
-    name: trade.name || trade.instrument || holdingsMatch?.name || approvedInstrument?.name || null,
+    name: trade.name || trade.instrument || approvedInstrument?.name || holdingsMatch?.name || null,
     quantityPurchased,
     pricePerUnit: unitPrice,
     unitPrice,
