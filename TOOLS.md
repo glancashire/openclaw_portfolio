@@ -1,5 +1,7 @@
 # TOOLS.md - Local Notes
 
+**Canonical host contract:** `docs/operations/openclaw-host-contract.md` — single-page matrix for channels, sandbox, cron delivery, restarts, and approvals on this host. Read that first; the sections below are the deeper invariants the matrix points at.
+
 Things that matter in this setup:
 
 ### Cron job invariants (revised 2026-05-23, Phase 204c)

@@ -2,6 +2,8 @@
 
 A 60-second orientation for the live repo. Updated 2026-06-02 during current-doc consolidation.
 
+**Host contract first:** the canonical matrix for channels, sandbox, cron delivery, restarts, and approvals on this host is `docs/operations/openclaw-host-contract.md`. Start there if you are new to the host.
+
 ## Top-level layout
 
 | Path | Role |

@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 313,
-    "safe": 240,
+    "total": 314,
+    "safe": 241,
     "integration": 68,
     "live-smoke": 3,
     "external": 2,
@@ -1359,6 +1359,13 @@
     },
     {
       "path": "scripts/test-open-runner-retry-summary-from-block-code.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-openclaw-host-contract.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

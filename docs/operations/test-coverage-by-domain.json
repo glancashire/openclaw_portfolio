@@ -1,10 +1,10 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T08:18:06.837Z",
+  "generatedAt": "2026-06-03T08:56:43.168Z",
   "counts": {
-    "totalTests": 313,
-    "domains": 114
+    "totalTests": 314,
+    "domains": 115
   },
   "domains": [
     {
@@ -1171,6 +1171,19 @@
       "inVerifyRepoChecks": 1,
       "examples": [
         "scripts/test-observability-doc-contract.js"
+      ]
+    },
+    {
+      "domain": "openclaw",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-openclaw-host-contract.js"
       ]
     },
     {

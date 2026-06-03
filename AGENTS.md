@@ -1,6 +1,9 @@
 AGENTS.md - Your Workspace
 
 This folder is home.
+
+**Host contract:** see `docs/operations/openclaw-host-contract.md` for the canonical matrix of channels, sandbox, cron delivery, restarts, and approvals on this host.
+
 ## Session Startup
 
 Before doing anything else:

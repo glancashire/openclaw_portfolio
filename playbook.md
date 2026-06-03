@@ -1,5 +1,7 @@
 # Portfolio Project Playbook
 
+**Host contract:** see `docs/operations/openclaw-host-contract.md` for the canonical channels/sandbox/cron-delivery/restarts/approvals matrix.
+
 ## Project-local skills
 
 Use these project skills for work derived from `SPECIFICATION.md`:

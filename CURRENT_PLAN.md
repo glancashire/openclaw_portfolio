@@ -12,7 +12,7 @@ Keep the live doc set small and truthful. Completed engineering phases stay in `
 Phase 1 operator surface cleanup and dashboard path cleanup   [DONE]     ██████████
 Phase 2 artifact hygiene and legacy surface retirement        [DONE]     ██████████
 Phase 3 usage and decision-support reporting                  [OPEN]     █░░░░░░░░░
-Phase 4 OpenClaw maintainer contract                          [OPEN]     █░░░░░░░░░
+Phase 4 OpenClaw maintainer contract                          [DONE]     ██████████
 Phase 0 external unblockers and operator-owned gates          [WAITING]  ███░░░░░░░
 Phase 5 parked product and domain explorations                [PARKED]   █░░░░░░░░░
 ```
@@ -97,19 +97,17 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 ---
 
 ## Phase 4 - OpenClaw maintainer contract
-**Status:** OPEN
+**Status:** COMPLETE (2026-06-03)
 
 ### Completed
 - [x] Host-specific invariants are captured in `TOOLS.md`.
 - [x] Repo orientation and test-governance docs exist.
+- [x] Wrote canonical host contract `docs/operations/openclaw-host-contract.md` with a one-page matrix of channels / sandbox / cron delivery / restarts / approvals.
+- [x] Top-of-file pointers added to `TOOLS.md`, `AGENTS.md`, `playbook.md`, and `docs/operations/repo-map.md`.
+- [x] New regression `scripts/test-openclaw-host-contract.js` locks the contract surface (rows + cross-links + pointer presence).
 
 ### Started / already true
 - [x] Current-vs-archive boundaries are now explicit in the doc set.
-
-### Still open
-- [ ] Write a canonical OpenClaw host/config/delivery contract.
-- [ ] Tighten responsibilities across `AGENTS.md`, `TOOLS.md`, `playbook.md`, and setup docs.
-- [ ] Add one clear matrix for channels, sandboxing, cron delivery, restarts, and approvals.
 
 ---
 
