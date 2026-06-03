@@ -3,8 +3,8 @@
 > Single source of truth for the current operational state.
 > Live work lives in `CURRENT_PLAN.md`. Historical plans, audits, and task notes live under `archive/`.
 
-**Last refreshed:** 2026-06-03 12:30 UTC
-**Repo head:** current `master` (see `git log -1 --oneline` for exact head)
+**Last refreshed:** 2026-06-03 16:24 UTC
+**Repo head:** `cf56f87` ("fills: prefer canonical approvedInstruments name in fill emails")
 
 ---
 
@@ -14,46 +14,51 @@
 | --- | --- | --- |
 | ETF portfolio read/report path | healthy | regular reporting surfaces build from current repo/runtime state |
 | IBKR socket / auth / read | green | readonly access and reporting flows are healthy |
-| IBKR quote posture | degraded | `marketDataMode=unknown`; live submission stays blocked pending operator-side diagnosis |
-| Holdings sync | functional | sync is truthful and usable, though still not especially fast |
-| Dashboard / report emails | healthy | light-only theme; hero shows Net deposited; Total return vs deposits headline; usage counters auto-refreshed at send time |
-| Deposits ledger | wired | `portfolio/etf/deposits.md` (8 deposits, 120k CHF net); `history.md` carries cumulative `Net deposited CHF` per row; auto-import CLI available |
-| Safe-lane verification | green | last run: 241 passed, 0 failed, 3 quarantined |
-| Cron jobs | healthy snapshot | latest tracked cron snapshot is healthy; see `docs/operations/active-cron-jobs.md` |
+| IBKR quote posture | **green** | `marketDataMode=live_or_realtime`; 20k live basket executed today (2026-06-03 14:29 UTC) |
+| Live order submission | **unblocked** | end-to-end basket flow validated today |
+| Holdings sync | functional | sync is truthful |
+| Dashboard / report emails | healthy | light-only theme, hero shows Net deposited, per-instrument descriptions in P/L card |
+| Fill-confirmation emails | healthy | ISIN↔conid identity bridge live, canonical-name precedence fixed, `monitor-fills` cron retrying every 15 min during market hours |
+| Deposits ledger | wired | 9 deposits, 140k CHF cumulative, `history.md` carries `Net deposited CHF` per row |
+| Safe-lane verification | green | last run: 242 passed, 0 failed, 3 quarantined |
+| Cron jobs | healthy | 11 enabled jobs in snapshot; policy gate 12/12 green |
 | OpenClaw control UI | healthy | session-retention cleanup and current repo surfaces are in place |
 
-## What works
+## What works (current)
 
-- Markdown-controlled portfolio contracts (`portfolio.md`, `holdings.md`, `trades.md`, `history.md`, `dashboard.md`).
-- Native IBKR readonly client for account discovery, positions, and accounting snapshots.
+- Markdown-controlled portfolio contracts (`portfolio.md`, `holdings.md`, `trades.md`, `history.md`, `dashboard.md`, `deposits.md`).
+- Native IBKR readonly + transmitted-live order paths.
 - Sync guard lock plus last-known-good preservation on broker reads.
-- Approval-gated execution flow with dry-run, confirmation, and transmitted-live boundaries.
+- Approval-gated execution with safe-word + PIN; basket envelope flow with policy gate.
 - Reporting stack: dashboard, health reports, overview surfaces, digests, investor emails, fill emails.
-- Test governance and repo-truth checks (`npm test`, manifest/domain-summary validation, root-cleanliness gate).
+- Fill notification self-healing: `monitor-fills` cron retries deferred fills every 15 minutes; canonical instrument names + ISIN↔conid bridge prevent silent defers.
+- Test governance and repo-truth checks (`npm test`, `test:safe`, manifest/domain-summary validation, root-cleanliness gate).
 - Archive-backed history: completed phase plans, audits, and task notes live outside the current docs.
 
-## What is degraded
+## What is open (engineering)
 
-- **Quote posture is still `unknown`.** The reporting/read path is fine, but live order submission remains blocked until the IBKR subscription/data-farm diagnosis in `docs/operations/ibkr-recovery.md` Step 6 is completed.
+See `CURRENT_PLAN.md` for the phased breakdown. Summary:
 
-## What is blocked or parked
+- **Phase F** — fill-pipeline observability close-out: passive soak (F5) + small cleanup (F6).
+- **Phase G** — deposits ledger close-out: docs (G4) + cron wiring after operator backfill (G2/G3).
+- **Phase H** — allocation-target decision (additive vs replacement): data-gated, ~2 weeks out.
 
-- **Live order submission** - blocked by quote posture, not by the readonly/reporting path.
-- **Control UI direct embedding** - target exists, editable source remains undiscovered or unavailable.
-- **FX cash reconciliation** - parked as Graham-owned WIP unless explicitly reactivated.
-- **Spitex exploration** - concept only; not active implementation work.
+## What is operator-owned
 
-## Current open-work buckets
+- **Phase B5** — keep IBKR session warm; respond to keepalive 2FA alerts.
+- **Phase F4 / G3** — when the next IBKR XLS arrives, swap `pending_ibkr_xls` placeholder for the real broker reference in the 2026-06-03 deposits row.
 
-- **Phase B — Operator/external unblockers** - IBKR runbook Step 6, then re-test live submission.
-- **Phase D — Parked product/domain explorations** - FX recon, Control UI embedding (Spitex removed as out-of-scope).
+## What is parked
 
-Full breakdown in `CURRENT_PLAN.md`. Phase A and Phase C completed 2026-06-03 — see `archive/phase-plans/2026-06-03-phase-a-c/README.md`.
+- FX cash reconciliation · Control UI direct embedding · EM ex-China sleeve.
+- All locked PARKED unless explicitly reactivated.
+
 ## Operator quick refs
 
 - IBKR live status: `node scripts/ibkr-fast-status.js`
 - Sync after recovery: `node scripts/sync-ibkr-after-recovery.js etf`
 - Compact dashboard: `node scripts/show-dashboard.js etf`
+- Send dashboard digest: `node scripts/send-dashboard-digest.js --portfolio=etf --frequency=daily --send`
 - Cron snapshot: `docs/operations/active-cron-jobs.md`
 - Recovery ladder: `docs/operations/ibkr-recovery.md`
 
