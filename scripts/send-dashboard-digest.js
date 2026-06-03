@@ -16,6 +16,7 @@ const { collectPortfolioSummary } = require('../src/reporting/summaryArtifacts')
 const { buildReportEmailHtml, buildReportEmailText } = require('../src/reporting/reportEmail');
 const { effectiveDeliveryPolicy } = require('../src/reporting/deliveryPolicy');
 const { sendEmailMessage } = require('../src/reporting/emailDelivery');
+const { buildSnapshot, writeSnapshot } = require('../src/reporting/usageCounters');
 
 function parseArgs(argv) {
   const args = { portfolio: 'etf', frequency: 'daily', dryRun: false };
@@ -54,6 +55,17 @@ async function main() {
   const frequency = String(args.frequency).toLowerCase();
   const generatedAt = new Date().toISOString();
   const period = frequency === 'weekly' ? 'Weekly' : 'Daily';
+
+  // Phase C — refresh usage counters before reading the summary so the
+  // Operations KPI card reflects current evidence on disk. Best-effort:
+  // a regeneration failure must not abort the send.
+  try {
+    const repoRoot = path.resolve(__dirname, '..');
+    const snapshot = buildSnapshot(repoRoot);
+    writeSnapshot(snapshot);
+  } catch (err) {
+    process.stderr.write(`[send-dashboard-digest] usage-counter refresh failed (continuing): ${err.message}\n`);
+  }
 
   const summary = await collectPortfolioSummary({ portfolioDir });
 
