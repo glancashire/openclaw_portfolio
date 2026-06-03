@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 321,
-    "safe": 243,
+    "total": 322,
+    "safe": 244,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -562,6 +562,13 @@
       "path": "scripts/test-deposits-ledger.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-deposits-withdrawal-display.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

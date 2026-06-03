@@ -341,13 +341,20 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
   const investedChf = Number.isFinite(metrics.investedChf) ? metrics.investedChf : null;
 
   let netDepositedChf = null;
+  let cumulativeDepositsChf = null;
+  let cumulativeWithdrawalsChf = null;
   if (portfolioDir) {
     try {
       const dl = loadDepositsLedger(portfolioDir);
-      if (dl && !dl.missing) netDepositedChf = Number(dl.totals.netDepositedChf);
+      if (dl && !dl.missing) {
+        netDepositedChf = Number(dl.totals.netDepositedChf);
+        cumulativeDepositsChf = Number(dl.totals.cumulativeDepositsChf);
+        cumulativeWithdrawalsChf = Number(dl.totals.cumulativeWithdrawalsChf);
+      }
     } catch (_err) { /* ignore */ }
   }
   const hasNetDeposits = Number.isFinite(netDepositedChf) && netDepositedChf > 0;
+  const hasWithdrawals = Number.isFinite(cumulativeWithdrawalsChf) && cumulativeWithdrawalsChf > 0;
   const totalReturnChf = hasNetDeposits && Number.isFinite(metrics.totalValueChf)
     ? Number((metrics.totalValueChf - netDepositedChf).toFixed(2))
     : null;
@@ -362,7 +369,12 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
     `Total value: ${formatCurrency(metrics.totalValueChf, 'CHF')}`,
     `Cash: ${formatCurrency(metrics.cashChf, 'CHF')}`,
     ...(hasNetDeposits
-      ? [`Net deposited: ${formatCurrency(netDepositedChf, 'CHF')}`]
+      ? hasWithdrawals
+        ? [
+            `Net deposited: ${formatCurrency(netDepositedChf, 'CHF')}`,
+            `(Deposits ${formatCurrency(cumulativeDepositsChf, 'CHF')}, Withdrawals ${formatCurrency(cumulativeWithdrawalsChf, 'CHF')})`,
+          ]
+        : [`Net deposited: ${formatCurrency(netDepositedChf, 'CHF')}`]
       : [`Invested: ${formatCurrency(metrics.investedChf, 'CHF')}`]),
     '',
     'Profit / Loss',
@@ -416,13 +428,20 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
 
   // Load deposits ledger for true "total return vs net deposited capital".
   let netDepositedChf = null;
+  let cumulativeDepositsChf = null;
+  let cumulativeWithdrawalsChf = null;
   if (portfolioDir) {
     try {
       const dl = loadDepositsLedger(portfolioDir);
-      if (dl && !dl.missing) netDepositedChf = Number(dl.totals.netDepositedChf);
+      if (dl && !dl.missing) {
+        netDepositedChf = Number(dl.totals.netDepositedChf);
+        cumulativeDepositsChf = Number(dl.totals.cumulativeDepositsChf);
+        cumulativeWithdrawalsChf = Number(dl.totals.cumulativeWithdrawalsChf);
+      }
     } catch (_err) { /* ignore */ }
   }
   const hasNetDeposits = Number.isFinite(netDepositedChf) && netDepositedChf > 0;
+  const hasWithdrawals = Number.isFinite(cumulativeWithdrawalsChf) && cumulativeWithdrawalsChf > 0;
   const totalReturnChf = hasNetDeposits && Number.isFinite(metrics.totalValueChf)
     ? Number((metrics.totalValueChf - netDepositedChf).toFixed(2))
     : null;
@@ -440,8 +459,12 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
   // Hero card — portfolio value snapshot. When the ledger is present, show
   // "Net deposited" instead of "Invested" (current-position cost basis), so
   // the operator-visible math reconciles with money actually put in.
+  // When withdrawals exist, expand to a Deposits/Withdrawals/Net stack.
   const investedLabel = hasNetDeposits ? 'Net deposited' : 'Invested';
   const investedDisplay = hasNetDeposits ? netDepositedChf : metrics.investedChf;
+  const withdrawalDetail = hasNetDeposits && hasWithdrawals
+    ? `<div style="margin-top:6px;font-size:11px;letter-spacing:0.04em;color:rgba(255,255,255,0.78);font-weight:600;">Deposits ${escapeHtml(formatCurrency(cumulativeDepositsChf, 'CHF'))} · Withdrawals ${escapeHtml(formatCurrency(cumulativeWithdrawalsChf, 'CHF'))}</div>`
+    : '';
   const heroCard = `
     <div style="margin:0 0 16px;padding:28px 24px 24px;background:linear-gradient(135deg, #1e293b 0%, #334155 100%);border-radius:16px;color:#f1f5f9;">
       <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.7;font-weight:700;margin-bottom:6px;">Total portfolio value</div>
@@ -454,6 +477,7 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
         <td style="padding:0;vertical-align:top;">
           <div style="font-size:11px;letter-spacing:0.05em;text-transform:uppercase;opacity:0.65;font-weight:700;margin-bottom:4px;">${escapeHtml(investedLabel)}</div>
           <div style="font-size:20px;font-weight:800;color:#ffffff;">${escapeHtml(formatCurrency(investedDisplay, 'CHF'))}</div>
+          ${withdrawalDetail}
         </td>
       </tr></table>
     </div>`;

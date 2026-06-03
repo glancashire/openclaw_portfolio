@@ -75,6 +75,9 @@ function renderValueHeadlineCard(summary = {}, portfolioDir) {
     deposits = null;
   }
   const netDepositedChf = deposits && !deposits.missing ? Number(deposits.totals.netDepositedChf || 0) : null;
+  const cumulativeDepositsChf = deposits && !deposits.missing ? Number(deposits.totals.cumulativeDepositsChf || 0) : null;
+  const cumulativeWithdrawalsChf = deposits && !deposits.missing ? Number(deposits.totals.cumulativeWithdrawalsChf || 0) : null;
+  const hasWithdrawals = Number.isFinite(cumulativeWithdrawalsChf) && cumulativeWithdrawalsChf > 0;
   const totalReturnChf = netDepositedChf != null ? Number((totalValueChf - netDepositedChf).toFixed(2)) : null;
   const totalReturnPct = netDepositedChf && netDepositedChf > 0 && totalReturnChf != null
     ? Number(((totalReturnChf / netDepositedChf) * 100).toFixed(2))
@@ -97,7 +100,7 @@ function renderValueHeadlineCard(summary = {}, portfolioDir) {
   const totalReturnLine = totalReturnChf != null
     ? `<div style="font-size:15px;line-height:1.5;color:${totalReturnChf >= 0 ? '#166534' : '#991b1b'};margin-bottom:6px;font-weight:600;">
         Total return vs deposits: ${totalReturnChf >= 0 ? '+' : ''}${formatCurrency(totalReturnChf, 'CHF')}${totalReturnPct != null ? ` (${totalReturnPct >= 0 ? '+' : ''}${totalReturnPct.toFixed(2)}%)` : ''}
-        <span style="color:#475569;font-weight:500;font-size:13px;margin-left:6px;">on net deposited ${formatCurrency(netDepositedChf, 'CHF')}</span>
+        <span style="color:#475569;font-weight:500;font-size:13px;margin-left:6px;">on net deposited ${formatCurrency(netDepositedChf, 'CHF')}${hasWithdrawals ? ` (deposits ${formatCurrency(cumulativeDepositsChf, 'CHF')} · withdrawals ${formatCurrency(cumulativeWithdrawalsChf, 'CHF')})` : ''}</span>
        </div>`
     : '';
 

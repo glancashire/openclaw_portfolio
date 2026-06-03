@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T11:11:19.449Z",
+  "generatedAt": "2026-06-03T11:16:15.024Z",
   "counts": {
-    "totalTests": 321,
+    "totalTests": 322,
     "domains": 119
   },
   "domains": [
@@ -576,6 +576,20 @@
       ]
     },
     {
+      "domain": "deposits",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-deposits-ledger.js",
+        "scripts/test-deposits-withdrawal-display.js"
+      ]
+    },
+    {
       "domain": "diagnostics",
       "total": 2,
       "safe": 1,
@@ -926,19 +940,6 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "scripts/test-currency-deployment.js"
-      ]
-    },
-    {
-      "domain": "deposits",
-      "total": 1,
-      "safe": 0,
-      "integration": 1,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-deposits-ledger.js"
       ]
     },
     {
