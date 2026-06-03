@@ -46,3 +46,15 @@ For live basket execution (Phases 184–198), see `docs/basket-execution-runbook
 ## Console helpers
 
 - **`show dashboard`** → `node scripts/show-dashboard.js [portfolio]` (default `etf`). Compact console view of value/cash/allocation/queue/next step with a sanity check that total = invested + cash. Run after `node scripts/regenerate-dashboard.js portfolio/<name>` if the underlying state changed.
+- **Email digest preview** → `node scripts/regenerate-dashboard-email-preview.js [portfolio]` writes the current daily digest to `runtime/dashboard-email-phase7-preview.{html,txt}` without sending. Use to eye-check email rendering in light + dark.
+
+## Wrappers and shims
+
+Some scripts look like dead code but are kept on purpose. See `docs/operations/wrappers-and-shims.md` before deleting any of them. Highlights:
+
+- `scripts/execute-trades.js` is a deliberate failure shim (exit 1 + obsolescence redirect). Locked in by `scripts/test-execute-trades-shim-contract.js` and used by `scripts/test-trading-guards.js`.
+- 14 diagnostic-script wrappers in `scripts/` forward to `scripts/diagnostics/` and are locked in by `scripts/test-diagnostics-script-compat.js`.
+
+## Generated-artifact idempotence (decision)
+
+2026-06-03 — defer naming a separate idempotence verification lane. Existing checks (`scripts/check-generated-state.js`, `scripts/test-test-manifest-shape.js`, root-cleanliness, `npm test`) cover the surface. Revisit if churn-driven false-reds appear.

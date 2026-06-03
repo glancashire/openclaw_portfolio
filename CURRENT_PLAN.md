@@ -10,7 +10,7 @@ Keep the live doc set small and truthful. Completed engineering phases stay in `
 
 ```text
 Phase 1 operator surface cleanup and dashboard path cleanup   [DONE]     ██████████
-Phase 2 artifact hygiene and legacy surface retirement        [OPEN]     ██░░░░░░░░
+Phase 2 artifact hygiene and legacy surface retirement        [DONE]     ██████████
 Phase 3 usage and decision-support reporting                  [OPEN]     █░░░░░░░░░
 Phase 4 OpenClaw maintainer contract                          [OPEN]     █░░░░░░░░░
 Phase 0 external unblockers and operator-owned gates          [WAITING]  ███░░░░░░░
@@ -63,22 +63,19 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 ---
 
 ## Phase 2 - Artifact hygiene and legacy surface retirement
-**Status:** OPEN
+**Status:** COMPLETE (2026-06-03)
 
 ### Completed
 - [x] Historical phase plans live under `archive/phase-plans/`.
 - [x] Repo-root cleanliness and plan/doc-truth tests exist.
 - [x] Generated test-manifest and domain-summary artifacts already exist.
+- [x] Decided to keep `scripts/execute-trades.js` as a deliberate failure shim. Rationale block added in-file. New regression test `scripts/test-execute-trades-shim-contract.js` locks in the exit-1 + obsolescence-message contract.
+- [x] Tracked wrapper/compatibility scripts blessed in `docs/operations/wrappers-and-shims.md`. The 14 diagnostic-script forwarders are kept (locked in by `scripts/test-diagnostics-script-compat.js`).
+- [x] Decision recorded: defer naming a separate generated-artifact idempotence verification lane. Existing checks already cover the surface.
 
 ### Started / already true
 - [x] Current docs consolidation moved stale audit/task notes out of the live surfaces.
 - [x] Diagnostic scripts already live under `scripts/diagnostics/` with compatibility coverage.
-
-### Still open
-- [ ] Decide whether `scripts/execute-trades.js` should be removed or kept as a deliberate failure shim.
-- [ ] Audit tracked wrapper/compatibility scripts and either bless, archive, or remove them.
-- [ ] Tighten source-vs-generated-vs-fixture boundaries where git churn is still high.
-- [ ] Decide whether generated-artifact idempotence deserves a named verification lane.
 
 ---
 

@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 312,
+    "total": 313,
     "safe": 240,
-    "integration": 67,
+    "integration": 68,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -660,6 +660,13 @@
       "path": "scripts/test-etf-suggestion-hardening.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-execute-trades-shim-contract.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

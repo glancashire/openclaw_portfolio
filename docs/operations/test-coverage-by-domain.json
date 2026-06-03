@@ -1,10 +1,10 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T08:04:44.658Z",
+  "generatedAt": "2026-06-03T08:18:06.837Z",
   "counts": {
-    "totalTests": 312,
-    "domains": 113
+    "totalTests": 313,
+    "domains": 114
   },
   "domains": [
     {
@@ -976,6 +976,19 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "tests/test-etfQualityFilter.js"
+      ]
+    },
+    {
+      "domain": "execute",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-execute-trades-shim-contract.js"
       ]
     },
     {
