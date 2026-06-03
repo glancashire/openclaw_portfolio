@@ -120,19 +120,19 @@ function formatPercent(value) {
 }
 
 /**
- * Returns the inline <style> block that drives the dark mode overrides.
- * The light palette is the inline fallback applied to every element directly,
- * so when this <style> is stripped by an email client, the email still
- * renders correctly in light mode.
+ * Returns the inline <style> block. We commit to LIGHT MODE ONLY here.
+ *
+ * Why: the digest body uses many bespoke renderers in dashboardDigest.js
+ * with hardcoded inline colors. A real dark-mode flip would require
+ * theme-aware refactors across every renderer. Email clients that
+ * auto-invert produce ugly half-flipped results. Forcing light mode
+ * keeps the design coherent across Apple Mail, iOS Mail, Outlook web,
+ * Outlook Windows, Gmail web, Gmail iOS.
  */
 function buildThemeStyleBlock() {
-  const D = TOKENS.dark;
-  // Class-based overrides for clients that respect prefers-color-scheme.
-  // Outlook.com web dark mode honors [data-ogsc] / [data-ogsb] selectors
-  // for foreground/background overrides. We mirror the dark rules so
-  // Outlook's automatic invert uses our palette instead.
   return `<style>
-  /* OpenClaw email theming — see docs/email-dashboard-light-dark-spec.md */
+  /* OpenClaw email theming — LIGHT MODE ONLY. */
+  :root { color-scheme: only light; supported-color-schemes: light; }
   body, table, td, p, div, h1, h2, h3, h4, span, a {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -140,8 +140,7 @@ function buildThemeStyleBlock() {
   table { mso-table-lspace: 0; mso-table-rspace: 0; }
   img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
 
-  /* Default (light) — inline styles already cover this; defined here so
-     that "data-ogsc" and dark @media can flip cleanly. */
+  /* Class hooks pinned to the light palette (used as defense vs auto-invert). */
   .t-page         { background-color: ${TOKENS.light.bg} !important; }
   .t-shell        { background-color: ${TOKENS.light.surface} !important; border-color: ${TOKENS.light.line} !important; }
   .t-surface      { background-color: ${TOKENS.light.surface} !important; }
@@ -156,44 +155,19 @@ function buildThemeStyleBlock() {
   .t-pos          { color: ${TOKENS.light.positive} !important; }
   .t-neg          { color: ${TOKENS.light.negative} !important; }
 
-  @media (prefers-color-scheme: dark) {
-    .t-page         { background-color: ${D.bg} !important; }
-    .t-shell        { background-color: ${D.surface} !important; border-color: ${D.line} !important; }
-    .t-surface      { background-color: ${D.surface} !important; }
-    .t-surface-alt  { background-color: ${D.surfaceAlt} !important; }
-    .t-card         { background-color: ${D.surface} !important; border-color: ${D.line} !important; }
-    .t-text         { color: ${D.text} !important; }
-    .t-muted        { color: ${D.muted} !important; }
-    .t-subtle       { color: ${D.subtle} !important; }
-    .t-line         { border-color: ${D.line} !important; }
-    .t-line-strong  { border-color: ${D.lineStrong} !important; }
-    .t-accent       { color: ${D.accent} !important; }
-    .t-pos          { color: ${D.positive} !important; }
-    .t-neg          { color: ${D.negative} !important; }
-    .t-badge-info     { color: ${D.info} !important; background-color: ${D.infoBg} !important; }
-    .t-badge-warn     { color: ${D.warn} !important; background-color: ${D.warnBg} !important; }
-    .t-badge-success  { color: ${D.success} !important; background-color: ${D.successBg} !important; }
-    .t-badge-danger   { color: ${D.danger} !important; background-color: ${D.dangerBg} !important; }
-    .t-badge-neutral  { color: ${D.neutral} !important; background-color: ${D.neutralBg} !important; }
-  }
-
-  /* Outlook.com / Outlook 365 web dark mode hooks. */
-  [data-ogsc] .t-page         { background-color: ${D.bg} !important; }
-  [data-ogsc] .t-shell        { background-color: ${D.surface} !important; border-color: ${D.line} !important; }
-  [data-ogsc] .t-surface      { background-color: ${D.surface} !important; }
-  [data-ogsc] .t-surface-alt  { background-color: ${D.surfaceAlt} !important; }
-  [data-ogsc] .t-card         { background-color: ${D.surface} !important; border-color: ${D.line} !important; }
-  [data-ogsc] .t-text         { color: ${D.text} !important; }
-  [data-ogsc] .t-muted        { color: ${D.muted} !important; }
-  [data-ogsc] .t-subtle       { color: ${D.subtle} !important; }
-  [data-ogsc] .t-pos          { color: ${D.positive} !important; }
-  [data-ogsc] .t-neg          { color: ${D.negative} !important; }
-  [data-ogsc] .t-accent       { color: ${D.accent} !important; }
-  [data-ogsb] .t-page         { background-color: ${D.bg} !important; }
-  [data-ogsb] .t-shell        { background-color: ${D.surface} !important; }
-  [data-ogsb] .t-surface      { background-color: ${D.surface} !important; }
-  [data-ogsb] .t-surface-alt  { background-color: ${D.surfaceAlt} !important; }
-  [data-ogsb] .t-card         { background-color: ${D.surface} !important; }
+  /* Outlook.com / Outlook 365 web dark mode — force the LIGHT palette
+     so auto-invert can't darken the email. */
+  [data-ogsc] .t-page, [data-ogsb] .t-page         { background-color: ${TOKENS.light.bg} !important; }
+  [data-ogsc] .t-shell, [data-ogsb] .t-shell       { background-color: ${TOKENS.light.surface} !important; border-color: ${TOKENS.light.line} !important; }
+  [data-ogsc] .t-surface, [data-ogsb] .t-surface   { background-color: ${TOKENS.light.surface} !important; }
+  [data-ogsc] .t-surface-alt, [data-ogsb] .t-surface-alt { background-color: ${TOKENS.light.surfaceAlt} !important; }
+  [data-ogsc] .t-card, [data-ogsb] .t-card         { background-color: ${TOKENS.light.surface} !important; }
+  [data-ogsc] .t-text                              { color: ${TOKENS.light.text} !important; }
+  [data-ogsc] .t-muted                             { color: ${TOKENS.light.muted} !important; }
+  [data-ogsc] .t-subtle                            { color: ${TOKENS.light.subtle} !important; }
+  [data-ogsc] .t-pos                               { color: ${TOKENS.light.positive} !important; }
+  [data-ogsc] .t-neg                               { color: ${TOKENS.light.negative} !important; }
+  [data-ogsc] .t-accent                            { color: ${TOKENS.light.accent} !important; }
 
   @media only screen and (max-width: 600px) {
     .t-shell { border-radius: 14px !important; }
@@ -218,8 +192,8 @@ function page({ eyebrow = 'OpenClaw Portfolio Manager', title, subtitle = '', ac
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light dark">
-  <meta name="supported-color-schemes" content="light dark">
+  <meta name="color-scheme" content="only light">
+  <meta name="supported-color-schemes" content="light">
   <title>${escapeHtml(title)}</title>
   ${buildThemeStyleBlock()}
 </head>

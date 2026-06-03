@@ -53,12 +53,13 @@ const html = require('../src/reporting/emailHtml');
   assert(out.includes('<html>'));
   assert(out.includes('</html>'));
 
-  // dark-mode awareness signals
-  assert(out.includes('<meta name="color-scheme" content="light dark">'), 'color-scheme meta');
-  assert(out.includes('<meta name="supported-color-schemes" content="light dark">'), 'supported-color-schemes meta');
-  assert(out.includes('@media (prefers-color-scheme: dark)'), 'dark media query');
-  assert(out.includes('[data-ogsc]'), 'Outlook ogsc hook');
-  assert(out.includes('[data-ogsb]'), 'Outlook ogsb hook');
+  // light-mode-only signals
+  assert(out.includes('<meta name="color-scheme" content="only light">'), 'color-scheme meta is light-only');
+  assert(out.includes('<meta name="supported-color-schemes" content="light">'), 'supported-color-schemes is light');
+  assert(out.includes('color-scheme: only light'), 'inline color-scheme is light-only');
+  assert(out.includes('[data-ogsc]'), 'Outlook ogsc hook (forces light)');
+  assert(out.includes('[data-ogsb]'), 'Outlook ogsb hook (forces light)');
+  assert(!out.includes('@media (prefers-color-scheme: dark)'), 'no dark-mode media query');
 
   // class hook scaffolding present on key wrappers
   assert(out.includes('class="t-page'), 't-page hook on body');
@@ -71,11 +72,10 @@ const html = require('../src/reporting/emailHtml');
   assert(out.includes('#ffffff'), 'white surface inline fallback');
   assert(out.includes('#0f172a'), 'text inline fallback');
 
-  // contains dark token in the <style> block (so the block is real, not stub)
-  assert(out.includes('#0b1220'), 'dark bg defined in <style> block');
-  assert(out.includes('#0f1623'), 'dark surface defined in <style> block');
-  assert(out.includes('#34d399'), 'dark positive defined in <style> block');
-  assert(out.includes('#f87171'), 'dark negative defined in <style> block');
+  // No dark-mode hex tokens leak into the rendered HTML now that we are
+  // light-only. (The TOKENS.dark map is still exported for back-compat.)
+  assert(!out.includes('#0b1220'), 'dark page bg not in output');
+  assert(!out.includes('#0f1623'), 'dark surface not in output');
 
   // body content survives
   assert(out.includes('<p>body</p>'));
