@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 324,
-    "safe": 246,
+    "total": 325,
+    "safe": 247,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -141,6 +141,13 @@
       "path": "scripts/test-basket-execution-runner.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-basket-lifecycle-defer-contract.js",
+      "lane": "safe",
+      "reason": "static read of basketLifecycle.js, no execution",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

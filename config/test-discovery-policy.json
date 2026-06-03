@@ -25,6 +25,10 @@
       "lane": "safe",
       "reason": "static read of docs/operator-runbooks.md, no execution"
     },
+    "scripts/test-basket-lifecycle-defer-contract.js": {
+      "lane": "safe",
+      "reason": "static read of basketLifecycle.js, no execution"
+    },
     "scripts/test-dashboard-digest-rebalance-and-ai.js": {
       "lane": "integration",
       "reason": "builds reporting artifacts from seeded repo fixtures"

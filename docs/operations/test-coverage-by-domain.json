@@ -1,12 +1,27 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T16:48:29.084Z",
+  "generatedAt": "2026-06-03T16:51:42.480Z",
   "counts": {
-    "totalTests": 324,
+    "totalTests": 325,
     "domains": 119
   },
   "domains": [
+    {
+      "domain": "basket",
+      "total": 14,
+      "safe": 14,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-basket-approval-envelope.js",
+        "scripts/test-basket-execution-runner.js",
+        "scripts/test-basket-lifecycle-defer-contract.js"
+      ]
+    },
     {
       "domain": "dashboard",
       "total": 14,
@@ -35,21 +50,6 @@
         "scripts/test-trade-blocking-safety-hardening.js",
         "scripts/test-trade-cli-surface.js",
         "scripts/test-trade-cli-venue-aware-market-message.js"
-      ]
-    },
-    {
-      "domain": "basket",
-      "total": 13,
-      "safe": 13,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-basket-approval-envelope.js",
-        "scripts/test-basket-execution-runner.js",
-        "scripts/test-basket-lifecycle.js"
       ]
     },
     {

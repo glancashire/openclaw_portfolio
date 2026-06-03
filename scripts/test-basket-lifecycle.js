@@ -104,7 +104,7 @@ const path = require('path');
   assert.strictEqual(result.mirror.appended, 4, 'mirror should append 3 filled + 1 cancelled = 4 rows');
   assert.strictEqual(result.notifyResults.length, 3, 'should record exactly 3 fills');
   assert(result.notifyResults.every((r) => r.ok), 'all fill records should be ok');
-  assert(result.notifyResults.every((r) => r.result.reason === 'deferred_to_post_resync'), 'fills should be deferred to post-resync path');
+  assert(result.notifyResults.every((r) => r.result.reason === 'deferred_to_monitor_fills_cron'), 'fills should be deferred to monitor-fills cron');
   assert(result.reproposal && !result.reproposal.skipped, 'reproposal should be built');
   assert.strictEqual(result.reproposal.envelope.legs.length, 1, 'reproposal should contain only the cancelled leg');
   assert(result.reproposal.envelope.legs[0].limitPrice > 129.00, 'reproposal limit must exceed previous 129.00');

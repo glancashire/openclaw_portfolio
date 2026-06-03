@@ -134,11 +134,25 @@ async function runBasketLifecycle({
       orderId: exec.orderId,
       costChf: Number(exec.shares || exec.quantity || 0) * Number(exec.price || 0),
     };
-    // Phase 1 fix: defer investor-facing email to the post-resync path (monitor-fills)
-    // which has access to real portfolio totals/holdings. Record the fill for downstream
-    // notification without sending a zero-placeholder investor email.
-    notifyResults.push({ orderId: exec.orderId, ok: true, result: { attempted: false, sent: false, reason: 'deferred_to_post_resync' }, trade });
-    log(`Fill recorded for order ${exec.orderId} (${trade.symbol} ${trade.action} ${trade.fillQty}@${trade.fillPrice} ${trade.currency}) — investor email deferred to post-resync path`);
+    // Phase F6 (2026-06-03): investor email is intentionally NOT sent from this
+    // lifecycle path. Fill emails are dispatched by `scripts/monitor-fills.js`
+    // (cron `portfolio-etf-monitor-fills`, every 15 min during market hours)
+    // which has access to a fully-resynced holdings snapshot via
+    // `lib/tradeNotificationEmail.js#buildNormalizedTradeContext`. The
+    // basket-lifecycle path runs while holdings are still mid-resync and
+    // would render an email with stale or zero-value portfolio totals.
+    //
+    // The `reason` string below is what downstream code/tests inspect to
+    // confirm the deferral is by design (not a missed code path or a silent
+    // failure). If you change it, update `scripts/test-basket-lifecycle.js`
+    // and any cron payload that asserts on it.
+    notifyResults.push({
+      orderId: exec.orderId,
+      ok: true,
+      result: { attempted: false, sent: false, reason: 'deferred_to_monitor_fills_cron' },
+      trade,
+    });
+    log(`Fill recorded for order ${exec.orderId} (${trade.symbol} ${trade.action} ${trade.fillQty}@${trade.fillPrice} ${trade.currency}) — investor email handed off to monitor-fills cron`);
   }
 
   try {
