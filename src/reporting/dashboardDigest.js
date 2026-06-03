@@ -10,6 +10,7 @@ const { sendEmailMessage } = require('./emailDelivery');
 const fs = require('fs');
 const { computeRebalancePlan } = require('../../lib/rebalanceAnalyzer');
 const { parseAllocationTargets, parseHoldings, applyAliases } = require('../../lib/portfolioMarkdown');
+const { loadDepositsLedger } = require('../../lib/depositsLedger');
 const { assessPortfolio, narrateAssessment } = require('../../lib/aiAssessment');
 const { createModelClient } = require('../../lib/modelClient');
 
@@ -66,6 +67,19 @@ function renderValueHeadlineCard(summary = {}, portfolioDir) {
   const totalProfitChf = Number(plTotals.totalProfitChf || 0);
   const totalProfitPct = plTotals.totalProfitPct;
 
+  // Deposit ledger — enables true "total return vs net deposited capital" line.
+  let deposits = null;
+  try {
+    deposits = loadDepositsLedger(portfolioDir);
+  } catch (_err) {
+    deposits = null;
+  }
+  const netDepositedChf = deposits && !deposits.missing ? Number(deposits.totals.netDepositedChf || 0) : null;
+  const totalReturnChf = netDepositedChf != null ? Number((totalValueChf - netDepositedChf).toFixed(2)) : null;
+  const totalReturnPct = netDepositedChf && netDepositedChf > 0 && totalReturnChf != null
+    ? Number(((totalReturnChf / netDepositedChf) * 100).toFixed(2))
+    : null;
+
   // Daily and weekly change from net liq history
   const series = lastNDays(readNetLiqHistory(portfolioDir), 30);
   const values = series.map((row) => Number(row.totalChf || 0)).filter(Number.isFinite);
@@ -80,9 +94,16 @@ function renderValueHeadlineCard(summary = {}, portfolioDir) {
     }
   }
 
+  const totalReturnLine = totalReturnChf != null
+    ? `<div style="font-size:15px;line-height:1.5;color:${totalReturnChf >= 0 ? '#166534' : '#991b1b'};margin-bottom:6px;font-weight:600;">
+        Total return vs deposits: ${totalReturnChf >= 0 ? '+' : ''}${formatCurrency(totalReturnChf, 'CHF')}${totalReturnPct != null ? ` (${totalReturnPct >= 0 ? '+' : ''}${totalReturnPct.toFixed(2)}%)` : ''}
+        <span style="color:#475569;font-weight:500;font-size:13px;margin-left:6px;">on net deposited ${formatCurrency(netDepositedChf, 'CHF')}</span>
+       </div>`
+    : '';
+
   const profitLine = totalProfitChf !== 0 || totalProfitPct != null
     ? `<span style="color:${totalProfitChf >= 0 ? '#0f766e' : '#991b1b'};font-weight:600;">
-        ${totalProfitChf > 0 ? '+' : ''}${formatCurrency(totalProfitChf, 'CHF')}${totalProfitPct != null ? ` (${totalProfitPct >= 0 ? '+' : ''}${Number(totalProfitPct).toFixed(2)}%)` : ''} all-time profit
+        ${totalProfitChf > 0 ? '+' : ''}${formatCurrency(totalProfitChf, 'CHF')}${totalProfitPct != null ? ` (${totalProfitPct >= 0 ? '+' : ''}${Number(totalProfitPct).toFixed(2)}%)` : ''} unrealized on held positions
        </span>`
     : '';
 
@@ -111,6 +132,7 @@ function renderValueHeadlineCard(summary = {}, portfolioDir) {
       <div style="font-size:18px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:6px;">
         ${formatCurrency(totalValueChf, 'CHF')} current value${dailyLine}${weeklyLine}
       </div>
+      ${totalReturnLine}
       ${profitLine ? `<div style="font-size:14px;margin-bottom:2px;">${profitLine}</div>` : ''}
       ${cashLine}
     `,
@@ -471,12 +493,31 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
   const profitRows = Array.isArray(summary.profitLoss?.rows) ? summary.profitLoss.rows.filter((r) => Number(r.valueChf || 0) > 0) : [];
   const totalValueInclCashChf = profitRows.reduce((s, r) => s + (Number(r.valueChf) || 0), 0)
     + Number(summary.holdings?.cashChf || 0);
+
+  let depositsTotalsForText = null;
+  try {
+    const dl = loadDepositsLedger(portfolioDir);
+    if (dl && !dl.missing) depositsTotalsForText = dl.totals;
+  } catch (_err) { /* ignore */ }
+  const totalReturnChfText = depositsTotalsForText
+    ? Number((totalValueInclCashChf - Number(depositsTotalsForText.netDepositedChf || 0)).toFixed(2))
+    : null;
+  const totalReturnPctText = depositsTotalsForText && Number(depositsTotalsForText.netDepositedChf) > 0 && totalReturnChfText != null
+    ? Number(((totalReturnChfText / Number(depositsTotalsForText.netDepositedChf)) * 100).toFixed(2))
+    : null;
+
   const textSections = [
     `${portfolioName} ${frequency} portfolio digest`,
     '',
     `Portfolio value (incl cash): ${formatCurrency(totalValueInclCashChf, 'CHF')}`,
     `Cash: ${formatCurrency(summary.holdings?.cashChf, 'CHF')}`,
-    `Unrealized profit: ${formatCurrency(profitTotals.totalProfitChf, 'CHF')}${profitTotals.totalProfitPct != null ? ` (${profitTotals.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotals.totalProfitPct).toFixed(2)}%)` : ''}`,
+    ...(depositsTotalsForText
+      ? [
+          `Net deposited: ${formatCurrency(depositsTotalsForText.netDepositedChf, 'CHF')}`,
+          `Total return vs deposits: ${totalReturnChfText >= 0 ? '+' : ''}${formatCurrency(totalReturnChfText, 'CHF')}${totalReturnPctText != null ? ` (${totalReturnPctText >= 0 ? '+' : ''}${totalReturnPctText.toFixed(2)}%)` : ''}`,
+        ]
+      : []),
+    `Unrealized profit on held positions: ${formatCurrency(profitTotals.totalProfitChf, 'CHF')}${profitTotals.totalProfitPct != null ? ` (${profitTotals.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotals.totalProfitPct).toFixed(2)}%)` : ''}`,
     `Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}`,
     `Operator queue: ${summary.operatorQueue?.summary?.total || 0}`,
     resolvedCronHealth.status === 'unavailable'

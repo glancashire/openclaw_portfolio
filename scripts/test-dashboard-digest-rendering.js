@@ -71,7 +71,7 @@ function seed(repoRoot) {
   assert(digest.html.includes('health-monitor'));
   assert(digest.text.includes('Cron health: 1/2 healthy, 1 failing'));
   assert(digest.text.includes('Portfolio value (incl cash):'));
-  assert(digest.text.includes('Unrealized profit:'));
+  assert(digest.text.includes('Unrealized profit on held positions:'));
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {
   console.error(error.stack || String(error));

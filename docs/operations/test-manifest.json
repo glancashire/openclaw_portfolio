@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 317,
+    "total": 318,
     "safe": 241,
-    "integration": 71,
+    "integration": 72,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -555,6 +555,13 @@
       "path": "scripts/test-delivery-status-markdown-broker-block-context.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-deposits-ledger.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
