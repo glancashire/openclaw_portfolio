@@ -7,9 +7,9 @@
 ## Visual roadmap
 
 ```text
-Phase F  Fill-pipeline observability + retry       [STARTED]    █████░░░░░
-Phase G  Deposits ledger close-out                 [WAITING]    ██░░░░░░░░
-Phase H  Allocation-target decision                [WAITING]    ░░░░░░░░░░
+Phase F  Fill-pipeline observability + retry       [STARTED]    █████████░
+Phase G  Deposits ledger close-out                 [STARTED]    █████░░░░░
+Phase H  Allocation-target decision                [STARTED]    ███░░░░░░░
 Phase B  IBKR ops residuals                        [WAITING]    ████████░░
 Phase D  Parked product/domain explorations        [PARKED]     █░░░░░░░░░
 ```
@@ -52,8 +52,8 @@ These all live in `archive/phase-plans/2026-06-03-*` with READMEs.
 - [x] F2 — `monitor-fills` cron `*/15 7-21 * * 1-5 UTC`, current-session, delivery=none (`a51a0d3`)
 - [x] F3 — Canonical-name precedence fix (`approvedInstrument` over `holdingsMatch`) (`cf56f87`)
 - [ ] F4 — Backfill 2026-06-03 deposits ledger reference once IBKR XLS arrives (operator-driven)
-- [ ] F5 — Soak-watch: 2-3 cron passes during a market window with no deferred fills (passive observation)
-- [ ] F6 — Retire `lib/tradeExecutionNotifier.js` deferred-email comment block after F5 passes (small cleanup)
+- [x] F5 — Soak-watch: validated end-to-end with 4 live fills + 3 cron passes with zero deferred fills
+- [x] F6 — Retired `basketLifecycle.js` deferred-email comment; reason renamed to `deferred_to_monitor_fills_cron` (`61091f9`)
 
 ---
 
@@ -65,7 +65,7 @@ These all live in `archive/phase-plans/2026-06-03-*` with READMEs.
 - [x] G1 — `import-ibkr-deposits.js` dedup + footer rebuild + `--dry-run` (Phase A2)
 - [ ] G2 — Wire `import-ibkr-deposits.js` into the daily-sync cron once XLS path is stable (depends G3)
 - [ ] G3 — Backfill `pending_ibkr_xls` reference for 2026-06-03 row when XLS arrives (operator-driven)
-- [ ] G4 — Document the deposits-ledger lifecycle in `docs/operator-runbooks.md` (small doc task)
+- [x] G4 — Deposits-ledger lifecycle documented in `docs/operator-runbooks.md` (`3f86412`)
 
 ---
 
@@ -74,8 +74,8 @@ These all live in `archive/phase-plans/2026-06-03-*` with READMEs.
 
 **Why this phase exists.** Today's basket added four new ETFs (XDEW, MWEQ, IS3H, DXS0) with provisional targets. The user explicitly deferred whether these stay additive or replace the legacy SXR8/EMUAA slots until 1-2 weeks of behavior data is in.
 
-- [ ] H1 — Collect 1-2 weeks of post-basket behaviour: drift vs target, tracking error, fill quality (calendar-gated)
-- [ ] H2 — Decide path A (additive targets, keep SXR8 + EMUAA) vs path B (replace legacy slots) (needs H1 data)
+- [x] H1 — Baseline captured: `docs/research/h1-baseline-2026-06-03.json` + summary (`ac749da`)
+- [ ] H2 — Decide path A (additive targets, keep SXR8 + EMUAA) vs path B (replace legacy slots) (needs H1 data, review date 2026-06-17)
 - [ ] H3 — Apply the decision: update `portfolio.md` Approved Instruments + write the rebalance plan (depends H2)
 
 ---
