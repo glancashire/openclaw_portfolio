@@ -15,6 +15,8 @@ This document defines the supported reporting, dashboard, and email command surf
 | `node scripts/regenerate-usage-counters.js` | JSON | `runtime/overview/usage-counters.json` | none | rebuild usage KPI counters from evidence on disk |
 | `node scripts/regenerate-usage-kpi.js` | JSON | `runtime/overview/usage-kpi.{json,md,html}` | none | regenerate the operations KPI artifact triplet |
 | `node scripts/regenerate-dashboard-email-preview.js [portfolio]` | JSON | `runtime/dashboard-email-phase7-preview.{html,txt}` | none | eye-check the digest email in light/dark without sending |
+| `node scripts/backfill-history-net-deposited.js --portfolio=<name>` | JSON | rewrites `portfolio/<name>/history.md` | none | populate the `Net deposited CHF` column from `deposits.md`; idempotent; supports `--dry-run` |
+| `node scripts/import-ibkr-deposits.js --portfolio=<name> --xls=<path>` | JSON | appends to `portfolio/<name>/deposits.md` | none | dedup-aware import of new IBKR deposits; supports `--dry-run`; requires Python `xlrd` |
 
 ## Output contract quick guide
 

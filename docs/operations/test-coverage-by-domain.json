@@ -1,10 +1,10 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T11:02:16.664Z",
+  "generatedAt": "2026-06-03T11:08:01.679Z",
   "counts": {
-    "totalTests": 319,
-    "domains": 117
+    "totalTests": 320,
+    "domains": 118
   },
   "domains": [
     {
@@ -1056,6 +1056,19 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "scripts/test-guided-remediation-wording.js"
+      ]
+    },
+    {
+      "domain": "import",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-import-ibkr-deposits.js"
       ]
     },
     {

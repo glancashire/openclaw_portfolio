@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 319,
-    "safe": 241,
+    "total": 320,
+    "safe": 242,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -946,6 +946,13 @@
     },
     {
       "path": "scripts/test-ibkr-sync-guard.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-import-ibkr-deposits.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
