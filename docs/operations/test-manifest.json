@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 314,
+    "total": 317,
     "safe": 241,
-    "integration": 68,
+    "integration": 71,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -447,6 +447,13 @@
     },
     {
       "path": "scripts/test-dashboard-digest-cli.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-dashboard-digest-kpi-card.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
@@ -2083,6 +2090,20 @@
       "path": "scripts/test-ubspx-primary-exchange-propagation.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-usage-counters.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-usage-kpi-artifact.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

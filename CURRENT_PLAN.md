@@ -11,7 +11,7 @@ Keep the live doc set small and truthful. Completed engineering phases stay in `
 ```text
 Phase 1 operator surface cleanup and dashboard path cleanup   [DONE]     ██████████
 Phase 2 artifact hygiene and legacy surface retirement        [DONE]     ██████████
-Phase 3 usage and decision-support reporting                  [OPEN]     █░░░░░░░░░
+Phase 3 usage and decision-support reporting                  [DONE]     ██████████
 Phase 4 OpenClaw maintainer contract                          [DONE]     ██████████
 Phase 0 external unblockers and operator-owned gates          [WAITING]  ███░░░░░░░
 Phase 5 parked product and domain explorations                [PARKED]   █░░░░░░░░░
@@ -80,19 +80,21 @@ Phase 5 parked product and domain explorations                [PARKED]   █░�
 ---
 
 ## Phase 3 - Usage and decision-support reporting
-**Status:** OPEN
+**Status:** COMPLETE (2026-06-03)
 
 ### Completed
 - [x] Dashboard, overview, health, fill, digest, and investor email surfaces already exist.
 - [x] Cron health and guided-remediation truth already surface degraded states honestly.
+- [x] Added `src/reporting/usageCounters.js` — build/read/summarize rolling usage counters from evidence on disk.
+- [x] Added `src/reporting/usageKpiArtifact.js` — generates the usage-kpi triplet (JSON/MD/HTML).
+- [x] Added `scripts/regenerate-usage-counters.js` + `scripts/regenerate-usage-kpi.js`.
+- [x] Wired an "Operations KPI" card into the daily digest (operator-facing only). Absent gracefully when no counters file exists.
+- [x] Decision made: all KPI counters are operator-facing only. Investor reports stay focused on portfolio outcomes.
+- [x] New tests: `scripts/test-usage-counters.js` (17 assertions), `scripts/test-usage-kpi-artifact.js`, `scripts/test-dashboard-digest-kpi-card.js`.
+- [x] Updated `docs/reporting-command-surface.md` and `playbook.md` with new commands.
 
 ### Started / already true
 - [x] Usage/KPI themes were already identified in the 2026-05-30 project audit and roadmap work.
-
-### Still open
-- [ ] Add usage counters for report sends, failures, approval latency, readiness failures, broker degradation, and reconciliation lag.
-- [ ] Add trend and KPI summaries to overview artifacts.
-- [ ] Decide which metrics are operator-facing only and which belong in investor-facing outputs.
 
 ---
 

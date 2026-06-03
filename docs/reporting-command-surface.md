@@ -12,6 +12,9 @@ This document defines the supported reporting, dashboard, and email command surf
 | `node scripts/run-health-check.js <portfolio-dir> [--dry-run] [--send-email]` | JSON | writes health-report artifacts | optional | operator health review and issue surfacing |
 | `node scripts/send-dashboard-digest.js --portfolio=<name> --frequency=daily\|weekly [--dry-run]` | JSON | none | yes, unless `--dry-run` | recurring digest delivery |
 | `node scripts/send-email-verification.js <portfolio-dir> [--to user@example.com]` | JSON | none | yes | transport verification |
+| `node scripts/regenerate-usage-counters.js` | JSON | `runtime/overview/usage-counters.json` | none | rebuild usage KPI counters from evidence on disk |
+| `node scripts/regenerate-usage-kpi.js` | JSON | `runtime/overview/usage-kpi.{json,md,html}` | none | regenerate the operations KPI artifact triplet |
+| `node scripts/regenerate-dashboard-email-preview.js [portfolio]` | JSON | `runtime/dashboard-email-phase7-preview.{html,txt}` | none | eye-check the digest email in light/dark without sending |
 
 ## Output contract quick guide
 

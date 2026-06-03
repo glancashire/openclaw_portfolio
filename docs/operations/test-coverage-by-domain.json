@@ -1,12 +1,27 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T08:56:43.168Z",
+  "generatedAt": "2026-06-03T09:11:53.191Z",
   "counts": {
-    "totalTests": 314,
-    "domains": 115
+    "totalTests": 317,
+    "domains": 116
   },
   "domains": [
+    {
+      "domain": "dashboard",
+      "total": 14,
+      "safe": 8,
+      "integration": 6,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 3,
+      "examples": [
+        "scripts/test-dashboard-best-next-step-priority.js",
+        "scripts/test-dashboard-command-center.js",
+        "scripts/test-dashboard-delivery-backfill-dedup.js"
+      ]
+    },
     {
       "domain": "basket",
       "total": 13,
@@ -20,21 +35,6 @@
         "scripts/test-basket-approval-envelope.js",
         "scripts/test-basket-execution-runner.js",
         "scripts/test-basket-lifecycle.js"
-      ]
-    },
-    {
-      "domain": "dashboard",
-      "total": 13,
-      "safe": 8,
-      "integration": 5,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 3,
-      "examples": [
-        "scripts/test-dashboard-best-next-step-priority.js",
-        "scripts/test-dashboard-command-center.js",
-        "scripts/test-dashboard-delivery-backfill-dedup.js"
       ]
     },
     {
@@ -740,6 +740,20 @@
       "examples": [
         "scripts/test-ubspx-alternatives-decision-support.js",
         "scripts/test-ubspx-primary-exchange-propagation.js"
+      ]
+    },
+    {
+      "domain": "usage",
+      "total": 2,
+      "safe": 0,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-usage-counters.js",
+        "scripts/test-usage-kpi-artifact.js"
       ]
     },
     {

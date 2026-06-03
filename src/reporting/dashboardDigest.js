@@ -3,6 +3,7 @@ const { page, card, badge, metricGrid, dataTable, bulletList, formatCurrency, fo
 const { collectPortfolioSummary } = require('./summaryArtifacts');
 const { fetchCronHealth } = require('./cronJobsFetcher');
 const { readNetLiqHistory, lastNDays } = require('./historyDigest');
+const { readSnapshot, summarizeForDashboard } = require('./usageCounters');
 const { buildSparklineSvg } = require('./sparkline');
 const { effectiveDeliveryPolicy, reportDeliveryStatus } = require('./deliveryPolicy');
 const { sendEmailMessage } = require('./emailDelivery');
@@ -400,6 +401,22 @@ function renderAiAssessmentCard(assessment) {
   });
 }
 
+/**
+ * Render an Operations KPI card from the cached usage-counters snapshot.
+ * Returns empty string if no counters file exists, so the digest renders
+ * cleanly without KPI data.
+ */
+function renderOperationsKpiCard() {
+  const snapshot = readSnapshot();
+  if (!snapshot) return '';
+  const items = summarizeForDashboard(snapshot);
+  if (!items.length) return '';
+  return card({
+    title: 'Operations KPI',
+    contentHtml: metricGrid(items),
+  });
+}
+
 async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generatedAt = new Date().toISOString(), cronHealth = null, modelClient = null }) {
   const portfolioName = path.basename(portfolioDir);
   const summary = await collectPortfolioSummary({ portfolioDir });
@@ -437,6 +454,7 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
     }),
     renderInstrumentHealthCard(summary),
     renderCronHealthCard(resolvedCronHealth),
+    renderOperationsKpiCard(),
     renderWorkflowCard(summary, deliveryStatus),
   ].join('');
 

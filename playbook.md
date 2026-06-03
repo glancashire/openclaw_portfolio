@@ -49,6 +49,7 @@ For live basket execution (Phases 184–198), see `docs/basket-execution-runbook
 
 - **`show dashboard`** → `node scripts/show-dashboard.js [portfolio]` (default `etf`). Compact console view of value/cash/allocation/queue/next step with a sanity check that total = invested + cash. Run after `node scripts/regenerate-dashboard.js portfolio/<name>` if the underlying state changed.
 - **Email digest preview** → `node scripts/regenerate-dashboard-email-preview.js [portfolio]` writes the current daily digest to `runtime/dashboard-email-phase7-preview.{html,txt}` without sending. Use to eye-check email rendering in light + dark.
+- **Usage counters** → `node scripts/regenerate-usage-counters.js` rebuilds `runtime/overview/usage-counters.json` from evidence on disk. Then `node scripts/regenerate-usage-kpi.js` produces the KPI artifact triplet.
 
 ## Wrappers and shims
 
