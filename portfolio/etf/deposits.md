@@ -29,10 +29,11 @@ Account: `U25624150` (Graham Lancashire).
 | 2026-05-29 | deposit | CHF | 20000.00 | 1 | 20000.00 | bank_transfer | C107183510 | |
 | 2026-06-01 | deposit | CHF | 10000.00 | 1 | 10000.00 | bank_transfer | C107346207 | |
 | 2026-06-02 | deposit | CHF | 20000.00 | 1 | 20000.00 | bank_transfer | C107533357 | |
+| 2026-06-03 | deposit | CHF | 20000.00 | 1 | 20000.00 | bank_transfer | pending_ibkr_xls | New money deposit, landed before 14:16 UTC; verified via fetchLedger SettledCash CHF 20,257.52 (was ~257.52). Reference to be backfilled from next IBKR transactions XLS. |
 
 ## Totals (computed)
 
-- Cumulative deposits CHF: **120000.00**
+- Cumulative deposits CHF: **140000.00**
 - Cumulative withdrawals CHF: **0.00**
-- **Net deposited CHF: 120000.00**
-- Last update: 2026-06-03 (imported from IBKR transactions report)
+- **Net deposited CHF: 140000.00**
+- Last update: 2026-06-03 14:30 UTC (added new-money 20k deposit; reference pending IBKR XLS backfill)

@@ -6,10 +6,10 @@
  *
  * Verifies lib/depositsLedger.js parses portfolio/<name>/deposits.md
  * correctly:
- *   - 8 entries from the IBKR-imported ledger
- *   - cumulative deposits = 120000.00 CHF
+ *   - 9 entries from the IBKR-imported ledger (8 imported via XLS + 1 manual 2026-06-03 new-money)
+ *   - cumulative deposits = 140000.00 CHF
  *   - withdrawals = 0
- *   - net deposited = 120000.00 CHF
+ *   - net deposited = 140000.00 CHF
  *   - missing-file path returns sane zero-valued totals
  *
  * Domain: reporting
@@ -28,7 +28,7 @@ function main() {
   const md = fs.readFileSync(ledgerPath, 'utf8');
   const parsed = parseDepositsLedger(md);
 
-  assert.strictEqual(parsed.entries.length, 8, 'expected 8 deposit entries');
+  assert.strictEqual(parsed.entries.length, 9, 'expected 9 deposit entries');
   for (const e of parsed.entries) {
     assert.strictEqual(e.direction, 'deposit', `entry ${e.reference} should be a deposit`);
     assert.strictEqual(e.currency, 'CHF', `entry ${e.reference} currency`);
@@ -37,10 +37,10 @@ function main() {
     assert(e.reference, `entry has a reference`);
   }
 
-  assert.strictEqual(parsed.totals.cumulativeDepositsChf, 120000, 'cumulative deposits = 120000');
+  assert.strictEqual(parsed.totals.cumulativeDepositsChf, 140000, 'cumulative deposits = 140000');
   assert.strictEqual(parsed.totals.cumulativeWithdrawalsChf, 0, 'no withdrawals');
-  assert.strictEqual(parsed.totals.netDepositedChf, 120000, 'net deposited = 120000');
-  assert.strictEqual(parsed.totals.lastDate, '2026-06-02', 'last deposit date');
+  assert.strictEqual(parsed.totals.netDepositedChf, 140000, 'net deposited = 140000');
+  assert.strictEqual(parsed.totals.lastDate, '2026-06-03', 'last deposit date');
 
   // Sorted chronologically
   for (let i = 1; i < parsed.entries.length; i += 1) {
@@ -50,7 +50,7 @@ function main() {
   // loadDepositsLedger wrapper works
   const loaded = loadDepositsLedger(portfolioDir);
   assert.strictEqual(loaded.missing, false);
-  assert.strictEqual(loaded.totals.netDepositedChf, 120000);
+  assert.strictEqual(loaded.totals.netDepositedChf, 140000);
 
   // Missing file path returns sane zeros
   const empty = loadDepositsLedger(path.join(__dirname, '..', 'portfolio', '__nonexistent__'));

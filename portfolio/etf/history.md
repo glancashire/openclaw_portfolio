@@ -71,4 +71,5 @@
 | 2026-06-02 | execution_not_found | 121051.18141547001 | 118400.40141547001 | 120000 | 0 | 0 | 0 | Broker order 9162 status sync: not_found |
 | 2026-06-02 | execution_staged | 121051.18141547001 | 118400.40141547001 | 120000 | 0 | 0 | 0 | Transmitted live broker order submitted. |
 | 2026-06-02 | execution_staged | 120957.28991034001 | 118306.50991034001 | 120000 | 0 | 0 | 0 | Transmitted live broker order submitted. |
-| 2026-06-03 | end_of_day | 121891.25980935001 | 121633.73980935001 | 120000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-03 | end_of_day | 121891.25980935001 | 121633.73980935001 | 140000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-03 | execution_staged | 141511.0369755 | 121253.51697550001 | 140000 | 0 | 0 | 0 | Transmitted live broker order submitted. |
