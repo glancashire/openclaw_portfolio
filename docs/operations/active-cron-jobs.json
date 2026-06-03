@@ -1,5 +1,5 @@
 {
-  "snapshotAt": "2026-05-27T08:23:09Z",
+  "snapshotAt": "2026-06-03T15:50:00Z",
   "host": "ef6083bf72ed",
   "policy": {
     "agentsDefaultsSandboxMode": "off",
@@ -201,6 +201,24 @@
       "delivery": {
         "mode": "announce",
         "bestEffort": true
+      }
+    },
+    {
+      "id": "d4c3207d-9e03-4e98-85eb-2eff38f50d4d",
+      "name": "portfolio-etf-monitor-fills",
+      "schedule": {
+        "kind": "cron",
+        "expr": "*/15 7-21 * * 1-5",
+        "tz": "UTC"
+      },
+      "sessionTarget": "current",
+      "payloadKind": "agentTurn",
+      "toolsAllow": [
+        "exec",
+        "read"
+      ],
+      "delivery": {
+        "mode": "none"
       }
     }
   ]

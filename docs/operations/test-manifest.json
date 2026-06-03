@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 322,
-    "safe": 244,
+    "total": 323,
+    "safe": 245,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -2013,6 +2013,13 @@
       "path": "scripts/test-trade-notification-email.js",
       "lane": "external",
       "reason": "sends real trade notification email",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-trade-notification-readiness-bridge.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

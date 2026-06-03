@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-03T11:16:15.024Z",
+  "generatedAt": "2026-06-03T15:46:19.828Z",
   "counts": {
-    "totalTests": 322,
+    "totalTests": 323,
     "domains": 119
   },
   "domains": [
@@ -20,6 +20,21 @@
         "scripts/test-dashboard-best-next-step-priority.js",
         "scripts/test-dashboard-command-center.js",
         "scripts/test-dashboard-delivery-backfill-dedup.js"
+      ]
+    },
+    {
+      "domain": "trade",
+      "total": 14,
+      "safe": 8,
+      "integration": 5,
+      "live-smoke": 0,
+      "external": 1,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 3,
+      "examples": [
+        "scripts/test-trade-blocking-safety-hardening.js",
+        "scripts/test-trade-cli-surface.js",
+        "scripts/test-trade-cli-venue-aware-market-message.js"
       ]
     },
     {
@@ -65,21 +80,6 @@
         "scripts/test-market-calendar-artifact-has-holiday-fields.js",
         "scripts/test-market-calendar-holidays.js",
         "scripts/test-market-calendar-readiness.js"
-      ]
-    },
-    {
-      "domain": "trade",
-      "total": 13,
-      "safe": 7,
-      "integration": 5,
-      "live-smoke": 0,
-      "external": 1,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 3,
-      "examples": [
-        "scripts/test-trade-blocking-safety-hardening.js",
-        "scripts/test-trade-cli-surface.js",
-        "scripts/test-trade-cli-venue-aware-market-message.js"
       ]
     },
     {

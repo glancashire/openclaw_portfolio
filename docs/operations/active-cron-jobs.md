@@ -1,6 +1,6 @@
-# Active cron jobs — snapshot 2026-05-27
+# Active cron jobs — snapshot 2026-06-03
 
-Generated 2026-05-27T08:23:09Z. Gated by `scripts/test-cron-job-policy.js`.
+Generated 2026-06-03T15:50:00Z. Gated by `scripts/test-cron-job-policy.js`.
 
 ## Policy summary
 
@@ -25,4 +25,6 @@ Generated 2026-05-27T08:23:09Z. Gated by `scripts/test-cron-job-policy.js`.
 | 8 | soak-self-check-2026-05-30 | `2026-05-30T09:00:00.000Z` @ - | session:agent:main:main | agentTurn | exec, read, write | True |
 | 9 | portfolio-etf-monthly-report | `35 17 1 * *` @ UTC | current | agentTurn | exec, read, write, edit | True |
 | 10 | portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` @ UTC | current | agentTurn | exec, read, write, edit | True |
+| 11 | portfolio-etf-monitor-fills | `*/15 7-21 * * 1-5` @ UTC | current | agentTurn | exec, read | n/a (delivery=none) |
+
 
