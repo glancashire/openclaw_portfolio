@@ -70,8 +70,11 @@ function reportPendingActions({ lifecycleSummary = {}, freshness = null, brokerE
   if (thresholds.staleDashboard && freshness?.stale) {
     actions.push('Dashboard/report freshness is stale relative to source state.');
   }
-  if (Number(lifecycleSummary.failed || 0) >= Number(thresholds.failedTrades || 1) && Number(lifecycleSummary.failed || 0) > 0) {
-    actions.push(`${lifecycleSummary.failed} trade row(s) are marked failed and need operator review.`);
+  // Only surface failed rows that are genuinely actionable (not terminal not_found reconciliations).
+  // `actionableFailed` is computed by lifecycleStatus — excludes not_found rows.
+  const actionableFailedCount = Number(lifecycleSummary.actionableFailed ?? lifecycleSummary.failed ?? 0);
+  if (actionableFailedCount >= Number(thresholds.failedTrades || 1) && actionableFailedCount > 0) {
+    actions.push(`${actionableFailedCount} trade row(s) recently marked failed — review needed.`);
   }
   // True in-flight (live at the broker) — these block overlapping actions.
   const awaitingReconcile = Number(lifecycleSummary.submittedAwaitingReconcile || 0);

@@ -63,6 +63,7 @@ function isSubmittedAwaitingReconcile(row, normalized, now = new Date()) {
 
 function summarizeLifecycleStatuses(rows = [], options = {}) {
   const now = options.now || new Date();
+
   const summary = {
     proposed: 0,
     approved: 0,
@@ -74,6 +75,7 @@ function summarizeLifecycleStatuses(rows = [], options = {}) {
     filled: 0,
     cancelled: 0,
     failed: 0,
+    actionableFailed: 0, // subset of `failed`: excludes terminal not_found reconciliation outcomes
     inactive: 0,
     simulated: 0,
     planned: 0,
@@ -93,7 +95,16 @@ function summarizeLifecycleStatuses(rows = [], options = {}) {
     else if (normalized === 'partially_filled') summary.partiallyFilled += 1;
     else if (normalized === 'filled') summary.filled += 1;
     else if (normalized === 'cancelled') summary.cancelled += 1;
-    else if (normalized === 'failed') summary.failed += 1;
+    else if (normalized === 'failed') {
+      summary.failed += 1;
+      // A 'failed' row is actionable only if its failure reason is NOT a terminal
+      // reconciliation outcome like 'not_found' (order never existed at broker).
+      const reason = String(row.reason || row.Reason || row.approval || row.Approval || '').toLowerCase();
+      const isTerminalReconcile = reason.includes('not_found') || reason.includes('not found');
+      if (!isTerminalReconcile) {
+        summary.actionableFailed += 1;
+      }
+    }
     else if (normalized === 'inactive') summary.inactive += 1;
     else if (normalized === 'simulated') summary.simulated += 1;
     else if (normalized === 'planned') summary.planned += 1;
