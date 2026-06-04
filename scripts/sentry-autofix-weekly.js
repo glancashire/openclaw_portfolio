@@ -177,7 +177,7 @@ function sendDigest(text, subject) {
         'Content-Length': Buffer.byteLength(postData),
       },
     };
-    var req = https || require('https');
+    var https = require('https');
     var creq = require('https').request(options, function(res) {
       var body = '';
       res.on('data', function(chunk) { body += chunk; });
@@ -199,7 +199,7 @@ function sendDigest(text, subject) {
 
 function main(argv) {
   var args = parseArgs(argv || process.argv);
-  var dryRun = !!args.dryRun;
+  var dryRun = !!(args.dryRun || args['dry-run']);
   var overrideLimit = args.limit ? parseInt(args.limit, 10) : null;
 
   var org = args.org || process.env.SENTRY_ORG_SLUG;

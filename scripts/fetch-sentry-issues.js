@@ -61,7 +61,7 @@ async function main() {
     process.exit(1);
   }
 
-  const statsPeriod = args.since || '7d';
+  const statsPeriod = args.since || '14d';
   const limit = args.limit ? parseInt(args.limit, 10) : 25;
   const status = args.status || 'unresolved';
   const query = args.query || `is:${status}`;
