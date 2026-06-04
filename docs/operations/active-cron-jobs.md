@@ -25,7 +25,12 @@ Generated 2026-06-03T15:50:00Z. Gated by `scripts/test-cron-job-policy.js`.
 | 8 | soak-self-check-2026-05-30 | `2026-05-30T09:00:00.000Z` @ - | session:agent:main:main | agentTurn | exec, read, write | True |
 | 9 | portfolio-etf-monthly-report | `35 17 1 * *` @ UTC | current | agentTurn | exec, read, write, edit | True |
 | 10 | portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` @ UTC | current | agentTurn | exec, read, write, edit | True |
-| 11 | portfolio-etf-monitor-fills | `*/15 7-21 * * 1-5` @ UTC | current | agentTurn | exec, read | n/a (delivery=none) |
 | 12 | sentry-autofix-weekly | `0 9 * * 1` @ Europe/Zurich | session:agent:main:main | agentTurn | exec, read, write, edit | True |
+
+## Disabled jobs (registered but not firing)
+
+| # | Name | Schedule | Target | Kind | Policy | bestEffort |
+|---|---|---|---|---|---|---|
+| D1 | portfolio-etf-monitor-fills | `*/15 7-21 * * 1-5` @ UTC | current | agentTurn | Only enable while a basket is approved AND orders are pending fills. Disable again on completion or at end of trading day, whichever comes first. (Graham 2026-06-04) | n/a (delivery=none) |
 
 
