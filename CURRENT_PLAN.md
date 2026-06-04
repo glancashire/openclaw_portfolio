@@ -1,16 +1,17 @@
 # Current Plan
 
-**Date:** 2026-06-04 (consolidated 12:55 UTC)
-**Repo head:** `86f901c` (fix: treat failed+not_found trade rows as terminal)
-**Tests:** `npm test` 23/23 · `npm run test:safe` 251/251
+**Date:** 2026-06-04 (refreshed 13:00 UTC)
+**Repo head:** `d49af30` (feat: Phase J — targeted second-pass autofix)
+**Tests:** `npm test` 23/23 · `npm run test:safe` 254/254
 **Health:** 🟢 healthy — All systems normal.
 
 ## Visual roadmap (open work only)
 
 ```text
-Phase J  Health-monitor Phase B (second-pass autofix)           [PARKED]   ░░░░░░░░░░
+Phase J  Second-pass autofix                                    [DONE]     ██████████
+Phase G2 Deposits inbox → daily-sync cron                       [DONE]     ██████████
 Phase F  Fill-pipeline residuals (XLS backfill)                 [WAITING]  █████████░
-Phase G  Deposits ledger close-out                              [WAITING]  █████░░░░░
+Phase G3 Deposits XLS backfill                                  [WAITING]  █████████░
 Phase H  Allocation-target decision                             [WAITING]  ████░░░░░░
 Phase B  IBKR ops residual                                      [OPS]      █████████░
 Phase D  Parked product/domain explorations                     [PARKED]   █░░░░░░░░░
@@ -20,13 +21,10 @@ Phase D  Parked product/domain explorations                     [PARKED]   █�
 
 ---
 
-## Phase J — Health-monitor Phase B (PARKED)
+## Completed today (2026-06-04, second batch)
 
-- [ ] J1 — `src/reporting/healthFixers.js` dispatch table
-- [ ] J2 — Hook into `runHealthCheck` after pass-1
-- [ ] J3 — Tests
-
-**Reactivate only if** frequent attention emails resume despite the current gate.
+- [x] **G2** — `scripts/process-ibkr-statement-inbox.js` wired into daily-sync cron. 30 test assertions. Inbox at `runtime/ibkr-statements/inbox/`.
+- [x] **J** — `src/reporting/healthFixers.js` dispatch table (5 fixers), 24h rate-limit, wired into `runHealthCheck`, escalation email updated. 56 test assertions.
 
 ---
 
@@ -37,11 +35,10 @@ Phase D  Parked product/domain explorations                     [PARKED]   █�
 
 ---
 
-## Phase G — Deposits ledger close-out (operator-gated)
+## Phase G — Deposits ledger close-out
 
-- [x] G1, G4 — shipped
-- [ ] **G2** — Wire `import-ibkr-deposits.js` into daily-sync cron (depends G3).
-- [ ] **G3** — Backfill XLS reference (same action as F4).
+- [x] G1, G2, G4 — shipped
+- [ ] **G3** — Backfill XLS reference (same action as F4 — needs IBKR statement file).
 
 ---
 

@@ -1,7 +1,7 @@
 # Decisions pending — single surface
 
 **Owner:** Graham
-**Last refreshed:** 2026-06-04 12:55 UTC
+**Last refreshed:** 2026-06-04 13:00 UTC
 
 ---
 
@@ -23,8 +23,14 @@ The 2026-06-03 deposit row carries `pending_ibkr_xls`.
 
 - **Recommend:** ⏸ Defer until **2026-06-17** (14 days post-deconcentration). Baseline anchor: `docs/research/h1-baseline-2026-06-03.json`.
 
-### D-4 — Phase J — second-pass autofix
-- **Recommend:** ⏸ Leave parked. Current gate + rate-limit already solves the noise.
+---
+
+## Completed (closed today)
+
+| Item | Resolution |
+|---|---|
+| D-4 — Phase J second-pass autofix | ✅ Shipped (`d49af30`). 5 fixers, 24h rate-limit, wired into health check. |
+| G2 — Deposits cron wiring | ✅ Shipped (`467fc05`). Inbox at `runtime/ibkr-statements/inbox/`. |
 
 ---
 
@@ -51,5 +57,4 @@ The 2026-06-03 deposit row carries `pending_ibkr_xls`.
 
 - **"chase the XLS"** → prompt with IBKR statements URL
 - **"decide H2 now"** → draft recommendation against partial data
-- **"do Phase J"** → start second-pass autofix
 - **"rotate token with event:admin"** → exact steps for Sentry scope change
