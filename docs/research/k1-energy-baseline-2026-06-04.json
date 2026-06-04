@@ -24,7 +24,7 @@
       "venueLabel": "Xetra",
       "currency": "EUR",
       "aumEur": 1684000000,
-      "stampDuty": "none",
+      "stampDuty": "swiss_stamp_0_15pct_foreign_domicile",
       "withholdingTax": "irish_domiciled_15pct_recoverable_via_swiss_da1",
       "closeQuoteSnapshot": {
         "bid": 61.53,
@@ -51,7 +51,7 @@
       "venueLabel": "SIX Swiss Exchange",
       "currency": "CHF",
       "aumEur": 2389000000,
-      "stampDuty": "swiss_stamp_typical_0_15pct",
+      "stampDuty": "swiss_stamp_0_15pct_foreign_domicile",
       "withholdingTax": "irish_domiciled_15pct_recoverable_via_swiss_da1",
       "closeQuoteSnapshot": {
         "bid": null,
@@ -87,7 +87,7 @@
       "venueLabel": "Euronext Paris",
       "currency": "EUR",
       "aumEur": 865000000,
-      "stampDuty": "none",
+      "stampDuty": "swiss_stamp_0_15pct_foreign_domicile",
       "withholdingTax": "irish_domiciled_15pct_recoverable_via_swiss_da1",
       "closeQuoteSnapshot": {
         "bid": 29.28,

@@ -35,7 +35,7 @@ All three primary picks resolve cleanly on IBKR. NUUR demoted on AUM concern (�
 | Quote (close) | bid €61.53 / ask €62.20 / last €61.82 / prev close €62.13 |
 | Spread (close) | 1.08% — wide because markets are closed; expect 5-15 bps during EU hours |
 | Trading hours | 07:30-23:00 UTC weekdays (Xetra core 09:00-17:30 UTC) |
-| Stamp duty | None (DE) |
+| Stamp duty | 0.15% Swiss federal stamp (foreign-domiciled, both sides) |
 | Suitable | ✅ |
 
 **Notes:** Xetra is the Swiss-friendly default for EUR-denominated UCITS ETFs (no stamp, deep liquidity, IBKR routing well-tested). Existing portfolio uses IBIS2 venue for XDEW + IS3H — same routing path.
@@ -56,7 +56,7 @@ All three primary picks resolve cleanly on IBKR. NUUR demoted on AUM concern (�
 | Distribution | Acc |
 | Quote (close) | last $6.233 / prev close $6.238 — bid/ask 0 (post-close, AEX closed 16:30 UTC) |
 | AUM | **€27m** (justETF, 2026-06) |
-| Stamp duty | None (NL) |
+| Stamp duty | 0.15% Swiss federal stamp (foreign-domiciled, both sides) |
 | Suitable | ⚠️ AUM too small for top pick — see revised recommendation |
 
 **⚠️ AUM correction.** Initial screening estimated ~€220m. The justETF profile shows **€27m**. That's well below the comfortable threshold (~€100m) for an ETF you'd want as a multi-year hold:
@@ -129,10 +129,17 @@ Fallback if SIX live-hours spread proves too wide: NUKL on Paris (SBF), EUR, con
 
 | Venue | Stamp / FTT | Notes |
 |---|---|---|
-| Xetra (DE) — XDWE | None | Default route for EUR UCITS |
-| AEX (NL) — NUUR | None | NL has no transaction tax for ETFs |
-| Paris (FR) — INRE | None | French FTT exempts UCITS ETFs |
-| LSE (UK) — INRA-LSE | 0.5% SDRT | Avoid |
+| Xetra (DE) — XDWE | **Swiss federal stamp 0.15%** (foreign-domiciled) | Levied on purchase + sale via IBKR Switzerland |
+| AEX (NL) — NUUR | **Swiss federal stamp 0.15%** (foreign-domiciled) | Same; NL has no transaction tax |
+| Paris (FR) — INRE | **Swiss federal stamp 0.15%** (foreign-domiciled) | Same; French FTT exempts UCITS ETFs |
+| **SIX (CH) — NUCL** | **Swiss federal stamp 0.15%** (foreign-domiciled, even on SIX) | Stamp triggered by foreign domicile, not exchange |
+| LSE (UK) — INRA-LSE | 0.15% Swiss stamp + **0.5% UK SDRT** | Avoid — double-charged |
+
+**Important correction:** All four shortlist instruments (XDWE, NUCL, NUKL, INRE) are Irish-domiciled, so all carry the **0.15% Swiss federal stamp duty** on both buy and sell. This applies regardless of trading venue — even NUCL on SIX. The CHF-native advantage of NUCL is real (no FX leg), but it does NOT save the stamp.
+
+**Round-trip cost estimate:** 0.30% combined (0.15% buy + 0.15% sell). On a CHF 2,832 NUCL position (medium-6% sleeve), that's ~CHF 8.50 round-trip. Negligible relative to a multi-year hold but worth pricing in.
+
+**LSE-listed instruments** add another 0.5% SDRT on the buy side, making total entry cost 0.65%. That's the firm reason to avoid INRA-LSE.
 
 ---
 
