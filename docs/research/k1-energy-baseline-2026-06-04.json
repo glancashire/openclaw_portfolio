@@ -1,0 +1,163 @@
+{
+  "schema": "k1-energy-sleeve-baseline.v1",
+  "capturedAt": "2026-06-04T20:38:00Z",
+  "portfolioName": "etf",
+  "status": "research_only_no_decision",
+  "thesis": "Add a deliberate energy production + nuclear sleeve at 4-7% of portfolio, alongside the existing legacy core (SXR8 + EMUAA) and deconcentration ETFs (XDEW + MWEQ + IS3H + DXS0). Selection criteria: UCITS, physical full replication, accumulating, low TER, IBKR-tradeable on Swiss-friendly venues.",
+  "predecessorDocs": [
+    "docs/research/energy-nuclear-screening-2026-06-04.md",
+    "docs/research/energy-nuclear-preflight-2026-06-04.md",
+    "docs/research/k-series-energy-sleeve-stub.md"
+  ],
+  "shortlist": [
+    {
+      "isin": "IE00BM67HM91",
+      "ibkrSymbol": "XDW0",
+      "conid": "227263991",
+      "name": "Xtrackers MSCI World Energy 1C",
+      "role": "broad_energy_production",
+      "thesis": "Cap-weighted exposure to global energy majors (oil, gas, some renewables). Full replication, lowest TER in segment.",
+      "ter": 0.25,
+      "replication": "physical_full",
+      "distribution": "accumulating",
+      "venue": "IBIS2",
+      "venueLabel": "Xetra",
+      "currency": "EUR",
+      "aumEur": 1684000000,
+      "stampDuty": "none",
+      "withholdingTax": "irish_domiciled_15pct_recoverable_via_swiss_da1",
+      "closeQuoteSnapshot": {
+        "bid": 61.53,
+        "ask": 62.20,
+        "last": 61.82,
+        "close": 62.13,
+        "spreadPct": 1.08,
+        "capturedAt": "2026-06-04T20:21:40Z",
+        "note": "Post-close (Xetra closes 17:30 UTC). Live-hours spread expected to tighten to <0.20%."
+      },
+      "verdict": "ready_to_slot"
+    },
+    {
+      "isin": "IE000M7V94E1",
+      "ibkrSymbol": "NUCL",
+      "conid": "626090692",
+      "name": "VanEck Uranium and Nuclear Technologies UCITS ETF",
+      "role": "nuclear_uranium",
+      "thesis": "Pure nuclear / uranium exposure (utilities + reactors + miners + fuel). CHF native eliminates FX leg from CHF cash. Largest pure-nuclear UCITS in Europe.",
+      "ter": 0.55,
+      "replication": "physical_full",
+      "distribution": "accumulating",
+      "venue": "EBS",
+      "venueLabel": "SIX Swiss Exchange",
+      "currency": "CHF",
+      "aumEur": 2389000000,
+      "stampDuty": "swiss_stamp_typical_0_15pct",
+      "withholdingTax": "irish_domiciled_15pct_recoverable_via_swiss_da1",
+      "closeQuoteSnapshot": {
+        "bid": null,
+        "ask": null,
+        "last": 47.465,
+        "close": 48.40,
+        "spreadPct": null,
+        "capturedAt": "2026-06-04T20:21:48Z",
+        "note": "AEX/SIX closed at 16:30 UTC. Need live-hours probe — cron 141064ee Fri 13:00 UTC."
+      },
+      "fallback": {
+        "isin": "IE000M7V94E1",
+        "ibkrSymbol": "NUKL",
+        "conid": "613031265",
+        "venue": "SBF",
+        "venueLabel": "Euronext Paris",
+        "currency": "EUR",
+        "rationale": "Same ETF, EUR listing. Fallback if SIX live-hours spread proves too wide."
+      },
+      "verdict": "primary_pick_pending_live_spread_check"
+    },
+    {
+      "isin": "IE000U58J0M1",
+      "ibkrSymbol": "INRE",
+      "conid": "552352705",
+      "name": "iShares Global Clean Energy Transition UCITS ETF",
+      "role": "clean_energy_optional",
+      "thesis": "Tracks S&P Global Clean Energy Transition index. Largest clean-energy UCITS in Europe. Optional separation from XDWE for renewables-only overweight.",
+      "ter": 0.65,
+      "replication": "physical_full",
+      "distribution": "accumulating",
+      "venue": "SBF",
+      "venueLabel": "Euronext Paris",
+      "currency": "EUR",
+      "aumEur": 4000000000,
+      "stampDuty": "none",
+      "withholdingTax": "irish_domiciled_15pct_recoverable_via_swiss_da1",
+      "closeQuoteSnapshot": {
+        "bid": 29.28,
+        "ask": 29.425,
+        "last": 29.325,
+        "close": 29.47,
+        "spreadPct": 0.49,
+        "capturedAt": "2026-06-04T20:21:52Z",
+        "note": "Tightest close-snap spread of the three. Live-hours expected <0.20%."
+      },
+      "alternateListings": [
+        {"conid": "552334714", "venue": "AEB", "currency": "USD", "note": "AEX-USD, lower volume"},
+        {"conid": "764736034", "venue": "LSEETF", "currency": "GBP", "note": "AVOID — UK SDRT 0.5%"}
+      ],
+      "verdict": "ready_to_slot"
+    }
+  ],
+  "demoted": [
+    {
+      "isin": "IE000BMZP0I6",
+      "ibkrSymbol": "NUUR",
+      "name": "iShares Nuclear Energy and Uranium Mining UCITS ETF",
+      "reason": "AUM only €27m (justETF). Below comfortable threshold for multi-year hold; closure risk and wider spreads. Replaced by NUCL-SIX which has 88× the AUM at +15 bps TER."
+    }
+  ],
+  "currentPortfolioSnapshot": {
+    "totalValueChf": 141621.37,
+    "snapshotSource": "docs/research/h1-baseline-2026-06-03.json",
+    "noteOnDrift": "Portfolio value moves daily; this baseline is a research anchor, not a real-time snapshot. Pull fresh holdings + dashboard before any K2 basket build."
+  },
+  "proposedSleeveSizes": [
+    {
+      "label": "small_4pct",
+      "totalSleevePct": 4,
+      "totalSleeveChf": 5664.85,
+      "split": {"XDWE_pct": 2, "NUCL_pct": 1, "INRE_pct": 1},
+      "split_chf": {"XDWE": 2832.43, "NUCL": 1416.21, "INRE": 1416.21}
+    },
+    {
+      "label": "medium_6pct",
+      "totalSleevePct": 6,
+      "totalSleeveChf": 8497.28,
+      "split": {"XDWE_pct": 3, "NUCL_pct": 2, "INRE_pct": 1},
+      "split_chf": {"XDWE": 4248.64, "NUCL": 2832.43, "INRE": 1416.21}
+    },
+    {
+      "label": "large_8pct",
+      "totalSleevePct": 8,
+      "totalSleeveChf": 11329.71,
+      "split": {"XDWE_pct": 3, "NUCL_pct": 2, "INRE_pct": 3},
+      "split_chf": {"XDWE": 4248.64, "NUCL": 2832.43, "INRE": 4248.64}
+    }
+  ],
+  "nextSteps": {
+    "ifGo": [
+      "Lift docs/research/k-series-energy-sleeve-stub.md to plans/phase-k1-energy-baseline.md",
+      "Refresh holdings + cash snapshot",
+      "Run K1 baseline pull (live-hours quotes, ADV, tracking difference)",
+      "Generate K2 basket proposals (3 sleeve sizes)",
+      "STOP at operator approval gate"
+    ],
+    "ifPark": [
+      "Leave research in docs/research/",
+      "Revisit on H2 review date (2026-06-17) or when Graham reactivates",
+      "Friday 13:00 UTC probe still runs (cron 141064ee, self-deletes)"
+    ],
+    "ifModify": [
+      "Graham specifies the swap (e.g. replace INRE with WATR water ETF)",
+      "Re-run screening + preflight on the substitute",
+      "Update this baseline JSON"
+    ]
+  }
+}
