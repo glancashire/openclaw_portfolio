@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-04T12:37:51.135Z",
+  "generatedAt": "2026-06-04T13:03:22.799Z",
   "counts": {
-    "totalTests": 336,
+    "totalTests": 337,
     "domains": 122
   },
   "domains": [
@@ -38,6 +38,21 @@
       ]
     },
     {
+      "domain": "ibkr",
+      "total": 14,
+      "safe": 12,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-ibkr-accounting-preserve-last-good.js",
+        "scripts/test-ibkr-cli-tzdata-hardening.js",
+        "scripts/test-ibkr-config-defaults-native.js"
+      ]
+    },
+    {
       "domain": "trade",
       "total": 14,
       "safe": 8,
@@ -50,21 +65,6 @@
         "scripts/test-trade-blocking-safety-hardening.js",
         "scripts/test-trade-cli-surface.js",
         "scripts/test-trade-cli-venue-aware-market-message.js"
-      ]
-    },
-    {
-      "domain": "ibkr",
-      "total": 13,
-      "safe": 11,
-      "integration": 2,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-ibkr-accounting-preserve-last-good.js",
-        "scripts/test-ibkr-cli-tzdata-hardening.js",
-        "scripts/test-ibkr-config-defaults-native.js"
       ]
     },
     {

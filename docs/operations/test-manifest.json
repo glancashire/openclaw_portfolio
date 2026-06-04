@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 336,
-    "safe": 254,
+    "total": 337,
+    "safe": 255,
     "integration": 77,
     "live-smoke": 3,
     "external": 2,
@@ -988,6 +988,13 @@
     },
     {
       "path": "scripts/test-ibkr-skill-client-config-load.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-ibkr-statement-inbox.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
