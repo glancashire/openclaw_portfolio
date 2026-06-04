@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-04T06:33:25.829Z",
+  "generatedAt": "2026-06-04T06:41:06.905Z",
   "counts": {
-    "totalTests": 328,
+    "totalTests": 329,
     "domains": 121
   },
   "domains": [
@@ -563,6 +563,21 @@
       ]
     },
     {
+      "domain": "sentry",
+      "total": 3,
+      "safe": 3,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-sentry-api.js",
+        "scripts/test-sentry-bootstrap.js",
+        "scripts/test-sentry-integration.js"
+      ]
+    },
+    {
       "domain": "ai",
       "total": 2,
       "safe": 2,
@@ -700,20 +715,6 @@
       "examples": [
         "scripts/test-reproposal-latest-and-sweep.js",
         "scripts/test-reproposal-surface.js"
-      ]
-    },
-    {
-      "domain": "sentry",
-      "total": 2,
-      "safe": 2,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-sentry-bootstrap.js",
-        "scripts/test-sentry-integration.js"
       ]
     },
     {
