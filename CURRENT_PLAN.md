@@ -1,7 +1,7 @@
 # Current Plan
 
-**Date:** 2026-06-04 20:36 UTC
-**Repo head:** `0ba9be7`
+**Date:** 2026-06-04 20:50 UTC
+**Repo head:** `99b6593`
 **Tests:** `npm run test:safe` 254/254 · **Health:** 🟢 healthy
 
 ---
@@ -9,24 +9,17 @@
 ## Visual roadmap (open + parked, completed work archived)
 
 ```text
-                                                              BLOCKER       BB8 ACTION READY
-─── OPEN ───────────────────────────────────────────────────────────────────────────
-Phase H   Allocation rebalance decision (H2 + H3)             CALENDAR      ❌ wait until 2026-06-17
-Phase F4  IBKR XLS backfill                                   OPERATOR      ❌ wait for XLS drop
-Phase G3  Deposits XLS reference backfill                     OPERATOR      ❌ same XLS as F4
-Phase B5  IBKR keepalive 2FA                                  RECURRING     ❌ no engineering
-
-─── PARKED (research complete, awaiting decision) ──────────────────────────────────
-Phase K   Energy + nuclear sleeve                             DECISION      🟡 stub + shortlist ready
-                                                                            Cron probe Fri 13:00 UTC
-
-─── PARKED (legacy explorations) ───────────────────────────────────────────────────
-Phase D1  FX cash reconciliation                              PARKED        ❌ explicit reactivation
-Phase D2  Control UI direct embedding                         PARKED        ❌ upstream not available
-Phase D3  EM ex-China sleeve                                  PARKED        ❌ no Acc UCITS on IBKR
+Phase H   Allocation rebalance decision (H2 + H3)    [WAITING] █████████░  CALENDAR  — 2026-06-17
+Phase F4  IBKR XLS backfill                          [WAITING] █████████░  OPERATOR  — wait for XLS drop
+Phase G3  Deposits XLS reference backfill            [WAITING] █████████░  OPERATOR  — same XLS as F4
+Phase B5  IBKR keepalive 2FA                         [WAITING] █████████░  RECURRING — no engineering
+Phase K   Energy + nuclear sleeve (research done)    [PARKED]  ████████░░  DECISION  — stub + shortlist ready
+Phase D1  FX cash reconciliation                     [PARKED]  █░░░░░░░░░  reactivate explicitly
+Phase D2  Control UI direct embedding                [PARKED]  █░░░░░░░░░  upstream not available
+Phase D3  EM ex-China sleeve                         [PARKED]  █░░░░░░░░░  no Acc UCITS on IBKR
 ```
 
-**Autonomous engineering ready to start: none.** Phase K has research + plan stub but needs your go-ahead.
+**Autonomous engineering ready to start: none.** Phase K has research + plan stub but needs your go-ahead. Friday 2026-06-05 13:00 UTC live-hours probe runs automatically (cron `141064ee`, self-deletes).
 
 ---
 
@@ -62,6 +55,7 @@ Phase D3  EM ex-China sleeve                                  PARKED        ❌ 
 - [x] Screening — `docs/research/energy-nuclear-screening-2026-06-04.md`
 - [x] Preflight — `docs/research/energy-nuclear-preflight-2026-06-04.md` (conid + venue + close-snap quote + AUM)
 - [x] K-series plan stub — `docs/research/k-series-energy-sleeve-stub.md`
+- [x] K1 baseline JSON — `docs/research/k1-energy-baseline-2026-06-04.json` (3 sleeve sizes 4/6/8%)
 - [x] Live-hours probe scheduled — cron `141064ee` runs Fri 2026-06-05 13:00 UTC, self-deletes
 - [ ] **You** — decide: build the sleeve or park
 - [ ] If go: lift K-series stub → `plans/phase-k1-energy-baseline.md` and run K1
