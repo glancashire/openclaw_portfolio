@@ -1,13 +1,26 @@
 # Decisions pending — single surface
 
 **Owner:** Graham
-**Last refreshed:** 2026-06-04 20:00 UTC
+**Last refreshed:** 2026-06-04 20:38 UTC
 
 ---
 
 ## Active decisions
 
-_(empty — all open decisions resolved or scheduled)_
+### D-5 — Build the energy + nuclear sleeve?
+
+**What:** Add 4–7% allocation across XDWE / NUCL / INRE.
+
+**Status:** Research + preflight complete. Plan stub ready. Live-hours probe scheduled for Fri 2026-06-05 13:00 UTC.
+
+**Recommend:** ⏸ wait for Friday probe results, then decide. The probe will confirm whether the close-snap spreads we saw (1.08% / n/a / 0.49%) tighten to acceptable levels (<0.40%) during EU trading hours. If yes → go. If no → swap NUCL fallback to NUKL-Paris and re-probe.
+
+**Cost of delay:** zero — the sleeve is additive, not corrective.
+
+**Three options when Graham decides:**
+1. **Go** — bb8 lifts K-series stub to `plans/`, runs K1 baseline, generates K2 basket proposals (3 size variants), stops at approval gate
+2. **Park** — leave research in place, revisit at H2 review on 2026-06-17
+3. **Modify shortlist** — Graham wants different instruments (e.g. swap clean-energy INRE for water/AI/something else)
 
 ---
 
@@ -52,6 +65,8 @@ _(empty — all open decisions resolved or scheduled)_
 
 ## Quick reply templates
 
-- **"do H2 now"** → bb8 will draft a recommendation against partial data (calendar wants 2026-06-17)
-- **"reactivate D1/D2/D3"** → bb8 will lift the parked phase and write a plan
+- **"build the energy sleeve"** → bb8 lifts K-stub to `plans/`, runs K1, generates K2 basket proposals
+- **"park the energy sleeve"** → leave research, revisit at H2
+- **"do H2 now"** → bb8 drafts a recommendation against partial data (calendar wants 2026-06-17)
+- **"reactivate D1/D2/D3"** → bb8 lifts the parked phase and writes a plan
 - **"resolve sentry issue X"** → use `resolveIssue()` helper directly
