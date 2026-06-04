@@ -1,5 +1,5 @@
 const path = require('path');
-const { runHealthCheck } = require('../src/reporting/healthReport');
+const { runHealthCheck, buildEscalationEmail } = require('../src/reporting/healthReport');
 const { effectiveDeliveryPolicy } = require('../src/reporting/deliveryPolicy');
 const { emailDeliveryReadiness, sendEmailMessage } = require('../src/reporting/emailDelivery');
 
@@ -18,11 +18,11 @@ async function main() {
   let emailDelivery = { attempted: false, sent: false, reason: 'email_not_requested' };
 
   if (sendEmail) {
-    // Suppress green health report emails — only send when there are issues
-    const severity = String(report.health?.severity || '').toLowerCase();
-    const healthStatus = String(report.health?.health || '').toLowerCase();
-    if (severity === 'none' || healthStatus === 'healthy' || (report.health?.blockerCount === 0 && severity !== 'high' && severity !== 'critical')) {
-      emailDelivery = { attempted: false, sent: false, reason: 'suppressed_green_health', health: report.health?.health, severity };
+    // Only email when state is attention or critical (persistent, non-autofixable issues)
+    const state = String(report.health?.state || 'healthy').toLowerCase();
+    const SEND_STATES = new Set(['attention', 'critical']);
+    if (!SEND_STATES.has(state)) {
+      emailDelivery = { attempted: false, sent: false, reason: 'suppressed_state_' + state, health: report.health?.health, state };
     } else {
     const policy = effectiveDeliveryPolicy(portfolioDir);
     const readiness = emailDeliveryReadiness(policy, { pendingActions: [] });
@@ -31,10 +31,8 @@ async function main() {
     } else if (!readiness.ready) {
       emailDelivery = { attempted: false, sent: false, reason: 'email_not_ready', detail: readiness.reason, missing: readiness.missing };
     } else {
-      const subject = `[Portfolio] ${report.portfolio} system health report (${String(report.generatedAt).slice(0, 10)})`;
-      const text = artifacts.markdown;
-      const html = artifacts.html;
-      const result = await sendEmailMessage({ policy, subject, text, html });
+      const escalation = buildEscalationEmail(report);
+      const result = await sendEmailMessage({ policy, subject: escalation.subject, text: escalation.text, html: escalation.html });
       emailDelivery = { attempted: true, sent: true, result, recipients: readiness.recipients, provider: readiness.provider };
     }
     } // close green-suppression else

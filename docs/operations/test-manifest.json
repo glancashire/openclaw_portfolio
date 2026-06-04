@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 331,
-    "safe": 252,
-    "integration": 74,
+    "total": 333,
+    "safe": 253,
+    "integration": 75,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -804,6 +804,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-health-escalation-email.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-health-monitor-cron.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
@@ -831,6 +838,13 @@
       "inVerifyRepoChecks": false,
       "quarantined": true,
       "quarantineReason": "pre-existing: assertion against current trend formatting drifts (W10 quarantine)"
+    },
+    {
+      "path": "scripts/test-health-state-derivation.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
     },
     {
       "path": "scripts/test-health-trend-synthesis.js",

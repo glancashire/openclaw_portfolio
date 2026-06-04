@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-04T07:23:28.755Z",
+  "generatedAt": "2026-06-04T09:06:07.932Z",
   "counts": {
-    "totalTests": 331,
+    "totalTests": 333,
     "domains": 121
   },
   "domains": [
@@ -128,6 +128,21 @@
       ]
     },
     {
+      "domain": "health",
+      "total": 8,
+      "safe": 5,
+      "integration": 3,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 1,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-health-check-cli.js",
+        "scripts/test-health-escalation-email.js",
+        "scripts/test-health-monitor-cron.js"
+      ]
+    },
+    {
       "domain": "portfolio",
       "total": 8,
       "safe": 6,
@@ -215,21 +230,6 @@
         "scripts/test-execution-authority.js",
         "scripts/test-execution-classification.js",
         "scripts/test-execution-command-surface-doc.js"
-      ]
-    },
-    {
-      "domain": "health",
-      "total": 6,
-      "safe": 4,
-      "integration": 2,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 1,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-health-check-cli.js",
-        "scripts/test-health-monitor-cron.js",
-        "scripts/test-health-report-priority-order.js"
       ]
     },
     {

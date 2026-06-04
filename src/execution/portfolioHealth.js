@@ -53,9 +53,38 @@ function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRow
     blockers.push({ code: 'delivery_attention', message: deliveryStatus.pendingActions[0] });
   }
 
+  // Derive canonical state (Phase A — single source of truth for email gate + UI)
+  // state: 'healthy' | 'watch' | 'attention' | 'critical'
+  // summary: one-sentence human explanation
+  // canonicalNextAction: null (no action needed) | string (concrete instruction)
+  let state = 'healthy';
+  let summary = 'All systems normal.';
+  let canonicalNextAction = null;
+
+  const hasCriticalBlocker = blockers.some(function(b) {
+    return b.code === 'broker_automation_paused' || b.code === 'broker_unready';
+  });
+
+  if (hasCriticalBlocker) {
+    state = 'critical';
+    summary = blockers.find(function(b) { return b.code === 'broker_automation_paused' || b.code === 'broker_unready'; }).message;
+    canonicalNextAction = recommendedActions[0] || null;
+  } else if (blockers.length > 0) {
+    state = 'attention';
+    summary = blockers[0].message;
+    canonicalNextAction = recommendedActions[0] || null;
+  } else if (health !== 'healthy') {
+    state = 'watch';
+    summary = 'Minor signals detected; monitoring.';
+    canonicalNextAction = null;
+  }
+
   return {
     health,
     severity,
+    state,
+    summary,
+    canonicalNextAction,
     blockerCount: blockers.length,
     blockers,
     recommendedActions: Array.from(new Set(recommendedActions)),

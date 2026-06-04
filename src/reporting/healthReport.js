@@ -364,6 +364,75 @@ async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySaf
   return { report, artifacts };
 }
 
+
+function buildEscalationEmail(report) {
+  const state = report.health?.state || 'attention';
+  const summary = report.health?.summary || 'Health issue detected.';
+  const canonicalNextAction = report.health?.canonicalNextAction || null;
+  const portfolio = report.portfolio || 'etf';
+  const generatedAt = report.generatedAt || new Date().toISOString();
+
+  // What bb8 already tried
+  const healed = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((a) => a.ok) : [];
+  const failedFixes = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((a) => !a.ok) : [];
+  const triedLines = [];
+  if (healed.length) {
+    for (const h of healed) triedLines.push('- ' + h.kind.replace(/_/g, ' '));
+  }
+  if (failedFixes.length) {
+    for (const f of failedFixes) triedLines.push('- ' + f.kind.replace(/_/g, ' ') + ' (failed: ' + (f.error || 'unknown') + ')');
+  }
+  if (!triedLines.length) triedLines.push('- No automatic fixes were applicable this cycle.');
+
+  // Subject
+  const stateLabel = state === 'critical' ? 'CRITICAL' : 'attention needed';
+  const subject = '[Portfolio] ' + portfolio.toUpperCase() + ' ' + stateLabel + ' — ' + summary.slice(0, 80);
+
+  // Plain text body
+  const text = [
+    portfolio.toUpperCase() + ' portfolio — ' + stateLabel,
+    'Generated ' + generatedAt.slice(0, 19).replace('T', ' ') + ' UTC.',
+    '',
+    'What\'s wrong',
+    '  ' + summary,
+    '',
+    'What bb8 already tried',
+    ...triedLines.map((l) => '  ' + l),
+    '',
+    'What to do',
+    canonicalNextAction ? '  ' + canonicalNextAction : '  Review the full report and decide on next steps.',
+    '',
+    'Full report: runtime/overview/health-report.html',
+  ].join('\n');
+
+  // HTML body
+  const html = page({
+    title: portfolio.toUpperCase() + ' ' + stateLabel,
+    bodyHtml: [
+      '<div style="padding:24px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">',
+      '<h1 style="font-size:20px;margin:0 0 16px;">' + portfolio.toUpperCase() + ' — ' + stateLabel + '</h1>',
+      '<p style="font-size:13px;color:#6b7280;margin:0 0 20px;">Generated ' + generatedAt.slice(0, 19).replace('T', ' ') + ' UTC</p>',
+      '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:20px;">',
+      '<div style="font-size:11px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:6px;">What\'s wrong</div>',
+      '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + summary + '</div>',
+      '</div>',
+      '<div style="background:#f0f9ff;border:1px solid #93c5fd;border-radius:12px;padding:16px;margin-bottom:20px;">',
+      '<div style="font-size:11px;color:#1e40af;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:6px;">What bb8 already tried</div>',
+      '<ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.8;color:#334155;">',
+      ...triedLines.map((l) => '<li>' + l.replace(/^- /, '') + '</li>'),
+      '</ul>',
+      '</div>',
+      '<div style="background:#ecfdf5;border:1px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;">',
+      '<div style="font-size:11px;color:#166534;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:6px;">What to do</div>',
+      '<div style="font-size:14px;color:#1e293b;">' + (canonicalNextAction ? canonicalNextAction : 'Review the full report and decide on next steps.') + '</div>',
+      '</div>',
+      '</div>',
+    ].join('\n'),
+  });
+
+  return { subject, text, html };
+}
+
 module.exports = {
   healthReportPaths,
   severityTone,
@@ -373,6 +442,7 @@ module.exports = {
   attemptSafeSelfHeal,
   buildHealthReportMarkdown,
   buildHealthReportHtml,
+  buildEscalationEmail,
   writeHealthReportArtifacts,
   runHealthCheck,
 };
