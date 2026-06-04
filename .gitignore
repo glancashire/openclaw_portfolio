@@ -5,6 +5,7 @@ secrets/
 # Local environment / dependencies
 node_modules/
 .env*
+!.env.example
 
 # Local assistant memory and tool state
 memory/

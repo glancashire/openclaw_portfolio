@@ -38,6 +38,7 @@
     "verify:execution": "node scripts/verify-execution-surface.js"
   },
   "dependencies": {
+    "@sentry/node": "^10.56.0",
     "@stoqey/ib": "^1.5.3",
     "playwright": "^1.59.1"
   }
