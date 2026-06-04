@@ -14,7 +14,7 @@
 | **XDWE** | ✅ conid 227263991 | Xetra EUR (IBIS2) | bid €61.53 / ask €62.20 (close snap) | **€1,684m** | ready to slot |
 | **NUCL** | ✅ conid 626090692 | **SIX CHF (EBS)** | last CHF 47.465 (close, no live bid/ask) | **~€2.4bn** | 🌟 primary nuclear pick — CHF native, no FX |
 | **NUUR** | ✅ conid 825813453 | AEX USD | last $6.233 (close, no live bid/ask) | **€27m** ⚠️ | demoted — AUM too small |
-| **INRA / INRE** | ✅ 3 listings | Paris EUR (INRE) | bid €29.28 / ask €29.425 (close snap) | **~€4bn** | ready, INRE preferred |
+| **INRA / INRE** | ✅ 3 listings | Paris EUR (INRE) | bid €29.28 / ask €29.425 (close snap) | **€865m** | ready, INRE preferred |
 
 All three primary picks resolve cleanly on IBKR. NUUR demoted on AUM concern (€27m, well below comfortable threshold). NUCL on SIX wins the nuclear slot — CHF native eliminates FX overhead.
 
@@ -114,7 +114,9 @@ Fallback if SIX live-hours spread proves too wide: NUKL on Paris (SBF), EUR, con
 | TER | 0.65% |
 | Replication | Physical (full) |
 | Distribution | Acc |
-| AUM | ~€4bn (largest clean-energy UCITS) |
+| AUM | **€865m** (justETF, 2026-06) |
+| Holdings | 100 stocks |
+| Inception | 2022-02-23 |
 
 **Recommended venue: INRE (Paris, EUR).** Tightest live spread observed (0.49% even at close), EUR-denominated (matches existing EMU sleeve), no stamp duty on French ETFs for non-French residents.
 
@@ -165,7 +167,7 @@ If Graham is **not** sure about the sleeve yet:
 |---|---|---|---:|---:|---|---:|---|
 | Broad energy | **XDWE** | Xetra EUR | 227263991 | 0.25% | ✅ | €1.7bn | Cheapest, full replication, deepest AUM |
 | Nuclear / uranium | **NUCL** | SIX CHF 🌟 | 626090692 | 0.55% | ✅ | ~€2.4bn | CHF native = no FX leg, largest nuclear UCITS |
-| Clean energy (optional) | **INRE** | Paris EUR | 552352705 | 0.65% | ✅ | ~€4bn | Tightest live spread, EUR matches EMU sleeve |
+| Clean energy (optional) | **INRE** | Paris EUR | 552352705 | 0.65% | ✅ | €865m | Tightest live spread, EUR matches EMU sleeve |
 
 Fallbacks: NUKL-Paris (EUR, conid 613031265) if NUCL-SIX spread proves too wide live; NUUR demoted (€27m AUM too small).
 

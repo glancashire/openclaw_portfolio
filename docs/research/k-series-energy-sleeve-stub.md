@@ -15,7 +15,7 @@ This is a forward-looking plan stub. Lives in research, not active plans, becaus
 |---|---|---|---:|---|---:|---:|---:|
 | Broad energy | **XDWE** | Xetra | 227263991 | EUR | 0.25% | €1.7bn | 2–3% |
 | Nuclear | **NUCL** | SIX | 626090692 | **CHF** | 0.55% | ~€2.4bn | 1–2% |
-| Clean energy (optional) | **INRE** | Paris | 552352705 | EUR | 0.65% | ~€4bn | 1–2% |
+| Clean energy (optional) | **INRE** | Paris | 552352705 | EUR | 0.65% | €865m | 1–2% |
 
 ---
 

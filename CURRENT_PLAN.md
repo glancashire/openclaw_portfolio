@@ -57,7 +57,7 @@ Phase D3  EM ex-China sleeve                                  PARKED        ❌ 
 |---|---|---|---:|---:|---:|
 | Broad energy | XDWE | Xetra EUR | 227263991 | 0.25% | €1.7bn |
 | Nuclear | **NUCL** | **SIX CHF** 🌟 | 626090692 | 0.55% | €2.4bn |
-| Clean energy (opt) | INRE | Paris EUR | 552352705 | 0.65% | €4bn |
+| Clean energy (opt) | INRE | Paris EUR | 552352705 | 0.65% | €865m |
 
 - [x] Screening — `docs/research/energy-nuclear-screening-2026-06-04.md`
 - [x] Preflight — `docs/research/energy-nuclear-preflight-2026-06-04.md` (conid + venue + close-snap quote + AUM)
