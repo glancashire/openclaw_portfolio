@@ -27,4 +27,10 @@ Generated 2026-06-03T15:50:00Z. Gated by `scripts/test-cron-job-policy.js`.
 | 10 | portfolio-etf-quarterly-report | `50 17 1 1,4,7,10 *` @ UTC | current | agentTurn | exec, read, write, edit | True |
 | 11 | portfolio-etf-monitor-fills | `*/15 7-21 * * 1-5` @ UTC | current | agentTurn | exec, read | n/a (delivery=none) |
 
+## Disabled jobs (registered but not firing)
+
+| # | Name | Schedule | Target | Kind | Reason | bestEffort |
+|---|---|---|---|---|---|---|
+| D1 | sentry-autofix-weekly | `0 9 * * 1` @ Europe/Zurich | session:agent:main:main | agentTurn | Sentry auth token has insufficient scopes; awaiting token with `project:read`, `event:read`, `issue:read`. Smoke-tested write side (DSN) works. | True |
+
 
