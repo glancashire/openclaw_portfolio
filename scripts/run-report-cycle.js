@@ -1,3 +1,5 @@
+require('../lib/observability/bootstrap');
+
 const { generateAndWriteReport } = require('../src/reporting/reportGenerator');
 const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
 const { appendHistorySnapshot } = require('../src/analysis/historyWriter');

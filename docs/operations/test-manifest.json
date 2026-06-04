@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 327,
-    "safe": 249,
+    "total": 328,
+    "safe": 250,
     "integration": 73,
     "live-smoke": 3,
     "external": 2,
@@ -1822,6 +1822,13 @@
     },
     {
       "path": "scripts/test-send-digest-counter-refresh.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-sentry-bootstrap.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

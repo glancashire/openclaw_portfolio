@@ -1,5 +1,7 @@
 'use strict';
 
+require('../lib/observability/bootstrap');
+
 /**
  * send-dashboard-digest.js
  *

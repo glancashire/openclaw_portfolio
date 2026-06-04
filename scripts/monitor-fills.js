@@ -1,5 +1,7 @@
 'use strict';
 
+require('../lib/observability/bootstrap');
+
 /**
  * Monitor open orders for fills and send email notifications.
  * Designed to be run periodically (e.g. every 60s during market hours).

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+require('../lib/observability/bootstrap');
+
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
