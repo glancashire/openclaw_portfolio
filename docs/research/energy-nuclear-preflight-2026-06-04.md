@@ -12,7 +12,7 @@
 | Pick | Resolved on IBKR | Best venue | Live quote | AUM | Verdict |
 |---|---|---|---|---:|---|
 | **XDWE** | ✅ conid 227263991 | Xetra EUR (IBIS2) | bid €61.53 / ask €62.20 (close snap) | **€1,684m** | ready to slot |
-| **NUCL** | ✅ conid 626090692 | **SIX CHF (EBS)** | last CHF 47.465 (close, no live bid/ask) | **~€1.2bn** | 🌟 primary nuclear pick — CHF native, no FX |
+| **NUCL** | ✅ conid 626090692 | **SIX CHF (EBS)** | last CHF 47.465 (close, no live bid/ask) | **~€2.4bn** | 🌟 primary nuclear pick — CHF native, no FX |
 | **NUUR** | ✅ conid 825813453 | AEX USD | last $6.233 (close, no live bid/ask) | **€27m** ⚠️ | demoted — AUM too small |
 | **INRA / INRE** | ✅ 3 listings | Paris EUR (INRE) | bid €29.28 / ask €29.425 (close snap) | **~€4bn** | ready, INRE preferred |
 
@@ -73,10 +73,10 @@ All three primary picks resolve cleanly on IBKR. NUUR demoted on AUM concern (�
 | TER | 0.55% (+15 bps vs NUUR) |
 | Replication | Physical (full) |
 | Distribution | Acc |
-| AUM | ~€1.2bn |
-| Venues | Xetra (EUR), Borsa Italiana (USD), LSE |
+| AUM | **€2,389m** (justETF, 2026-06) |
+| Venues | Xetra (EUR), Borsa Italiana (USD), LSE, Paris (EUR), SIX (CHF, USD, GBP) |
 
-NUKL is 44× the AUM, only 15 bps more expensive, and lists on Xetra in EUR (better currency match for the portfolio). Closure risk is essentially zero at this size.
+NUKL is **88×** the AUM of NUUR, only 15 bps more expensive, and lists across many venues. Closure risk is essentially zero at this size. Largest pure-nuclear UCITS ETF in Europe.
 
 **NUUR could still be a satellite addition** if you want minimum TER for a small, conviction-only nuclear bet — but it's not the right top pick for a structured sleeve. Resolving NUKL conid is the next preflight step if Graham agrees with the swap.
 
@@ -164,7 +164,7 @@ If Graham is **not** sure about the sleeve yet:
 | Role | Ticker | Venue | Conid | TER | Acc | AUM | Why this one |
 |---|---|---|---:|---:|---|---:|---|
 | Broad energy | **XDWE** | Xetra EUR | 227263991 | 0.25% | ✅ | €1.7bn | Cheapest, full replication, deepest AUM |
-| Nuclear / uranium | **NUCL** | SIX CHF 🌟 | 626090692 | 0.55% | ✅ | ~€1.2bn | CHF native = no FX leg, large AUM |
+| Nuclear / uranium | **NUCL** | SIX CHF 🌟 | 626090692 | 0.55% | ✅ | ~€2.4bn | CHF native = no FX leg, largest nuclear UCITS |
 | Clean energy (optional) | **INRE** | Paris EUR | 552352705 | 0.65% | ✅ | ~€4bn | Tightest live spread, EUR matches EMU sleeve |
 
 Fallbacks: NUKL-Paris (EUR, conid 613031265) if NUCL-SIX spread proves too wide live; NUUR demoted (€27m AUM too small).
