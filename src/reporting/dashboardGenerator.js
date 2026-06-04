@@ -4,6 +4,7 @@ const { analyzeAllocation } = require('../analysis/allocationAnalysis');
 const { readApprovedInstruments } = require('../analysis/approvedInstruments');
 const { buildExecutionPlan } = require('../analysis/executionPlan');
 const { recentTrades, latestTradeProposals, latestHistory, executionLifecycleSummary } = require('./portfolioData');
+const { trulyInFlightCount } = require('../execution/lifecycleStatus');
 const readinessModule = require('../brokers/interactive-brokers/readiness');
 const getInteractiveBrokersReadinessBounded =
   typeof readinessModule.getInteractiveBrokersReadinessBounded === 'function'
@@ -283,7 +284,7 @@ function buildPendingOperatorActions({ tradesPath = null, holdingsText = '', del
   if (brokerErrorState?.stopAutomation) {
     actions.push({ queueType: 'recovery', severity: 'high', status: 'paused', summary: `Broker automation paused after ${brokerErrorState.consecutive} consecutive errors; investigate before resuming.` });
   }
-  const inFlightCount = Number(lifecycleSummary?.staged || 0) + Number(lifecycleSummary?.submitted || 0) + Number(lifecycleSummary?.partiallyFilled || 0);
+  const inFlightCount = trulyInFlightCount(lifecycleSummary);
   actions.push(...readBlockedTradeQueueItems(tradesPath).filter((item) => {
     if (item.blockCode !== 'contract_resolution_failed') return true;
     return inFlightCount > 0;
@@ -307,9 +308,8 @@ function buildPendingOperatorActions({ tradesPath = null, holdingsText = '', del
   if ((lifecycleSummary?.proposed || 0) > 0) {
     actions.push({ queueType: 'approval', severity: 'medium', status: 'pending_user_approval', summary: `There are ${lifecycleSummary.proposed} proposed trade row(s) awaiting approval.` });
   }
-  if ((lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0 || (lifecycleSummary?.staged || 0) > 0) {
-    const inflight = (lifecycleSummary?.submitted || 0) + (lifecycleSummary?.partiallyFilled || 0) + (lifecycleSummary?.staged || 0);
-    actions.push({ queueType: 'execution', severity: 'medium', status: 'in_flight', summary: `Reconcile ${inflight} in-flight broker order(s) before creating overlapping plans.` });
+  if (inFlightCount > 0) {
+    actions.push({ queueType: 'execution', severity: 'medium', status: 'in_flight', summary: `Reconcile ${inFlightCount} in-flight broker order(s) before creating overlapping plans.` });
   }
   if (safetyDiagnostics?.holdingsHealth?.stalePricing) {
     actions.push({ queueType: 'data', severity: 'high', status: 'stale', summary: 'Refresh holdings or pricing because safety diagnostics currently mark pricing as stale.' });

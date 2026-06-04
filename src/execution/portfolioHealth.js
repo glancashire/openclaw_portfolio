@@ -73,6 +73,11 @@ function classifyPortfolioHealth({ brokerReadiness, errorState, staleApprovedRow
     state = 'attention';
     summary = blockers[0].message;
     canonicalNextAction = recommendedActions[0] || null;
+    // If the leading blocker is about awaiting reconcile, provide a concrete command
+    // instead of leaving the operator with no actionable next step.
+    if (!canonicalNextAction && /sync-portfolio-order-status to reconcile/i.test(summary)) {
+      canonicalNextAction = 'For each unreconciled broker order id, run: node scripts/sync-portfolio-order-status.js <portfolio-dir> <order-id>';
+    }
   } else if (health !== 'healthy') {
     state = 'watch';
     summary = 'Minor signals detected; monitoring.';

@@ -73,9 +73,17 @@ function reportPendingActions({ lifecycleSummary = {}, freshness = null, brokerE
   if (Number(lifecycleSummary.failed || 0) >= Number(thresholds.failedTrades || 1) && Number(lifecycleSummary.failed || 0) > 0) {
     actions.push(`${lifecycleSummary.failed} trade row(s) are marked failed and need operator review.`);
   }
-  const inflight = Number(lifecycleSummary.staged || 0) + Number(lifecycleSummary.submitted || 0) + Number(lifecycleSummary.partiallyFilled || 0);
+  // True in-flight (live at the broker) — these block overlapping actions.
+  const awaitingReconcile = Number(lifecycleSummary.submittedAwaitingReconcile || 0);
+  const submittedTotal = Number(lifecycleSummary.submitted || 0);
+  const submittedLive = Math.max(0, submittedTotal - awaitingReconcile);
+  const inflight = Number(lifecycleSummary.staged || 0) + submittedLive + Number(lifecycleSummary.partiallyFilled || 0);
   if (inflight >= Number(thresholds.inFlightOrders || 1) && inflight > 0) {
     actions.push(`${inflight} in-flight execution row(s) need reconciliation before overlapping actions.`);
+  }
+  // Submitted-but-unreconciled rows — bookkeeping debt, not live execution.
+  if (awaitingReconcile > 0) {
+    actions.push(`${awaitingReconcile} trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.`);
   }
   if (thresholds.brokerAutomationPaused && brokerErrorState?.stopAutomation) {
     actions.push(`Broker automation is paused after ${brokerErrorState.consecutive} consecutive broker errors.`);

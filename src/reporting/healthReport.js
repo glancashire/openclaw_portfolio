@@ -314,6 +314,68 @@ function buildHealthReportHtml(report) {
   });
 }
 
+function appendHealthTrend(report, { repoRoot = process.cwd() } = {}) {
+  // Phase I-2: append one line per health check to runtime/overview/health-trend.jsonl
+  // for trend visibility (dashboard reads the tail; ops can grep history).
+  // Best-effort: failure to append must NOT bubble up and break the health check.
+  try {
+    const trendDir = path.join(repoRoot, 'runtime', 'overview');
+    if (!fs.existsSync(trendDir)) fs.mkdirSync(trendDir, { recursive: true });
+    const trendPath = path.join(trendDir, 'health-trend.jsonl');
+    const blockers = Array.isArray(report.health?.blockers) ? report.health.blockers : [];
+    const blockerCodes = blockers.map((b) => b && b.code).filter(Boolean);
+    const entry = {
+      ts: report.generatedAt || new Date().toISOString(),
+      portfolio: report.portfolio || 'unknown',
+      state: report.health?.state || 'healthy',
+      summary: report.health?.summary || '',
+      blockerCodes,
+      severity: report.health?.severity || null,
+    };
+    fs.appendFileSync(trendPath, JSON.stringify(entry) + '\n');
+  } catch (err) {
+    // swallow — trend log is observability, not a hard requirement
+  }
+}
+
+function readHealthTrendTail({ repoRoot = process.cwd(), portfolio = null, limit = 10 } = {}) {
+  // Used by the dashboard to summarize recent health verdicts.
+  try {
+    const trendPath = path.join(repoRoot, 'runtime', 'overview', 'health-trend.jsonl');
+    if (!fs.existsSync(trendPath)) return [];
+    const text = fs.readFileSync(trendPath, 'utf8');
+    const lines = text.split('\n').filter((l) => l.trim().length > 0);
+    const rows = [];
+    for (const line of lines) {
+      try {
+        const obj = JSON.parse(line);
+        if (portfolio && obj.portfolio !== portfolio) continue;
+        rows.push(obj);
+      } catch { /* skip malformed line */ }
+    }
+    return rows.slice(-limit);
+  } catch { return []; }
+}
+
+function summarizeHealthTrendTail(tail = []) {
+  if (!tail.length) return null;
+  const last = tail[tail.length - 1];
+  // Count consecutive cycles ending with the same state
+  let consecutive = 0;
+  for (let i = tail.length - 1; i >= 0; i--) {
+    if (tail[i].state === last.state) consecutive++;
+    else break;
+  }
+  return {
+    currentState: last.state,
+    summary: last.summary,
+    consecutiveSame: consecutive,
+    sinceTs: tail[tail.length - consecutive].ts,
+    blockerCodes: last.blockerCodes || [],
+    totalSampleCount: tail.length,
+  };
+}
+
 function writeHealthReportArtifacts(portfolioDir, report) {
   const paths = healthReportPaths(portfolioDir);
   const markdown = buildHealthReportMarkdown(report);
@@ -361,6 +423,7 @@ async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySaf
     healed: selfHeal.actions.map((item) => item.kind),
     openIssues: selfHeal.openIssues.map((item) => item.category),
   }, { repoRoot });
+  appendHealthTrend(report, { repoRoot });
   return { report, artifacts };
 }
 
@@ -475,5 +538,8 @@ module.exports = {
   buildHealthReportHtml,
   buildEscalationEmail,
   writeHealthReportArtifacts,
+  appendHealthTrend,
+  readHealthTrendTail,
+  summarizeHealthTrendTail,
   runHealthCheck,
 };

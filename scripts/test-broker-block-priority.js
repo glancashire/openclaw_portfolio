@@ -7,7 +7,7 @@ const { buildPendingOperatorActions, bestNextStep } = require('../src/reporting/
 (function main() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'broker-block-priority-'));
   const tradesPath = path.join(tmpDir, 'trades.md');
-  fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| 2026-05-28 09:40:00 | inactive | buy | IE000XZSV718 | SPYL | 105 | 15.5 | 1560.83 | 0 | live submit | broker_inactive | 9105 | exchange_closed_at_submit | Broker rejected the order because the target exchange was closed at submission time. | 2026-05-28 09:40:02 | Retry during the venue trading session or hand the row back to the market-open runner. |\n`);
+  fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| 2026-06-04 09:00:00 | inactive | buy | IE000XZSV718 | SPYL | 105 | 15.5 | 1560.83 | 0 | live submit | broker_inactive | 9105 | exchange_closed_at_submit | Broker rejected the order because the target exchange was closed at submission time. | 2026-06-04 09:00:02 | Retry during the venue trading session or hand the row back to the market-open runner. |\n`);
 
   const pendingActions = buildPendingOperatorActions({
     tradesPath,

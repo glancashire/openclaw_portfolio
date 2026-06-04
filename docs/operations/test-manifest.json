@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 333,
-    "safe": 253,
-    "integration": 75,
+    "total": 336,
+    "safe": 254,
+    "integration": 77,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -847,6 +847,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-health-trend-jsonl.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-health-trend-synthesis.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -1102,6 +1109,13 @@
       "path": "scripts/test-latest-trade-proposals-dedup.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-lifecycle-counter-awaiting-reconcile.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
@@ -1880,6 +1894,13 @@
       "path": "scripts/test-shared-quote-path-fallback.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-show-dashboard-health-tail.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

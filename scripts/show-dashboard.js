@@ -210,6 +210,29 @@ if (items.length) {
   lines.push(`Op: ${items.join(' · ')}`);
 }
 
+// ── Health trend tail (Phase I-3) ─────────────────────────────────────────────
+try {
+  const { readHealthTrendTail, summarizeHealthTrendTail } = require('../src/reporting/healthReport');
+  const tail = readHealthTrendTail({ portfolio, limit: 20 });
+  const summary = summarizeHealthTrendTail(tail);
+  if (summary) {
+    const stateEmoji = summary.currentState === 'healthy' ? '🟢'
+      : summary.currentState === 'watch' ? '🟡'
+      : summary.currentState === 'attention' ? '🟠'
+      : summary.currentState === 'critical' ? '🔴' : '⚪';
+    const since = String(summary.sinceTs || '').slice(0, 16).replace('T', ' ');
+    const stateLabel = summary.consecutiveSame > 1
+      ? `${summary.currentState} (last ${summary.consecutiveSame} cycles, since ${since} UTC)`
+      : `${summary.currentState} (since ${since} UTC)`;
+    let line = `Health: ${stateEmoji} ${stateLabel}`;
+    if (summary.currentState !== 'healthy' && summary.summary) {
+      const s = summary.summary.length > 100 ? summary.summary.slice(0, 97) + '…' : summary.summary;
+      line += ` — ${s}`;
+    }
+    lines.push(line);
+  }
+} catch { /* trend log is optional */ }
+
 // ── Sanity check ──────────────────────────────────────────────────────────────
 if (total != null && invested != null && cash != null) {
   const diff = Math.abs(total - (invested + cash));

@@ -1,10 +1,10 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-04T09:06:07.932Z",
+  "generatedAt": "2026-06-04T12:37:51.135Z",
   "counts": {
-    "totalTests": 333,
-    "domains": 121
+    "totalTests": 336,
+    "domains": 122
   },
   "domains": [
     {
@@ -98,6 +98,21 @@
       ]
     },
     {
+      "domain": "health",
+      "total": 9,
+      "safe": 5,
+      "integration": 4,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 1,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-health-check-cli.js",
+        "scripts/test-health-escalation-email.js",
+        "scripts/test-health-monitor-cron.js"
+      ]
+    },
+    {
       "domain": "interactive",
       "total": 9,
       "safe": 0,
@@ -125,21 +140,6 @@
         "scripts/test-live-order-guard.js",
         "scripts/test-live-preflight-diagnostic-artifact.js",
         "scripts/test-live-preflight-no-hardcoded-ebs-market-window.js"
-      ]
-    },
-    {
-      "domain": "health",
-      "total": 8,
-      "safe": 5,
-      "integration": 3,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 1,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-health-check-cli.js",
-        "scripts/test-health-escalation-email.js",
-        "scripts/test-health-monitor-cron.js"
       ]
     },
     {
@@ -631,6 +631,20 @@
       "examples": [
         "scripts/test-latest-proposal-for-portfolio.js",
         "scripts/test-latest-trade-proposals-dedup.js"
+      ]
+    },
+    {
+      "domain": "lifecycle",
+      "total": 2,
+      "safe": 2,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-lifecycle-counter-awaiting-reconcile.js",
+        "scripts/test-lifecycle-status-normalization.js"
       ]
     },
     {
@@ -1154,19 +1168,6 @@
       ]
     },
     {
-      "domain": "lifecycle",
-      "total": 1,
-      "safe": 1,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-lifecycle-status-normalization.js"
-      ]
-    },
-    {
       "domain": "mailgun",
       "total": 1,
       "safe": 0,
@@ -1489,6 +1490,19 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "scripts/test-shared-quote-path-fallback.js"
+      ]
+    },
+    {
+      "domain": "show",
+      "total": 1,
+      "safe": 0,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-show-dashboard-health-tail.js"
       ]
     },
     {
