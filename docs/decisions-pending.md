@@ -1,25 +1,21 @@
 # Decisions pending — single surface
 
 **Owner:** Graham
-**Last refreshed:** 2026-06-04 16:05 UTC
+**Last refreshed:** 2026-06-04 20:00 UTC
 
 ---
 
 ## Active decisions
 
-_(empty — all open decisions resolved)_
+_(empty — all open decisions resolved or scheduled)_
 
 ---
 
-## Completed (closed today)
+## Scheduled (calendar-gated)
 
-| Item | Resolution |
-|---|---|
-| D-1 — Sentry smoke event `OPENCLAW_PORTFOLIO-1` | ✅ Resolved programmatically. Token now has `event:admin`. Smoke issue marked resolved via API (id 7526237514). `resolveIssue()` helper added to `sentryApi.js` so weekly autofix cron can resolve issues after fixes land. |
-| D-2 — F4 / G3 — IBKR XLS backfill | ⏸ Parked by Graham. The deposits inbox cron (Phase G2) will pick up the XLS automatically whenever it lands. No active follow-up. |
-| D-3 — H2 — Allocation path A/B/C | ⏸ Confirmed deferred to **2026-06-17** (14 days post-deconcentration). Baseline anchor: `docs/research/h1-baseline-2026-06-03.json`. Will surface again on the calendar date. |
-| D-4 — Phase J second-pass autofix | ✅ Shipped (`d49af30`). 5 fixers, 24h rate-limit, wired into health check. |
-| G2 — Deposits cron wiring | ✅ Shipped (`467fc05`). Inbox at `runtime/ibkr-statements/inbox/`. |
+| Item | Earliest review | What you'll be asked |
+|---|---|---|
+| **H2 — allocation path** | 2026-06-17 | Pick path A (no change), B (light deconcentration), or C (full rotation). Baseline anchor: `docs/research/h1-baseline-2026-06-03.json`. bb8 will surface this on the date. |
 
 ---
 
@@ -28,7 +24,8 @@ _(empty — all open decisions resolved)_
 | Item | What to do |
 |---|---|
 | B5 — IBKR keepalive 2FA | Respond to alerts when they fire |
-| Fill-monitor cron | Enable only during live execution; disable after |
+| Fill-monitor cron | Enable only during live execution; disable after fills land or end-of-day |
+| F4 / G3 — XLS backfill | Drop next IBKR transactions XLS into `runtime/ibkr-statements/inbox/` |
 
 ---
 
@@ -42,7 +39,19 @@ _(empty — all open decisions resolved)_
 
 ---
 
+## Recently closed (this week)
+
+| Item | Resolution |
+|---|---|
+| D-1 — Sentry smoke event | ✅ Resolved via API. Token now has `event:admin`. |
+| D-2 — IBKR XLS backfill | ⏸ Parked. Inbox cron auto-picks-up when XLS lands. |
+| D-3 — Allocation path | ⏸ Confirmed deferred to 2026-06-17. |
+| D-4 — Phase J autofix | ✅ Shipped (`d49af30`). |
+
+---
+
 ## Quick reply templates
 
-- **"do H2 now"** → draft recommendation against partial data (calendar wants 2026-06-17)
-- **"reactivate FX reconciliation"** → start D1
+- **"do H2 now"** → bb8 will draft a recommendation against partial data (calendar wants 2026-06-17)
+- **"reactivate D1/D2/D3"** → bb8 will lift the parked phase and write a plan
+- **"resolve sentry issue X"** → use `resolveIssue()` helper directly

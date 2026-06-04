@@ -1,64 +1,84 @@
 # Current Plan
 
-**Date:** 2026-06-04 (refreshed 13:00 UTC)
-**Repo head:** `d49af30` (feat: Phase J — targeted second-pass autofix)
-**Tests:** `npm test` 23/23 · `npm run test:safe` 254/254
-**Health:** 🟢 healthy — All systems normal.
+**Date:** 2026-06-04 20:00 UTC
+**Repo head:** `0a294ce`
+**Tests:** `npm run test:safe` 254/254 · **Health:** 🟢 healthy
 
-## Visual roadmap (open work only)
+---
+
+## Visual roadmap (open phases only — completed work archived)
 
 ```text
-Phase J  Second-pass autofix                                    [DONE]     ██████████
-Phase G2 Deposits inbox → daily-sync cron                       [DONE]     ██████████
-Phase F  Fill-pipeline residuals (XLS backfill)                 [WAITING]  █████████░
-Phase G3 Deposits XLS backfill                                  [WAITING]  █████████░
-Phase H  Allocation-target decision                             [WAITING]  ████░░░░░░
-Phase B  IBKR ops residual                                      [OPS]      █████████░
-Phase D  Parked product/domain explorations                     [PARKED]   █░░░░░░░░░
+                         ──────── BLOCKER TYPE ────────
+Phase H  Allocation rebalance decision     CALENDAR ░░░░░░░░░░  → 2026-06-17
+Phase F4 IBKR XLS backfill                 OPERATOR ░░░░░░░░░░  → drop XLS in inbox
+Phase G3 Deposits XLS reference backfill   OPERATOR ░░░░░░░░░░  → same XLS as F4
+Phase B5 IBKR keepalive 2FA                RECURRING            → respond to alerts
+Phase D  Parked explorations               PARKED   ░░░░░░░░░░  → reactivate explicitly
 ```
 
-**No autonomous engineering work is ready to start.** Everything remaining is calendar-gated, operator-gated, or explicitly parked.
+**There is no autonomous engineering work pending.** Every open item is gated on a human action, a calendar date, or explicit reactivation.
 
 ---
 
-## Completed today (2026-06-04, second batch)
+## Phase H — Allocation rebalance decision (CALENDAR-GATED)
 
-- [x] **G2** — `scripts/process-ibkr-statement-inbox.js` wired into daily-sync cron. 30 test assertions. Inbox at `runtime/ibkr-statements/inbox/`.
-- [x] **J** — `src/reporting/healthFixers.js` dispatch table (5 fixers), 24h rate-limit, wired into `runHealthCheck`, escalation email updated. 56 test assertions.
+**Earliest review:** 2026-06-17 (14 days post-deconcentration).
+**Baseline anchor:** `docs/research/h1-baseline-2026-06-03.json`
 
----
-
-## Phase F — Fill-pipeline residuals (operator-gated)
-
-- [x] F1–F3, F5, F6 — shipped
-- [ ] **F4** — Backfill `pending_ibkr_xls` for 2026-06-03 deposit row when next IBKR XLS arrives.
-
----
-
-## Phase G — Deposits ledger close-out
-
-- [x] G1, G2, G4 — shipped
-- [ ] **G3** — Backfill XLS reference (same action as F4 — needs IBKR statement file).
-
----
-
-## Phase H — Allocation-target decision (calendar-gated)
-
+### H2 — Decide allocation path
 - [x] H1 — baseline frozen
-- [ ] **H2** — Decide path A/B/C for the 4 new ETFs. **Earliest review: 2026-06-17.**
-- [ ] **H3** — Apply H2 decision to `portfolio.md`.
+- [ ] **H2** — Pick path A, B, or C for the 4 new ETFs alongside SXR8 + EMUAA
+  - **Path A** — accept current concentration, no new ETFs
+  - **Path B** — add 1–2 deconcentration ETFs, light rebalance
+  - **Path C** — full rotation into the H1 mega-cap-screened set
+- [ ] **H3** — Apply H2 decision to `portfolio.md`
+
+### What bb8 will do once unblocked
+1. Pull live IBKR prices + fresh holdings snapshot
+2. Compare against H1 baseline drift bands
+3. Generate a rebalance basket proposal under each path
+4. Present side-by-side: cost, drift reduction, sector exposure delta
+5. Wait for path selection, then build the basket and ask for approval
 
 ---
 
-## Phase B — IBKR ops residual
+## Phase F4 + G3 — IBKR XLS backfill (OPERATOR-GATED)
 
-- [x] B1–B4 — shipped
-- [ ] **B5** — Respond to keepalive 2FA alerts. Recurring ops, no engineering.
+**Single action unblocks both.** The 2026-06-03 deposit row carries `pending_ibkr_xls`.
+
+- [ ] **F4 / G3** — Operator drops a transactions XLS into `runtime/ibkr-statements/inbox/`
+  - Daily-sync cron picks it up automatically (Phase G2 wiring)
+  - `import-ibkr-deposits` de-dupes by reference; safe to drop any range
+  - Processed file moves to `runtime/ibkr-statements/archive/`
+
+### What bb8 will do once unblocked
+- Confirm row reconciled (`pending_ibkr_xls` cleared)
+- Update `summary.json` and history snapshot
+- Mark F4 + G3 closed
 
 ---
 
-## Phase D — Parked product/domain explorations
+## Phase B5 — IBKR keepalive 2FA (RECURRING OPS)
 
-- [ ] D1 — FX cash reconciliation
-- [ ] D2 — Control UI direct embedding
-- [ ] D3 — EM ex-China sleeve
+- [ ] **B5** — Respond to keepalive 2FA prompts when they fire (no fixed cadence)
+
+Not engineering work. Just a heads-up the cron is alive.
+
+---
+
+## Phase D — Parked explorations
+
+These stay parked until you say "reactivate".
+
+- [ ] **D1** — FX cash reconciliation (only if live ops get confused by FX cash)
+- [ ] **D2** — Control UI direct embedding (waiting on upstream availability)
+- [ ] **D3** — EM ex-China sleeve (no physical Acc UCITS on IBKR feed)
+
+---
+
+## What is NOT in this plan
+
+Anything fully shipped (Sentry, health-monitor simplification, Phase I lifecycle counter, Phase G2 deposits inbox, Phase J second-pass autofix, F6, G4, H1) is in `archive/phase-plans/`. It does not need surface space here.
+
+Operational state (cron jobs, test pass rates, health) is in `STATUS.md`. Pending operator decisions are in `docs/decisions-pending.md`.
