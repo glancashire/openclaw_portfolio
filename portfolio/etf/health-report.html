@@ -3,68 +3,115 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="only light">
+  <meta name="supported-color-schemes" content="light">
   <title>etf system health report</title>
+  <style>
+  /* OpenClaw email theming — LIGHT MODE ONLY. */
+  :root { color-scheme: only light; supported-color-schemes: light; }
+  body, table, td, p, div, h1, h2, h3, h4, span, a {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  table { mso-table-lspace: 0; mso-table-rspace: 0; }
+  img { border: 0; line-height: 100%; outline: none; text-decoration: none; }
+
+  /* Class hooks pinned to the light palette (used as defense vs auto-invert). */
+  .t-page         { background-color: #ffffff !important; }
+  .t-shell        { background-color: #ffffff !important; border-color: #e5e7eb !important; }
+  .t-surface      { background-color: #ffffff !important; }
+  .t-surface-alt  { background-color: #f7f8fb !important; }
+  .t-card         { background-color: #ffffff !important; border-color: #e5e7eb !important; }
+  .t-text         { color: #0f172a !important; }
+  .t-muted        { color: #475569 !important; }
+  .t-subtle       { color: #64748b !important; }
+  .t-line         { border-color: #e5e7eb !important; }
+  .t-line-strong  { border-color: #cbd5e1 !important; }
+  .t-accent       { color: #1d4ed8 !important; }
+  .t-pos          { color: #166534 !important; }
+  .t-neg          { color: #991b1b !important; }
+
+  /* Outlook.com / Outlook 365 web dark mode — force the LIGHT palette
+     so auto-invert can't darken the email. */
+  [data-ogsc] .t-page, [data-ogsb] .t-page         { background-color: #ffffff !important; }
+  [data-ogsc] .t-shell, [data-ogsb] .t-shell       { background-color: #ffffff !important; border-color: #e5e7eb !important; }
+  [data-ogsc] .t-surface, [data-ogsb] .t-surface   { background-color: #ffffff !important; }
+  [data-ogsc] .t-surface-alt, [data-ogsb] .t-surface-alt { background-color: #f7f8fb !important; }
+  [data-ogsc] .t-card, [data-ogsb] .t-card         { background-color: #ffffff !important; }
+  [data-ogsc] .t-text                              { color: #0f172a !important; }
+  [data-ogsc] .t-muted                             { color: #475569 !important; }
+  [data-ogsc] .t-subtle                            { color: #64748b !important; }
+  [data-ogsc] .t-pos                               { color: #166534 !important; }
+  [data-ogsc] .t-neg                               { color: #991b1b !important; }
+  [data-ogsc] .t-accent                            { color: #1d4ed8 !important; }
+
+  @media only screen and (max-width: 600px) {
+    .t-shell { border-radius: 14px !important; }
+    .t-pad-md { padding: 18px !important; }
+  }
+</style>
 </head>
-<body style="margin:0;padding:16px;background:#eef4ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a;">
-  <div style="max-width:720px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 18px 48px rgba(15,23,42,0.10);border:1px solid #dbe4f0;">
-    <div style="background:linear-gradient(135deg, #7c2d12 0%, #3b82f6 100%);padding:24px 22px;color:#eff6ff;">
-      <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.92;font-weight:800;">OpenClaw Health Monitor</div>
-      <h1 style="margin:10px 0 0;font-size:28px;line-height:1.15;color:#ffffff;">etf system health report</h1>
-      <p style="margin:10px 0 0;font-size:15px;line-height:1.6;color:#eff6ff;max-width:560px;">Short investor-facing health summary: what matters now, what was already handled, and whether the overall direction is stable or changing.</p>
+<body class="t-page t-text" style="margin:0;padding:24px 16px;background-color:#ffffff;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <div class="t-shell" style="max-width:720px;margin:0 auto;background-color:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(15,23,42,0.06);">
+    <div class="t-pad-md" style="padding:28px 28px 22px;">
+      <div class="t-subtle" style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#64748b;font-weight:700;">OpenClaw Health Monitor</div>
+      <h1 class="t-text" style="margin:8px 0 0;font-size:24px;line-height:1.2;color:#0f172a;font-weight:700;letter-spacing:-0.01em;">etf system health report</h1>
+      <p class="t-muted" style="margin:8px 0 0;font-size:14px;line-height:1.55;color:#475569;max-width:560px;">Short investor-facing health summary: what matters now, what was already handled, and whether the overall direction is stable or changing.</p>
     </div>
-    <div style="padding:18px;"><section style="margin:0 0 14px;padding:16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:16px;">
-    <h2 style="margin:0 0 12px;font-size:16px;line-height:1.35;color:#0f172a;">Management summary</h2>
+    <div class="t-line" style="border-top:1px solid #e5e7eb;"></div>
+    <div class="t-pad-md" style="padding:22px 28px;"><section class="t-card t-text" style="margin:0 0 14px;padding:18px 18px;background-color:#dbeafe;border:1px solid #e5e7eb;border-radius:14px;">
+    <h2 class="t-text" style="margin:0 0 12px;font-size:14px;line-height:1.35;color:#0f172a;font-weight:700;letter-spacing:-0.005em;text-transform:uppercase;letter-spacing:0.06em;">Management summary</h2>
     
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"><span style="display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:800;letter-spacing:0.01em;line-height:1.2;box-sizing:border-box;vertical-align:top;">healthy / low</span><span style="display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border-radius:999px;background:#dcfce7;color:#166534;font-size:12px;font-weight:800;letter-spacing:0.01em;line-height:1.2;box-sizing:border-box;vertical-align:top;">Everything important looks healthy</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"><span class="t-badge-success" style="display:inline-flex;align-items:center;min-height:24px;padding:4px 10px;border-radius:999px;background-color:#dcfce7;color:#166534;font-size:11px;font-weight:700;letter-spacing:0.02em;line-height:1.2;box-sizing:border-box;vertical-align:top;">healthy / low</span><span class="t-badge-success" style="display:inline-flex;align-items:center;min-height:24px;padding:4px 10px;border-radius:999px;background-color:#dcfce7;color:#166534;font-size:11px;font-weight:700;letter-spacing:0.02em;line-height:1.2;box-sizing:border-box;vertical-align:top;">Everything important looks healthy</span></div>
       <div style="margin:0 0 14px;padding:16px 18px;background:#ecfdf5;border:1px solid #86efac;border-radius:14px;">
         <div style="font-size:11px;color:#166534;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;margin-bottom:6px;">Management summary</div>
         <div style="font-size:16px;font-weight:800;color:#0f172a;line-height:1.6;">Everything important is working normally. No action is needed right now.</div>
       </div>
       <table style="width:100%;border-collapse:collapse;"><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Generated at</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">2026-05-29T08:00:28.278Z</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Generated at</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">2026-06-04T13:23:36.574Z</td>
   </tr><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Next step</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">No immediate operator action is required.</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Next step</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">No immediate operator action is required.</td>
   </tr><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Automatic fixes applied</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">2</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Automatic fixes applied</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">2</td>
   </tr><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Issues still needing attention</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">0</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Issues still needing attention</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">0</td>
   </tr></table>
     
-  </section><section style="margin:0 0 14px;padding:16px;background:#f0fdf4;border:1px solid #86efac;border-radius:16px;">
-    <h2 style="margin:0 0 12px;font-size:16px;line-height:1.35;color:#0f172a;">What matters now</h2>
+  </section><section class="t-card t-text" style="margin:0 0 14px;padding:18px 18px;background-color:#dcfce7;border:1px solid #e5e7eb;border-radius:14px;">
+    <h2 class="t-text" style="margin:0 0 12px;font-size:14px;line-height:1.35;color:#0f172a;font-weight:700;letter-spacing:-0.005em;text-transform:uppercase;letter-spacing:0.06em;">What matters now</h2>
     
       <div style="margin:0 0 12px;padding:16px 18px;background:#ecfdf5;border:1px solid #86efac;border-radius:14px;">
         <div style="font-size:16px;font-weight:700;line-height:1.6;color:#0f172a;">No urgent exceptions are open right now.</div>
       </div>
       <div style="font-size:14px;line-height:1.6;color:#334155;"><strong>Next action:</strong> No immediate operator action is required.</div>
-  </section><section style="margin:0 0 14px;padding:16px;background:#f8fbff;border:1px solid #dbe4f0;border-radius:16px;">
-    <h2 style="margin:0 0 12px;font-size:16px;line-height:1.35;color:#0f172a;">What the system already handled</h2>
+  </section><section class="t-card t-text" style="margin:0 0 14px;padding:18px 18px;background-color:#ffffff;border:1px solid #e5e7eb;border-radius:14px;">
+    <h2 class="t-text" style="margin:0 0 12px;font-size:14px;line-height:1.35;color:#0f172a;font-weight:700;letter-spacing:-0.005em;text-transform:uppercase;letter-spacing:0.06em;">What the system already handled</h2>
     
       <div style="font-size:14px;line-height:1.6;color:#334155;">The system already handled 2 issue(s) automatically.</div>
       
       
-  </section><section style="margin:0 0 14px;padding:16px;background:#f8fbff;border:1px solid #dbe4f0;border-radius:16px;">
-    <h2 style="margin:0 0 12px;font-size:16px;line-height:1.35;color:#0f172a;">Health direction</h2>
+  </section><section class="t-card t-text" style="margin:0 0 14px;padding:18px 18px;background-color:#ffffff;border:1px solid #e5e7eb;border-radius:14px;">
+    <h2 class="t-text" style="margin:0 0 12px;font-size:14px;line-height:1.35;color:#0f172a;font-weight:700;letter-spacing:-0.005em;text-transform:uppercase;letter-spacing:0.06em;">Health direction</h2>
     <div style="font-size:14px;line-height:1.7;color:#334155;"><strong>Improving.</strong> Health direction is improving: earlier issues have eased and the latest posture is healthier than the recent baseline.</div>
-  </section><section style="margin:0 0 14px;padding:16px;background:#f8fbff;border:1px solid #dbe4f0;border-radius:16px;">
-    <h2 style="margin:0 0 12px;font-size:16px;line-height:1.35;color:#0f172a;">Remaining status and reference details</h2>
+  </section><section class="t-card t-text" style="margin:0 0 14px;padding:18px 18px;background-color:#ffffff;border:1px solid #e5e7eb;border-radius:14px;">
+    <h2 class="t-text" style="margin:0 0 12px;font-size:14px;line-height:1.35;color:#0f172a;font-weight:700;letter-spacing:-0.005em;text-transform:uppercase;letter-spacing:0.06em;">Remaining status and reference details</h2>
     
       <table style="width:100%;border-collapse:collapse;"><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Generated-state issues</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">0</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Generated-state issues</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">0</td>
   </tr><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Delivery pending actions</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">0</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Delivery pending actions</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">0</td>
   </tr><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Fill backfill review still open</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">0</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Fill backfill review still open</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">0</td>
   </tr><tr>
-    <td style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;">Acknowledged backfilled fills</td>
-    <td style="padding:8px 0;color:#0f172a;font-weight:700;vertical-align:top;font-size:14px;line-height:1.55;">1</td>
+    <td class="t-muted t-line" style="padding:8px 0;color:#475569;vertical-align:top;width:38%;font-size:13px;line-height:1.5;border-bottom:1px solid #e5e7eb;">Acknowledged backfilled fills</td>
+    <td class="t-text t-line" style="padding:8px 0;color:#0f172a;font-weight:600;vertical-align:top;font-size:14px;line-height:1.55;border-bottom:1px solid #e5e7eb;">1</td>
   </tr></table>
       <div style="height:12px"></div>
       
@@ -72,7 +119,7 @@
       <p style="margin:0;color:#6b7280;">No additional low-priority status details require review.</p>
     
   </section></div>
-    <div style="padding:16px 18px;background:#f8fbff;border-top:1px solid #dbe4f0;font-size:12px;color:#475569;text-align:center;line-height:1.6;">OpenClaw Portfolio Manager • Health monitoring report</div>
+    <div class="t-surface-alt t-subtle" style="padding:16px 22px;background-color:#f7f8fb;border-top:1px solid #e5e7eb;font-size:12px;color:#64748b;text-align:center;line-height:1.6;">OpenClaw Portfolio Manager • Health monitoring report</div>
   </div>
 </body>
 </html>

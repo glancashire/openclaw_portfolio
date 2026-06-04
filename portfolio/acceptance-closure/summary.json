@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-29T12:45:05.942Z",
+  "generatedAt": "2026-06-04T13:29:38.844Z",
   "portfolio": "acceptance-closure",
   "status": {
     "health": "warning",
@@ -22,7 +22,10 @@
     "source": "simulated",
     "latestSnapshotDate": "YYYY-MM-DD",
     "dailyChangeChf": 0,
-    "dailyChangePct": 0
+    "dailyChangePct": 0,
+    "depositedCapitalChf": null,
+    "accountProfitChf": null,
+    "accountProfitPct": null
   },
   "investorHoldings": {
     "rows": [],
@@ -41,6 +44,11 @@
       "coveredValueChf": 0,
       "coveredCount": 0,
       "totalProfitPct": null
+    },
+    "index": {
+      "byIsin": {},
+      "byKey": {},
+      "legs": []
     }
   },
   "approvals": {
@@ -53,7 +61,7 @@
   },
   "operatorQueue": {
     "summary": {
-      "total": 7,
+      "total": 6,
       "blocking": 5,
       "approvals": 0,
       "execution": 0,
@@ -65,10 +73,10 @@
       "delivery": 1,
       "data": 0,
       "warnings": 5,
-      "workflow": 1,
+      "workflow": 0,
       "bySeverity": {
         "high": 5,
-        "medium": 2,
+        "medium": 1,
         "low": 0
       }
     },
@@ -135,18 +143,6 @@
       },
       {
         "rank": 6,
-        "queueType": "backfill_review",
-        "portfolio": "acceptance-closure",
-        "kind": "delivery",
-        "severity": "medium",
-        "status": "backfill_review",
-        "summary": "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome.",
-        "source": "fill_notification_state"
-      },
-      {
-        "rank": 7,
         "queueType": "delivery",
         "portfolio": "acceptance-closure",
         "kind": "delivery",
@@ -306,10 +302,12 @@
       "rejected": 0,
       "staged": 0,
       "submitted": 0,
+      "submittedAwaitingReconcile": 0,
       "partiallyFilled": 0,
       "filled": 0,
       "cancelled": 0,
       "failed": 0,
+      "actionableFailed": 0,
       "inactive": 0,
       "simulated": 0,
       "planned": 0,
@@ -413,7 +411,6 @@
     "Missing concrete risk limit: Max single ETF allocation.",
     "Missing concrete risk limit: Max single issuer allocation.",
     "Portfolio still has open questions; trade execution must remain blocked.",
-    "6 reconciled fill(s) were detected after the live window and still need notification backfill review.",
     "Dashboard/report freshness is stale relative to source state."
   ],
   "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
@@ -424,63 +421,24 @@
     "health": {
       "health": "degraded",
       "severity": "low",
-      "blockerCount": 2,
+      "state": "attention",
+      "summary": "Dashboard/report freshness is stale relative to source state.",
+      "canonicalNextAction": null,
+      "blockerCount": 1,
       "blockers": [
-        {
-          "code": "fill_notification_backfill",
-          "message": "6 fill notification(s) still need backfill review."
-        },
         {
           "code": "delivery_attention",
           "message": "Dashboard/report freshness is stale relative to source state."
         }
       ],
-      "recommendedActions": [
-        "Review reconciled fills and close the notification backfill backlog."
-      ],
-      "nextAction": "Review reconciled fills and close the notification backfill backlog."
+      "recommendedActions": [],
+      "nextAction": "No immediate operator action is required."
     },
     "classified": [],
     "healed": [],
     "openIssues": [],
-    "actions": [
-      {
-        "kind": "command",
-        "command": "node scripts/trade.js delivery portfolio/etf",
-        "reason": "Review reconciled fills pending notification backfill."
-      }
-    ],
-    "recoveryLadders": [
-      {
-        "category": "fill_notification_backfill",
-        "ladder": [
-          {
-            "rank": 1,
-            "action": "list_open_orders",
-            "description": "List orders the broker still considers open; this is the source of truth for what is in flight.",
-            "command": "node scripts/diagnostics/list-ibkr-open-orders.js",
-            "automated": false,
-            "risk": "low"
-          },
-          {
-            "rank": 2,
-            "action": "resync_fills",
-            "description": "Resync portfolio order state against the broker so filled rows transition out of the open queue.",
-            "command": "node scripts/resync-portfolio-orders.js portfolio/etf",
-            "automated": false,
-            "risk": "low"
-          },
-          {
-            "rank": 3,
-            "action": "close_notification_backlog",
-            "description": "Acknowledge any reconciled fills that still need notification backfill review.",
-            "command": "node scripts/acknowledge-fill-notification-backfill.js portfolio/etf",
-            "automated": false,
-            "risk": "low"
-          }
-        ]
-      }
-    ]
+    "actions": [],
+    "recoveryLadders": []
   },
   "explanations": {
     "biggestDrift": "Global equities is 50% under target and outside the allowed band around the 50% target.",
@@ -492,35 +450,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-05-29 12:45:05.600 UTC",
+      "time": "2026-06-04 13:29:36.805 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 12:41:20.389 UTC",
+      "time": "2026-06-04 13:27:56.555 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 12:16:11.004 UTC",
+      "time": "2026-06-04 13:23:35.045 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 10:14:16.201 UTC",
+      "time": "2026-06-04 13:23:01.450 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-05-29 10:10:26.175 UTC",
+      "time": "2026-06-04 13:19:30.339 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
@@ -549,8 +507,7 @@
     "mode": "email_and_repo",
     "failureAlertMode": "local_operator_review",
     "pendingActions": [
-      "Dashboard/report freshness is stale relative to source state.",
-      "6 reconciled fill(s) still need notification backfill review."
+      "Dashboard/report freshness is stale relative to source state."
     ]
   },
   "runtimeState": {
