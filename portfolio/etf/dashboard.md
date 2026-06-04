@@ -1,61 +1,61 @@
 # Dashboard: etf
 ## Portfolio Value Snapshot
-- Total value CHF: 141164.34873894998
+- Total value CHF: 141037.12626237
 - Cash CHF: 1468.65
-- Invested CHF: 139695.69873894998
+- Invested CHF: 139568.47626237
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
 - Since last report %: 0
 - Number of holdings: 15
 - Latest snapshot date: 2026-06-04
-- Total unrealized profit CHF: -988.06
-- Total unrealized profit %: -0.7
-- Cost-basis coverage: 15/15 holdings (CHF 139695.7 of position value)
+- Total unrealized profit CHF: -699.96
+- Total unrealized profit %: -0.5
+- Cost-basis coverage: 15/15 holdings (CHF 139568.48 of position value)
 
 ## Profit / Loss
-- Total unrealized profit CHF: -988.06
-- Total cost basis CHF (covered holdings only): 140683.77
-- Total unrealized profit %: -0.7%
+- Total unrealized profit CHF: -699.96
+- Total cost basis CHF (covered holdings only): 140268.42
+- Total unrealized profit %: -0.5%
 - Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 
 | Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
 |---|---:|---:|---:|---:|---|
-| UKGBPB | 8'344.58 | 8'434.55 | -89.97 | -1.07% | IBKR avg cost |
-| AIFS | 4'760.03 | 4'763.73 | -3.70 | -0.08% | IBKR avg cost |
-| DXS0 | 2'707.41 | 2'704.66 | 2.75 | +0.10% | IBKR avg cost |
-| CHSPI | 10'901.76 | 11'016.56 | -114.80 | -1.04% | trades.md |
-| SPMCHA | 13'024.96 | 13'074.69 | -49.73 | -0.38% | IBKR avg cost |
-| MWEQ | 4'718.45 | 4'748.51 | -30.06 | -0.63% | IBKR avg cost |
-| HMCD | 7'006.27 | 6'999.03 | 7.24 | +0.10% | IBKR avg cost |
-| XAIX | 4'517.89 | 4'630.24 | -112.35 | -2.43% | IBKR avg cost |
-| CEBL | 11'542.95 | 11'570.72 | -27.77 | -0.24% | IBKR avg cost |
-| SEC0 | 10'051.69 | 9'480.00 | 571.69 | +6.03% | IBKR avg cost |
-| LCUJ | 9'243.66 | 9'114.48 | 129.18 | +1.42% | IBKR avg cost |
-| EMUAA | 16'748.66 | 17'100.95 | -352.29 | -2.06% | trades.md |
-| XDEW | 7'531.00 | 7'528.75 | 2.25 | +0.03% | IBKR avg cost |
-| SXR8 | 24'802.35 | 25'728.02 | -925.67 | -3.60% | trades.md |
-| IS3H | 3'794.05 | 3'788.88 | 5.17 | +0.14% | IBKR avg cost |
+| UKGBPB | 8'329.03 | 8'387.06 | -58.03 | -0.69% | IBKR avg cost |
+| AIFS | 4'724.22 | 4'736.90 | -12.68 | -0.27% | IBKR avg cost |
+| DXS0 | 2'703.10 | 2'689.43 | 13.67 | +0.51% | IBKR avg cost |
+| CHSPI | 10'952.08 | 11'016.56 | -64.48 | -0.59% | trades.md |
+| SPMCHA | 13'053.24 | 13'074.69 | -21.45 | -0.16% | IBKR avg cost |
+| MWEQ | 4'727.26 | 4'721.77 | 5.49 | +0.12% | IBKR avg cost |
+| HMCD | 6'966.82 | 6'959.62 | 7.20 | +0.10% | IBKR avg cost |
+| XAIX | 4'501.88 | 4'604.17 | -102.29 | -2.22% | IBKR avg cost |
+| CEBL | 11'520.78 | 11'505.56 | 15.22 | +0.13% | IBKR avg cost |
+| SEC0 | 9'996.14 | 9'426.63 | 569.51 | +6.04% | IBKR avg cost |
+| LCUJ | 9'200.69 | 9'063.16 | 137.53 | +1.52% | IBKR avg cost |
+| EMUAA | 16'654.35 | 17'100.95 | -446.60 | -2.61% | trades.md |
+| XDEW | 7'509.51 | 7'486.35 | 23.16 | +0.31% | IBKR avg cost |
+| SXR8 | 24'955.69 | 25'728.02 | -772.33 | -3.00% | trades.md |
+| IS3H | 3'773.67 | 3'767.55 | 6.12 | +0.16% | IBKR avg cost |
 ## Holdings
 Holdings sorted by CHF value (descending).
 
 | Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
-| SXR8 | 24'802.35 | -925.67 | -3.60% | 17.6% |
-| EMUAA | 16'748.66 | -352.29 | -2.06% | 11.9% |
-| SPMCHA | 13'024.96 | -49.73 | -0.38% | 9.2% |
-| CEBL | 11'542.95 | -27.77 | -0.24% | 8.2% |
-| CHSPI | 10'901.76 | -114.80 | -1.04% | 7.7% |
-| SEC0 | 10'051.69 | +571.69 | +6.03% | 7.1% |
-| LCUJ | 9'243.66 | +129.18 | +1.42% | 6.5% |
-| UKGBPB | 8'344.58 | -89.97 | -1.07% | 5.9% |
-| XDEW | 7'531.00 | +2.25 | +0.03% | 5.3% |
-| HMCD | 7'006.27 | +7.24 | +0.10% | 5.0% |
-| AIFS | 4'760.03 | -3.70 | -0.08% | 3.4% |
-| MWEQ | 4'718.45 | -30.06 | -0.63% | 3.3% |
-| XAIX | 4'517.89 | -112.35 | -2.43% | 3.2% |
-| IS3H | 3'794.05 | +5.17 | +0.14% | 2.7% |
-| DXS0 | 2'707.41 | +2.75 | +0.10% | 1.9% |
+| SXR8 | 24'955.69 | -772.33 | -3.00% | 17.7% |
+| EMUAA | 16'654.35 | -446.60 | -2.61% | 11.8% |
+| SPMCHA | 13'053.24 | -21.45 | -0.16% | 9.3% |
+| CEBL | 11'520.78 | +15.22 | +0.13% | 8.2% |
+| CHSPI | 10'952.08 | -64.48 | -0.59% | 7.8% |
+| SEC0 | 9'996.14 | +569.51 | +6.04% | 7.1% |
+| LCUJ | 9'200.69 | +137.53 | +1.52% | 6.5% |
+| UKGBPB | 8'329.03 | -58.03 | -0.69% | 5.9% |
+| XDEW | 7'509.51 | +23.16 | +0.31% | 5.3% |
+| HMCD | 6'966.82 | +7.20 | +0.10% | 4.9% |
+| MWEQ | 4'727.26 | +5.49 | +0.12% | 3.4% |
+| AIFS | 4'724.22 | -12.68 | -0.27% | 3.3% |
+| XAIX | 4'501.88 | -102.29 | -2.22% | 3.2% |
+| IS3H | 3'773.67 | +6.12 | +0.16% | 2.7% |
+| DXS0 | 2'703.10 | +13.67 | +0.51% | 1.9% |
 ## Instrument Actions Queue
 Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 
@@ -76,14 +76,14 @@ Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 | IE000OEF25S1 | 0 | 4 | deploy | Target is 4% — no active buy planned. Cash available for deployment. | watch |
 | IE00BCLWRD08 | 0 | 3 | deploy | Target is 3% — no active buy planned. Cash available for deployment. | watch |
 | LU0322248146 | 0 | 2 | deploy | Target is 2% — no active buy planned. Cash available for deployment. | watch |
-| CASH-CHF | 1.43 | 3 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| CASH-CHF | 1.44 | 3 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 ## Balance Check
 Allocation drift is tracked as a constraint; see below. All sleeves within target bands is the goal.
 
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 80.09 | 65 | 15.09 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 18.87 | 20 | -1.13 | on_track | no | within tolerance |
+| Global equities | 80.02 | 65 | 15.02 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 18.94 | 20 | -1.06 | on_track | no | within tolerance |
 | Bonds / cash-like | 1.04 | 15 | -13.96 | out_of_bounds | yes | outside min/max band |
 ## Pending Operator Actions
 1. [workflow/recommended/low] Portfolio is performing as intended. Hold current positions and review after the next market session.
@@ -98,7 +98,7 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Pending operator queue items: 1
 ## Health Snapshot
 - Strategy status: rebalance_needed
-- Last successful sync: 2026-06-04 08:06:11
+- Last successful sync: 2026-06-04 17:05:16
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
@@ -154,7 +154,7 @@ Portfolio is performing as intended. Hold current positions and review after the
   - Continue normal monitoring and refresh the portfolio workflow after the next material state change.
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 139140.22 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 139013 unallocated beyond the intentional CHF cash sleeve.
 - 5 actionable trade row(s) are currently marked failed and may need manual review.
 - Latest history note: 0
 - Observability shows 100 recent blocked execution-policy event(s).
