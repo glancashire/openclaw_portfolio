@@ -1,9 +1,9 @@
 # Current Plan
 
-**Date:** 2026-06-04 (consolidated 12:35 UTC)
-**Repo head:** `31cd6f0` (Phase I — lifecycle counter, trend log, dashboard surfacing)
+**Date:** 2026-06-04 (consolidated 12:55 UTC)
+**Repo head:** `86f901c` (fix: treat failed+not_found trade rows as terminal)
 **Tests:** `npm test` 23/23 · `npm run test:safe` 251/251
-**Last archive batch:** [`archive/phase-plans/2026-06-04-sentry-and-health-monitor/`](archive/phase-plans/2026-06-04-sentry-and-health-monitor/)
+**Health:** 🟢 healthy — All systems normal.
 
 ## Visual roadmap (open work only)
 
@@ -18,30 +18,6 @@ Phase D  Parked product/domain explorations                     [PARKED]   █�
 
 **No autonomous engineering work is ready to start.** Everything remaining is calendar-gated, operator-gated, or explicitly parked.
 
-## Document map
-
-| File | Role |
-|---|---|
-| `CURRENT_PLAN.md` (this file) | Open work + decisions |
-| `STATUS.md` | Operational health snapshot |
-| `SPECIFICATION.md` | System contract |
-| `docs/decisions-pending.md` | Pending operator decisions |
-| `MEMORY.md` + `memory/YYYY-MM-DD.md` | Durable memory + daily notes |
-| `playbook.md` | Project skills + reusable patterns |
-| `docs/operations/*.md` | Operator runbooks (cron, IBKR recovery, host contract, Sentry) |
-| `archive/phase-plans/**` | All completed/historical plans |
-
-## What shipped today (2026-06-04)
-
-1. **Sentry integration** — end-to-end (instrumentation, API read, weekly autofix cron, runbook, smoke event).
-2. **Health-monitor simplification** — single `state` field, escalation-only emails, persistence check, 24h rate-limit, 4-block email with paste-ready bb8 prompt.
-3. **Fill-monitor cron policy** — disabled by default, lifecycle documented.
-4. **Phase I — health-monitor follow-on:**
-   - ✅ I1: Lifecycle counter now separates `submitted-awaiting-reconcile` (stale bookkeeping) from genuinely in-flight orders. Dashboard and health messages are accurate.
-   - ✅ I2: `runtime/overview/health-trend.jsonl` — one JSON line per health-check cycle.
-   - ✅ I3: `scripts/show-dashboard.js` surfaces the health trend tail.
-5. **Phases F6, G4, H1** — all closed.
-
 ---
 
 ## Phase J — Health-monitor Phase B (PARKED)
@@ -50,7 +26,7 @@ Phase D  Parked product/domain explorations                     [PARKED]   █�
 - [ ] J2 — Hook into `runHealthCheck` after pass-1
 - [ ] J3 — Tests
 
-**Reactivate only if** we still see frequent attention emails after the persistence + rate-limit gate.
+**Reactivate only if** frequent attention emails resume despite the current gate.
 
 ---
 
@@ -89,19 +65,3 @@ Phase D  Parked product/domain explorations                     [PARKED]   █�
 - [ ] D1 — FX cash reconciliation
 - [ ] D2 — Control UI direct embedding
 - [ ] D3 — EM ex-China sleeve
-
----
-
-## Known residual issue
-
-The ETF health state is `attention` because 5 `trades.md` rows have status `submitted` with no broker confirmation (orders 9164–9168, known cancelled but never reconciled in the ledger). The lifecycle counter now correctly classifies them as "awaiting reconcile" instead of "in-flight", and the message is accurate ("run sync-portfolio-order-status to reconcile"). The 24h rate-limit prevents email spam. To resolve fully, run:
-
-```bash
-node scripts/sync-portfolio-order-status.js portfolio/etf 9164
-node scripts/sync-portfolio-order-status.js portfolio/etf 9165
-node scripts/sync-portfolio-order-status.js portfolio/etf 9166
-node scripts/sync-portfolio-order-status.js portfolio/etf 9167
-node scripts/sync-portfolio-order-status.js portfolio/etf 9168
-```
-
-This requires IBKR connectivity. Once reconciled, health state will flip to `healthy` and no more attention emails will fire.
