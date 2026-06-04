@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 337,
-    "safe": 255,
+    "total": 339,
+    "safe": 257,
     "integration": 77,
     "live-smoke": 3,
     "external": 2,
@@ -811,6 +811,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-health-fixers.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-health-monitor-cron.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
@@ -838,6 +845,13 @@
       "inVerifyRepoChecks": false,
       "quarantined": true,
       "quarantineReason": "pre-existing: assertion against current trend formatting drifts (W10 quarantine)"
+    },
+    {
+      "path": "scripts/test-health-second-pass-integration.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
     },
     {
       "path": "scripts/test-health-state-derivation.js",

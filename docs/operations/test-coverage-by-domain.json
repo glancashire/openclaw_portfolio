@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-04T13:03:22.799Z",
+  "generatedAt": "2026-06-04T13:22:22.449Z",
   "counts": {
-    "totalTests": 337,
+    "totalTests": 339,
     "domains": 122
   },
   "domains": [
@@ -83,6 +83,21 @@
       ]
     },
     {
+      "domain": "health",
+      "total": 11,
+      "safe": 7,
+      "integration": 4,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 1,
+      "inVerifyRepoChecks": 1,
+      "examples": [
+        "scripts/test-health-check-cli.js",
+        "scripts/test-health-escalation-email.js",
+        "scripts/test-health-fixers.js"
+      ]
+    },
+    {
       "domain": "native",
       "total": 11,
       "safe": 7,
@@ -95,21 +110,6 @@
         "scripts/test-native-conid-contract-normalization.js",
         "scripts/test-native-conid-order-minimal-contract.js",
         "scripts/test-native-contract-details-normalization.js"
-      ]
-    },
-    {
-      "domain": "health",
-      "total": 9,
-      "safe": 5,
-      "integration": 4,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 1,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-health-check-cli.js",
-        "scripts/test-health-escalation-email.js",
-        "scripts/test-health-monitor-cron.js"
       ]
     },
     {

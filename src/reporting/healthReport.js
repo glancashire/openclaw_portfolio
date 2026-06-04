@@ -386,7 +386,7 @@ function writeHealthReportArtifacts(portfolioDir, report) {
   return { ...paths, markdown, html };
 }
 
-async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySafeFixes = true }) {
+async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySafeFixes = true, secondPass = true }) {
   const before = await collectHealthSignals({ portfolioDir, repoRoot });
   const priorEvents = readObservabilityEvents({ repoRoot });
   const plan = await buildSelfHealPlan({ portfolioDir, repoRoot });
@@ -400,7 +400,28 @@ async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySaf
     recoveryLadders: Array.isArray(plan.recoveryLadders) ? plan.recoveryLadders : [],
     actions: applySafeFixes ? [...recipeActions, ...(await attemptSafeSelfHeal({ portfolioDir }))] : recipeActions,
   };
-  const after = applySafeFixes ? await collectHealthSignals({ portfolioDir, repoRoot }) : before;
+  let after = applySafeFixes ? await collectHealthSignals({ portfolioDir, repoRoot }) : before;
+
+  // Phase J — second-pass autofix when post-pass-1 verdict is still attention/critical.
+  if (applySafeFixes && secondPass) {
+    const postPass1State = String(after?.health?.state || '').toLowerCase();
+    if (postPass1State === 'attention' || postPass1State === 'critical') {
+      try {
+        const { runSecondPassFixers } = require('./healthFixers');
+        const pass2 = await runSecondPassFixers({ report: { health: after.health, portfolio: before.portfolio }, portfolioDir, repoRoot });
+        selfHeal.secondPass = pass2;
+        if (pass2 && Array.isArray(pass2.attempted) && pass2.attempted.some((a) => a.ok)) {
+          // At least one fixer reported success — re-collect signals so the verdict reflects the new state.
+          after = await collectHealthSignals({ portfolioDir, repoRoot });
+        }
+      } catch (err) {
+        selfHeal.secondPass = { error: err.message || String(err), attempted: [], rateLimited: [], skipped: [] };
+      }
+    } else {
+      selfHeal.secondPass = { skippedReason: 'state_' + postPass1State, attempted: [], rateLimited: [], skipped: [] };
+    }
+  }
+
   const trends = summarizeHealthTrends(priorEvents, { limit: 7 });
   const report = {
     schemaVersion: '2.1',
@@ -456,7 +477,7 @@ function buildEscalationEmail(report) {
   const portfolio = report.portfolio || 'etf';
   const generatedAt = report.generatedAt || new Date().toISOString();
 
-  // What bb8 already tried
+  // What bb8 already tried — pass 1
   const healed = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((a) => a.ok) : [];
   const failedFixes = Array.isArray(report.selfHeal?.actions) ? report.selfHeal.actions.filter((a) => !a.ok) : [];
   const triedLines = [];
@@ -466,6 +487,22 @@ function buildEscalationEmail(report) {
   if (failedFixes.length) {
     for (const f of failedFixes) triedLines.push('- ' + f.kind.replace(/_/g, ' ') + ' (failed: ' + (f.error || 'unknown') + ')');
   }
+
+  // What bb8 tried — pass 2 (Phase J)
+  const pass2 = report.selfHeal?.secondPass;
+  if (pass2 && Array.isArray(pass2.attempted) && pass2.attempted.length > 0) {
+    triedLines.push('- [pass 2]:');
+    for (const a of pass2.attempted) {
+      const status = a.ok ? 'ok' : 'failed: ' + (a.error || 'unknown');
+      triedLines.push('- ' + (a.label || a.fixerKey || a.code) + ' (' + status + ')');
+    }
+  }
+  if (pass2 && Array.isArray(pass2.rateLimited) && pass2.rateLimited.length > 0) {
+    for (const r of pass2.rateLimited) {
+      triedLines.push('- ' + (r.fixerKey || r.code) + ' (rate-limited until ' + (r.nextEligibleAt || '?') + ')');
+    }
+  }
+
   if (!triedLines.length) triedLines.push('- No automatic fixes were applicable this cycle.');
 
   // Build the bb8 prompt (always; useful even when canonicalNextAction is set)

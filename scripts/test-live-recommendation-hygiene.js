@@ -50,7 +50,7 @@ function extractRecommendedActions(modulePath) {
 
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'live-recommendation-hygiene-'));
   const tradesPath = path.join(tmpDir, 'trades.md');
-  fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| 2026-05-28 13:17:00 | inactive | buy | CH0032912732 | UBS SLI ETF | 8 | 163.15 | 1305.20 | 0 | live submit | broker_inactive | 9138 | contract_resolution_failed | Broker rejected the order because the contract identity or venue resolution was not accepted. | 2026-05-28 13:17:02 | Verify conid, symbol, exchange, and primary exchange before retrying. |\n`);
+  fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| ${new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ')} | inactive | buy | CH0032912732 | UBS SLI ETF | 8 | 163.15 | 1305.20 | 0 | live submit | broker_inactive | 9138 | contract_resolution_failed | Broker rejected the order because the contract identity or venue resolution was not accepted. | 2026-05-28 13:17:02 | Verify conid, symbol, exchange, and primary exchange before retrying. |\n`);
 
   const suppressed = dashboard.buildPendingOperatorActions({
     tradesPath,
