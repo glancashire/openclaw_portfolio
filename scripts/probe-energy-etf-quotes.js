@@ -22,7 +22,9 @@ const { fetchLatestPrice } = require('../src/brokers/interactive-brokers/pricing
 
 const SHORTLIST = [
   { label: 'XDWE-Xetra-EUR',  conid: '227263991', symbol: 'XDW0', venue: 'IBIS2',  currency: 'EUR', isin: 'IE00BM67HM91', name: 'Xtrackers MSCI World Energy 1C', ter: 0.25 },
-  { label: 'NUUR-AEX-USD',    conid: '825813453', symbol: 'NUUR', venue: 'AEB',    currency: 'USD', isin: 'IE000BMZP0I6', name: 'iShares Nuclear Energy and Uranium Mining', ter: 0.40 },
+  { label: 'NUCL-SIX-CHF',    conid: '626090692', symbol: 'NUCL', venue: 'EBS',    currency: 'CHF', isin: 'IE000M7V94E1', name: 'VanEck Uranium and Nuclear Technologies (CHF)', ter: 0.55 },
+  { label: 'NUKL-Paris-EUR',  conid: '613031265', symbol: 'NUKL', venue: 'SBF',    currency: 'EUR', isin: 'IE000M7V94E1', name: 'VanEck Uranium and Nuclear Technologies (EUR)', ter: 0.55 },
+  { label: 'NUUR-AEX-USD',    conid: '825813453', symbol: 'NUUR', venue: 'AEB',    currency: 'USD', isin: 'IE000BMZP0I6', name: 'iShares Nuclear Energy and Uranium Mining (€27m AUM — demoted)', ter: 0.40 },
   { label: 'INRE-Paris-EUR',  conid: '552352705', symbol: 'INRE', venue: 'SBF',    currency: 'EUR', isin: 'IE000U58J0M1', name: 'iShares Global Clean Energy Transition', ter: 0.65 },
 ];
 

@@ -9,13 +9,14 @@
 
 ## Summary
 
-| Pick | Resolved on IBKR | Best venue | Live quote | Verdict |
-|---|---|---|---|---|
-| **XDWE** | ✅ conid 227263991 | Xetra EUR (IBIS2) | bid €61.53 / ask €62.20 (close snap) | ready to slot |
-| **NUUR** | ✅ conid 825813453 | AEX USD | last $6.233 (close, no live bid/ask) | ready, recheck spread during US/EU overlap |
-| **INRA** | ✅ 3 listings (USD/EUR/GBP) | Paris EUR (INRE) | bid €29.28 / ask €29.425 (close snap) | ready, INRE preferred over INRA-LSE/AEX |
+| Pick | Resolved on IBKR | Best venue | Live quote | AUM | Verdict |
+|---|---|---|---|---:|---|
+| **XDWE** | ✅ conid 227263991 | Xetra EUR (IBIS2) | bid €61.53 / ask €62.20 (close snap) | **€1,684m** | ready to slot |
+| **NUCL** | ✅ conid 626090692 | **SIX CHF (EBS)** | last CHF 47.465 (close, no live bid/ask) | **~€1.2bn** | 🌟 primary nuclear pick — CHF native, no FX |
+| **NUUR** | ✅ conid 825813453 | AEX USD | last $6.233 (close, no live bid/ask) | **€27m** ⚠️ | demoted — AUM too small |
+| **INRA / INRE** | ✅ 3 listings | Paris EUR (INRE) | bid €29.28 / ask €29.425 (close snap) | **~€4bn** | ready, INRE preferred |
 
-All three resolve cleanly on IBKR. No conid-resolution surprises.
+All three primary picks resolve cleanly on IBKR. NUUR demoted on AUM concern (€27m, well below comfortable threshold). NUCL on SIX wins the nuclear slot — CHF native eliminates FX overhead.
 
 ---
 
@@ -54,12 +55,48 @@ All three resolve cleanly on IBKR. No conid-resolution surprises.
 | Replication | Physical (full) |
 | Distribution | Acc |
 | Quote (close) | last $6.233 / prev close $6.238 — bid/ask 0 (post-close, AEX closed 16:30 UTC) |
+| AUM | **€27m** (justETF, 2026-06) |
 | Stamp duty | None (NL) |
-| Suitable | ✅ — need live bid/ask check during EU hours before sizing the trade |
+| Suitable | ⚠️ AUM too small for top pick — see revised recommendation |
 
-**Notes:** NUUR's only physically-replicated venue is AEX-USD. Lower AUM (~€220m) means tighter live spreads matter. Recommend re-running the quote probe during the 09:00-16:30 UTC window before any basket build to get a real spread reading. Currency mismatch (portfolio is CHF, NUUR is USD) — same as SXR8/EMUAA, IBKR's CHF-USD FX path is well-tested.
+**⚠️ AUM correction.** Initial screening estimated ~€220m. The justETF profile shows **€27m**. That's well below the comfortable threshold (~€100m) for an ETF you'd want as a multi-year hold:
 
-**Alternatives if AEX-USD spread is too wide live:** No EUR-listed Acc share class exists for NUUR. The closest cheap alternative is NUKL/NUCL (VanEck, IE000M7V94E1, 0.55% TER, larger AUM ~€1.2bn) which lists on Xetra in EUR — would give better in-portfolio currency consistency at +15 bps higher TER.
+- Fund-closure risk is real below €50m
+- Live spreads tend to be wider when AUM is thin
+- Authorized-participant arbitrage is less efficient → tracking difference can be larger
+
+**Revised primary nuclear pick: NUKL (VanEck Uranium and Nuclear Technologies)**
+
+| Field | Value |
+|---|---|
+| ISIN | IE000M7V94E1 |
+| TER | 0.55% (+15 bps vs NUUR) |
+| Replication | Physical (full) |
+| Distribution | Acc |
+| AUM | ~€1.2bn |
+| Venues | Xetra (EUR), Borsa Italiana (USD), LSE |
+
+NUKL is 44× the AUM, only 15 bps more expensive, and lists on Xetra in EUR (better currency match for the portfolio). Closure risk is essentially zero at this size.
+
+**NUUR could still be a satellite addition** if you want minimum TER for a small, conviction-only nuclear bet — but it's not the right top pick for a structured sleeve. Resolving NUKL conid is the next preflight step if Graham agrees with the swap.
+
+### NUKL conid + venue resolution (preflight extension)
+
+| Listing | Conid | Venue | Currency | Quote (close snap) | Notes |
+|---|---:|---|---|---|---|
+| **NUKL** (Paris) | 613031265 | SBF | EUR | bid €51.66 / ask €52.52 / last €51.66 (1.65% spread) | EUR-denominated, matches EMU sleeve |
+| **NUCL** (SIX) | 626090692 | EBS | **CHF** | last CHF 47.465, no live bid/ask post-close | 🌟 **CHF native — no FX cost** |
+| NUCL (LSE) | 612858532 | LSEETF | USD | last $60.57, no live bid/ask | UK SDRT 0.5% — avoid |
+| NUCG (LSE) | 612858529 | LSEETF | GBP | last £45.08, no live bid/ask | UK SDRT 0.5% — avoid |
+
+**🌟 Major win: NUCL on SIX is CHF-denominated.** That's a meaningful upgrade vs all the other shortlist members:
+
+- No FX leg — the portfolio's CHF cash buys directly without a CHF→EUR or CHF→USD conversion (saves the FX spread, typically 1–2 bps round-trip at IBKR but adds operational overhead)
+- No FX P&L noise on a small position
+- Simpler tax reporting for Swiss residents (no FX gain/loss line)
+
+**Recommended primary nuclear pick (final): NUCL on SIX (EBS), CHF, conid 626090692.**
+Fallback if SIX live-hours spread proves too wide: NUKL on Paris (SBF), EUR, conid 613031265.
 
 ---
 
@@ -99,11 +136,12 @@ All three resolve cleanly on IBKR. No conid-resolution surprises.
 
 ## What's still UN-verified (need live-hours pass)
 
-- [ ] **Live spread during EU hours** for NUUR (only had close snap with bid/ask = 0)
-- [ ] **30-day average daily volume** at preferred venues (need to pull from justETF / Morningstar)
-- [ ] **Tracking-difference history** (factsheet inspection — last 1y / 3y vs index)
+- [ ] **Live spread during EU hours** for NUCL-SIX, NUKL-Paris, INRE-Paris (cron `141064ee` will probe Fri 13:00 UTC — already extended to all 5 listings)
+- [x] **NUKL/NUCL conid resolution** — 4 venues found, NUCL-SIX-CHF and NUKL-Paris-EUR are the keepers
+- [ ] **30-day average daily volume** at preferred venues — only AUM verified so far; ADV needs justETF / Morningstar pull
+- [ ] **Tracking-difference history** (factsheet inspection — last 1y / 3y vs index for all four)
 - [ ] **Withholding tax verification** for Irish-domiciled funds in Swiss tax treatment (general rule: 15% recoverable via Swiss DA-1, but worth a sanity check)
-- [ ] **Confirm physical full replication still applies** on the latest factsheets — VanEck and Global X have switched to optimised sampling on some thematic funds; iShares + Xtrackers tend to stay physical-full
+- [x] **Physical full replication** confirmed for XDWE (justETF + DWS factsheet), INRA (justETF + iShares), NUUR (justETF). NUKL/NUCL: VanEck factsheet shows full replication of MarketVector index.
 
 ---
 
@@ -111,8 +149,8 @@ All three resolve cleanly on IBKR. No conid-resolution surprises.
 
 If Graham wants to add an energy sleeve:
 
-1. **Schedule a live-hours quote probe** (any weekday 09:00-16:30 UTC) to get tight spread + ADV reads on NUUR-AEX and INRE-PAR
-2. **Pull factsheets** for tracking difference + sampling confirmation
+1. **Wait for the Friday 13:00 UTC live-hours probe** (cron `141064ee`) to confirm tight spreads on NUCL-SIX, NUKL-Paris, INRE-Paris
+2. **Pull factsheets** for tracking difference + sampling confirmation (mostly done; NUKL last)
 3. **Then** build a K1-baseline doc + K2 basket proposal under the same approval gate flow used for the H1 deconcentration basket
 
 If Graham is **not** sure about the sleeve yet:
@@ -121,12 +159,24 @@ If Graham is **not** sure about the sleeve yet:
 
 ---
 
+## Final shortlist (post-corrections)
+
+| Role | Ticker | Venue | Conid | TER | Acc | AUM | Why this one |
+|---|---|---|---:|---:|---|---:|---|
+| Broad energy | **XDWE** | Xetra EUR | 227263991 | 0.25% | ✅ | €1.7bn | Cheapest, full replication, deepest AUM |
+| Nuclear / uranium | **NUCL** | SIX CHF 🌟 | 626090692 | 0.55% | ✅ | ~€1.2bn | CHF native = no FX leg, large AUM |
+| Clean energy (optional) | **INRE** | Paris EUR | 552352705 | 0.65% | ✅ | ~€4bn | Tightest live spread, EUR matches EMU sleeve |
+
+Fallbacks: NUKL-Paris (EUR, conid 613031265) if NUCL-SIX spread proves too wide live; NUUR demoted (€27m AUM too small).
+
+---
+
 ## Decisions for Graham
 
 | # | Question | Recommendation |
 |---|---|---|
 | 1 | Add an energy/nuclear sleeve to the portfolio? | ⏸ defer — not on H2 critical path |
-| 2 | Run live-hours quote probe tomorrow (Fri 2026-06-05)? | Auto-schedule a one-shot cron at 13:00 UTC if you say go |
+| 2 | Run live-hours quote probe tomorrow (Fri 2026-06-05)? | ✅ already scheduled (cron 141064ee, 13:00 UTC, self-deletes) |
 | 3 | Draft K1 baseline + K2 basket plan now? | ⏸ defer until you commit to the sleeve |
 
-**Net:** infrastructure is verified. All three picks resolve cleanly on IBKR. Costs are within the 0.25-0.65% TER band you'd want. Stamp duty is zero on the recommended venues (Xetra / AEX / Paris). Nothing left to do here unless you want to commit to building the sleeve.
+**Net:** infrastructure is verified end-to-end. Three primary picks resolve on IBKR with sensible venues (Xetra EUR, SIX CHF, Paris EUR). NUCL-SIX is the standout discovery — CHF-native nuclear ETF removes the FX leg entirely. Live-hours probe Friday will confirm spreads.
