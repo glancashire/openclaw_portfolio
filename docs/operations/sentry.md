@@ -11,7 +11,7 @@
 |---|---|
 | `lib/observability/sentry.js` | `initSentry()` / `captureError()`. No-ops when DSN unset. |
 | `lib/observability/bootstrap.js` | Auto-init on require. Registers global error handlers. |
-| `lib/observability/sentryApi.js` | Read-only Web API client: listIssues / getIssue / getLatestEvent. |
+| `lib/observability/sentryApi.js` | Web API client: listIssues / getIssue / getLatestEvent / resolveIssue. |
 | `lib/observability/autofixBrain.js` | Decision engine: classifyIssue / deriveFixBrief / shouldAutoMerge. |
 | `scripts/fetch-sentry-issues.js` | CLI: `node scripts/fetch-sentry-issues.js [--json] [--limit=25]` |
 | `scripts/sentry-autofix-weekly.js` | Weekly cron entry: `node scripts/sentry-autofix-weekly.js [--dry-run]` |
@@ -36,8 +36,10 @@ These scripts all no-op safely when `SENTRY_DSN` is unset.
 # Client-side DSN (where to send errors)
 SENTRY_DSN=https://...@o000000.ingest.sentry.io/0000000
 
-# Server-side auth token (for API read: issues, events)
-# Scopes needed: project:read, event:read, issue:read
+# Server-side auth token (for API read + resolve)
+# Scopes needed: project:read, event:read, issue:read, event:admin
+# (event:admin is required so the autofix cron can mark issues resolved
+#  after a fix lands; without it, resolution must be done manually in UI.)
 SENTRY_AUTH_TOKEN=***
 
 # Org + project slugs (from the Sentry project URL)

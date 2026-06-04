@@ -164,6 +164,35 @@ async function run() {
     eq('getLatestEvent returns event', result.eventID, 'abc');
   }
 
+  // --- 9b. resolveIssue PUT shape ---
+  {
+    const { resolveIssue } = require('../lib/observability/sentryApi');
+    const { impl, calls } = mockFetch([{ json: { id: '7526237514', shortId: 'OPENCLAW_PORTFOLIO-1', status: 'resolved' } }]);
+    const result = await resolveIssue({ issueId: '7526237514', fetchImpl: impl });
+    eq('resolveIssue method=PUT', calls[0].opts.method, 'PUT');
+    ok('resolveIssue URL', calls[0].url.includes('/issues/7526237514/'));
+    eq('resolveIssue body status', JSON.parse(calls[0].opts.body).status, 'resolved');
+    eq('resolveIssue Content-Type', calls[0].opts.headers['Content-Type'], 'application/json');
+    eq('resolveIssue returns issue', result.status, 'resolved');
+  }
+
+  // --- 9c. resolveIssue with statusDetails ---
+  {
+    const { resolveIssue } = require('../lib/observability/sentryApi');
+    const { impl, calls } = mockFetch([{ json: { id: 'abc', status: 'resolved' } }]);
+    await resolveIssue({ issueId: 'abc', statusDetails: { inNextRelease: true }, fetchImpl: impl });
+    const body = JSON.parse(calls[0].opts.body);
+    eq('resolveIssue body has statusDetails.inNextRelease', body.statusDetails.inNextRelease, true);
+  }
+
+  // --- 9d. resolveIssue requires issueId ---
+  {
+    const { resolveIssue } = require('../lib/observability/sentryApi');
+    let threw = null;
+    try { await resolveIssue({ fetchImpl: async () => {} }); } catch (e) { threw = e; }
+    ok('resolveIssue missing issueId throws', threw !== null && /issueId/.test(threw.message));
+  }
+
   // --- 10. listIssues bad shape (non-array) ---
   {
     const { impl } = mockFetch([{ json: { detail: 'not found' } }]);
