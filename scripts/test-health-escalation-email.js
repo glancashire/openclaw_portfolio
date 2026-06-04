@@ -111,4 +111,36 @@ function ok(label, cond) {
   ok('no-actions: subject still present', email.subject.includes('attention needed'));
 }
 
+
+// ── bb8 prompt is always present and actionable ────────────────────────────────
+
+{
+  const report = {
+    portfolio: 'etf',
+    generatedAt: '2026-06-04T10:00:00.000Z',
+    health: {
+      state: 'attention',
+      summary: '5 in-flight execution row(s) need reconciliation.',
+      canonicalNextAction: null,
+      blockers: [{ code: 'delivery_attention', message: '5 rows...' }],
+    },
+    selfHeal: { actions: [{ kind: 'regenerate_dashboard', ok: true }] },
+  };
+
+  const email = buildEscalationEmail(report);
+  ok('prompt: bb8Prompt returned', typeof email.bb8Prompt === 'string' && email.bb8Prompt.length > 50);
+  ok('prompt: contains symptom', email.bb8Prompt.includes('execution row'));
+  ok('prompt: lists blocker codes', email.bb8Prompt.includes('delivery_attention'));
+  ok('prompt: lists what was tried', email.bb8Prompt.includes('regenerate dashboard'));
+  ok('prompt: includes explicit ask', email.bb8Prompt.includes('Please:') && email.bb8Prompt.includes('Fix it or tell me'));
+  ok('prompt: references health-report.json paths', email.bb8Prompt.includes('health-report.json'));
+
+  ok('text email: contains "Prompt for bb8"', email.text.includes('Prompt for bb8'));
+  ok('text email: contains the prompt body', email.text.includes('Please:'));
+  ok('text email: replaces deflection with actionable', !email.text.includes('Review the full report and decide on next steps') && email.text.includes('Paste the prompt below to bb8'));
+
+  ok('html email: contains pre block for prompt', email.html.includes('<pre'));
+  ok('html email: contains the prompt body', email.html.includes('Please:'));
+}
+
 console.log('\nhealth-escalation-email tests: ' + asserted + ' assertions passed');

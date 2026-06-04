@@ -365,6 +365,27 @@ async function runHealthCheck({ portfolioDir, repoRoot = process.cwd(), applySaf
 }
 
 
+function buildBb8Prompt(report, summary, triedLines) {
+  // Build a self-contained prompt Graham can paste back to bb8 in any session.
+  const portfolio = (report.portfolio || 'etf').toUpperCase();
+  const blockerCodes = (report.health?.blockers || []).map((b) => b.code).filter(Boolean);
+  const lines = [
+    'Health monitor flagged ' + portfolio + ' as ' + (report.health?.state || 'attention') + '.',
+    '',
+    'Symptom: ' + summary,
+    blockerCodes.length ? 'Blocker codes: ' + blockerCodes.join(', ') : null,
+    '',
+    'Already tried this cycle:',
+    ...triedLines.map((l) => l.replace(/^- /, '  - ')),
+    '',
+    'Please:',
+    '  1. Read runtime/overview/health-report.json + portfolio/' + (report.portfolio || 'etf') + '/health-report.json',
+    '  2. Diagnose the root cause (not just the symptom)',
+    '  3. Fix it or tell me exactly what to do — no "review the report" deflections',
+  ].filter((x) => x !== null);
+  return lines.join('\n');
+}
+
 function buildEscalationEmail(report) {
   const state = report.health?.state || 'attention';
   const summary = report.health?.summary || 'Health issue detected.';
@@ -384,6 +405,9 @@ function buildEscalationEmail(report) {
   }
   if (!triedLines.length) triedLines.push('- No automatic fixes were applicable this cycle.');
 
+  // Build the bb8 prompt (always; useful even when canonicalNextAction is set)
+  const bb8Prompt = buildBb8Prompt(report, summary, triedLines);
+
   // Subject
   const stateLabel = state === 'critical' ? 'CRITICAL' : 'attention needed';
   const subject = '[Portfolio] ' + portfolio.toUpperCase() + ' ' + stateLabel + ' — ' + summary.slice(0, 80);
@@ -400,12 +424,17 @@ function buildEscalationEmail(report) {
     ...triedLines.map((l) => '  ' + l),
     '',
     'What to do',
-    canonicalNextAction ? '  ' + canonicalNextAction : '  Review the full report and decide on next steps.',
+    canonicalNextAction ? '  ' + canonicalNextAction : '  Paste the prompt below to bb8 in a fresh session.',
+    '',
+    '─── Prompt for bb8 ───',
+    bb8Prompt,
+    '─────────────────────',
     '',
     'Full report: runtime/overview/health-report.html',
   ].join('\n');
 
-  // HTML body
+  // HTML body — wrap prompt in a copyable <pre> block
+  const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const html = page({
     title: portfolio.toUpperCase() + ' ' + stateLabel,
     bodyHtml: [
@@ -414,23 +443,25 @@ function buildEscalationEmail(report) {
       '<p style="font-size:13px;color:#6b7280;margin:0 0 20px;">Generated ' + generatedAt.slice(0, 19).replace('T', ' ') + ' UTC</p>',
       '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:20px;">',
       '<div style="font-size:11px;color:#991b1b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:6px;">What\'s wrong</div>',
-      '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + summary + '</div>',
+      '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + escapeHtml(summary) + '</div>',
       '</div>',
       '<div style="background:#f0f9ff;border:1px solid #93c5fd;border-radius:12px;padding:16px;margin-bottom:20px;">',
       '<div style="font-size:11px;color:#1e40af;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:6px;">What bb8 already tried</div>',
       '<ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.8;color:#334155;">',
-      ...triedLines.map((l) => '<li>' + l.replace(/^- /, '') + '</li>'),
+      ...triedLines.map((l) => '<li>' + escapeHtml(l.replace(/^- /, '')) + '</li>'),
       '</ul>',
       '</div>',
       '<div style="background:#ecfdf5;border:1px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;">',
       '<div style="font-size:11px;color:#166534;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:6px;">What to do</div>',
-      '<div style="font-size:14px;color:#1e293b;">' + (canonicalNextAction ? canonicalNextAction : 'Review the full report and decide on next steps.') + '</div>',
+      '<div style="font-size:14px;color:#1e293b;margin-bottom:12px;">' + (canonicalNextAction ? escapeHtml(canonicalNextAction) : 'Copy the prompt below and paste it to bb8 in a fresh session.') + '</div>',
+      '<div style="font-size:11px;color:#475569;text-transform:uppercase;font-weight:600;margin-bottom:6px;">Prompt for bb8 (copy &amp; paste)</div>',
+      '<pre style="background:#0f172a;color:#e2e8f0;border-radius:8px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word;margin:0;">' + escapeHtml(bb8Prompt) + '</pre>',
       '</div>',
       '</div>',
     ].join('\n'),
   });
 
-  return { subject, text, html };
+  return { subject, text, html, bb8Prompt };
 }
 
 module.exports = {
