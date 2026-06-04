@@ -140,10 +140,13 @@ Fallback if SIX live-hours spread proves too wide: NUKL on Paris (SBF), EUR, con
 
 - [ ] **Live spread during EU hours** for NUCL-SIX, NUKL-Paris, INRE-Paris (cron `141064ee` will probe Fri 13:00 UTC — already extended to all 5 listings)
 - [x] **NUKL/NUCL conid resolution** — 4 venues found, NUCL-SIX-CHF and NUKL-Paris-EUR are the keepers
-- [ ] **30-day average daily volume** at preferred venues — only AUM verified so far; ADV needs justETF / Morningstar pull
-- [ ] **Tracking-difference history** (factsheet inspection — last 1y / 3y vs index for all four)
-- [ ] **Withholding tax verification** for Irish-domiciled funds in Swiss tax treatment (general rule: 15% recoverable via Swiss DA-1, but worth a sanity check)
-- [x] **Physical full replication** confirmed for XDWE (justETF + DWS factsheet), INRA (justETF + iShares), NUUR (justETF). NUKL/NUCL: VanEck factsheet shows full replication of MarketVector index.
+- [x] **AUM verified** — XDWE €1.7bn, NUCL/NUKL €2.4bn, INRE €865m, NUUR €27m (demoted)
+- [x] **Physical full replication** confirmed via justETF profiles for all four
+- [ ] **30-day average daily volume** at preferred venues — trackingdifferences.com + justETF performance tabs render via JS; bb8's web_fetch returns empty markdown. Either pull manually before any K2 build, or run `node scripts/fetch-interactive-brokers-price.js <conid>` repeatedly during a session to sample turnover.
+- [ ] **Tracking-difference history** (1y / 3y vs index) — same issue: JS-rendered. Manual pull from Morningstar / justETF / trackingdifferences.com before K2.
+- [ ] **Withholding tax sanity check** for Irish-domiciled funds in Swiss tax treatment (general rule: 15% recoverable via DA-1, but worth confirming for these specific funds before sizing the sleeve)
+
+None of these are blockers — all four ETFs have public factsheets that pre-empt closure or sampling-replication concerns. The two remaining items (ADV and tracking difference) are *nice to have* before sizing a final basket; they're not gates on the decision to add the sleeve.
 
 ---
 
