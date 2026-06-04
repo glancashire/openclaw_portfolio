@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 329,
-    "safe": 251,
-    "integration": 73,
+    "total": 331,
+    "safe": 252,
+    "integration": 74,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -1831,6 +1831,20 @@
       "path": "scripts/test-sentry-api.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-sentry-autofix-weekly.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-sentry-autofix.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
