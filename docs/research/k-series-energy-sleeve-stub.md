@@ -87,3 +87,27 @@ Like H1 after the deconcentration basket fills:
 2. Run K1 acceptance criteria
 3. Commit baseline doc + JSON
 4. Wait for "build the basket" to start K2
+
+---
+
+## Pre-drafted `portfolio.md` candidate-instrument rows
+
+When Graham gives the go, append these rows to the **Candidate Instruments** table in `portfolio/etf/portfolio.md`. Format matches the existing rows exactly. No edits to the **Approved Instruments** table or allocation targets at this stage — those happen in K2/K3 after basket sizing.
+
+```markdown
+| IE00BM67HM91 | Global | Energy production | Xtrackers MSCI World Energy UCITS ETF 1C | 0.25% | physical (full) | EUR | verified (conid 227263991, IBIS2) | Broad MSCI World Energy sleeve; ~70% oil & gas majors plus integrated energy and renewables; physical full replication; AUM €1.7bn; matches portfolio's low-TER discipline. |
+| IE000M7V94E1 | Global | Nuclear / uranium | VanEck Uranium and Nuclear Technologies UCITS ETF | 0.55% | physical (full) | CHF | verified (conid 626090692, EBS) | CHF-native nuclear sleeve via SIX listing — no FX leg from CHF cash; tracks MarketVector Global Uranium and Nuclear Energy Infrastructure (utilities + reactors + miners + fuel); largest pure-nuclear UCITS in Europe at €2.4bn; full physical replication. Fallback EUR listing on Paris (NUKL, conid 613031265). |
+| IE000U58J0M1 | Global | Clean energy | iShares Global Clean Energy Transition UCITS ETF USD (Acc) | 0.65% | physical (full) | EUR | verified (conid 552352705, SBF) | Optional clean-energy / renewables overweight separate from XDWE; tracks S&P Global Clean Energy Transition (~100 holdings); full physical replication; AUM €865m; INRE on Paris is the preferred listing (tightest spread, no FTT, EUR-native). Avoid INRA-LSE (UK SDRT 0.5%). |
+```
+
+If the K2 sleeve sizing decision lands at one of the targets in `k1-energy-baseline-2026-06-04.json`, also append to **Approved Instruments**:
+
+```markdown
+| IE00BM67HM91 | Xtrackers MSCI World Energy UCITS ETF 1C | Global equities | 2 | 0 | 4 | IBIS2 / Xetra | EUR | Energy production sleeve; physical full replication; TER 0.25%; AUM €1.7bn; ibkr_symbol=XDW0; ibkr_conid=227263991; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
+| IE000M7V94E1 | VanEck Uranium and Nuclear Technologies UCITS ETF | Global equities | 2 | 0 | 4 | SIX / EBS | CHF | Nuclear / uranium sleeve; CHF native; physical full replication; TER 0.55%; AUM €2.4bn; ibkr_symbol=NUCL; ibkr_conid=626090692; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| IE000U58J0M1 | iShares Global Clean Energy Transition UCITS ETF | Global equities | 1 | 0 | 3 | SBF / Paris | EUR | Optional clean-energy sleeve; physical full replication; TER 0.65%; AUM €865m; ibkr_symbol=INRE; ibkr_conid=552352705; ibkr_primary_exchange=SBF; fx_to_chf=0.96 |
+```
+
+Target % values above are **placeholders** matching the medium-6% sleeve from the K1 baseline JSON (`split: XDWE 3% / NUCL 2% / INRE 1%`). Adjust based on K2 basket sizing. Min/Max bands set to allow normal drift without breaching constraints.
+
+**Existing target adjustments needed if sleeve added:** the current Approved Instruments table sums to ~108% on top-line targets (rebalance buffers). Adding 5–7% energy pushes it further. K2 needs to either trim Cash CHF target (currently 3%) or shave the deconcentration sleeves (XDEW/MWEQ/IS3H/DXS0) that are still ramping. Operator decision.
