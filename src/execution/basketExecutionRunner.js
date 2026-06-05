@@ -126,6 +126,62 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
     }
   }
 
+  // Phase L1.B (2026-06-05): daily transmit cap. Refuse if today's already-
+  // transmitted notional plus this basket would breach the daily cap.
+  // Defaults to CHF 50k (matches the per-basket cap, so the conservative
+  // read is "one basket per day at the cap"). Override via
+  // safeguardConfig.dailyTransmitCapChf.
+  if (safeguardConfig.skipDailyTransmitCap !== true) {
+    const { evaluateDailyTransmitCap } = require('./dailyTransmitCap');
+    const capChf = Number.isFinite(safeguardConfig.dailyTransmitCapChf)
+      ? Number(safeguardConfig.dailyTransmitCapChf)
+      : undefined;
+    const dailyResult = evaluateDailyTransmitCap({
+      portfolio,
+      rootDir,
+      envelope,
+      fxLookup: fxLookup || (() => 1),
+      now,
+      capChf,
+    });
+    if (!dailyResult.ok) {
+      for (const leg of envelope.legs || []) {
+        state.legs[leg.legId] = {
+          legId: leg.legId,
+          instrument: leg.instrument,
+          attempts: 0,
+          status: 'blocked',
+          lastReason: `safeguard_${dailyResult.code}: ${dailyResult.reason}`,
+          safeguardDetail: {
+            capChf: dailyResult.capChf,
+            usedToday: dailyResult.used,
+            requested: dailyResult.requested,
+            remaining: dailyResult.remaining,
+            byApproval: dailyResult.byApproval,
+          },
+          updatedAt: new Date(now).toISOString(),
+        };
+      }
+      persistRunState(statePath, summarizeRun(state), now);
+      return {
+        path: statePath,
+        runState: summarizeRun(state),
+        approvalId,
+        portfolio,
+        safeguardBlockers: [{
+          code: dailyResult.code,
+          reason: dailyResult.reason,
+          detail: {
+            capChf: dailyResult.capChf,
+            usedToday: dailyResult.used,
+            requested: dailyResult.requested,
+            remaining: dailyResult.remaining,
+          },
+        }],
+      };
+    }
+  }
+
   for (const leg of envelope.legs || []) {
     const eligibility = legEligible(leg, state);
     if (!eligibility.ok) {
