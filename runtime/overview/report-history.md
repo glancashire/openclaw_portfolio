@@ -1,7 +1,7 @@
 # Report History
 
-- Generated at: 2026-05-29T12:45:06.709Z
-- Total reports: 14
+- Generated at: 2026-06-05T10:04:27.074Z
+- Total reports: 16
 - Portfolios: 2
 
 ## Report Index
@@ -14,6 +14,8 @@ No reports generated yet.
 
 | Date | Period | Formats | Report |
 |---|---|---|---|
+| 20260602 | weekly | html, md, pdf | portfolio_report_etf_weekly_20260602 |
+| 20260601 | monthly | html, md, pdf | portfolio_report_etf_monthly_20260601 |
 | 20260523 | weekly | html, md, pdf | portfolio_report_etf_weekly_20260523 |
 | 20260522 | monthly | html, md, pdf | portfolio_report_etf_monthly_20260522 |
 | 20260515 | weekly | html, md, pdf | portfolio_report_etf_weekly_20260515 |

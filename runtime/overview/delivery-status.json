@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-29T12:45:06.715Z",
+  "generatedAt": "2026-06-05T10:04:27.078Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -21,12 +21,11 @@
       "overrideLoaded": true,
       "ready": false,
       "pendingActions": [
-        "Dashboard/report freshness is stale relative to source state.",
-        "6 reconciled fill(s) still need notification backfill review."
+        "Dashboard/report freshness is stale relative to source state."
       ],
       "deliveryPosture": {
         "ready": false,
-        "pendingActionCount": 2,
+        "pendingActionCount": 1,
         "latestHistoryDate": "YYYY-MM-DD",
         "freshnessStale": true,
         "failedTrades": 0,
@@ -36,7 +35,7 @@
           "blockedTradeCount": 0,
           "topBrokerBlock": null
         },
-        "recommendedNextAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome."
+        "recommendedNextAction": "Email delivery is not ready: missing pendingDeliveryActions."
       }
     },
     {
@@ -56,28 +55,28 @@
       "overrideLoaded": true,
       "ready": false,
       "pendingActions": [
-        "6 reconciled fill(s) still need notification backfill review."
+        "3 in-flight execution row(s) need reconciliation before overlapping actions."
       ],
       "deliveryPosture": {
         "ready": false,
         "pendingActionCount": 1,
-        "latestHistoryDate": "2026-05-29",
+        "latestHistoryDate": "2026-06-05",
         "freshnessStale": false,
-        "failedTrades": 0,
-        "inFlightOrders": 0,
+        "failedTrades": 5,
+        "inFlightOrders": 3,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 11,
+          "blockedTradeCount": 13,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
             "name": "UBS SLI ETF (SMI gleichgewichtet)",
             "blockCode": "contract_resolution_failed",
             "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
             "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-            "brokerOrderId": "9149"
+            "brokerOrderId": "9163"
           }
         },
-        "recommendedNextAction": "Review the reconciled fill notification backfill state and decide whether to record a manual backfill outcome."
+        "recommendedNextAction": "Email delivery is not ready: missing pendingDeliveryActions."
       }
     }
   ]

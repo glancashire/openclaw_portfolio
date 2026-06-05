@@ -89,10 +89,42 @@ function summarizeRun(runState = {}) {
   return runState;
 }
 
-async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = process.cwd(), now = new Date(), submitLeg = null } = {}) {
+async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = process.cwd(), now = new Date(), submitLeg = null, fetchLiveQuote = null, fxLookup = null, safeguardConfig = {} } = {}) {
   const portfolio = path.basename(portfolioDir);
   const { envelope } = loadApprovalEnvelope({ portfolio, approvalId, rootDir, now });
   const { path: statePath, state } = loadOrCreateRunState({ portfolio, approvalId, rootDir, now });
+
+  // Pre-flight safeguards (Phase L, 2026-06-05): validate the whole basket
+  // BEFORE any leg is sent. Refuses on sell-without-envelope-approval,
+  // limit price too far from market, oversized leg/basket, or stale quote.
+  // See src/execution/orderSafeguards.js.
+  if (typeof fetchLiveQuote === 'function') {
+    const { evaluateBasketSafeguards } = require('./orderSafeguards');
+    const guardResult = await evaluateBasketSafeguards({
+      envelope,
+      fetchLiveQuote,
+      fxLookup: fxLookup || (() => 1),
+      config: safeguardConfig,
+    });
+    if (!guardResult.ok) {
+      const blockerSummary = guardResult.blockers.map((b) => `${b.legId || 'basket'}:${b.code}:${b.reason}`).join(' | ');
+      // Mark every leg blocked with a structured reason.
+      for (const leg of envelope.legs || []) {
+        const blocker = guardResult.blockers.find((b) => b.legId === leg.legId) || guardResult.blockers[0];
+        state.legs[leg.legId] = {
+          legId: leg.legId,
+          instrument: leg.instrument,
+          attempts: 0,
+          status: 'blocked',
+          lastReason: `safeguard_${blocker?.code || 'unknown'}: ${blocker?.reason || blockerSummary}`,
+          safeguardDetail: blocker?.detail || null,
+          updatedAt: new Date(now).toISOString(),
+        };
+      }
+      persistRunState(statePath, summarizeRun(state), now);
+      return { path: statePath, runState: summarizeRun(state), approvalId, portfolio, safeguardBlockers: guardResult.blockers };
+    }
+  }
 
   for (const leg of envelope.legs || []) {
     const eligibility = legEligible(leg, state);

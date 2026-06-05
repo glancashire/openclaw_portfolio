@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-05-29T12:45:06.709Z",
-  "totalReports": 14,
+  "generatedAt": "2026-06-05T10:04:27.074Z",
+  "totalReports": 16,
   "portfolioCount": 2,
   "portfolios": [
     {
@@ -11,8 +11,38 @@
     },
     {
       "portfolio": "etf",
-      "reportCount": 14,
+      "reportCount": 16,
       "reports": [
+        {
+          "basename": "portfolio_report_etf_weekly_20260602",
+          "period": "weekly",
+          "date": "20260602",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "weekly/portfolio_report_etf_weekly_20260602.html",
+            "weekly/portfolio_report_etf_weekly_20260602.md",
+            "weekly/portfolio_report_etf_weekly_20260602.pdf"
+          ]
+        },
+        {
+          "basename": "portfolio_report_etf_monthly_20260601",
+          "period": "monthly",
+          "date": "20260601",
+          "formats": [
+            "html",
+            "md",
+            "pdf"
+          ],
+          "paths": [
+            "monthly/portfolio_report_etf_monthly_20260601.html",
+            "monthly/portfolio_report_etf_monthly_20260601.md",
+            "monthly/portfolio_report_etf_monthly_20260601.pdf"
+          ]
+        },
         {
           "basename": "portfolio_report_etf_weekly_20260523",
           "period": "weekly",

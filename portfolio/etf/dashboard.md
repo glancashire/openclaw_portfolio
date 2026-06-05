@@ -1,61 +1,67 @@
 # Dashboard: etf
 ## Portfolio Value Snapshot
-- Total value CHF: 141037.12626237
-- Cash CHF: 1468.65
-- Invested CHF: 139568.47626237
+- Total value CHF: 149881.98592747
+- Cash CHF: 2433.12
+- Invested CHF: 147448.86592747
 - Daily move CHF: 0
 - Daily move %: 0
 - Since last report CHF: 0
 - Since last report %: 0
-- Number of holdings: 15
-- Latest snapshot date: 2026-06-04
-- Total unrealized profit CHF: -699.96
-- Total unrealized profit %: -0.5
-- Cost-basis coverage: 15/15 holdings (CHF 139568.48 of position value)
+- Number of holdings: 18
+- Latest snapshot date: 2026-06-05
+- Total unrealized profit CHF: -1911.67
+- Total unrealized profit %: -1.28
+- Cost-basis coverage: 18/18 holdings (CHF 147448.87 of position value)
 
 ## Profit / Loss
-- Total unrealized profit CHF: -699.96
-- Total cost basis CHF (covered holdings only): 140268.42
-- Total unrealized profit %: -0.5%
+- Total unrealized profit CHF: -1911.67
+- Total cost basis CHF (covered holdings only): 149360.54
+- Total unrealized profit %: -1.28%
 - Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 
 | Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
 |---|---:|---:|---:|---:|---|
-| UKGBPB | 8'329.03 | 8'387.06 | -58.03 | -0.69% | IBKR avg cost |
-| AIFS | 4'724.22 | 4'736.90 | -12.68 | -0.27% | IBKR avg cost |
-| DXS0 | 2'703.10 | 2'689.43 | 13.67 | +0.51% | IBKR avg cost |
-| CHSPI | 10'952.08 | 11'016.56 | -64.48 | -0.59% | trades.md |
-| SPMCHA | 13'053.24 | 13'074.69 | -21.45 | -0.16% | IBKR avg cost |
-| MWEQ | 4'727.26 | 4'721.77 | 5.49 | +0.12% | IBKR avg cost |
-| HMCD | 6'966.82 | 6'959.62 | 7.20 | +0.10% | IBKR avg cost |
-| XAIX | 4'501.88 | 4'604.17 | -102.29 | -2.22% | IBKR avg cost |
-| CEBL | 11'520.78 | 11'505.56 | 15.22 | +0.13% | IBKR avg cost |
-| SEC0 | 9'996.14 | 9'426.63 | 569.51 | +6.04% | IBKR avg cost |
-| LCUJ | 9'200.69 | 9'063.16 | 137.53 | +1.52% | IBKR avg cost |
-| EMUAA | 16'654.35 | 17'100.95 | -446.60 | -2.61% | trades.md |
-| XDEW | 7'509.51 | 7'486.35 | 23.16 | +0.31% | IBKR avg cost |
-| SXR8 | 24'955.69 | 25'728.02 | -772.33 | -3.00% | trades.md |
-| IS3H | 3'773.67 | 3'767.55 | 6.12 | +0.16% | IBKR avg cost |
+| UKGBPB | 8'322.49 | 8'397.31 | -74.82 | -0.89% | IBKR avg cost |
+| AIFS | 4'612.34 | 4'742.70 | -130.36 | -2.75% | IBKR avg cost |
+| DXS0 | 2'705.31 | 2'692.72 | 12.59 | +0.47% | IBKR avg cost |
+| XDW0 | 4'503.37 | 4'505.38 | -2.01 | -0.04% | IBKR avg cost |
+| CHSPI | 10'941.20 | 11'016.56 | -75.36 | -0.68% | trades.md |
+| INRE | 1'494.34 | 1'501.75 | -7.41 | -0.49% | IBKR avg cost |
+| SPMCHA | 13'074.69 | 13'074.69 | 0.00 | +0.00% | IBKR avg cost |
+| MWEQ | 4'724.80 | 4'727.54 | -2.74 | -0.06% | IBKR avg cost |
+| HMCD | 6'904.95 | 6'968.13 | -63.18 | -0.91% | IBKR avg cost |
+| NUCL | 2'981.16 | 2'995.30 | -14.14 | -0.47% | IBKR avg cost |
+| XAIX | 4'393.02 | 4'609.80 | -216.78 | -4.70% | IBKR avg cost |
+| CEBL | 11'174.67 | 11'519.63 | -344.96 | -2.99% | IBKR avg cost |
+| SEC0 | 9'629.60 | 9'438.15 | 191.45 | +2.03% | IBKR avg cost |
+| LCUJ | 9'171.44 | 9'074.24 | 97.20 | +1.07% | IBKR avg cost |
+| EMUAA | 16'674.71 | 17'100.95 | -426.24 | -2.49% | trades.md |
+| XDEW | 7'503.73 | 7'495.51 | 8.22 | +0.11% | IBKR avg cost |
+| SXR8 | 24'841.03 | 25'728.02 | -886.99 | -3.45% | trades.md |
+| IS3H | 3'796.02 | 3'772.16 | 23.86 | +0.63% | IBKR avg cost |
 ## Holdings
 Holdings sorted by CHF value (descending).
 
 | Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
-| SXR8 | 24'955.69 | -772.33 | -3.00% | 17.7% |
-| EMUAA | 16'654.35 | -446.60 | -2.61% | 11.8% |
-| SPMCHA | 13'053.24 | -21.45 | -0.16% | 9.3% |
-| CEBL | 11'520.78 | +15.22 | +0.13% | 8.2% |
-| CHSPI | 10'952.08 | -64.48 | -0.59% | 7.8% |
-| SEC0 | 9'996.14 | +569.51 | +6.04% | 7.1% |
-| LCUJ | 9'200.69 | +137.53 | +1.52% | 6.5% |
-| UKGBPB | 8'329.03 | -58.03 | -0.69% | 5.9% |
-| XDEW | 7'509.51 | +23.16 | +0.31% | 5.3% |
-| HMCD | 6'966.82 | +7.20 | +0.10% | 4.9% |
-| MWEQ | 4'727.26 | +5.49 | +0.12% | 3.4% |
-| AIFS | 4'724.22 | -12.68 | -0.27% | 3.3% |
-| XAIX | 4'501.88 | -102.29 | -2.22% | 3.2% |
-| IS3H | 3'773.67 | +6.12 | +0.16% | 2.7% |
-| DXS0 | 2'703.10 | +13.67 | +0.51% | 1.9% |
+| SXR8 | 24'841.03 | -886.99 | -3.45% | 16.6% |
+| EMUAA | 16'674.71 | -426.24 | -2.49% | 11.1% |
+| SPMCHA | 13'074.69 | +0.00 | +0.00% | 8.7% |
+| CEBL | 11'174.67 | -344.96 | -2.99% | 7.5% |
+| CHSPI | 10'941.20 | -75.36 | -0.68% | 7.3% |
+| SEC0 | 9'629.60 | +191.45 | +2.03% | 6.4% |
+| LCUJ | 9'171.44 | +97.20 | +1.07% | 6.1% |
+| UKGBPB | 8'322.49 | -74.82 | -0.89% | 5.6% |
+| XDEW | 7'503.73 | +8.22 | +0.11% | 5.0% |
+| HMCD | 6'904.95 | -63.18 | -0.91% | 4.6% |
+| MWEQ | 4'724.80 | -2.74 | -0.06% | 3.2% |
+| AIFS | 4'612.34 | -130.36 | -2.75% | 3.1% |
+| XDW0 | 4'503.37 | -2.01 | -0.04% | 3.0% |
+| XAIX | 4'393.02 | -216.78 | -4.70% | 2.9% |
+| IS3H | 3'796.02 | +23.86 | +0.63% | 2.5% |
+| NUCL | 2'981.16 | -14.14 | -0.47% | 2.0% |
+| DXS0 | 2'705.31 | +12.59 | +0.47% | 1.8% |
+| INRE | 1'494.34 | -7.41 | -0.49% | 1.0% |
 ## Instrument Actions Queue
 Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 
@@ -76,32 +82,46 @@ Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 | IE000OEF25S1 | 0 | 4 | deploy | Target is 4% — no active buy planned. Cash available for deployment. | watch |
 | IE00BCLWRD08 | 0 | 3 | deploy | Target is 3% — no active buy planned. Cash available for deployment. | watch |
 | LU0322248146 | 0 | 2 | deploy | Target is 2% — no active buy planned. Cash available for deployment. | watch |
-| CASH-CHF | 1.44 | 3 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
+| IE00BM67HM91 | 3.29 | 3 | submitted: buy | Portfolio-approved transmitted live broker order submitted. | submitted_to_broker |
+| IE000M7V94E1 | 2 | 2 | submitted: buy | Portfolio-approved transmitted live broker order submitted. | submitted_to_broker |
+| IE000U58J0M1 | 1.1 | 1 | submitted: buy | Portfolio-approved transmitted live broker order submitted. | submitted_to_broker |
+| CASH-CHF | 1.35 | 3 | planned: hold | Keep this portion in CHF cash to satisfy the defensive sleeve without placing an order. | blocked_by_min_trade_size |
 ## Balance Check
 Allocation drift is tracked as a constraint; see below. All sleeves within target bands is the goal.
 
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 80.02 | 65 | 15.02 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 18.94 | 20 | -1.06 | on_track | no | within tolerance |
-| Bonds / cash-like | 1.04 | 15 | -13.96 | out_of_bounds | yes | outside min/max band |
+| Global equities | 80.55 | 65 | 15.55 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 17.83 | 20 | -2.17 | on_track | no | within tolerance |
+| Bonds / cash-like | 1.62 | 15 | -13.38 | out_of_bounds | yes | outside min/max band |
 ## Pending Operator Actions
-1. [workflow/recommended/low] Portfolio is performing as intended. Hold current positions and review after the next market session.
+1. [execution_block/blocked/high] CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
+2. [execution_block/blocked/high] CH0130595124: Broker rejected the order because the contract identity or venue resolution was not accepted.
+3. [execution_block/blocked/high] IE000I8KRLL9: Broker rejected the order because the contract identity or venue resolution was not accepted.
+4. [execution_block/blocked/high] IE000X59ZHE2: Broker rejected the order because the contract identity or venue resolution was not accepted.
+5. [execution_block/blocked/high] IE00B5BMR087: Broker rejected the order because the contract identity or venue resolution was not accepted.
+6. [execution_block/blocked/high] IE00B5L8K969: Broker rejected the order because the contract identity or venue resolution was not accepted.
+7. [execution_block/blocked/high] IE00BGV5VN51: Broker rejected the order because the contract identity or venue resolution was not accepted.
+8. [execution_block/blocked/high] LU0950668870: Broker rejected the order because the contract identity or venue resolution was not accepted.
+9. [execution_block/blocked/high] LU0950670850: Broker rejected the order because the contract identity or venue resolution was not accepted.
+10. [execution_block/blocked/high] LU1781541252: Broker rejected the order because the contract identity or venue resolution was not accepted.
+11. [execution/in_flight/medium] Reconcile 3 in-flight broker order(s) before creating overlapping plans.
+12. [delivery/pending/medium] 3 in-flight execution row(s) need reconciliation before overlapping actions.
 ## Immediate Status
 - Portfolio status: warning
 - Top blocker: none currently surfaced
-- Next action: Portfolio is performing as intended. Hold current positions and review after the next market session.
+- Next action: CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
 - Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
 - Execution posture: ready_for_review
-- Delivery posture: ready
+- Delivery posture: needs_operator_attention
 - Active blockers: 0
-- Pending operator queue items: 1
+- Pending operator queue items: 12
 ## Health Snapshot
 - Strategy status: rebalance_needed
-- Last successful sync: 2026-06-04 17:05:16
+- Last successful sync: 2026-06-05 08:56:46
 - Data freshness: current
 - Pending approvals: 0
-- In-flight execution rows: 0
+- In-flight execution rows: 3
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
@@ -111,22 +131,22 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Active blocker detail:
 - none
 ## Contract Intelligence Readiness
-- 16/16 approved instrument(s) have complete IBKR contract identity; missing conid: 0, missing symbol: 0, missing venue: 0.
+- 19/19 approved instrument(s) have complete IBKR contract identity; missing conid: 0, missing symbol: 0, missing venue: 0.
 - Recommended contract-intelligence action: No contract-intelligence remediation is currently required.
 ## Operator Queue Summary
-- Total queue items: 1
+- Total queue items: 12
 - Blocking items: 0
 - Approval items: 0
 - Fresh actionable approvals: 0
 - Stale approvals needing reapproval: 0
-- Execution items: 0
+- Execution items: 1
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
 - Recovery items: 0
-- Delivery items: 0
+- Delivery items: 1
 - Data items: 0
 - Warning items: 0
-- Workflow items: 1
+- Workflow items: 10
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
@@ -136,26 +156,27 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 | 2026-06-04 07:23:58.973 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
 | 2026-06-04 07:23:29.909 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Resolve the blocking condition before proceeding. |
 ## Report / Delivery Status
-- Weekly report: latest history 2026-06-04
+- Weekly report: latest history 2026-06-05
 - Monthly report: email_and_repo
 - Quarterly report: local_operator_review
-- Delivery readiness: ready
+- Delivery readiness: needs_operator_attention
 - Failure alert readiness: local_operator_review
 - Notified fills: 11
 - Reconciled fills pending notification backfill: 0
 - Acknowledged backfilled fills: 1
 ## Recommended Next Step
-Portfolio is performing as intended. Hold current positions and review after the next market session.
+CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
 ## Status Labels
 - Pending approvals queue count: 0
-- In-flight execution rows: 0
+- In-flight execution rows: 3
 - Latest action recommendations:
-  - Portfolio is performing as intended. Hold current positions and review after the next market session.
-  - Continue normal monitoring and refresh the portfolio workflow after the next material state change.
+  - Monitor staged, submitted, and partially filled orders before generating fresh proposals.
+  - Reconcile broker order status back into trades, holdings, and history before acting on new execution plans.
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 139013 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 138287.74 unallocated beyond the intentional CHF cash sleeve.
 - 5 actionable trade row(s) are currently marked failed and may need manual review.
+- There are in-flight broker order states; avoid overlapping execution plans until reconciliation is current.
 - Latest history note: 0
 - Observability shows 100 recent blocked execution-policy event(s).
 ## Observability Status
@@ -171,21 +192,24 @@ Portfolio is performing as intended. Hold current positions and review after the
 - Approved: 0
 - Rejected: 0
 - Staged: 0
-- Submitted: 0
+- Submitted: 3
 - Partially filled: 0
 - Filled: 0
 - Cancelled: 0
 - Failed: 5
 - Planned-only entries: 1
-- Rows with broker order id: 17
+- Rows with broker order id: 20
 ## Execution Plan
 - CASH-CHF: target 3% | intended CHF 2024.13 | executable CHF 2024.13 | gap CHF 0
-- Totals: intended CHF 2024.13 | executable CHF 2024.13 | gap CHF 0
+- IE00BM67HM91: target 3% | intended CHF 4936.8 | executable CHF 4936.8 | gap CHF 0
+- IE000M7V94E1: target 2% | intended CHF 2990.3 | executable CHF 2990.3 | gap CHF 0
+- IE000U58J0M1: target 1% | intended CHF 1643.02 | executable CHF 1643.02 | gap CHF 0
+- Totals: intended CHF 11594.25 | executable CHF 11594.25 | gap CHF 0
 ## Recent Trades
 | Date | Action | Instrument | Amount CHF | Status |
 |---|---|---|---:|---|
+| 2026-06-05 08:56:30 | buy | iShares Global Clean Energy Transition UCITS ETF | 1643.02 | submitted |
+| 2026-06-05 08:56:28 | buy | VanEck Uranium and Nuclear Technologies UCITS ETF | 2990.3 | submitted |
+| 2026-06-05 08:56:26 | buy | Xtrackers MSCI World Energy UCITS ETF 1C | 4936.8 | submitted |
 | 2026-06-03 14:29:34 | buy | Xtrackers SLI UCITS ETF 1D | 2948.4 | failed |
 | 2026-06-03 14:29:32 | buy | iShares MSCI EMU Mid Cap UCITS ETF EUR (Acc) | 4131.54 | failed |
-| 2026-06-03 14:29:31 | buy | Invesco MSCI World Equal Weight UCITS ETF Acc | 5178.7 | failed |
-| 2026-06-03 14:29:29 | buy | Xtrackers S&P 500 Equal Weight UCITS ETF 1C | 8211.48 | failed |
-| 2026-06-02 14:01:32 | buy | HSBC MSCI China UCITS ETF USD | 3025.14 | failed |

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-06-04T20:00:26.222Z",
+  "generatedAt": "2026-06-05T08:00:23.805Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-06-04T20:00:21.082Z",
+    "generatedAt": "2026-06-05T08:00:18.534Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -120,7 +120,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-06-04T20:00:21.080Z",
+      "generatedAt": "2026-06-05T08:00:18.532Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -298,7 +298,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-06-04T20:00:26.222Z",
+    "generatedAt": "2026-06-05T08:00:23.804Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": true,
@@ -414,7 +414,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-06-04T20:00:26.221Z",
+      "generatedAt": "2026-06-05T08:00:23.803Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -633,34 +633,6 @@
   "trends": {
     "recent": [
       {
-        "at": "2026-06-04T12:47:14.496Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "degraded",
-        "severity": "low",
-        "blockerCount": 1,
-        "classified": [],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": []
-      },
-      {
-        "at": "2026-06-04T12:51:11.494Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "healthy",
-        "severity": "low",
-        "blockerCount": 0,
-        "classified": [],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": []
-      },
-      {
         "at": "2026-06-04T12:52:54.902Z",
         "kind": "health_check",
         "portfolio": "etf",
@@ -729,11 +701,38 @@
           "regenerate_reporting_artifacts"
         ],
         "openIssues": []
+      },
+      {
+        "at": "2026-06-04T20:00:26.225Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "healthy",
+        "severity": "low",
+        "blockerCount": 0,
+        "classified": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": []
+      },
+      {
+        "at": "2026-06-05T00:18:35.442Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "healthy",
+        "severity": "low",
+        "blockerCount": 0,
+        "classified": [],
+        "healed": [
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": []
       }
     ],
     "counts": {
-      "degraded": 1,
-      "healthy": 6
+      "healthy": 7
     },
     "direction": "stable",
     "summary": "Health direction is stable: recent checks stayed healthy, and no new operating risk is building."

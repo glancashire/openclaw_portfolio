@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 339,
+    "total": 340,
     "safe": 257,
-    "integration": 77,
+    "integration": 78,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -2342,6 +2342,13 @@
       "path": "tests/test-monitorFills.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "tests/test-orderSafeguards.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },

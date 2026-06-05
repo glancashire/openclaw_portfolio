@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-06-04 20:38 UTC · **Repo head:** `0ba9be7` · **Tests:** 254/254 · **Health:** 🟢 healthy
+**Last refreshed:** 2026-06-05 09:30 UTC · **Repo head:** see `git log -1` · **Tests:** 254/254 · **Health:** 🟢 healthy
 
 ---
 
@@ -16,25 +16,28 @@
 | Holdings sync | 🟢 functional |
 | Dashboard / report emails | 🟢 healthy |
 | Fill-confirmation emails | 🟢 healthy (`monitor-fills` cron disabled by policy) |
-| Deposits ledger | 🟢 9 deposits, 140k CHF cumulative |
+| Deposits ledger | 🟢 10 deposits, CHF 150k cumulative |
 | Deposits inbox cron | 🟢 wired (`runtime/ibkr-statements/inbox/`) |
 | Health monitor | 🟢 escalation-only, persistence + 24h rate-limit |
 | Health second-pass autofix | 🟢 5 fixers, 24h per-code rate-limit |
 | Sentry error tracking | 🟢 live, weekly autofix Mon 09:00 CET, `event:admin` token |
-| Safe-lane verification | 🟢 254 passed, 0 failed, 3 quarantined |
-| Cron jobs | 🟢 11 enabled + 1 policy-disabled + 1 one-shot pending |
+| Safe-lane verification | 🟢 254 passed (incl 12 new safeguard tests), 0 failed, 3 quarantined |
+| Pre-flight order safeguards | 🟢 SELL/BUY price floor+ceiling, notional caps, stale-quote, sellApproved gate |
+| Cron jobs | 🟢 11 enabled + 1 policy-disabled |
 
 ## Open work — at a glance
 
 | Phase | Status | Blocker | Action holder |
 |---|---|---|---|
+| **L** | **80% DONE — L1 ready** | **decision: run L1 batches?** | **Graham (D-1)** |
 | H2/H3 | CALENDAR | 2026-06-17 review | Graham (decision) |
 | F4 + G3 | OPERATOR | XLS file | Graham (drop file) |
-| **K** | **DECISION** | **build the sleeve?** | **Graham (go/no-go)** |
 | B5 | RECURRING | 2FA prompts | Graham (when alert fires) |
 | D1/D2/D3 | PARKED | explicit reactivation | Graham |
 
-**Autonomous engineering ready to execute:** none. Phase K research is complete with plan stub ready; waiting on Graham's go/no-go.
+**Autonomous engineering ready to execute:** Phase L1 (5 batches A–E). Phase K shipped 2026-06-05 (energy sleeve filled).
+
+Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`.
 
 ## Active research thread (Phase K — energy + nuclear sleeve)
 

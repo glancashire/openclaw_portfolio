@@ -79,3 +79,5 @@
 | 2026-06-04 | execution_not_found | 141164.34873894998 | 139695.69873894998 | 140000 | 0 | 0 | 0 | Broker order 9166 status sync: not_found |
 | 2026-06-04 | execution_not_found | 141164.34873894998 | 139695.69873894998 | 140000 | 0 | 0 | 0 | Broker order 9167 status sync: not_found |
 | 2026-06-04 | execution_not_found | 141164.34873894998 | 139695.69873894998 | 140000 | 0 | 0 | 0 | Broker order 9168 status sync: not_found |
+| 2026-06-05 | end_of_day | 139606.57096738 | 138137.92096738 | 140000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-05 | execution_staged | 139606.57096738 | 138137.92096738 | 150000 | 0 | 0 | 0 | Transmitted live broker order submitted. |

@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-05-30T18:38:00.137Z",
+  "generatedAt": "2026-06-05T10:04:27.069Z",
   "portfolioCount": 2,
-  "totalValueChf": 90390.19,
+  "totalValueChf": 149881.99,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 7,
+      "pendingActions": 6,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -38,75 +38,75 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
       "status": "warning",
-      "strategyStatus": "blocked",
-      "totalValueChf": 90390.18983012001,
-      "cashChf": 4701.68,
-      "investedChf": 85688.50983012,
-      "lastSyncAt": "2026-05-29 17:05:28",
-      "latestSnapshotDate": "2026-05-29",
+      "strategyStatus": "rebalance_needed",
+      "totalValueChf": 149881.98592747,
+      "cashChf": 2433.12,
+      "investedChf": 147448.86592747,
+      "lastSyncAt": "2026-06-05 08:56:46",
+      "latestSnapshotDate": "2026-06-05",
       "pendingApprovals": 0,
       "blockers": 0,
-      "pendingActions": 1,
-      "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "pendingActions": 3,
+      "recommendedNextStep": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "blockedTradeCount": 11,
+      "blockedTradeCount": 13,
       "topBrokerBlock": {
         "tickerOrIsin": "CH0032912732",
         "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "blockCode": "contract_resolution_failed",
         "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
         "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-        "brokerOrderId": "9149"
+        "brokerOrderId": "9163"
       },
       "driftStatuses": [
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 8.3
+          "driftPct": 15.55
         },
         {
           "assetClass": "Swiss equities",
           "status": "on_track",
-          "driftPct": 1.5
+          "driftPct": -2.17
         },
         {
           "assetClass": "Bonds / cash-like",
           "status": "out_of_bounds",
-          "driftPct": -9.8
+          "driftPct": -13.38
         }
       ],
-      "brokerHealth": "degraded",
-      "executionPosture": "degraded_dry_run_only",
-      "deliveryPosture": "ready",
+      "brokerHealth": "healthy",
+      "executionPosture": "ready_for_review",
+      "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 8,
-    "blocking": 7,
+    "total": 9,
+    "blocking": 6,
     "approvals": 0,
-    "execution": 0,
+    "execution": 2,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 2,
-    "delivery": 1,
+    "recovery": 0,
+    "delivery": 2,
     "data": 0,
     "warnings": 5,
     "workflow": 0,
     "bySeverity": {
-      "high": 7,
-      "medium": 1,
+      "high": 6,
+      "medium": 3,
       "low": 0
     }
   }

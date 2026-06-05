@@ -238,7 +238,7 @@ For the active repository, “acceptable” now means:
 ## 14. Current Outstanding Work
 
 The current outstanding work should be tracked in:
-- `CURRENT_PLAN.md` (active phase + backlog)
+- `PLAN.md` (active phase + backlog, consolidated 2026-06-05)
 - `STATUS.md` (current health snapshot)
 
 Detail for the active phase lives in `plans/<phase>.md`. Historical plans are under `archive/phase-plans/`.

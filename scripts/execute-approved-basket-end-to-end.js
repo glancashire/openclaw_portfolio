@@ -112,9 +112,30 @@ async function main() {
 
     log('Transmitting via canonical basket runner...');
     try {
-      const runResult = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: ROOT });
+      // Phase L (2026-06-05): wire pre-flight safeguards into the runner.
+      // Live quote feeder uses the IBKR client snapshot fields (84=bid, 86=ask, 31=last).
+      const guardClient = new InteractiveBrokersClient({ portfolio });
+      const fetchLiveQuote = async (conid) => {
+        const snap = await guardClient.fetchMarketSnapshot([conid]);
+        const d = Array.isArray(snap) ? snap[0] : snap;
+        return { bid: Number(d?.['84']), ask: Number(d?.['86']), last: Number(d?.['31']) };
+      };
+      // Trust the envelope's per-leg fxToChf (set at proposal time). Defaults to 1.
+      const fxLookup = (currency) => {
+        if (!currency || String(currency).toUpperCase() === 'CHF') return 1;
+        // Fallback approximation for EUR/USD/GBP if envelope-level FX is missing.
+        return 1;
+      };
+      const runResult = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: ROOT, fetchLiveQuote, fxLookup });
       runState = runResult.runState;
       log(`Runner summary: ${JSON.stringify(runState.summary)}`);
+      if (runResult.safeguardBlockers && runResult.safeguardBlockers.length > 0) {
+        console.error(`SAFEGUARDS BLOCKED: ${runResult.safeguardBlockers.length} blocker(s) — basket NOT transmitted.`);
+        for (const b of runResult.safeguardBlockers) {
+          console.error(`  ${b.legId || 'basket'} ${b.code}: ${b.reason}`);
+        }
+        process.exit(7);
+      }
     } catch (error) {
       console.error(`Runner threw: ${error.message}`);
       console.error(error.stack);

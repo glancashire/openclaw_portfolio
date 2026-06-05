@@ -1,18 +1,18 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-04T20:00:25.847Z",
+  "generatedAt": "2026-06-05T10:04:42.367Z",
   "portfolio": "etf",
   "incidentStatus": "action_required",
   "summary": {
     "health": "warning",
     "brokerHealth": "healthy",
     "executionPosture": "ready_for_review",
-    "deliveryPosture": "ready",
+    "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "current",
     "blockerCount": 0,
-    "queueItemCount": 1,
+    "queueItemCount": 3,
     "pendingApprovals": 0,
-    "recommendedNextStep": "5 trade row(s) are marked failed and need operator review.",
+    "recommendedNextStep": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
     "executionWhy": "No explicit execution block is currently surfaced.",
     "approvalWhy": "74 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
@@ -212,6 +212,22 @@
       "action": "Review the failed trade rows and resolve the root cause before retrying.",
       "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
       "source": "trade_lifecycle"
+    },
+    {
+      "step": 2,
+      "priority": "medium",
+      "title": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
+      "action": "Reconcile broker order status before creating overlapping execution plans.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "trade_lifecycle"
+    },
+    {
+      "step": 3,
+      "priority": "medium",
+      "title": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
+      "action": "Review report delivery readiness and clear the pending action.",
+      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
+      "source": "delivery_policy"
     }
   ],
   "verificationChecks": [

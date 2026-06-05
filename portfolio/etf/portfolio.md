@@ -9,8 +9,8 @@
 - Broker account reference: U25624150
 - Execution mode: transmitted_live
 - Asset scope: ETF only
-- Total capital deposited CHF: 90000
-- Capital deposit history: 2026-04-27 initial 5000, 2026-05-12 top-up 85000
+- Total capital deposited CHF: 150000
+- Capital deposit history: see portfolio/etf/deposits.md (canonical ledger). Summary: 2026-04-27 initial 5000; 2026-05-20/21/22 top-ups 5000+20000+20000; 2026-05-28/29 top-ups 20000+20000; 2026-06-01/02/03 top-ups 10000+20000+20000; 2026-06-05 top-up 10000.
 
 ## Strategy Summary
 Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad equity exposure with a small Swiss tilt and a defensive CHF cash-like sleeve. Sized for approximately CHF 5000 and designed to stay easy to manage.
@@ -62,6 +62,9 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | IE000OEF25S1 | Invesco MSCI World Equal Weight UCITS ETF Acc | Global equities | 4 | 0 | 8 | IBIS2 / Xetra | EUR | Global equal-weight sleeve; dilutes Mag-7 across ~1,400 names; physical replication; accumulating; TER 0.20%; AUM €1.3bn; launched Sep 2024; validated via native IBKR contract details (2026-06-03) and live quote path on MWEQ; ibkr_symbol=MWEQ; ibkr_conid=732138353; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
 | IE00BCLWRD08 | iShares MSCI EMU Mid Cap UCITS ETF EUR (Acc) | Global equities | 3 | 0 | 6 | IBIS2 / Xetra | EUR | Eurozone mid-cap sleeve to dial back EMU mega-cap (ASML/SAP/LVMH) concentration; physical replication (sampling); accumulating; TER 0.25%; substituted for EUMD (IE00BYXYX745) which IBKR did not resolve on 2026-06-03; validated via native IBKR contract details (2026-06-03) and live quote path on IS3H; ibkr_symbol=IS3H; ibkr_conid=134428813; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
 | LU0322248146 | Xtrackers SLI UCITS ETF 1D | Swiss equities | 2 | 0 | 5 | IBIS2 / Xetra | EUR | Swiss capped-large-cap sleeve; SLI methodology caps top 4 holdings at 9% each (Nestle/Roche/Novartis/UBS) so combined is bounded vs ~50% in SMI; physical full replication; **distributing** (no accumulating SLI class exists in UCITS today); TER 0.25%; validated via native IBKR contract details (2026-06-03) and live quote path on DXS0; ibkr_symbol=DXS0; ibkr_conid=53524044; ibkr_primary_exchange=IBIS2; fx_to_chf=0.96 |
+| IE00BM67HM91 | Xtrackers MSCI World Energy UCITS ETF 1C | Global equities | 3 | 0 | 5 | IBIS2 / Xetra | EUR | Energy production sleeve; physical full replication; TER 0.25%; AUM €1.7bn; ibkr_symbol=XDW0; ibkr_conid=227263991; ibkr_primary_exchange=IBIS2; fx_to_chf=0.909118 |
+| IE000M7V94E1 | VanEck Uranium and Nuclear Technologies UCITS ETF | Global equities | 2 | 0 | 4 | EBS / SIX | CHF | Nuclear / uranium sleeve; CHF native; physical full replication; TER 0.55%; AUM €2.4bn; ibkr_symbol=NUCL; ibkr_conid=626090692; ibkr_primary_exchange=EBS; fx_to_chf=1 |
+| IE000U58J0M1 | iShares Global Clean Energy Transition UCITS ETF | Global equities | 1 | 0 | 3 | SBF / Paris | EUR | Optional clean-energy sleeve; physical full replication; TER 0.65%; AUM €865m; ibkr_symbol=INRE; ibkr_conid=552352705; ibkr_primary_exchange=SBF; fx_to_chf=0.909118 |
 | CASH-CHF | CHF cash balance | Bonds / cash-like | 3 | 1 | 10 | IBKR cash balance | CHF | Reduced cash target after 2026-06-03 deconcentration deployment; keep minimal reserve. |
 
 ## Candidate Instruments
@@ -76,6 +79,9 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 | IE00BGV5VN51 | Global | Artificial intelligence & big data | Xtrackers Artificial Intelligence & Big Data UCITS ETF 1C | 0.35% | physical (full) | EUR | verified (conid 352446357, IBIS2) | Broad AI / big-data thematic sleeve; substituted for the preferred robotics ETF because the current IBKR search path did not resolve IE00BYZK4552 cleanly. |
 | IE00B53SZB19 | NASDAQ | Nasdaq 100 | iShares Nasdaq 100 UCITS ETF (Acc) | 0.30% | physical | USD | research-only | Best low-TER physical UCITS Nasdaq 100 candidate from the sources checked. |
 | XS2940466316 | Crypto | Bitcoin ETP | iShares Bitcoin ETP | 0.15% temporary / 0.25% standard | physically backed ETP | USD | research-only | Suitable Europe/Switzerland-friendly Bitcoin alternative to US IBIT for future consideration; not UCITS and not in the ETF-only MVP lane. |
+| IE00BM67HM91 | Global | Energy production | Xtrackers MSCI World Energy UCITS ETF 1C | 0.25% | physical (full) | EUR | verified (conid 227263991, IBIS2) | Broad MSCI World Energy sleeve; ~70% oil & gas majors plus integrated energy and renewables; physical full replication; AUM €1.7bn; matches portfolio's low-TER discipline. |
+| IE000M7V94E1 | Global | Nuclear / uranium | VanEck Uranium and Nuclear Technologies UCITS ETF | 0.55% | physical (full) | CHF | verified (conid 626090692, EBS) | CHF-native nuclear sleeve via SIX listing — no FX leg from CHF cash; tracks MarketVector Global Uranium and Nuclear Energy Infrastructure (utilities + reactors + miners + fuel); largest pure-nuclear UCITS in Europe at €2.4bn; full physical replication. Fallback EUR listing on Paris (NUKL, conid 613031265). |
+| IE000U58J0M1 | Global | Clean energy | iShares Global Clean Energy Transition UCITS ETF USD (Acc) | 0.65% | physical (full) | EUR | verified (conid 552352705, SBF) | Optional clean-energy / renewables overweight separate from XDWE; tracks S&P Global Clean Energy Transition (~100 holdings); full physical replication; AUM €865m; INRE on Paris is the preferred listing (tightest spread, no FTT, EUR-native). Avoid INRA-LSE (UK SDRT 0.5%). |
 
 ## Excluded Instruments
 | Ticker / ISIN | Reason |
@@ -124,7 +130,7 @@ Simple CHF-first starter ETF portfolio for Interactive Brokers targeting broad e
 - Send reports automatically: yes
 - Require user approval for new instruments: yes
 - Require user approval for first purchase: yes
-- Require user approval for sales: yes unless auto_trade_limited is enabled
+- Require user approval for sales: yes
 
 ## Notes / Open Questions
 - ETF issuer preferences: prefer UBS and iShares; exclude Invesco.
