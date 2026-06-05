@@ -167,9 +167,9 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 
 | # | Decision | Recommendation | Cost of waiting |
 |---|---|---|---|
-| **D-1** | Run Phase L1 batches A–E now? | ✅ **YES, today.** Each is small, reversible, and improves the safety story before any future SELL or larger BUY. | Low for current CHF 150k; rises with capital. |
+| **D-1** | Run Phase L1 batches A–E now? | ✅ **DONE 2026-06-05** — 5 commits shipped (1c11fbf, 42ea718, 6e36a7f, 7170e50, 0e9d20f). | n/a |
 | **D-2** | Run Phase L2 (file signing, daily-loss circuit breaker, multi-party approval)? | ⏸ Defer until capital > CHF 250k or 3 months of clean ops. | Low — belt-and-suspenders. |
-| **D-3** | IBKR API scoping (L1.E) — write the runbook, then you click? | ✅ **YES, write the runbook.** One-time 15-min op task that materially shrinks blast radius. | Medium-high — scoped API keys are the only thing stopping a full liquidation if `.env` ever leaks. |
+| **D-3** | IBKR API scoping (L1.E) — write the runbook, then you click? | ✅ **Runbook shipped** at `docs/setup/ibkr-api-scoping.md`. ~15 min IBKR Client Portal work + 3 decisions noted at the bottom of the runbook. | Medium-high — scoped API keys are the only thing stopping a full liquidation if `.env` ever leaks. |
 | **D-4** | Phase H2 — pre-draft the rebalance recommendation, or wait for 2026-06-17? | ⏸ Wait — pre-drafting risks anchoring. | None. |
 | **D-5** | Re-enable fill-monitor cron (`d4c3207d`) for the next 24h? | ⏸ Skip — all 3 legs already filled and reconciled. | None. |
 | **D-6** | Reactivate parked D1/D2/D3? | ⏸ Keep parked. No external trigger has changed. | None. |
@@ -177,7 +177,7 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 
 ### My single strongest recommendation
 
-**Say "go on L1"** — I run all five batches end-to-end and report back. After that, the safety posture is comfortable for CHF 500k+ without me needing to recommend more code-level guards.
+**Phase L1 is done.** Next operator step is Phase L1.E IBKR Client Portal work (~15 min, runbook at `docs/setup/ibkr-api-scoping.md`). After that, the safety posture is comfortable for CHF 500k+ without further code-level guards.
 
 ---
 

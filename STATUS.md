@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-06-05 09:30 UTC · **Repo head:** see `git log -1` · **Tests:** 254/254 · **Health:** 🟢 healthy
+**Last refreshed:** 2026-06-05 10:50 UTC · **Repo head:** see `git log -1` · **Tests:** 254/254 · **Health:** 🟢 healthy
 
 ---
 
@@ -22,20 +22,23 @@
 | Health second-pass autofix | 🟢 5 fixers, 24h per-code rate-limit |
 | Sentry error tracking | 🟢 live, weekly autofix Mon 09:00 CET, `event:admin` token |
 | Safe-lane verification | 🟢 254 passed (incl 12 new safeguard tests), 0 failed, 3 quarantined |
-| Pre-flight order safeguards | 🟢 SELL/BUY price floor+ceiling, notional caps, stale-quote, sellApproved gate |
+| Pre-flight order safeguards | 🟢 SELL/BUY price floor+ceiling, notional caps, stale-quote, sellApproved gate, BUY trend guard |
+| Daily transmit cap | 🟢 CHF 50k/day across all baskets (Phase L1.B) |
+| Approval intent | 🟢 consumed after every transmit attempt (Phase L1.A, no reuse window) |
+| Cron tool grants | 🟢 no live cron job carries `write`/`edit` (Phase L1.C) |
 | Cron jobs | 🟢 11 enabled + 1 policy-disabled |
 
 ## Open work — at a glance
 
 | Phase | Status | Blocker | Action holder |
 |---|---|---|---|
-| **L** | **80% DONE — L1 ready** | **decision: run L1 batches?** | **Graham (D-1)** |
+| **L** | **L0+L1 done; L1.E awaits operator (IBKR Client Portal)** | **operator action** | **Graham (15 min)** |
 | H2/H3 | CALENDAR | 2026-06-17 review | Graham (decision) |
 | F4 + G3 | OPERATOR | XLS file | Graham (drop file) |
 | B5 | RECURRING | 2FA prompts | Graham (when alert fires) |
 | D1/D2/D3 | PARKED | explicit reactivation | Graham |
 
-**Autonomous engineering ready to execute:** Phase L1 (5 batches A–E). Phase K shipped 2026-06-05 (energy sleeve filled).
+**Autonomous engineering shipped today:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard). Phase L1.E IBKR scoping runbook ready at `docs/setup/ibkr-api-scoping.md`.
 
 Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`.
 
