@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-05T10:50:42.250Z",
+  "generatedAt": "2026-06-05T11:02:11.602Z",
   "portfolio": "etf",
   "status": {
     "health": "warning",
@@ -913,7 +913,7 @@
         "kind": "delivery",
         "severity": "medium",
         "status": "pending",
-        "summary": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
+        "summary": "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.",
         "blocking": false,
         "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
         "source": "delivery_policy"
@@ -1313,7 +1313,7 @@
       "rejected": 0,
       "staged": 0,
       "submitted": 3,
-      "submittedAwaitingReconcile": 0,
+      "submittedAwaitingReconcile": 3,
       "partiallyFilled": 0,
       "filled": 0,
       "cancelled": 0,
@@ -1861,7 +1861,7 @@
   "pendingActions": [
     "5 trade row(s) are marked failed and need operator review.",
     "3 in-flight execution row(s) need reconciliation before overlapping actions.",
-    "3 in-flight execution row(s) need reconciliation before overlapping actions."
+    "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile."
   ],
   "recommendedNextStep": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
   "selfHealPlan": {
@@ -1872,13 +1872,13 @@
       "health": "degraded",
       "severity": "low",
       "state": "attention",
-      "summary": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
-      "canonicalNextAction": null,
+      "summary": "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.",
+      "canonicalNextAction": "For each unreconciled broker order id, run: node scripts/sync-portfolio-order-status.js <portfolio-dir> <order-id>",
       "blockerCount": 1,
       "blockers": [
         {
           "code": "delivery_attention",
-          "message": "3 in-flight execution row(s) need reconciliation before overlapping actions."
+          "message": "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile."
         }
       ],
       "recommendedActions": [],
@@ -1958,7 +1958,7 @@
     "mode": "email_and_repo",
     "failureAlertMode": "local_operator_review",
     "pendingActions": [
-      "3 in-flight execution row(s) need reconciliation before overlapping actions."
+      "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile."
     ]
   },
   "runtimeState": {

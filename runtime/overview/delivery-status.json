@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-05T10:50:26.010Z",
+  "generatedAt": "2026-06-05T11:01:56.657Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -55,7 +55,7 @@
       "overrideLoaded": true,
       "ready": false,
       "pendingActions": [
-        "3 in-flight execution row(s) need reconciliation before overlapping actions."
+        "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile."
       ],
       "deliveryPosture": {
         "ready": false,

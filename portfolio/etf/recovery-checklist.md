@@ -83,7 +83,7 @@
    - Action: Reconcile broker order status before creating overlapping execution plans.
    - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
    - Source: trade_lifecycle
-3. [medium] 3 in-flight execution row(s) need reconciliation before overlapping actions.
+3. [medium] 3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.
    - Action: Review report delivery readiness and clear the pending action.
    - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
    - Source: delivery_policy

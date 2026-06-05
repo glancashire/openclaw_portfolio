@@ -95,27 +95,16 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 | Swiss equities | 17.83 | 20 | -2.17 | on_track | no | within tolerance |
 | Bonds / cash-like | 1.62 | 15 | -13.38 | out_of_bounds | yes | outside min/max band |
 ## Pending Operator Actions
-1. [execution_block/blocked/high] CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
-2. [execution_block/blocked/high] CH0130595124: Broker rejected the order because the contract identity or venue resolution was not accepted.
-3. [execution_block/blocked/high] IE000I8KRLL9: Broker rejected the order because the contract identity or venue resolution was not accepted.
-4. [execution_block/blocked/high] IE000X59ZHE2: Broker rejected the order because the contract identity or venue resolution was not accepted.
-5. [execution_block/blocked/high] IE00B5BMR087: Broker rejected the order because the contract identity or venue resolution was not accepted.
-6. [execution_block/blocked/high] IE00B5L8K969: Broker rejected the order because the contract identity or venue resolution was not accepted.
-7. [execution_block/blocked/high] IE00BGV5VN51: Broker rejected the order because the contract identity or venue resolution was not accepted.
-8. [execution_block/blocked/high] LU0950668870: Broker rejected the order because the contract identity or venue resolution was not accepted.
-9. [execution_block/blocked/high] LU0950670850: Broker rejected the order because the contract identity or venue resolution was not accepted.
-10. [execution_block/blocked/high] LU1781541252: Broker rejected the order because the contract identity or venue resolution was not accepted.
-11. [execution/in_flight/medium] Reconcile 3 in-flight broker order(s) before creating overlapping plans.
-12. [delivery/pending/medium] 3 in-flight execution row(s) need reconciliation before overlapping actions.
+1. [delivery/pending/medium] 3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.
 ## Immediate Status
 - Portfolio status: warning
 - Top blocker: none currently surfaced
-- Next action: CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
+- Next action: 3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.
 - Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
 - Execution posture: ready_for_review
 - Delivery posture: needs_operator_attention
 - Active blockers: 0
-- Pending operator queue items: 12
+- Pending operator queue items: 1
 ## Health Snapshot
 - Strategy status: rebalance_needed
 - Last successful sync: 2026-06-05 08:56:46
@@ -134,19 +123,19 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - 19/19 approved instrument(s) have complete IBKR contract identity; missing conid: 0, missing symbol: 0, missing venue: 0.
 - Recommended contract-intelligence action: No contract-intelligence remediation is currently required.
 ## Operator Queue Summary
-- Total queue items: 12
+- Total queue items: 1
 - Blocking items: 0
 - Approval items: 0
 - Fresh actionable approvals: 0
 - Stale approvals needing reapproval: 0
-- Execution items: 1
+- Execution items: 0
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
 - Recovery items: 0
 - Delivery items: 1
 - Data items: 0
 - Warning items: 0
-- Workflow items: 10
+- Workflow items: 0
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
@@ -165,7 +154,7 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Reconciled fills pending notification backfill: 0
 - Acknowledged backfilled fills: 1
 ## Recommended Next Step
-CH0032912732: Broker rejected the order because the contract identity or venue resolution was not accepted.
+3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.
 ## Status Labels
 - Pending approvals queue count: 0
 - In-flight execution rows: 3

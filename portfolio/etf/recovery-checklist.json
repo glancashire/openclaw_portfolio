@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-05T10:50:42.250Z",
+  "generatedAt": "2026-06-05T11:02:11.602Z",
   "portfolio": "etf",
   "incidentStatus": "action_required",
   "summary": {
@@ -224,7 +224,7 @@
     {
       "step": 3,
       "priority": "medium",
-      "title": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
+      "title": "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.",
       "action": "Review report delivery readiness and clear the pending action.",
       "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
       "source": "delivery_policy"

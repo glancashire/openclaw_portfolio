@@ -1,6 +1,6 @@
 # Delivery & Alerting Status
 
-- Generated at: 2026-06-05T10:50:26.010Z
+- Generated at: 2026-06-05T11:01:56.657Z
 - Portfolios: 2
 - All ready: no
 
@@ -26,7 +26,7 @@
 - Policy override loaded: yes
 - Ready: no
 - Pending actions:
-  - 3 in-flight execution row(s) need reconciliation before overlapping actions.
+  - 3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.
 - Broker block context:
   - Count: 13
   - Top block: [contract_resolution_failed] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)
