@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-05T10:03:39.472Z",
+  "generatedAt": "2026-06-05T10:21:22.789Z",
   "counts": {
-    "totalTests": 340,
+    "totalTests": 341,
     "domains": 123
   },
   "domains": [
@@ -323,6 +323,21 @@
       ]
     },
     {
+      "domain": "approval",
+      "total": 4,
+      "safe": 2,
+      "integration": 2,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-approval-gate.js",
+        "scripts/test-approval-queue-grouping.js",
+        "scripts/test-approval-transition-guard.js"
+      ]
+    },
+    {
       "domain": "monitor",
       "total": 4,
       "safe": 4,
@@ -410,21 +425,6 @@
         "scripts/test-sync-order-status-does-not-hit-history-collisions.js",
         "scripts/test-sync-probable-cancelled-does-not-match-on-reason-text-alone.js",
         "scripts/test-sync-probable-cancelled-requires-strong-match.js"
-      ]
-    },
-    {
-      "domain": "approval",
-      "total": 3,
-      "safe": 2,
-      "integration": 1,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 2,
-      "examples": [
-        "scripts/test-approval-gate.js",
-        "scripts/test-approval-queue-grouping.js",
-        "scripts/test-approval-transition-guard.js"
       ]
     },
     {

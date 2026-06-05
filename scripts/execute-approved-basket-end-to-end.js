@@ -27,7 +27,7 @@ const { saveApprovalEnvelope } = require(path.join(ROOT, 'src/execution/basketAp
 const { executeApprovedBasket } = require(path.join(ROOT, 'src/execution/basketExecutionRunner'));
 const { runBasketLifecycle, loadRunState } = require(path.join(ROOT, 'src/execution/basketLifecycle'));
 const { latestProposalForPortfolio } = require(path.join(ROOT, 'src/execution/basketProposalGenerator'));
-const { requireApprovalIntent } = require(path.join(ROOT, 'src/execution/approvalGate'));
+const { requireApprovalIntent, consumeApprovalIntent } = require(path.join(ROOT, 'src/execution/approvalGate'));
 const { loadWorkspaceEnv } = require(path.join(ROOT, 'src/shared/env'));
 
 // Hydrate process.env from .env so the approval gate can find
@@ -111,7 +111,9 @@ async function main() {
     }
 
     log('Transmitting via canonical basket runner...');
+    let transmitAttempted = false;
     try {
+      transmitAttempted = true;
       // Phase L (2026-06-05): wire pre-flight safeguards into the runner.
       // Live quote feeder uses the IBKR client snapshot fields (84=bid, 86=ask, 31=last).
       const guardClient = new InteractiveBrokersClient({ portfolio });
@@ -134,13 +136,28 @@ async function main() {
         for (const b of runResult.safeguardBlockers) {
           console.error(`  ${b.legId || 'basket'} ${b.code}: ${b.reason}`);
         }
+        // Still consume intent — even when safeguards block, the operator
+        // must mint a fresh intent before retrying. Prevents reuse window.
+        const consume = consumeApprovalIntent({ approvalId, rootDir: ROOT });
+        log(`approval intent consumed: ${consume.deleted ? 'yes' : `no (${consume.reason || 'unknown'})`}`);
         process.exit(7);
       }
     } catch (error) {
       console.error(`Runner threw: ${error.message}`);
       console.error(error.stack);
+      // Consume intent on runner exception too (defensive: don't leave a
+      // valid intent file lying around after a failed transmit attempt).
+      if (transmitAttempted) {
+        try {
+          const consume = consumeApprovalIntent({ approvalId, rootDir: ROOT });
+          log(`approval intent consumed: ${consume.deleted ? 'yes' : `no (${consume.reason || 'unknown'})`}`);
+        } catch (_) { /* best-effort */ }
+      }
       process.exit(3);
     }
+    // Successful transmit attempt — always consume intent so it can't be reused.
+    const consume = consumeApprovalIntent({ approvalId, rootDir: ROOT });
+    log(`approval intent consumed: ${consume.deleted ? 'yes' : `no (${consume.reason || 'unknown'})`}`);
   } else {
     approvalId = args['approval-id'];
     if (!approvalId) { console.error('--reconcile-only requires --approval-id'); process.exit(1); }

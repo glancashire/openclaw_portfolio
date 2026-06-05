@@ -167,9 +167,35 @@ function writeApprovalIntent({
   return p;
 }
 
+/**
+ * Delete the approval-intent file after a transmit attempt completes
+ * (success or failure). Prevents intent reuse within the freshness
+ * window — a fresh approval is required for each transmit attempt.
+ *
+ * @param {object} params
+ * @param {string} params.approvalId
+ * @param {string} params.rootDir
+ * @returns {{ deleted: boolean, path: string, reason?: string }}
+ */
+function consumeApprovalIntent({ approvalId, rootDir } = {}) {
+  if (!approvalId) throw new Error('consumeApprovalIntent: approvalId required');
+  if (!rootDir)    throw new Error('consumeApprovalIntent: rootDir required');
+  const p = intentPath(rootDir, approvalId);
+  if (!fs.existsSync(p)) {
+    return { deleted: false, path: p, reason: 'not_found' };
+  }
+  try {
+    fs.unlinkSync(p);
+    return { deleted: true, path: p };
+  } catch (err) {
+    return { deleted: false, path: p, reason: `unlink_failed:${err.code || err.message}` };
+  }
+}
+
 module.exports = {
   requireApprovalIntent,
   writeApprovalIntent,
+  consumeApprovalIntent,
   ApprovalGateError,
   _intentPath: intentPath,
 };

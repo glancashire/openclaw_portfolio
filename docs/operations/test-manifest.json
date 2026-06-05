@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 340,
+    "total": 341,
     "safe": 257,
-    "integration": 78,
+    "integration": 79,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 52,
@@ -2312,6 +2312,13 @@
     },
     {
       "path": "tests/test-all-trading.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "tests/test-approval-intent-cleanup.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,

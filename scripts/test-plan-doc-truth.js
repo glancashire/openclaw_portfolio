@@ -21,14 +21,14 @@ function read(rel) {
   assert(governance.includes('npm run test:all -- --lane=safe'), 'governance doc should mention safe-lane command');
 
   const card = loadOpenPhasesCard({ repoRoot: ROOT });
-  assert.strictEqual(card.generatedFrom, 'CURRENT_PLAN.md', 'open phases should load from CURRENT_PLAN.md');
-  assert(card.items.length >= 1, 'CURRENT_PLAN should expose at least one roadmap item');
-  assert(card.items.some((item) => item.status === 'WAITING'), 'CURRENT_PLAN should expose a waiting backlog item');
-  assert(card.items.some((item) => (item.openItems || []).length >= 1), 'CURRENT_PLAN backlog item should list at least one open item');
+  assert.strictEqual(card.generatedFrom, 'PLAN.md', 'open phases should load from PLAN.md');
+  assert(card.items.length >= 1, 'PLAN should expose at least one roadmap item');
+  assert(card.items.some((item) => item.status === 'WAITING'), 'PLAN should expose a waiting backlog item');
+  assert(card.items.some((item) => (item.openItems || []).length >= 1), 'PLAN backlog item should list at least one open item');
 
-  const currentPlan = read('CURRENT_PLAN.md');
-  assert(currentPlan.includes('## Visual roadmap'), 'CURRENT_PLAN should include visual roadmap');
-  assert(!currentPlan.includes('# Email Dashboard Improvement Plan'), 'CURRENT_PLAN should no longer be the stale email-dashboard plan');
+  const currentPlan = read('PLAN.md');
+  assert(currentPlan.includes('## Visual roadmap'), 'PLAN should include visual roadmap');
+  assert(!currentPlan.includes('# Email Dashboard Improvement Plan'), 'PLAN should no longer be the stale email-dashboard plan');
 
   const phase4b = read('archive/phase-plans/2026-06-01-consolidation/phase-4b-test-governance-and-manifest-truth-2026-06-01.md');
   const phase7b = read('archive/phase-plans/2026-06-01-consolidation/phase-7b-cron-health-and-guided-remediation-truth-2026-06-01.md');

@@ -31,6 +31,13 @@ the threat model. This module is the **enforcement** of that convention.
   issuedAt })` — helper for the approve-and-execute wrapper (Phase E).
   Writes `runtime/approval-intent/<approvalId>.json` with file mode `0600`.
 
+- `consumeApprovalIntent({ approvalId, rootDir })` — deletes the
+  intent file after a transmit attempt completes (success, safeguard
+  block, or runner exception). Phase L1.A (2026-06-05). Each transmit
+  attempt requires its own freshly-minted intent — no reuse within the
+  30-min freshness window. Returns `{ deleted: boolean, path, reason? }`.
+  Called automatically by `execute-approved-basket-end-to-end.js`.
+
 ## Intent artefact shape
 
 ```json
