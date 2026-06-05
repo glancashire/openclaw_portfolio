@@ -10,7 +10,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-05T10:28:13.406Z"
+      "lastAt": "2026-06-05T10:50:46.307Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -82,7 +82,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-05T10:28:00.630Z"
+      "lastAt": "2026-06-05T10:50:32.106Z"
     },
     "execution-safety-closure-hRd2yl": {
       "consecutive": 0,
@@ -371,6 +371,18 @@
       "lastReason": null,
       "lastMessage": null,
       "lastAt": "2026-06-05T10:27:28.645Z"
+    },
+    "execution-safety-closure-BUzn3Q": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-05T10:34:58.408Z"
+    },
+    "execution-safety-closure-PvAfMK": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-05T10:50:00.659Z"
     }
   },
   "liveExecutionArms": {

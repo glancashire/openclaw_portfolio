@@ -54,6 +54,7 @@ const DEFAULTS = Object.freeze({
   maxLegChf: 25000,         // single leg ≤ CHF 25,000
   maxBasketChf: 50000,      // whole basket ≤ CHF 50,000
   maxLegsPerBasket: 10,     // refuse > 10 legs in one basket
+  maxBuyDailyMovePct: 3.0,  // refuse BUY when price up > 3% vs prior close (Phase L1.D)
 });
 
 class OrderSafeguardError extends Error {
@@ -160,6 +161,24 @@ function evaluateLeg({ leg, liveQuote, fxToChf, envelope = {}, config = {} } = {
         detail: { limitPrice, referencePrice: referenceForBuy, driftPct: drift, ceilingPct: cfg.maxAboveMarketPct },
       };
     }
+
+    // Phase L1.D: trend guard. Refuse BUY when intraday move is up
+    // > maxBuyDailyMovePct vs prior close. Catches "buy a parabolic
+    // pump" scenarios, especially around news-driven gappers. Skipped
+    // when prior close is unknown (don't block on missing data).
+    const prevClose = asNumber(liveQuote?.prevClose);
+    const trendRef = last ?? referenceForBuy;
+    if (Number.isFinite(prevClose) && prevClose > 0 && Number.isFinite(trendRef) && trendRef > 0) {
+      const movePct = Number((((trendRef - prevClose) / prevClose) * 100).toFixed(3));
+      if (movePct > cfg.maxBuyDailyMovePct) {
+        return {
+          ok: false,
+          code: 'buy_trend_guard',
+          reason: `BUY blocked: price ${trendRef} is up ${movePct}% vs prior close ${prevClose}; trend guard is ${cfg.maxBuyDailyMovePct}%.`,
+          detail: { referencePrice: trendRef, prevClose, movePct, maxBuyDailyMovePct: cfg.maxBuyDailyMovePct },
+        };
+      }
+    }
   }
 
   // Notional cap (per leg)
@@ -254,6 +273,7 @@ async function evaluateBasketSafeguards({ envelope, fetchLiveQuote, fxLookup, co
       maxBasketChf: cfg.maxBasketChf,
       maxBelowMarketPct: cfg.maxBelowMarketPct,
       maxAboveMarketPct: cfg.maxAboveMarketPct,
+      maxBuyDailyMovePct: cfg.maxBuyDailyMovePct,
     },
   };
 }

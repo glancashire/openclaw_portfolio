@@ -120,7 +120,13 @@ async function main() {
       const fetchLiveQuote = async (conid) => {
         const snap = await guardClient.fetchMarketSnapshot([conid]);
         const d = Array.isArray(snap) ? snap[0] : snap;
-        return { bid: Number(d?.['84']), ask: Number(d?.['86']), last: Number(d?.['31']) };
+        return {
+          bid: Number(d?.['84']),
+          ask: Number(d?.['86']),
+          last: Number(d?.['31']),
+          // 7295 = prior close (used by L1.D BUY trend guard)
+          prevClose: Number(d?.['7295']),
+        };
       };
       // Trust the envelope's per-leg fxToChf (set at proposal time). Defaults to 1.
       const fxLookup = (currency) => {

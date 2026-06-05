@@ -149,4 +149,54 @@ test('Defaults are sane', () => {
   assert.equal(DEFAULTS.maxAboveMarketPct, 5.0);
   assert.equal(DEFAULTS.maxLegChf, 25000);
   assert.equal(DEFAULTS.maxBasketChf, 50000);
+  assert.equal(DEFAULTS.maxBuyDailyMovePct, 3.0);
+});
+
+test('BUY blocked when price up > 3% vs prior close (trend guard)', () => {
+  // bid=100, ask=100.10, last=104 (4% above prevClose=100)
+  const r = evaluateLeg({
+    leg: { action: 'BUY', limitPrice: 100.10, quantity: 10, currency: 'CHF', conid: 1 },
+    liveQuote: { bid: 100, ask: 100.10, last: 104, prevClose: 100 },
+    fxToChf: 1,
+  });
+  assert.equal(r.ok, false);
+  assert.equal(r.code, 'buy_trend_guard');
+});
+
+test('BUY allowed when up exactly 3% (boundary inclusive)', () => {
+  const r = evaluateLeg({
+    leg: { action: 'BUY', limitPrice: 100.10, quantity: 10, currency: 'CHF', conid: 1 },
+    liveQuote: { bid: 100, ask: 100.10, last: 103, prevClose: 100 },
+    fxToChf: 1,
+  });
+  assert.equal(r.ok, true);
+});
+
+test('BUY allowed when up 1% (well within trend guard)', () => {
+  const r = evaluateLeg({
+    leg: { action: 'BUY', limitPrice: 100.10, quantity: 10, currency: 'CHF', conid: 1 },
+    liveQuote: { bid: 100, ask: 100.10, last: 101, prevClose: 100 },
+    fxToChf: 1,
+  });
+  assert.equal(r.ok, true);
+});
+
+test('BUY allowed when prevClose missing (do not block on missing data)', () => {
+  const r = evaluateLeg({
+    leg: { action: 'BUY', limitPrice: 100.10, quantity: 10, currency: 'CHF', conid: 1 },
+    liveQuote: { bid: 100, ask: 100.10, last: 110 }, // no prevClose
+    fxToChf: 1,
+  });
+  assert.equal(r.ok, true);
+});
+
+test('SELL not affected by trend guard (only BUYs)', () => {
+  const r = evaluateLeg({
+    leg: { action: 'SELL', limitPrice: 100, quantity: 10, currency: 'CHF', conid: 1 },
+    liveQuote: { bid: 100, ask: 100.10, last: 110, prevClose: 100 }, // 10% up
+    fxToChf: 1,
+    envelope: { sellApproved: true },
+  });
+  // selling into a pump is fine — trend guard only blocks BUYs
+  assert.equal(r.ok, true);
 });
