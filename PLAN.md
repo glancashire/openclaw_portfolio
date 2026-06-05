@@ -46,11 +46,11 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 
 ### L1 (P1) — autonomous execution batches
 
-- [ ] **L1.A** Delete approval-intent file after `executeApprovedBasket` returns (intent reuse hardening)
-- [ ] **L1.B** Daily transmit cap (CHF 50k/day across all baskets, reads `runtime/basket-runs/etf/`)
-- [ ] **L1.C** Tighten cron `toolsAllow` lists (remove unnecessary `write`/`edit`/`exec`)
-- [ ] **L1.D** Wire trend guard into basket runner (block BUY if up >3% on day)
-- [ ] **L1.E** Operator runbook: IBKR view-only API for read paths, scoped trading API key
+- [x] **L1.A** Delete approval-intent file after `executeApprovedBasket` returns (intent reuse hardening) — commit `1c11fbf`
+- [x] **L1.B** Daily transmit cap CHF 50k/day across all baskets — commit `42ea718`
+- [x] **L1.C** Tighten cron `toolsAllow` lists (no live cron carries `write`/`edit`) — commit `6e36a7f`
+- [x] **L1.D** BUY trend guard wired into basket runner (block BUY when up >3% vs prior close) — commit `7170e50`
+- [x] **L1.E** Operator runbook for IBKR view-only API for read paths — commit `0e9d20f` (operator action pending)
 
 ### L2 (P2) — capital-gated, defer until > CHF 250k
 
