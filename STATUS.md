@@ -32,7 +32,7 @@
 
 | Phase | Status | Blocker | Action holder |
 |---|---|---|---|
-| **L** | **L0+L1 done; L1.E awaits operator (IBKR Client Portal)** | **operator action** | **Graham (15 min)** |
+| **L** | **L0+L1 done; L1.E parked pending sub-user activation (`glancashire-bb8` not yet activated at IBKR)** | **parked** | **Graham (web Client Portal: first-login + 2FA enrol)** |
 | H2/H3 | CALENDAR | 2026-06-17 review | Graham (decision) |
 | F4 + G3 | OPERATOR | XLS file | Graham (drop file) |
 | B5 | RECURRING | 2FA prompts | Graham (when alert fires) |

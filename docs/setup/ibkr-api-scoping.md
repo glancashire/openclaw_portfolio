@@ -1,9 +1,25 @@
 # IBKR API scoping runbook (Phase L1.E)
 
-**Status:** runbook ready · operator action pending
+**Status:** ⏸️ **PARKED** as of 2026-06-05 11:31 UTC · sub-user `glancashire-bb8` exists at IBKR but rejected at login (likely pending first-login activation; see [Activation gotcha](#activation-gotcha) below) · code paths and gateway scaffold are ready, awaiting activated credentials
 **Audience:** Graham
-**Time required:** ~15 minutes
+**Time required:** ~15 minutes (once activation is complete)
 **Risk reduction:** turns the IBKR Trading API from "single key with full power" into "two keys, only one can place orders" — meaningfully shrinks the blast radius if `.env` ever leaks.
+
+---
+
+## Activation gotcha
+
+When you create an IBKR sub-user, IBKR sends a temporary password to the sub-user's email. **The sub-user is not usable for API/Gateway login until you complete first-login activation:**
+
+1. Log into <https://www.interactivebrokers.com/sso/Login> as the sub-user (`glancashire-bb8`) with the **temporary password** from the email.
+2. IBKR forces a password change.
+3. IBKR forces 2FA enrolment (IBKR Mobile or TOTP).
+4. Accept market-data agreements (the new user inherits the same subscriptions as the main user).
+5. After all of this, the user shows as **Active** in *Users & Access Rights* and can log into IB Gateway.
+
+**What I observed on 2026-06-05:** two login attempts (`glancashire-bb8` and `glancashirebb8`) with the main user's password were both rejected at the username/password stage with no 2FA prompt — which is consistent with either a pending-activation user or a different password. I stopped at 2 attempts to avoid IBKR account lockout.
+
+Graham confirmed (11:31 UTC) the username is `glancashire-bb8` (literal hyphen) and asked to park this until activation is complete.
 
 ---
 
@@ -187,3 +203,24 @@ Until I do the code wiring (Part 5), the workspace still uses `IBKR_HOST`/`IBKR_
 Reply with: **L1.E gateway is up** and I'll do Parts 5 and 6 in one batch.
 
 If something blocks you (IBKR doesn't show the user-management UI on your account type, market-data subscription costs change for the new user, etc.), share the error/screenshot and I'll adjust.
+
+---
+
+## What's already staged on the host (2026-06-05)
+
+For when activation completes, these scaffolding files are in place. The trading gateway on `:4001` is untouched.
+
+| Path | Purpose |
+|---|---|
+| `/home/ubuntu/ibgateway-readonly/start-ibc.sh` | Launcher (display `:100`, IBC command port `7463`) |
+| `/home/ubuntu/Jts-readonly/jts.ini` | API port `4002`, `ReadOnlyApi=true` |
+| `/home/ubuntu/ibc-readonly/config.ini` | `IbLoginId=glancashire-bb8`, `ReadOnlyLogin=yes`, `ReadOnlyApi=yes` |
+
+**To resume:**
+
+1. Confirm `glancashire-bb8` shows as **Active** in IBKR *Users & Access Rights*.
+2. If the password differs from the main user, set it in `.env` line `IBKR_PASSWORD_BB8=<password>` and update `/home/ubuntu/ibc-readonly/config.ini` `IbPassword=` from that value (chmod 600).
+3. Run `/home/ubuntu/ibgateway-readonly/start-ibc.sh`.
+4. Watch for port `4002` to start listening: `ss -ltnp | grep 4002`.
+5. Once it's up, reply with **L1.E gateway is up** and I'll wire Parts 5 + 6.
+

@@ -50,7 +50,7 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 - [x] **L1.B** Daily transmit cap CHF 50k/day across all baskets — commit `42ea718`
 - [x] **L1.C** Tighten cron `toolsAllow` lists (no live cron carries `write`/`edit`) — commit `6e36a7f`
 - [x] **L1.D** BUY trend guard wired into basket runner (block BUY when up >3% vs prior close) — commit `7170e50`
-- [x] **L1.E** Operator runbook for IBKR view-only API for read paths — commit `0e9d20f` (operator action pending)
+- [x] **L1.E** Operator runbook for IBKR view-only API for read paths — commit `0e9d20f` (⏸ parked 2026-06-05: sub-user `glancashire-bb8` exists at IBKR but pending first-login activation; staged gateway scaffold at `/home/ubuntu/ibgateway-readonly/`)
 
 ### L2 (P2) — capital-gated, defer until > CHF 250k
 
