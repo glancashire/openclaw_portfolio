@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-06-05 10:50 UTC · **Repo head:** see `git log -1` · **Tests:** 254/254 · **Health:** 🟢 healthy
+**Last refreshed:** 2026-06-11 09:45 UTC · **Repo head:** see `git log -1` · **Tests:** 253/254 (1 fixture clock-drift) · **Health:** 🟢 healthy
 
 ---
 
@@ -11,7 +11,7 @@
 | Lane | State |
 |---|---|
 | ETF portfolio read/report path | 🟢 healthy |
-| IBKR socket / auth / read | 🟢 green |
+| IBKR socket / auth / read | 🟢 green (master `glancashire` on `:4001`) |
 | Live order submission | 🟢 unblocked |
 | Holdings sync | 🟢 functional |
 | Dashboard / report emails | 🟢 healthy |
@@ -21,7 +21,7 @@
 | Health monitor | 🟢 escalation-only, persistence + 24h rate-limit |
 | Health second-pass autofix | 🟢 5 fixers, 24h per-code rate-limit |
 | Sentry error tracking | 🟢 live, weekly autofix Mon 09:00 CET, `event:admin` token |
-| Safe-lane verification | 🟢 254 passed (incl 12 new safeguard tests), 0 failed, 3 quarantined |
+| Safe-lane verification | 🟡 253 passed, 1 failed (fixture clock drift `test-broker-block-priority.js`), 3 quarantined |
 | Pre-flight order safeguards | 🟢 SELL/BUY price floor+ceiling, notional caps, stale-quote, sellApproved gate, BUY trend guard |
 | Daily transmit cap | 🟢 CHF 50k/day across all baskets (Phase L1.B) |
 | Approval intent | 🟢 consumed after every transmit attempt (Phase L1.A, no reuse window) |
@@ -32,13 +32,16 @@
 
 | Phase | Status | Blocker | Action holder |
 |---|---|---|---|
-| **L** | **L0+L1 done; L1.E parked pending sub-user activation (`glancashire-bb8` not yet activated at IBKR)** | **parked** | **Graham (web Client Portal: first-login + 2FA enrol)** |
+| **L** | **L0 + L1.A–L1.D done; L1.E CLOSED won't fix 2026-06-11** | **none** | **—** |
+| **engineering** | **`test-broker-block-priority.js` fixture clock drift** | **none (5-line fix)** | **bb8 (next session)** |
 | H2/H3 | CALENDAR | 2026-06-17 review | Graham (decision) |
 | F4 + G3 | OPERATOR | XLS file | Graham (drop file) |
 | B5 | RECURRING | 2FA prompts | Graham (when alert fires) |
 | D1/D2/D3 | PARKED | explicit reactivation | Graham |
 
-**Autonomous engineering shipped today:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard). Phase L1.E IBKR scoping runbook ready at `docs/setup/ibkr-api-scoping.md`.
+**Shipped 2026-06-05 → 2026-06-11:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard). Phase L1.E **CLOSED won't fix** 2026-06-11 — IBKR retail can't share market-data subscriptions between live users.
+
+Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`. L1.E close-out: `memory/2026-06-11.md`.
 
 Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`.
 

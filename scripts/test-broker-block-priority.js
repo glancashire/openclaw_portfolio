@@ -7,7 +7,12 @@ const { buildPendingOperatorActions, bestNextStep } = require('../src/reporting/
 (function main() {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'broker-block-priority-'));
   const tradesPath = path.join(tmpDir, 'trades.md');
-  fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| 2026-06-04 09:00:00 | inactive | buy | IE000XZSV718 | SPYL | 105 | 15.5 | 1560.83 | 0 | live submit | broker_inactive | 9105 | exchange_closed_at_submit | Broker rejected the order because the target exchange was closed at submission time. | 2026-06-04 09:00:02 | Retry during the venue trading session or hand the row back to the market-open runner. |\n`);
+  // Use a recent timestamp so the row stays inside the 7-day STALE_AGE_MS window
+  // in dashboardGenerator.readBlockedTradeQueueItems regardless of when the test runs.
+  const recent = new Date(Date.now() - 60 * 60 * 1000); // 1h ago
+  const recentStr = recent.toISOString().replace('T', ' ').slice(0, 19);
+  const recentPlus2 = new Date(recent.getTime() + 2_000).toISOString().replace('T', ' ').slice(0, 19);
+  fs.writeFileSync(tradesPath, `# Trades\n\n## Trade Log\n| Date/time | Status | Action | Ticker / ISIN | Name | Quantity | Limit price | Estimated CHF | Actual CHF | Reason | Approval | Broker order id | Block code | Block reason | Blocked at | Next action |\n|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|---|\n| ${recentStr} | inactive | buy | IE000XZSV718 | SPYL | 105 | 15.5 | 1560.83 | 0 | live submit | broker_inactive | 9105 | exchange_closed_at_submit | Broker rejected the order because the target exchange was closed at submission time. | ${recentPlus2} | Retry during the venue trading session or hand the row back to the market-open runner. |\n`);
 
   const pendingActions = buildPendingOperatorActions({
     tradesPath,

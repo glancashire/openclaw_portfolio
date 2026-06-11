@@ -1,6 +1,6 @@
 # PLAN — Portfolio Manager (consolidated)
 
-**Last refreshed:** 2026-06-05 10:25 UTC · **Repo head:** see `git log -1` · **Tests:** 254/254 safe lane · **Health:** 🟢 healthy
+**Last refreshed:** 2026-06-11 09:45 UTC · **Repo head:** see `git log -1` · **Tests:** 253/254 safe lane (1 fixture clock-drift) · **Health:** 🟢 healthy
 
 Single active plan document. Older plans are in `archive/phase-plans/`. Daily operational state lives in `STATUS.md`. Per-portfolio facts live in `MEMORY.md`. Risk audit is at `docs/risk-audit-2026-06-05.md`.
 
@@ -9,7 +9,7 @@ Single active plan document. Older plans are in `archive/phase-plans/`. Daily op
 ## Visual roadmap
 
 ```text
-Phase L   Risk hardening (live-money safeguards)     [STARTED] ████████░░  L0 done; L1 ready to execute
+Phase L   Risk hardening (live-money safeguards)     [STARTED] ▉▉▉▉▉▉▉▉█░  L0 + L1.A–L1.D done; L1.E CLOSED won't fix
 Phase H   Allocation rebalance decision (H2 + H3)    [WAITING] █████████░  CALENDAR  — 2026-06-17
 Phase F4  IBKR XLS backfill                          [WAITING] █████████░  OPERATOR  — wait for XLS drop
 Phase G3  Deposits XLS reference backfill            [WAITING] █████████░  OPERATOR  — same XLS as F4
@@ -19,9 +19,9 @@ Phase D2  Control UI direct embedding                [PARKED]  █░░░░�
 Phase D3  EM ex-China sleeve                         [PARKED]  █░░░░░░░░░  no Acc UCITS on IBKR
 ```
 
-**Shipped today (2026-06-05):** Phase K (energy + nuclear sleeve, all 3 legs filled) and Phase L0 (pre-flight order safeguards).
+**Shipped 2026-06-05 → 2026-06-11:** Phase K (energy + nuclear sleeve, all 3 legs filled), Phase L0 (pre-flight order safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, BUY trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11.
 
-**Autonomous engineering ready right now:** Phase L1 batches A–E. Everything else is waiting on operator action, calendar, or explicit reactivation.
+**Autonomous engineering ready right now:** small fixture-clock-drift fix on `test-broker-block-priority.js`. Everything else is waiting on operator action, calendar, or explicit reactivation.
 
 ---
 
@@ -50,7 +50,7 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 - [x] **L1.B** Daily transmit cap CHF 50k/day across all baskets — commit `42ea718`
 - [x] **L1.C** Tighten cron `toolsAllow` lists (no live cron carries `write`/`edit`) — commit `6e36a7f`
 - [x] **L1.D** BUY trend guard wired into basket runner (block BUY when up >3% vs prior close) — commit `7170e50`
-- [x] **L1.E** Operator runbook for IBKR view-only API for read paths — commit `0e9d20f` (⏸ parked 2026-06-05: sub-user `glancashire-bb8` exists at IBKR but pending first-login activation; staged gateway scaffold at `/home/ubuntu/ibgateway-readonly/`)
+- [x] **L1.E** Operator runbook for IBKR view-only API for read paths — **CLOSED won't fix** 2026-06-11. IBKR retail does not allow market-data subscription sharing between live users; duplicating SIX/Xetra/LSE L1 would cost ~CHF 30-50/month for marginal blast-radius reduction. Standing setup is single-gateway as `glancashire` on `:4001`. Safe-word + PIN gate is the high-value control. See `docs/setup/ibkr-api-scoping.md` (status: CLOSED) and `memory/2026-06-11.md`.
 
 ### L2 (P2) — capital-gated, defer until > CHF 250k
 
@@ -150,7 +150,7 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 | Lane | State |
 |---|---|
 | ETF portfolio read/report path | 🟢 healthy |
-| IBKR socket / auth / read | 🟢 green |
+| IBKR socket / auth / read | 🟢 green (master `glancashire` on `:4001`) |
 | Live order submission | 🟢 unblocked + safeguarded (Phase L0) |
 | Holdings sync | 🟢 functional |
 | Dashboard / report emails | 🟢 healthy |
@@ -158,7 +158,7 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 | Deposits ledger | 🟢 10 deposits, CHF 150k cumulative |
 | Health monitor | 🟢 escalation-only, persistence + 24h rate-limit |
 | Sentry error tracking | 🟢 live, weekly autofix Mon 09:00 CET |
-| Safe-lane verification | 🟢 254/254 (incl 12 new safeguard tests + 5 intent-cleanup tests) |
+| Safe-lane verification | 🟡 253 passed, 1 failed (fixture clock drift in `test-broker-block-priority.js`), 3 quarantined |
 | Cron jobs | 🟢 11 enabled + 1 policy-disabled |
 
 ---
@@ -169,15 +169,16 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 |---|---|---|---|
 | **D-1** | Run Phase L1 batches A–E now? | ✅ **DONE 2026-06-05** — 5 commits shipped (1c11fbf, 42ea718, 6e36a7f, 7170e50, 0e9d20f). | n/a |
 | **D-2** | Run Phase L2 (file signing, daily-loss circuit breaker, multi-party approval)? | ⏸ Defer until capital > CHF 250k or 3 months of clean ops. | Low — belt-and-suspenders. |
-| **D-3** | IBKR API scoping (L1.E) — write the runbook, then you click? | ✅ **Runbook shipped** at `docs/setup/ibkr-api-scoping.md`. ~15 min IBKR Client Portal work + 3 decisions noted at the bottom of the runbook. | Medium-high — scoped API keys are the only thing stopping a full liquidation if `.env` ever leaks. |
+| **D-3** | IBKR API scoping (L1.E) — split-key isolation via sub-user. | 🛑 **CLOSED won't fix** 2026-06-11. IBKR retail doesn't allow live-user subscription sharing. Standing setup: single-gateway `glancashire`. Safe-word + PIN gate covers the threat model. | n/a |
 | **D-4** | Phase H2 — pre-draft the rebalance recommendation, or wait for 2026-06-17? | ⏸ Wait — pre-drafting risks anchoring. | None. |
 | **D-5** | Re-enable fill-monitor cron (`d4c3207d`) for the next 24h? | ⏸ Skip — all 3 legs already filled and reconciled. | None. |
 | **D-6** | Reactivate parked D1/D2/D3? | ⏸ Keep parked. No external trigger has changed. | None. |
 | **D-7** | Next thematic sleeve to research after energy/nuclear? | 💬 Up to you (water, defence, biotech, AI infra, commodities). | None. |
+| **D-8** | Fix `test-broker-block-priority.js` fixture clock drift now or after H2? | 🔧 **Now** — ~5-line fixture change to use a recent timestamp instead of hardcoded 2026-06-04. Cron `test-suite-safe-lane` will keep flagging this every weekday until it's fixed. | Low — cosmetic but noisy. |
 
 ### My single strongest recommendation
 
-**Phase L1 is done.** Next operator step is Phase L1.E IBKR Client Portal work (~15 min, runbook at `docs/setup/ibkr-api-scoping.md`). After that, the safety posture is comfortable for CHF 500k+ without further code-level guards.
+**Phase L1 is closed.** Phase L2 isn't needed until capital crosses CHF 250k. Next operator-side decision is Phase H2 (rebalance review on 2026-06-17). Engineering side: ~5-line fixture fix on `test-broker-block-priority.js` to silence the daily false alarm.
 
 ---
 

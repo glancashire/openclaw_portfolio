@@ -1,6 +1,22 @@
 # IBKR API scoping runbook (Phase L1.E)
 
-**Status:** ⏸️ **PARKED** as of 2026-06-05 11:31 UTC · sub-user `glancashire-bb8` exists at IBKR but rejected at login (likely pending first-login activation; see [Activation gotcha](#activation-gotcha) below) · code paths and gateway scaffold are ready, awaiting activated credentials
+**Status:** 🛑 **CLOSED — won't fix** as of 2026-06-11 08:30 UTC
+
+**Why closed:** IBKR retail accounts do not allow market-data subscription sharing between live users on the same account. Confirmed by IBKR Campus docs and the r/interactivebrokers community: "each user needs its own market data subscriptions". The `glancashire-bb8` sub-user activated successfully (2026-06-10) and could log into IB Gateway, but the readiness probe surfaced the expected symptom: "Requested market data is not subscribed. Displaying delayed market data." Granting `glancashire-bb8` real-time SIX/Xetra/LSE L1 would mean paying every subscription a second time (~CHF 30-50/month), which is not worth the blast-radius reduction we'd buy.
+
+**Decision:** stay single-gateway. Rely on the safe-word + PIN approval gate (memory/feedback_approval_safeword.md) plus the rule that `scripts/approve-and-execute.js` is the only script that transmits orders. That's the high-value control. The split-key was belt-and-braces.
+
+**What was unwound (2026-06-11):**
+- `/home/ubuntu/ibgateway-readonly/`, `/home/ubuntu/Jts-readonly/`, `/home/ubuntu/ibc-readonly/` archived to `.archive/2026-06-11-l1e-park/` in the workspace.
+- IB Gateway login switched back from `glancashire-bb8` to `glancashire`.
+- The `glancashire-bb8` IBKR user is left in place (activated, no subscriptions) in case future requirements warrant revisiting.
+
+**If you ever revisit this:** the only retail-friendly path is single-gateway with login swap (Option A in the original runbook). The two-gateway concurrent split (Option B) requires either an advisor/F&F account type or paying for duplicate subscriptions.
+
+---
+
+## Original runbook (preserved for reference)
+
 **Audience:** Graham
 **Time required:** ~15 minutes (once activation is complete)
 **Risk reduction:** turns the IBKR Trading API from "single key with full power" into "two keys, only one can place orders" — meaningfully shrinks the blast radius if `.env` ever leaks.
