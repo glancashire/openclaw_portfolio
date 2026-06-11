@@ -38,3 +38,6 @@ portfolio/*/reports/quarterly/*.json
 portfolio/*/reports/quarterly/*.pdf
 # runtime-events.jsonl is append-only and was tracked before runtime/ was ignored
 runtime/events/runtime-events.jsonl
+
+# Local-only archive of unwound experiments (e.g. L1.E split-key gateway scaffold)
+.archive/
