@@ -5,10 +5,10 @@
 - Health: warning
 - Broker health: healthy
 - Execution posture: ready_for_review
-- Delivery posture: needs_operator_attention
+- Delivery posture: ready
 - Data freshness: current
 - Pending approvals: 0
-- Recommended next step: 3 in-flight execution row(s) need reconciliation before overlapping actions.
+- Recommended next step: 5 trade row(s) are marked failed and need operator review.
 
 ## Why This Incident Exists
 - No explicit execution block is currently surfaced.
@@ -79,14 +79,6 @@
    - Action: Review the failed trade rows and resolve the root cause before retrying.
    - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
    - Source: trade_lifecycle
-2. [medium] 3 in-flight execution row(s) need reconciliation before overlapping actions.
-   - Action: Reconcile broker order status before creating overlapping execution plans.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: trade_lifecycle
-3. [medium] 3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.
-   - Action: Review report delivery readiness and clear the pending action.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: delivery_policy
 
 ## Verification Checks
 - Broker health remains healthy or intentionally degraded with operator awareness.

@@ -1,24 +1,24 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-05T11:01:56.644Z",
-  "itemCount": 9,
+  "generatedAt": "2026-06-11T14:00:12.293Z",
+  "itemCount": 7,
   "queueSummary": {
-    "total": 9,
+    "total": 7,
     "blocking": 6,
     "approvals": 0,
-    "execution": 2,
+    "execution": 1,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
     "recovery": 0,
-    "delivery": 2,
+    "delivery": 1,
     "data": 0,
     "warnings": 5,
     "workflow": 0,
     "bySeverity": {
       "high": 6,
-      "medium": 3,
+      "medium": 1,
       "low": 0
     }
   },
@@ -97,36 +97,12 @@
     },
     {
       "rank": 7,
-      "queueType": "execution",
-      "portfolio": "etf",
-      "kind": "execution",
-      "severity": "medium",
-      "status": "in_flight",
-      "summary": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
-      "blocking": false,
-      "recommendedOperatorAction": "Reconcile broker order status before creating overlapping execution plans.",
-      "source": "trade_lifecycle"
-    },
-    {
-      "rank": 8,
       "queueType": "delivery",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
       "severity": "medium",
       "status": "pending",
       "summary": "Dashboard/report freshness is stale relative to source state.",
-      "blocking": false,
-      "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
-      "source": "delivery_policy"
-    },
-    {
-      "rank": 9,
-      "queueType": "delivery",
-      "portfolio": "etf",
-      "kind": "delivery",
-      "severity": "medium",
-      "status": "pending",
-      "summary": "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.",
       "blocking": false,
       "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
       "source": "delivery_policy"

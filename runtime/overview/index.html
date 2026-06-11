@@ -43,11 +43,11 @@ nav a:hover { background: #dbeafe; }
 <h1>Operator Cockpit</h1>
 <div class="status-grid">
   <div class="status-card"><div class="label">Overall Health</div><div class="value"><span class="badge badge-warning">warning</span></div></div>
-  <div class="status-card"><div class="label">Pending Approvals</div><div class="value">1</div></div>
+  <div class="status-card"><div class="label">Pending Approvals</div><div class="value">0</div></div>
   <div class="status-card"><div class="label">Cash to Deploy (CHF)</div><div class="value">2433.12</div></div>
   <div class="status-card"><div class="label">Biggest Drift</div><div class="value">Global equities -50%</div></div>
   <div class="status-card"><div class="label">Broker Health</div><div class="value">healthy</div></div>
-  <div class="status-card"><div class="label">Reports Available</div><div class="value">16</div></div>
+  <div class="status-card"><div class="label">Reports Available</div><div class="value">17</div></div>
 </div>
 
 <h2>Navigation</h2>
@@ -68,10 +68,28 @@ nav a:hover { background: #dbeafe; }
 <ul>
 <li><strong>etf</strong>: [contract_resolution_failed] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)<br />Reason: Broker rejected the order because the contract identity or venue resolution was not accepted.<br />Next action: Verify conid, symbol, exchange, and primary exchange before retrying.</li>
 </ul>
+<h2>Cron Health (10/15 healthy)</h2>
+<ul>
+<li><span class="badge badge-blocked">alert</span> <strong>market-calendar-sync</strong> &mdash; 4 consecutive errors, last run 7.3h ago <span style="color:#dc2626;font-size:0.8em">(cron: job execution timed out (last phase: tool-execution-started))</span></li>
+<li><span class="badge badge-warning">stale</span> <strong>dashboard-email-friday-close</strong> &mdash; 0 consecutive errors, last run 143.0h ago</li>
+<li><span class="badge badge-warning">stale</span> <strong>portfolio-etf-monthly-report</strong> &mdash; 0 consecutive errors, last run 236.4h ago</li>
+<li><span class="badge badge-warning">stale</span> <strong>portfolio-etf-weekly-report</strong> &mdash; 0 consecutive errors, last run 140.7h ago</li>
+<li><span class="badge badge-warning">stale</span> <strong>sentry-autofix-weekly</strong> &mdash; 0 consecutive errors, last run 79.0h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>daily-rebalance-check</strong> &mdash; 0 consecutive errors, last run 8.0h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>daily-workspace-env-backup</strong> &mdash; 0 consecutive errors, last run 13.7h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>dashboard-email-cash-influx</strong> &mdash; 0 consecutive errors, last run 1.0h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>dashboard-email-eod-transactions</strong> &mdash; 0 consecutive errors, last run 22.8h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>ibkr-native-gateway-keepalive</strong> &mdash; 0 consecutive errors, last run 1.0h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-daily-digest</strong> &mdash; 0 consecutive errors, last run 19.0h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-daily-sync-and-dashboard</strong> &mdash; 0 consecutive errors, last run 5.9h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-etf-quarterly-report</strong> &mdash; 0 consecutive errors, last run never</li>
+<li><span class="badge badge-healthy">ok</span> <strong>portfolio-health-monitor-etf</strong> &mdash; 0 consecutive errors, last run 6.0h ago</li>
+<li><span class="badge badge-healthy">ok</span> <strong>test-suite-safe-lane</strong> &mdash; 0 consecutive errors, last run 4.5h ago</li>
+</ul>
 <h2>Portfolio Trend (last days)</h2>
-<div style="padding:8px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="400" height="60" viewBox="0 0 400 60"><path d="M4 55.64 L27.06 55.64 L50.12 55.64 L73.18 55.64 L96.24 56 L119.29 55.52 L142.35 55.52 L165.41 53.58 L188.47 53.53 L211.53 53.79 L234.59 49.11 L257.65 37.56 L280.71 30.13 L303.76 21.94 L326.82 11.66 L349.88 11.31 L372.94 4 L396 4.59 L396 56 L4 56 Z" fill="rgba(29, 78, 216, 0.10)" stroke="none"/><path d="M4 55.64 L27.06 55.64 L50.12 55.64 L73.18 55.64 L96.24 56 L119.29 55.52 L142.35 55.52 L165.41 53.58 L188.47 53.53 L211.53 53.79 L234.59 49.11 L257.65 37.56 L280.71 30.13 L303.76 21.94 L326.82 11.66 L349.88 11.31 L372.94 4 L396 4.59" fill="none" stroke="#1d4ed8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="396" cy="4.59" r="2" fill="#1d4ed8"/></svg></div>
+<div style="padding:8px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="400" height="60" viewBox="0 0 400 60"><path d="M4 55.66 L23.6 55.66 L43.2 55.66 L62.8 55.66 L82.4 56 L102 55.54 L121.6 55.54 L141.2 53.72 L160.8 53.67 L180.4 53.91 L200 49.51 L219.6 38.62 L239.2 31.62 L258.8 23.9 L278.4 14.22 L298 13.88 L317.6 6.99 L337.2 4.37 L356.8 4.58 L376.4 4 L396 4.52 L396 56 L4 56 Z" fill="rgba(29, 78, 216, 0.10)" stroke="none"/><path d="M4 55.66 L23.6 55.66 L43.2 55.66 L62.8 55.66 L82.4 56 L102 55.54 L121.6 55.54 L141.2 53.72 L160.8 53.67 L180.4 53.91 L200 49.51 L219.6 38.62 L239.2 31.62 L258.8 23.9 L278.4 14.22 L298 13.88 L317.6 6.99 L337.2 4.37 L356.8 4.58 L376.4 4 L396 4.52" fill="none" stroke="#1d4ed8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="396" cy="4.52" r="2" fill="#1d4ed8"/></svg></div>
 
-<p class="meta">Generated: 2026-06-05T11:01:56.660Z</p>
+<p class="meta">Generated: 2026-06-11T14:00:12.304Z</p>
 </div>
 </body>
 </html>

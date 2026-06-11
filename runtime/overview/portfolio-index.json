@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-05T11:01:56.642Z",
+  "generatedAt": "2026-06-11T14:00:12.291Z",
   "portfolioCount": 2,
-  "totalValueChf": 149881.99,
+  "totalValueChf": 148101,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -47,15 +47,15 @@
       "portfolio": "etf",
       "status": "warning",
       "strategyStatus": "rebalance_needed",
-      "totalValueChf": 149881.98592747,
+      "totalValueChf": 148100.99814559997,
       "cashChf": 2433.12,
-      "investedChf": 147448.86592747,
-      "lastSyncAt": "2026-06-05 08:56:46",
-      "latestSnapshotDate": "2026-06-05",
+      "investedChf": 145667.87814559997,
+      "lastSyncAt": "2026-06-11 08:05:13",
+      "latestSnapshotDate": "2026-06-11",
       "pendingApprovals": 0,
       "blockers": 0,
-      "pendingActions": 3,
-      "recommendedNextStep": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
+      "pendingActions": 1,
+      "recommendedNextStep": "5 trade row(s) are marked failed and need operator review.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
       "blockedTradeCount": 13,
@@ -71,42 +71,42 @@
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 15.55
+          "driftPct": 15.26
         },
         {
           "assetClass": "Swiss equities",
           "status": "on_track",
-          "driftPct": -2.17
+          "driftPct": -1.91
         },
         {
           "assetClass": "Bonds / cash-like",
           "status": "out_of_bounds",
-          "driftPct": -13.38
+          "driftPct": -13.36
         }
       ],
       "brokerHealth": "healthy",
       "executionPosture": "ready_for_review",
-      "deliveryPosture": "needs_operator_attention",
+      "deliveryPosture": "ready",
       "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 9,
+    "total": 7,
     "blocking": 6,
     "approvals": 0,
-    "execution": 2,
+    "execution": 1,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
     "recovery": 0,
-    "delivery": 2,
+    "delivery": 1,
     "data": 0,
     "warnings": 5,
     "workflow": 0,
     "bySeverity": {
       "high": 6,
-      "medium": 3,
+      "medium": 1,
       "low": 0
     }
   }

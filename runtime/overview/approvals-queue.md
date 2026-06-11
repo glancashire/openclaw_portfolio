@@ -1,28 +1,15 @@
 # Approvals Queue
 
 ## Summary
-- Generated at: 2026-06-05T11:01:56.645Z
-- Approval items: 1
-- Actionable: 1
-- Stale: 0
-- Superseded: 0
+- Generated at: 2026-06-11T14:00:12.293Z
+- Approval items: 0
 
 ## Approval Review Queue
 
-## Actionable now
-
-### Approval 1: etf
-- Urgency: medium
-- Summary: 1 approved basket(s) are ready for execution.
-- Explanation: 1 approved basket(s) are executable now; row-level proposed trades remain legacy context.
-- Effect if approved: The operator can transmit the approved basket without re-approving row-level trade log entries.
-- Effect if ignored: The basket remains ready but unsubmitted, so the portfolio stays staged instead of executing.
-- Recommended action: Review the approved basket and submit when satisfied with the price bands and market window.
-
-## Stale / needs refresh
-
-_(none)_
-
-## Regenerated (superseded)
-
-_(none)_
+### Approval 1: none
+- Urgency: low
+- Summary: No pending approval items.
+- Explanation: No approval-gated actions are currently waiting.
+- Effect if approved: No action required.
+- Effect if ignored: No approval backlog remains.
+- Recommended action: Continue normal monitoring.

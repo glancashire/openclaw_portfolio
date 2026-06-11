@@ -43,7 +43,7 @@ pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 
 <div class="report-container">
 <h1>Recovery Checklist: etf</h1>
 <h2>Incident Status</h2>
-<ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: healthy</li><li>Execution posture: ready_for_review</li><li>Delivery posture: needs_operator_attention</li><li>Data freshness: current</li><li>Pending approvals: 0</li><li>Recommended next step: 3 in-flight execution row(s) need reconciliation before overlapping actions.</li></ul>
+<ul><li>Status: action_required</li><li>Health: warning</li><li>Broker health: healthy</li><li>Execution posture: ready_for_review</li><li>Delivery posture: ready</li><li>Data freshness: current</li><li>Pending approvals: 0</li><li>Recommended next step: 5 trade row(s) are marked failed and need operator review.</li></ul>
 <h2>Why This Incident Exists</h2>
 <ul><li>No explicit execution block is currently surfaced.</li><li>74 blocked row(s) still need explicit operator review before the workflow can advance cleanly.</li></ul>
 <h2>Incident Drivers</h2>
@@ -53,7 +53,7 @@ pre { white-space: pre-wrap; background: #f3f4f6; padding: 12px; border-radius: 
 <h2>Active Broker Blocks</h2>
 <ol><li>[contract_resolution_failed] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)</li><li>[contract_resolution_failed] IE000XZSV718 — State Street SPDR S&amp;P 500 UCITS ETF USD Unhedged (Acc)</li><li>[contract_resolution_failed] LU0950668870 — UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc</li><li>[contract_resolution_failed] IE00BD4TXW66 — UBS Core S&amp;P 500 UCITS ETF USD acc</li><li>[contract_resolution_failed] IE00B5BMR087 — iShares Core S&amp;P 500 UCITS ETF USD (Acc)</li><li>[contract_resolution_failed] CH0130595124 — UBS SPI Mid ETF (SPI ohne SMI)</li><li>[contract_resolution_failed] LU1781541252 — LU1781541252</li><li>[contract_resolution_failed] IE00B5L8K969 — IE00B5L8K969</li><li>[contract_resolution_failed] IE000I8KRLL9 — iShares MSCI Global Semiconductors UCITS ETF USD (Acc)</li><li>[contract_resolution_failed] LU0950670850 — UBS MSCI United Kingdom UCITS ETF GBP acc</li><li>[contract_resolution_failed] IE00B44T3H88 — HSBC MSCI China UCITS ETF USD</li><li>[contract_resolution_failed] IE000X59ZHE2 — iShares AI Infrastructure UCITS ETF USD (Acc)</li><li>[contract_resolution_failed] IE00BGV5VN51 — Xtrackers Artificial Intelligence &amp; Big Data UCITS ETF 1C</li></ol>
 <h2>Action Checklist</h2>
-<ol><li>[high] 5 trade row(s) are marked failed and need operator review.</li><li>[medium] 3 in-flight execution row(s) need reconciliation before overlapping actions.</li><li>[medium] 3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile.</li></ol>
+<ol><li>[high] 5 trade row(s) are marked failed and need operator review.</li></ol>
 <h2>Verification Checks</h2>
 <ul><li>Broker health remains healthy or intentionally degraded with operator awareness.</li><li>Freshness posture remains current.</li><li>No approval backlog remains.</li><li>No active blockers remain.</li></ul>
 <h2>Completion Criteria</h2>

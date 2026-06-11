@@ -1,10 +1,10 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-05T11:01:56.646Z",
+  "generatedAt": "2026-06-11T14:00:12.294Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 2433.12,
-    "approvalCount": 1,
+    "approvalCount": 0,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
@@ -20,15 +20,15 @@
   },
   "brokerHealth": "healthy",
   "reportingHealth": "attention_needed",
-  "pendingApprovals": 1,
-  "recommendedNextStep": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
-  "biggestDriftWhy": "Global equities is 15.55% over target and outside the allowed band around the 65% target.",
+  "pendingApprovals": 0,
+  "recommendedNextStep": "5 trade row(s) are marked failed and need operator review.",
+  "biggestDriftWhy": "Global equities is 15.26% over target and outside the allowed band around the 65% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",
     "cashChf": 2433.12,
     "brokerHealth": "healthy",
-    "deliveryPosture": "needs_operator_attention",
+    "deliveryPosture": "ready",
     "pendingApprovals": 0,
     "blockedTradeCount": 13,
     "topBrokerBlock": {
@@ -38,7 +38,7 @@
       "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
       "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
     },
-    "recommendedNextStep": "3 in-flight execution row(s) need reconciliation before overlapping actions.",
+    "recommendedNextStep": "5 trade row(s) are marked failed and need operator review.",
     "whyNow": "Broker rejected the order because the contract identity or venue resolution was not accepted."
   }
 }

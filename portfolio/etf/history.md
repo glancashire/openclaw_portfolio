@@ -81,3 +81,11 @@
 | 2026-06-04 | execution_not_found | 141164.34873894998 | 139695.69873894998 | 140000 | 0 | 0 | 0 | Broker order 9168 status sync: not_found |
 | 2026-06-05 | end_of_day | 139606.57096738 | 138137.92096738 | 140000 | 0 | 0 | 0 | daily sync snapshot |
 | 2026-06-05 | execution_staged | 139606.57096738 | 138137.92096738 | 150000 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+| 2026-06-05 | execution_filled | 149337.24599402 | 146904.12599402 | 150000 | 0 | 0 | 0 | Broker order 9169 status sync: Filled |
+| 2026-06-05 | execution_filled | 149337.23044187002 | 146904.11044187003 | 150000 | 0 | 0 | 0 | Broker order 9170 status sync: Filled |
+| 2026-06-05 | execution_filled | 149337.28850882998 | 146904.16850883 | 150000 | 0 | 0 | 0 | Broker order 9171 status sync: Filled |
+| 2026-06-05 | end_of_day | 148500.79362046 | 146067.67362046 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-05 | end_of_day | 148500.79362046 | 146067.67362046 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-06-08 | end_of_day | 147934.61291034997 | 145501.49291034997 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-09 | end_of_day | 149544.13642586998 | 147111.01642586998 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-11 | end_of_day | 148100.99814559997 | 145667.87814559997 | 150000 | 0 | 0 | 0 | daily sync snapshot |

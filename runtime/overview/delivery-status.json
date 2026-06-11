@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-05T11:01:56.657Z",
+  "generatedAt": "2026-06-11T14:00:12.301Z",
   "portfolioCount": 2,
   "allReady": false,
   "portfolios": [
@@ -53,17 +53,15 @@
         "report_cycle_json"
       ],
       "overrideLoaded": true,
-      "ready": false,
-      "pendingActions": [
-        "3 trade row(s) are 'submitted' with no broker confirmation — run sync-portfolio-order-status to reconcile."
-      ],
+      "ready": true,
+      "pendingActions": [],
       "deliveryPosture": {
-        "ready": false,
-        "pendingActionCount": 1,
-        "latestHistoryDate": "2026-06-05",
+        "ready": true,
+        "pendingActionCount": 0,
+        "latestHistoryDate": "2026-06-11",
         "freshnessStale": false,
         "failedTrades": 5,
-        "inFlightOrders": 3,
+        "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
           "blockedTradeCount": 13,
@@ -76,7 +74,7 @@
             "brokerOrderId": "9163"
           }
         },
-        "recommendedNextAction": "Email delivery is not ready: missing pendingDeliveryActions."
+        "recommendedNextAction": "No delivery-side operator action is currently required."
       }
     }
   ]
