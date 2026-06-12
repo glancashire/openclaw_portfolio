@@ -63,3 +63,12 @@ Some scripts look like dead code but are kept on purpose. See `docs/operations/w
 ## Generated-artifact idempotence (decision)
 
 2026-06-03 — defer naming a separate idempotence verification lane. Existing checks (`scripts/check-generated-state.js`, `scripts/test-test-manifest-shape.js`, root-cleanliness, `npm test`) cover the surface. Revisit if churn-driven false-reds appear.
+
+## External-system capability checks (decision)
+
+2026-06-11 — when an operational plan hinges on a capability of an external system (especially IBKR — account-type / subscription-model / sub-user features), verify the capability against vendor docs and a community forum search **before** scaffolding code or infra around it. Phase L1.E (split-key IBKR isolation) was scaffolded end-to-end before discovering IBKR retail doesn't allow market-data subscription sharing between live users — 30 seconds of search would have caught that. Closing/unwinding cost ~half a session.
+
+Practical check before designing around an IBKR feature:
+1. IBKR Campus / official docs.
+2. r/interactivebrokers thread search for the exact capability.
+3. Note the account-type assumption explicitly in the runbook header (retail vs F&F vs Advisor).
