@@ -11,7 +11,7 @@
 
 ## Biggest Drift Today
 - acceptance-closure: Global equities drift -50% (out_of_bounds)
-- Why it matters: Global equities is 15.26% over target and outside the allowed band around the 65% target.
+- Why it matters: Global equities is 15.28% over target and outside the allowed band around the 65% target.
 
 ## Highlighted Portfolio
 - Portfolio: etf

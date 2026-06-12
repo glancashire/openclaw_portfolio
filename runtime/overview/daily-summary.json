@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-11T14:00:12.294Z",
+  "generatedAt": "2026-06-11T20:00:15.014Z",
   "totals": {
     "portfolioCount": 2,
     "totalCashChf": 2433.12,
@@ -22,7 +22,7 @@
   "reportingHealth": "attention_needed",
   "pendingApprovals": 0,
   "recommendedNextStep": "5 trade row(s) are marked failed and need operator review.",
-  "biggestDriftWhy": "Global equities is 15.26% over target and outside the allowed band around the 65% target.",
+  "biggestDriftWhy": "Global equities is 15.28% over target and outside the allowed band around the 65% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",

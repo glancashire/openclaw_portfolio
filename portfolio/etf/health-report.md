@@ -1,7 +1,7 @@
 # Health Report: etf
 
 ## Management summary
-- Generated at: 2026-06-11T14:00:12.665Z
+- Generated at: 2026-06-11T20:00:15.551Z
 - Current status: healthy (low)
 - Management summary: Everything important is working normally. No action is needed right now.
 - Next step: No immediate operator action is required.
@@ -16,7 +16,7 @@
 - The system already handled 2 issue(s) automatically.
 
 ## Health direction
-- Health direction is worsening: 7 of the last 7 checks showed blocked or paused posture.
+- Health direction is worsening: 6 of the last 7 checks showed blocked or paused posture.
 
 ## Remaining status and reference details
 - Generated-state issues: 0

@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-11T14:00:12.291Z",
+  "generatedAt": "2026-06-11T20:00:15.010Z",
   "portfolioCount": 2,
-  "totalValueChf": 148101,
+  "totalValueChf": 148079.49,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -47,10 +47,10 @@
       "portfolio": "etf",
       "status": "warning",
       "strategyStatus": "rebalance_needed",
-      "totalValueChf": 148100.99814559997,
+      "totalValueChf": 148079.49139908995,
       "cashChf": 2433.12,
-      "investedChf": 145667.87814559997,
-      "lastSyncAt": "2026-06-11 08:05:13",
+      "investedChf": 145646.37139908996,
+      "lastSyncAt": "2026-06-11 17:05:53",
       "latestSnapshotDate": "2026-06-11",
       "pendingApprovals": 0,
       "blockers": 0,
@@ -71,12 +71,12 @@
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 15.26
+          "driftPct": 15.28
         },
         {
           "assetClass": "Swiss equities",
           "status": "on_track",
-          "driftPct": -1.91
+          "driftPct": -1.92
         },
         {
           "assetClass": "Bonds / cash-like",
