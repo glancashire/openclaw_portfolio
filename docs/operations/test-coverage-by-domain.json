@@ -1,10 +1,10 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-15T12:02:07.477Z",
+  "generatedAt": "2026-06-15T12:29:19.055Z",
   "counts": {
-    "totalTests": 343,
-    "domains": 124
+    "totalTests": 344,
+    "domains": 125
   },
   "domains": [
     {
@@ -1178,6 +1178,19 @@
       "inVerifyRepoChecks": 1,
       "examples": [
         "scripts/test-isin-search-contracts.js"
+      ]
+    },
+    {
+      "domain": "load",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-load-env-file.js"
       ]
     },
     {

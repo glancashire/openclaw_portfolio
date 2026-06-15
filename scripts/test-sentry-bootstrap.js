@@ -34,6 +34,9 @@ const before = {
 };
 
 // --- 1. require is safe with no DSN ----------------------------------------
+// Disable the .env file loader for this test: we are validating the no-DSN
+// default path, so the repo .env (which carries SENTRY_DSN) must not bleed in.
+process.env.OPENCLAW_DISABLE_ENV_FILE = '1';
 const prevDsn = process.env.SENTRY_DSN;
 delete process.env.SENTRY_DSN;
 
