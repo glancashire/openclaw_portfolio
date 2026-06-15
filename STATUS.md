@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-06-11 09:45 UTC · **Repo head:** see `git log -1` · **Tests:** 253/254 (1 fixture clock-drift) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-06-15 12:20 UTC · **Repo head:** `dd75ee9` · **Tests:** 255/255 (3 quarantined) · **Health:** 🟢 healthy
 
 ---
 
@@ -17,12 +17,14 @@
 | Dashboard / report emails | 🟢 healthy |
 | Fill-confirmation emails | 🟢 healthy (`monitor-fills` cron disabled by policy) |
 | Deposits ledger | 🟢 10 deposits, CHF 150k cumulative |
+| Cash sleeve | 🟢 ~CHF 209 (0.1%) — effectively fully deployed after R2SC |
 | Deposits inbox cron | 🟢 wired (`runtime/ibkr-statements/inbox/`) |
 | Health monitor | 🟢 escalation-only, persistence + 24h rate-limit |
 | Health second-pass autofix | 🟢 5 fixers, 24h per-code rate-limit |
 | Sentry error tracking | 🟢 live, weekly autofix Mon 09:00 CET, `event:admin` token |
-| Safe-lane verification | 🟡 253 passed, 1 failed (fixture clock drift `test-broker-block-priority.js`), 3 quarantined |
+| Safe-lane verification | 🟢 255 passed, 0 failed, 3 quarantined (fixture clock-drift resolved 2026-06-15) |
 | Pre-flight order safeguards | 🟢 SELL/BUY price floor+ceiling, notional caps, stale-quote, sellApproved gate, BUY trend guard |
+| IBKR tick-size conformance | 🟢 limit prices resolved from live market rules, not flat minTick (Phase M, 2026-06-15) |
 | Daily transmit cap | 🟢 CHF 50k/day across all baskets (Phase L1.B) |
 | Approval intent | 🟢 consumed after every transmit attempt (Phase L1.A, no reuse window) |
 | Cron tool grants | 🟢 no live cron job carries `write`/`edit` (Phase L1.C) |
@@ -32,18 +34,16 @@
 
 | Phase | Status | Blocker | Action holder |
 |---|---|---|---|
+| **M** | **DONE 2026-06-15** — R2SC filled + market-rule tick resolver shipped | **none** | **—** |
 | **L** | **L0 + L1.A–L1.D done; L1.E CLOSED won't fix 2026-06-11** | **none** | **—** |
-| **engineering** | **`test-broker-block-priority.js` fixture clock drift** | **none (5-line fix)** | **bb8 (next session)** |
 | H2/H3 | CALENDAR | 2026-06-17 review | Graham (decision) |
 | F4 + G3 | OPERATOR | XLS file | Graham (drop file) |
 | B5 | RECURRING | 2FA prompts | Graham (when alert fires) |
 | D1/D2/D3 | PARKED | explicit reactivation | Graham |
 
-**Shipped 2026-06-05 → 2026-06-11:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard). Phase L1.E **CLOSED won't fix** 2026-06-11 — IBKR retail can't share market-data subscriptions between live users.
+**Shipped 2026-06-05 → 2026-06-15:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11, Phase M (R2SC small-cap sleeve filled + IBKR market-rule tick resolver) 2026-06-15. No autonomous engineering queued — the old `test-broker-block-priority.js` fixture drift now passes.
 
-Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`. L1.E close-out: `memory/2026-06-11.md`.
-
-Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`.
+Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`. L1.E close-out: `memory/2026-06-11.md`. Phase M tick-size doc: `docs/operations/ibkr-tick-sizes.md`.
 
 ## Active research thread (Phase K — energy + nuclear sleeve)
 

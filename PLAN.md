@@ -1,6 +1,6 @@
 # PLAN — Portfolio Manager (consolidated)
 
-**Last refreshed:** 2026-06-11 09:45 UTC · **Repo head:** see `git log -1` · **Tests:** 253/254 safe lane (1 fixture clock-drift) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-06-15 12:20 UTC · **Repo head:** `dd75ee9` · **Tests:** 255/255 safe lane (3 quarantined) · **Health:** 🟢 healthy
 
 Single active plan document. Older plans are in `archive/phase-plans/`. Daily operational state lives in `STATUS.md`. Per-portfolio facts live in `MEMORY.md`. Risk audit is at `docs/risk-audit-2026-06-05.md`.
 
@@ -9,6 +9,7 @@ Single active plan document. Older plans are in `archive/phase-plans/`. Daily op
 ## Visual roadmap
 
 ```text
+Phase M   Small-cap sleeve + tick-size hardening    [SHIPPED] ▉▉▉▉▉▉▉▉▉▉  R2SC filled + IBKR market-rule tick resolver (2026-06-15)
 Phase L   Risk hardening (live-money safeguards)     [STARTED] ▉▉▉▉▉▉▉▉█░  L0 + L1.A–L1.D done; L1.E CLOSED won't fix
 Phase H   Allocation rebalance decision (H2 + H3)    [WAITING] █████████░  CALENDAR  — 2026-06-17
 Phase F4  IBKR XLS backfill                          [WAITING] █████████░  OPERATOR  — wait for XLS drop
@@ -19,9 +20,9 @@ Phase D2  Control UI direct embedding                [PARKED]  █░░░░�
 Phase D3  EM ex-China sleeve                         [PARKED]  █░░░░░░░░░  no Acc UCITS on IBKR
 ```
 
-**Shipped 2026-06-05 → 2026-06-11:** Phase K (energy + nuclear sleeve, all 3 legs filled), Phase L0 (pre-flight order safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, BUY trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11.
+**Shipped 2026-06-05 → 2026-06-15:** Phase K (energy + nuclear sleeve, all 3 legs filled), Phase L0 (pre-flight order safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, BUY trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11, Phase M (R2SC small-cap sleeve filled + IBKR market-rule tick resolver) 2026-06-15.
 
-**Autonomous engineering ready right now:** small fixture-clock-drift fix on `test-broker-block-priority.js`. Everything else is waiting on operator action, calendar, or explicit reactivation.
+**Autonomous engineering ready right now:** nothing queued. Everything open is waiting on operator action, calendar, or explicit reactivation. The `test-broker-block-priority.js` fixture drift (old D-8) now passes — no longer an action item.
 
 ---
 
@@ -59,6 +60,20 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 - [ ] **L2.C** Multi-party approval for baskets > CHF 25k
 - [ ] **L2.D** YubiKey / hardware-backed safe-word
 - [ ] **L2.E** Monthly disaster-recovery drill (operations runbook addition)
+
+---
+
+## Phase M — Small-cap sleeve + tick-size hardening · DONE 2026-06-15
+
+**Status:** SHIPPED 2026-06-15
+
+- [x] R2SC (SPDR Russell 2000 US Small Cap UCITS ETF, IE00BJ38QD84) added to approved instruments — Ubiquiti-adjacent low-cost sleeve
+- [x] Remaining cash deployed: order 9173 filled 32 @ GBP 65.1357 (~CHF 2,283); cash CHF 2,433 → ~209
+- [x] Root-caused the GBP/LSEETF "Inactive" rejection: flat `minTick=0.0005` is misleading; binding tick from market rule 983 is **0.01 above GBP 25**
+- [x] Built `src/execution/marketRuleResolver.js` — resolves binding tick from `marketRuleIds`↔`validExchanges` per venue + price band, live `reqMarketRule` + 30d disk cache + static fallback; never throws into order path
+- [x] Wired into proposal generator, execution runner, reproposal builder, lifecycle, live reconciliation + propose/execute/reproposal scripts
+- [x] Unit test `scripts/test-market-rule-resolver.js` (safe lane); live-verified rule 983 → 0.01 @ GBP 65.16
+- [x] Doc `docs/operations/ibkr-tick-sizes.md`; commits `1b595ff` + `dd75ee9`
 
 ---
 
@@ -158,8 +173,9 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 | Deposits ledger | 🟢 10 deposits, CHF 150k cumulative |
 | Health monitor | 🟢 escalation-only, persistence + 24h rate-limit |
 | Sentry error tracking | 🟢 live, weekly autofix Mon 09:00 CET |
-| Safe-lane verification | 🟡 253 passed, 1 failed (fixture clock drift in `test-broker-block-priority.js`), 3 quarantined |
+| Safe-lane verification | 🟢 255 passed, 0 failed, 3 quarantined (fixture clock-drift resolved) |
 | Cron jobs | 🟢 11 enabled + 1 policy-disabled |
+| IBKR tick-size conformance | 🟢 limit prices resolved from live market rules (Phase M) |
 
 ---
 
@@ -174,11 +190,12 @@ Goal: make live-money execution safe enough for higher capital. Full gap analysi
 | **D-5** | Re-enable fill-monitor cron (`d4c3207d`) for the next 24h? | ⏸ Skip — all 3 legs already filled and reconciled. | None. |
 | **D-6** | Reactivate parked D1/D2/D3? | ⏸ Keep parked. No external trigger has changed. | None. |
 | **D-7** | Next thematic sleeve to research after energy/nuclear? | 💬 Up to you (water, defence, biotech, AI infra, commodities). | None. |
-| **D-8** | Fix `test-broker-block-priority.js` fixture clock drift now or after H2? | 🔧 **Now** — ~5-line fixture change to use a recent timestamp instead of hardcoded 2026-06-04. Cron `test-suite-safe-lane` will keep flagging this every weekday until it's fixed. | Low — cosmetic but noisy. |
+| **D-8** | Fix `test-broker-block-priority.js` fixture clock drift now or after H2? | ✅ **RESOLVED** — fixture now passes; safe lane 255/255 green as of 2026-06-15. | n/a |
+| **D-9** | Next thematic sleeve after the R2SC small-cap add? | 💬 Up to you. Cash is now ~CHF 209 (fully deployed), so any new sleeve needs a fresh deposit or a sell-to-fund decision. | None. |
 
 ### My single strongest recommendation
 
-**Phase L1 is closed.** Phase L2 isn't needed until capital crosses CHF 250k. Next operator-side decision is Phase H2 (rebalance review on 2026-06-17). Engineering side: ~5-line fixture fix on `test-broker-block-priority.js` to silence the daily false alarm.
+**Phase L1 and Phase M are closed.** Cash is now fully deployed (~CHF 209). Phase L2 isn't needed until capital crosses CHF 250k. The next operator-side decision is Phase H2 (rebalance review on 2026-06-17). No autonomous engineering is queued — the safe lane is fully green.
 
 ---
 
