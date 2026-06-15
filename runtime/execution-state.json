@@ -10,7 +10,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-11T09:47:12.235Z"
+      "lastAt": "2026-06-15T12:08:55.821Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -34,7 +34,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-05T14:00:45.008Z"
+      "lastAt": "2026-06-15T11:43:57.677Z"
     },
     "dryrun-no-write2-tMfst2": {
       "consecutive": 0,
@@ -82,7 +82,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-11T09:46:59.047Z"
+      "lastAt": "2026-06-15T12:08:42.950Z"
     },
     "execution-safety-closure-hRd2yl": {
       "consecutive": 0,
@@ -425,6 +425,42 @@
       "lastReason": null,
       "lastMessage": null,
       "lastAt": "2026-06-11T09:46:26.905Z"
+    },
+    "execution-safety-closure-FTFaC9": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-12T09:31:01.455Z"
+    },
+    "execution-safety-closure-BPFyBr": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-12T09:33:14.096Z"
+    },
+    "execution-safety-closure-O7Zmfu": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-15T09:30:17.739Z"
+    },
+    "execution-safety-closure-jX5fM7": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-15T09:31:42.717Z"
+    },
+    "execution-safety-closure-mpGJe8": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-15T12:02:41.677Z"
+    },
+    "execution-safety-closure-JdKpfA": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-06-15T12:08:11.084Z"
     }
   },
   "liveExecutionArms": {

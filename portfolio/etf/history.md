@@ -89,3 +89,7 @@
 | 2026-06-08 | end_of_day | 147934.61291034997 | 145501.49291034997 | 150000 | 0 | 0 | 0 | daily sync snapshot |
 | 2026-06-09 | end_of_day | 149544.13642586998 | 147111.01642586998 | 150000 | 0 | 0 | 0 | daily sync snapshot |
 | 2026-06-11 | end_of_day | 148100.99814559997 | 145667.87814559997 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-12 | end_of_day | 150384.56039626 | 147951.44039626 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-12 | end_of_day | 151083.32148882 | 148650.20148882 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-06-15 | end_of_day | 153011.25594529998 | 150578.1359453 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-15 | execution_staged | 153024.17766470998 | 150591.05766470998 | 150000 | 0 | 0 | 0 | Transmitted live broker order submitted. |

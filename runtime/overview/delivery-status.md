@@ -1,6 +1,6 @@
 # Delivery & Alerting Status
 
-- Generated at: 2026-06-11T20:00:15.021Z
+- Generated at: 2026-06-15T12:08:37.002Z
 - Portfolios: 2
 - All ready: no
 
@@ -28,7 +28,7 @@
 - Pending actions:
   - None
 - Broker block context:
-  - Count: 13
+  - Count: 21
   - Top block: [contract_resolution_failed] CH0032912732 — UBS SLI ETF (SMI gleichgewichtet)
   - Reason: Broker rejected the order because the contract identity or venue resolution was not accepted.
   - Next action: Verify conid, symbol, exchange, and primary exchange before retrying.

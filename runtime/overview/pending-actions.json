@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-11T20:00:15.012Z",
+  "generatedAt": "2026-06-15T12:08:36.994Z",
   "itemCount": 7,
   "queueSummary": {
     "total": 7,
-    "blocking": 6,
+    "blocking": 5,
     "approvals": 0,
-    "execution": 1,
+    "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
@@ -15,11 +15,11 @@
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 0,
+    "workflow": 1,
     "bySeverity": {
-      "high": 6,
+      "high": 5,
       "medium": 1,
-      "low": 0
+      "low": 1
     }
   },
   "items": [
@@ -85,18 +85,6 @@
     },
     {
       "rank": 6,
-      "queueType": "execution",
-      "portfolio": "etf",
-      "kind": "execution",
-      "severity": "high",
-      "status": "failed",
-      "summary": "5 trade row(s) are marked failed and need operator review.",
-      "blocking": true,
-      "recommendedOperatorAction": "Review the failed trade rows and resolve the root cause before retrying.",
-      "source": "trade_lifecycle"
-    },
-    {
-      "rank": 7,
       "queueType": "delivery",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
@@ -106,6 +94,18 @@
       "blocking": false,
       "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
       "source": "delivery_policy"
+    },
+    {
+      "rank": 7,
+      "queueType": "workflow",
+      "portfolio": "etf",
+      "kind": "workflow",
+      "severity": "low",
+      "status": "recommended",
+      "summary": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
+      "blocking": false,
+      "recommendedOperatorAction": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
+      "source": "recommendation_engine"
     }
   ]
 }
