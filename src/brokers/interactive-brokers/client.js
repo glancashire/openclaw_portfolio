@@ -178,6 +178,12 @@ class InteractiveBrokersClient {
     throw new Error('fetchContractDetailsByConid requires native or skill client');
   }
 
+  async fetchMarketRules(ruleIds) {
+    if (this.native && typeof this.native.fetchMarketRules === 'function') return this.native.fetchMarketRules(ruleIds);
+    if (this.skill && typeof this.skill.fetchMarketRules === 'function') return this.skill.fetchMarketRules(ruleIds);
+    throw new Error('fetchMarketRules requires a native client');
+  }
+
   assertWritable(action = 'broker write') {
     if (this.config.readonly) {
       throw new Error(`Interactive Brokers is configured readonly=true; refusing ${action}`);

@@ -134,7 +134,13 @@ async function main() {
         // Fallback approximation for EUR/USD/GBP if envelope-level FX is missing.
         return 1;
       };
-      const runResult = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: ROOT, fetchLiveQuote, fxLookup });
+      // Resolve binding IBKR market-rule ticks per contract+venue+price so limit
+      // prices conform to the exchange's price-tiered increment (not the flat
+      // minTick). Prevents "Inactive: price does not conform to minimum price
+      // variation" rejections (R2SC/LSEETF, 2026-06-15).
+      const { makeTickResolver } = require(path.join(ROOT, 'src/execution/marketRuleResolver'));
+      const tickResolverFn = makeTickResolver({ client: guardClient, cacheDir: path.join(ROOT, 'runtime', 'broker-cache', 'market-rules') });
+      const runResult = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: ROOT, fetchLiveQuote, fxLookup, tickResolverFn });
       runState = runResult.runState;
       log(`Runner summary: ${JSON.stringify(runState.summary)}`);
       if (runResult.safeguardBlockers && runResult.safeguardBlockers.length > 0) {

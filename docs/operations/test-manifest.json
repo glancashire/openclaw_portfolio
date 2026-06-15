@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 342,
-    "safe": 257,
+    "total": 343,
+    "safe": 258,
     "integration": 80,
     "live-smoke": 3,
     "external": 2,
@@ -1303,6 +1303,13 @@
     },
     {
       "path": "scripts/test-market-open-trend-guard.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-market-rule-resolver.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

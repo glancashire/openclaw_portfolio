@@ -149,6 +149,25 @@ class InteractiveBrokersNativeClient {
     });
   }
 
+  /**
+   * Fetch the live IBKR price-increment table for one or more market rule ids.
+   * Returns a map { [ruleId]: [{ lowEdge, increment }, ...] }.
+   * IBKR market rules are the authoritative source for tick sizes: they are
+   * price-tiered and venue-specific, and supersede the flat contract `minTick`.
+   */
+  async fetchMarketRules(ruleIds) {
+    const list = Array.from(new Set(
+      (Array.isArray(ruleIds) ? ruleIds : [ruleIds])
+        .map((r) => Number(r))
+        .filter((r) => Number.isFinite(r) && r >= 0)
+    ));
+    if (!list.length) throw new Error('fetchMarketRules requires at least one rule id');
+    return this.withApi(async ({ api, connected }) => {
+      await connected;
+      return waitForMarketRules(api, list);
+    });
+  }
+
   async placeOrder(order) {
     return this.withApi(async ({ api, connected }) => {
       await connected;
@@ -399,6 +418,42 @@ function waitForContractDetails(api, contract) {
     api.on(EventName.contractDetailsEnd, onEnd);
     api.on(EventName.error, onError);
     api.reqContractDetails(reqId, contract);
+  });
+}
+
+/**
+ * Resolve live IBKR price-increment tables for a set of market rule ids.
+ * Returns { [ruleId]: [{ lowEdge, increment }] }. Rules that do not respond
+ * before the timeout are simply omitted from the map.
+ */
+function waitForMarketRules(api, ruleIds) {
+  return new Promise((resolve) => {
+    const { EventName } = loadIbModule();
+    const wanted = new Set(ruleIds.map((r) => Number(r)));
+    const results = {};
+    const onRule = (ruleId, increments) => {
+      const id = Number(ruleId);
+      if (!wanted.has(id)) return;
+      const table = (Array.isArray(increments) ? increments : [])
+        .map((row) => ({
+          lowEdge: Number(row.lowEdge ?? row.lowedge ?? row.low_edge),
+          increment: Number(row.increment),
+        }))
+        .filter((row) => Number.isFinite(row.lowEdge) && Number.isFinite(row.increment) && row.increment > 0)
+        .sort((a, b) => a.lowEdge - b.lowEdge);
+      if (table.length) results[id] = table;
+      if (Object.keys(results).length >= wanted.size) finish();
+    };
+    const finish = () => {
+      clearTimeout(timer);
+      api.off(EventName.marketRule, onRule);
+      resolve(results);
+    };
+    const timer = setTimeout(finish, 12000);
+    api.on(EventName.marketRule, onRule);
+    for (const id of wanted) {
+      try { api.reqMarketRule(id); } catch (_) { /* skip unsupported */ }
+    }
   });
 }
 
@@ -772,6 +827,9 @@ function normalizeContractDetails(details) {
     venueKey: normalized.venueKey,
     tradingHours: stringOrNull(detail.tradingHours ?? summary.tradingHours) || '',
     liquidHours: stringOrNull(detail.liquidHours ?? summary.liquidHours) || '',
+    minTick: Number(detail.minTick ?? summary.minTick) || null,
+    marketRuleIds: stringOrNull(detail.marketRuleIds ?? summary.marketRuleIds) || null,
+    validExchanges: stringOrNull(detail.validExchanges ?? summary.validExchanges) || null,
     raw: details,
   };
 }

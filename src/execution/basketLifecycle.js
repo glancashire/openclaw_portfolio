@@ -189,6 +189,12 @@ async function runBasketLifecycle({
           runState: reconciled,
           originalEnvelope,
           quoteFn,
+          tickResolverFn: options.tickResolverFn || (() => {
+            try {
+              const { makeTickResolver } = require('./marketRuleResolver');
+              return makeTickResolver({ client, cacheDir: path.join(rootDir, 'runtime', 'broker-cache', 'market-rules') });
+            } catch (_) { return null; }
+          })(),
           rootDir,
         });
         if (reproposal && !reproposal.skipped) {

@@ -111,12 +111,16 @@ async function main() {
     }
   };
 
+  const { makeTickResolver } = require(path.join(ROOT, 'src/execution/marketRuleResolver'));
+  const tickResolverFn = makeTickResolver({ client, cacheDir: path.join(ROOT, 'runtime', 'broker-cache', 'market-rules') });
+
   const result = await generateBasketProposal({
     portfolio,
     approvedInstruments,
     holdingsByIsin,
     cashChf,
     liveQuoteFn,
+    tickResolverFn,
   });
 
   if (result.envelope.legs.length === 0) {

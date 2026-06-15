@@ -73,6 +73,7 @@ async function generateBasketProposal({
   holdingsByIsin,
   cashChf,
   liveQuoteFn,
+  tickResolverFn,
   options = {},
 }) {
   const markupAskBps = Number.isFinite(Number(options.markupOverAskBps)) ? Number(options.markupOverAskBps) : 50;
@@ -118,7 +119,21 @@ async function generateBasketProposal({
     const referencePrice = Number.isFinite(ask) && ask > 0 ? ask : (Number.isFinite(lastClose) && lastClose > 0 ? lastClose : null);
     if (!Number.isFinite(referencePrice)) continue;
     const bps = Number.isFinite(ask) && ask > 0 ? markupAskBps : markupCloseBps;
-    const tick = pickTick({ instrument: target.isin, currency: target.currency }, referencePrice);
+    // Prefer the live/cached IBKR market-rule tick for this contract+venue+price.
+    // Fall back to the static price-tier heuristic when no resolver is wired.
+    let tick = pickTick({ instrument: target.isin, currency: target.currency }, referencePrice);
+    if (typeof tickResolverFn === 'function') {
+      try {
+        const resolved = await tickResolverFn({
+          conid: target.conid,
+          venue: target.primaryExchange || target.exchange,
+          currency: target.currency,
+          price: referencePrice,
+        });
+        const rt = Number(resolved && (resolved.tick != null ? resolved.tick : resolved));
+        if (Number.isFinite(rt) && rt > 0) tick = rt;
+      } catch (_) { /* keep heuristic tick */ }
+    }
     const limitNative = roundToTick(referencePrice * (1 + bps / 10000), tick);
 
     // Convert gap (CHF) into native currency to size the qty.

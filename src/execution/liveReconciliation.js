@@ -110,7 +110,15 @@ async function refreshBasketExecutionArtifacts({ portfolioDir, repoRoot = proces
       });
     }
     if (executeBasket) {
-      basketRun = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: repoRoot, now, submitLeg });
+      // Resolve binding IBKR market-rule ticks per contract+venue+price so the
+      // limit conforms to the exchange increment (see docs/operations/ibkr-tick-sizes.md).
+      let tickResolverFn = null;
+      try {
+        const { makeTickResolver } = require('./marketRuleResolver');
+        const tickClient = new InteractiveBrokersClient({ portfolio });
+        tickResolverFn = makeTickResolver({ client: tickClient, cacheDir: path.join(repoRoot, 'runtime', 'broker-cache', 'market-rules') });
+      } catch (_) { tickResolverFn = null; }
+      basketRun = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: repoRoot, now, submitLeg, tickResolverFn });
     }
   }
 

@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-05T10:27:09.674Z",
+  "generatedAt": "2026-06-15T12:02:07.477Z",
   "counts": {
-    "totalTests": 342,
+    "totalTests": 343,
     "domains": 124
   },
   "domains": [
@@ -53,6 +53,21 @@
       ]
     },
     {
+      "domain": "market",
+      "total": 14,
+      "safe": 11,
+      "integration": 3,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-market-calendar-artifact-has-holiday-fields.js",
+        "scripts/test-market-calendar-holidays.js",
+        "scripts/test-market-calendar-readiness.js"
+      ]
+    },
+    {
       "domain": "trade",
       "total": 14,
       "safe": 8,
@@ -65,21 +80,6 @@
         "scripts/test-trade-blocking-safety-hardening.js",
         "scripts/test-trade-cli-surface.js",
         "scripts/test-trade-cli-venue-aware-market-message.js"
-      ]
-    },
-    {
-      "domain": "market",
-      "total": 13,
-      "safe": 10,
-      "integration": 3,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 2,
-      "examples": [
-        "scripts/test-market-calendar-artifact-has-holiday-fields.js",
-        "scripts/test-market-calendar-holidays.js",
-        "scripts/test-market-calendar-readiness.js"
       ]
     },
     {

@@ -54,7 +54,13 @@ async function main() {
   console.log('Transmitting via canonical basket runner...');
   let runResult;
   try {
-    runResult = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: ROOT });
+    // Resolve binding IBKR market-rule ticks per contract+venue+price (see
+    // docs/operations/ibkr-tick-sizes.md). Critical on the retry-after-cancel
+    // path: a reproposal bumps the limit, and it must land on the venue's tick.
+    const { makeTickResolver } = require(path.join(ROOT, 'src/execution/marketRuleResolver'));
+    const tickClient = new InteractiveBrokersClient({ portfolio });
+    const tickResolverFn = makeTickResolver({ client: tickClient, cacheDir: path.join(ROOT, 'runtime', 'broker-cache', 'market-rules') });
+    runResult = await executeApprovedBasket({ portfolioDir, approvalId, rootDir: ROOT, tickResolverFn });
   } catch (error) {
     console.error('Runner failed:', error.message);
     console.error(error.stack);

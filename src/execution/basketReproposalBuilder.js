@@ -116,7 +116,7 @@ function nextVersion(rootDir, portfolio, approvalId) {
 }
 
 /** Build a reproposal envelope for cancelled legs. Returns { path, envelope, version, skipped, excludedLegs }. */
-async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState, originalEnvelope, quoteFn, rootDir, now = new Date(), circuitBreakerThreshold = 3 }) {
+async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState, originalEnvelope, quoteFn, tickResolverFn, rootDir, now = new Date(), circuitBreakerThreshold = 3 }) {
   const cancelled = Object.values(runState.legs || {}).filter((leg) => leg.status === 'cancelled');
   if (cancelled.length === 0) return { skipped: true, reason: 'no_cancelled_legs' };
 
@@ -162,7 +162,22 @@ async function buildReproposalForCancelledLegs({ portfolio, approvalId, runState
     const lastClose = Number(quote?.lastClose ?? quote?.last ?? quote?.close);
     const previousLimit = Number(orig.limitPrice);
     const refPrice = Number.isFinite(ask) && ask > 0 ? ask : (Number.isFinite(lastClose) && lastClose > 0 ? lastClose : previousLimit);
-    const tick = pickTick({ instrument: leg.instrument, currency: orig.currency }, refPrice);
+    // Prefer the live/cached IBKR market-rule tick for this contract+venue+price.
+    // Critical on the retry-after-cancel path: the bumped limit must land on the
+    // venue's actual increment. Falls back to the static heuristic.
+    let tick = pickTick({ instrument: leg.instrument, currency: orig.currency }, refPrice);
+    if (typeof tickResolverFn === 'function') {
+      try {
+        const resolved = await tickResolverFn({
+          conid: orig.conid || leg.conid,
+          venue: orig.primaryExchange || orig.exchange,
+          currency: orig.currency,
+          price: refPrice,
+        });
+        const rt = Number(resolved && (resolved.tick != null ? resolved.tick : resolved));
+        if (Number.isFinite(rt) && rt > 0) tick = rt;
+      } catch (_) { /* keep heuristic tick */ }
+    }
     const bumped = computeBumpedLimitPrice({ ask, lastClose, previousLimit, tick });
     if (!Number.isFinite(bumped)) {
       reproposalLegs.push({ ...orig, status: 'needs_manual_review', reason: 'no_quote_available' });

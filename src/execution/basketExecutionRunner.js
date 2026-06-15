@@ -89,7 +89,7 @@ function summarizeRun(runState = {}) {
   return runState;
 }
 
-async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = process.cwd(), now = new Date(), submitLeg = null, fetchLiveQuote = null, fxLookup = null, safeguardConfig = {} } = {}) {
+async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = process.cwd(), now = new Date(), submitLeg = null, fetchLiveQuote = null, fxLookup = null, tickResolverFn = null, safeguardConfig = {} } = {}) {
   const portfolio = path.basename(portfolioDir);
   const { envelope } = loadApprovalEnvelope({ portfolio, approvalId, rootDir, now });
   const { path: statePath, state } = loadOrCreateRunState({ portfolio, approvalId, rootDir, now });
@@ -198,15 +198,30 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
       continue;
     }
 
-    // Pre-flight tick validation: ensure limitPrice conforms to IBKR market rules
+    // Pre-flight tick validation: ensure limitPrice conforms to IBKR market rules.
+    // Prefer the live/cached market-rule tick for this contract+venue+price; fall
+    // back to the static price-tier table when no resolver is wired or it fails.
     const { tickForPrice, roundToTick } = require('./basketReproposalBuilder');
-    const expectedTick = tickForPrice(leg.limitPrice);
+    let expectedTick = tickForPrice(leg.limitPrice);
+    if (typeof tickResolverFn === 'function') {
+      try {
+        const resolved = await tickResolverFn({
+          conid: leg.conid,
+          venue: leg.primaryExchange || leg.exchange,
+          currency: leg.currency,
+          price: leg.limitPrice,
+        });
+        const rt = Number(resolved && (resolved.tick != null ? resolved.tick : resolved));
+        if (Number.isFinite(rt) && rt > 0) expectedTick = rt;
+      } catch (_) { /* keep static tick */ }
+    }
     const remainder = Math.abs((leg.limitPrice / expectedTick) % 1);
     const tickValid = remainder < 1e-9 || Math.abs(remainder - 1) < 1e-9;
     if (!tickValid) {
       const corrected = roundToTick(leg.limitPrice, expectedTick);
       leg.limitPrice = corrected;
       leg._tickCorrected = true;
+      leg._tickUsed = expectedTick;
     }
 
     const order = prepareOrderForSubmission({
