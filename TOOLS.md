@@ -40,6 +40,7 @@ Key invariants (kept here for muscle memory):
 - If readiness says `connect ECONNREFUSED 127.0.0.1:4001`, the wrapper started but the gateway has not completed login and exposed the API port yet.
 - Last verified launch display: `:99` via Xvfb.
 - The practical finish step is completing the IB Gateway login / second-factor approval on that display, then rerunning `node scripts/check-interactive-brokers-readiness.js`.
+- **Socket drops after a healthy start are almost always self-inflicted (verified 2026-06-15).** Do NOT fire a second `start-ibc.sh` while `:4001` is already listening. `ExistingSessionDetectedAction=primary` (in `/opt/ibc/config.ini`) keeps the *running* session and makes the *new* colliding login exit with `IBC returned exit status 1` — that log line means the duplicate lost, not that the live session died. The launcher already early-exits on a duplicate ("not starting a duplicate", exit 0) and `scripts/ibkr-native-keepalive.js` returns immediately on `ready` without restarting. So: check `ss -ltn | grep :4001` BEFORE starting; if up, do nothing.
 
 ### Reporting stabilization (Phases 163–165)
 - Dated portfolio reports now persist a sibling structured JSON artifact beside the dated markdown/html report; investor email loading should prefer that sibling JSON before falling back to `summary.json`.

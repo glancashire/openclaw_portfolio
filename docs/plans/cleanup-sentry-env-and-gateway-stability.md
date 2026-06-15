@@ -46,6 +46,24 @@ Add a tiny, dependency-free env loader and call it at the top of the unattended 
 
 ## Cleanup B — IB Gateway `:4001` socket drops after login
 
+### RESOLVED 2026-06-15 — no code/config change needed (root cause: self-inflicted restart collisions)
+
+**Diagnosis verdict (verified live 2026-06-15 12:34 UTC):**
+- The current gateway (java pid 1942) has been **up and stable for ~1h** since 11:25; readiness `reason: ready`.
+- The morning `IBC returned exit status 1` events at 11:11 / 11:19 / 11:27 were **my own repeated manual `start-ibc.sh` invocations** racing a session that was already healthy.
+- `ExistingSessionDetectedAction=primary` (in `/opt/ibc/config.ini:329`) did exactly the right thing: it kept the **running** session and made the **new colliding login** exit non-zero. The "exit status 1" is the *new* process losing, not the live session dying.
+- The existing guards are already correct and were verified:
+  - **Launcher guard:** a second `start-ibc.sh` early-exits with "Existing IB Gateway IBC launcher already running; not starting a duplicate" (exit 0) — proven live, healthy session untouched.
+  - **Keepalive guard:** `scripts/ibkr-native-keepalive.js` returns immediately on `firstStatus === 'ready'` and never calls `startGateway` over a healthy session.
+
+**Conclusion:** there is **no standing config defect and no code change required**. The fix is operational discipline, already documented: never fire a second `start-ibc.sh` while `:4001` is up. Earlier theory of a config bug is withdrawn.
+
+**Action taken:** documented the confirmed root cause in `TOOLS.md` (IBKR native gateway recovery) and `memory/2026-06-15.md`. No commit to executable code for B.
+
+---
+
+### Original plan (kept for history — superseded by the verdict above)
+
 ### Root cause (partially verified — needs a focused diagnosis pass)
 Two distinct things were conflated this morning:
 1. **Duplicate-launcher race (mostly already guarded):** `start-ibc.sh` *does* have a single-instance guard (`pgrep -f "/opt/ibc/scripts/ibcstart.sh ${GW_VERSION} ...--tws-settings-path=..."`). So a second `start-ibc.sh` invocation should early-exit. But during the session the socket still dropped, so the guard alone is not the whole story.
