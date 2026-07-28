@@ -14,6 +14,47 @@ const { loadDepositsLedger } = require('../../lib/depositsLedger');
 const { assessPortfolio, narrateAssessment } = require('../../lib/aiAssessment');
 const { createModelClient } = require('../../lib/modelClient');
 
+function formatWindowCell(window = {}, kind = 'currency') {
+  if (!window || !['available', 'partial', 'complete'].includes(window.availability)) return '—';
+  if (kind === 'percent') return window.gainPct == null ? '—' : formatPercent(window.gainPct);
+  return window.gainChf == null ? '—' : formatCurrency(window.gainChf, 'CHF');
+}
+
+function renderPortfolioWindowsCard(summary = {}) {
+  const windows = summary?.performance?.portfolio?.windows || null;
+  if (!windows) return '';
+  const rows = [
+    ['Since purchase', windows.sincePurchase],
+    ['Last 7 days', windows.last7d],
+    ['Last 30 days', windows.last30d],
+    ['YTD', windows.ytd],
+    ['Last 365 days', windows.last365d],
+  ].map(([label, window]) => [
+    escapeHtml(label),
+    escapeHtml(formatWindowCell(window, 'currency')),
+    escapeHtml(formatWindowCell(window, 'percent')),
+    escapeHtml(window?.availability === 'partial' ? 'partial' : window?.anchorDate || window?.availability || '—'),
+  ]);
+  return card({
+    title: 'Portfolio value windows (reference only)',
+    tone: 'surface',
+    contentHtml: `
+      <div style="margin-bottom:10px;font-size:12px;color:#64748b;line-height:1.5;">
+        Historical value anchors only. These windows are reference deltas on recorded portfolio value and do not neutralize deposits or withdrawals. They are not time-weighted or money-weighted return calculations.
+      </div>
+      ${dataTable({
+        columns: [
+          { label: 'Window' },
+          { label: 'Change CHF', align: 'right' },
+          { label: 'Change %', align: 'right' },
+          { label: 'Coverage', align: 'right' },
+        ],
+        rows,
+      })}
+    `,
+  });
+}
+
 function resolveDigestRecipients(policy = {}, env = process.env) {
   const configured = Array.isArray(policy.emailRecipients)
     ? policy.emailRecipients.map((item) => String(item || '').trim()).filter(Boolean)
@@ -539,6 +580,7 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
   const allocationHealthHtml = renderAllocationHealthLine(summary);
   const bodyHtml = [
     renderValueHeadlineCard(summary, portfolioDir),
+    renderPortfolioWindowsCard(summary),
     renderTopMoversCard(summary),
     renderSparklineCard(portfolioDir),
     renderProfitLossCard(summary),
@@ -592,6 +634,21 @@ async function buildDashboardDigest({ portfolioDir, frequency = 'daily', generat
         ]
       : []),
     `Unrealized profit on held positions: ${formatCurrency(profitTotals.totalProfitChf, 'CHF')}${profitTotals.totalProfitPct != null ? ` (${profitTotals.totalProfitPct >= 0 ? '+' : ''}${Number(profitTotals.totalProfitPct).toFixed(2)}%)` : ''}`,
+    ...(() => {
+      const windows = summary?.performance?.portfolio?.windows || {};
+      const items = [
+        ['Since purchase', windows.sincePurchase],
+        ['Last 7 days', windows.last7d],
+        ['Last 30 days', windows.last30d],
+        ['YTD', windows.ytd],
+        ['Last 365 days', windows.last365d],
+      ];
+      return [
+        'Portfolio value windows (reference only)',
+        'These are historical value-anchor deltas, not cash-flow-adjusted performance metrics.',
+        ...items.map(([label, window]) => `- ${label}: ${formatWindowCell(window, 'currency')}${formatWindowCell(window, 'percent') !== '—' ? ` (${formatWindowCell(window, 'percent')})` : ''} [${window?.availability || 'missing'}]`)
+      ];
+    })(),
     `Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}`,
     `Operator queue: ${summary.operatorQueue?.summary?.total || 0}`,
     resolvedCronHealth.status === 'unavailable'

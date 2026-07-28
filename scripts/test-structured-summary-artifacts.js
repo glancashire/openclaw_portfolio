@@ -53,6 +53,10 @@ async function main() {
   assert(summary.investorHoldings && Array.isArray(summary.investorHoldings.rows), 'Expected investor holdings rows');
   assert(summary.investorHoldings && summary.investorHoldings.totals && typeof summary.investorHoldings.totals.rowCount === 'number', 'Expected investor holdings totals');
   assert(summary.investorHoldings.totals.totalGainPct == null || Number.isFinite(summary.investorHoldings.totals.totalGainPct), 'Expected investor holding total gain pct to be finite or null');
+  assert(summary.performance && summary.performance.portfolio && summary.performance.portfolio.windows, 'Expected portfolio performance windows');
+  assert(summary.performance.portfolio.windows.last7d, 'Expected last7d portfolio window');
+  assert(summary.performance.portfolio.windows.ytd, 'Expected ytd portfolio window');
+  assert(summary.investorHoldings.rows.every((row) => row.performanceWindows && row.performanceWindows.sincePurchase), 'Expected per-row performance windows');
   assert(summary.execution && summary.execution.tradeState && typeof summary.execution.tradeState.blocked === 'number', 'Expected blocked trade-state count');
   assert(summary.execution && summary.execution.openRunnerRetryState && typeof summary.execution.openRunnerRetryState.queuedRetry === 'number', 'Expected queued-retry count');
   assert(typeof summary.execution.openRunnerRetryState.queuedInitial === 'number', 'Expected queued-initial count');

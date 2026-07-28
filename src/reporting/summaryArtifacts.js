@@ -13,6 +13,7 @@ const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { markdownToBasicHtml } = require('./pdfExport');
 const { writeJsonIfChanged, writeTextIfChanged } = require('./artifactWriter');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep } = require('./dashboardGenerator');
+const { snapshotProviderHealth, configuredProviderOrder } = require('../quotes');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 const { buildSparklineSvg } = require('./sparkline');
 const { readNetLiqHistory, lastNDays } = require('./historyDigest');
@@ -23,6 +24,7 @@ const { buildSelfHealPlan } = require('../execution/portfolioHealth');
 const { buildInvestorHoldingsSnapshot, parseHoldingsTable } = require('./investorReportingData');
 const { buildProfitLossSummary } = require('./costBasis');
 const { resolveHoldingQuotes } = require('./quoteResolution');
+const { buildPortfolioPerformanceWindows } = require('./performanceWindows');
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -499,12 +501,30 @@ async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, ho
     profitLossRows: profitLoss.rows,
     totalValueChf: totalValue,
   });
+  const performance = {
+    portfolio: buildPortfolioPerformanceWindows({
+      historyRows: historySeries,
+      sincePurchase: {
+        availability: profitLoss.totals.totalProfitChf == null ? 'missing' : (Number(profitLoss.totals.coveredCount || 0) === holdingCount ? 'complete' : 'partial'),
+        gainChf: profitLoss.totals.totalProfitChf,
+        gainPct: profitLoss.totals.totalProfitPct,
+        costBasisChf: profitLoss.totals.totalCostBasisChf,
+      },
+    }),
+    instruments: investorHoldings.rows.map((row) => ({
+      symbol: row.symbol,
+      name: row.name,
+      windows: row.performanceWindows || null,
+    })),
+  };
   const blockers = safetyDiagnostics?.blockers || [];
   const tradeStateSummary = summarizeTradeStateRows(tradesPath);
   const blockedTradeRows = listBlockedTradeRows(tradesPath);
   const staleApprovals = staleApprovalInventory(tradesPath);
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   const latestActions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
+  const quoteProviderHealth = snapshotProviderHealth();
+  const quoteProviderOrder = configuredProviderOrder();
   const pendingActions = buildPendingActionItems({
     portfolioName,
     deliveryStatus,
@@ -515,6 +535,8 @@ async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, ho
     openRunnerRetryState,
     safetyDiagnostics,
     fillNotificationState: deliveryStatus?.fillNotificationState || null,
+    quoteProviderHealth,
+    quoteProviderOrder,
     recommended: latestActions,
     latestProposals,
   });
@@ -651,6 +673,7 @@ function buildDeploymentOpportunity(holdingsText = '', totalValue = 0) {
         };
       })(),
     },
+    performance,
     profitLoss,
     approvals: {
       proposedCount: Number(lifecycleSummary?.proposed || 0),
@@ -735,6 +758,8 @@ function buildDeploymentOpportunity(holdingsText = '', totalValue = 0) {
       lastBrokerErrorAt: brokerErrorState?.lastAt || null,
     },
     recentTrades: existingTrades,
+    quoteProviderHealth,
+    quoteProviderOrder,
   };
 }
 
@@ -1113,6 +1138,21 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
 </html>`;
 }
 
+function formatProviderHealthBlock(summary = {}) {
+  const order = Array.isArray(summary.quoteProviderOrder) ? summary.quoteProviderOrder : [];
+  const health = Array.isArray(summary.quoteProviderHealth) ? summary.quoteProviderHealth : [];
+  const lines = [];
+  lines.push(`- Provider order: ${order.length ? order.join(' -> ') : 'unknown'}`);
+  if (!health.length) {
+    lines.push('- Provider state: no provider attempts recorded in this process yet');
+    return lines.join('\n');
+  }
+  for (const item of health) {
+    lines.push(`- ${item.providerId}: failures=${item.consecutiveFailures || 0}, lastSuccess=${item.lastSuccessAt || 'never'}, lastFailure=${item.lastFailureAt || 'never'}, cooldownUntil=${item.cooldownUntil || 'none'}`);
+  }
+  return lines.join('\n');
+}
+
 function renderPortfolioSummaryMarkdown(summary = {}) {
   const queueItems = Array.isArray(summary.operatorQueue?.items) ? summary.operatorQueue.items : [];
   const blockers = Array.isArray(summary.blockers?.items) ? summary.blockers.items : [];
@@ -1149,7 +1189,7 @@ function renderPortfolioSummaryMarkdown(summary = {}) {
   const onboardingSection = onboarding
     ? `## Onboarding Workflow\n- Completion: ${onboarding.completionPct}%\n- Answered questions: ${onboarding.answeredCount}/${onboarding.totalQuestions}\n- Pending questions: ${onboarding.pendingCount}\n- Ready for activation-question gate: ${onboarding.readyForActivationQuestions ? 'yes' : 'no'}\n- Next step: ${onboarding.nextStep}\n\n### Onboarding Sections\n${(onboarding.sections || []).length ? onboarding.sections.map((section) => `- ${section.label}: ${section.pendingCount} pending`).join('\n') : '- No pending onboarding sections.'}\n\n` : '';
 
-  return `# Portfolio Summary Page: ${summary.portfolio || 'unknown'}\n\n## Status Snapshot\n- Generated at: ${summary.generatedAt || 'unknown'}\n- Health: ${summary.status?.health || 'unknown'}\n- Strategy status: ${summary.status?.strategy || 'unknown'}\n- Broker health: ${summary.status?.brokerHealth || 'unknown'}\n- Execution posture: ${summary.status?.executionPosture || 'unknown'}\n- Delivery posture: ${summary.status?.deliveryPosture || 'unknown'}\n- Data freshness: ${summary.status?.dataFreshness || 'unknown'}\n- Live readiness: ${summary.readiness ? (summary.readiness.ok ? 'ready' : 'blocked') : 'not-evaluated'}\n- Live arm state: ${summary.readiness ? (summary.readiness.armedForMarketOpen ? `armed until ${summary.readiness.armExpiresAt || 'unknown'}` : 'not armed') : 'not-evaluated'}\n- Live readiness next step: ${summary.readiness?.recommendedNextAction || 'n/a'}\n- Guided remediation next step: ${summary.selfHealPlan?.health?.nextAction || 'No guided remediation action suggested.'}\n\n## Why This Portfolio Looks This Way\n- Drift: ${summary.explanations?.biggestDrift || 'No drift explanation available.'}\n- Execution: ${summary.explanations?.executionBlock || 'No execution explanation available.'}\n- Approvals: ${summary.explanations?.approvalBacklog || 'No approval explanation available.'}\n- Trade posture: ${summary.explanations?.noTradePosture || 'No trade-posture explanation available.'}\n\n## Holdings Snapshot\n- Total value CHF: ${summary.holdings?.totalValueChf || 0}\n- Cash CHF: ${summary.holdings?.cashChf || 0}\n- Invested CHF: ${summary.holdings?.investedChf || 0}\n- Holding count: ${summary.holdings?.holdingCount || 0}\n- Last sync: ${summary.holdings?.lastSyncAt || 'unknown'}\n- Latest snapshot date: ${summary.holdings?.latestSnapshotDate || 'unknown'}\n\n## Recommended Next Step\n- ${summary.recommendedNextStep || 'No recommendation available.'}\n\n## Operator Queue Summary\n- Total queue items: ${summary.operatorQueue?.summary?.total || 0}\n- Blocking items: ${summary.operatorQueue?.summary?.blocking || 0}\n- Approval items: ${summary.operatorQueue?.summary?.approvals || 0}\n- Fresh actionable approvals: ${summary.operatorQueue?.summary?.freshApprovals || 0}\n- Stale approvals needing reapproval: ${summary.operatorQueue?.summary?.staleApprovals || 0}\n- Open-runner first handoffs: ${summary.operatorQueue?.summary?.openRunnerQueue || 0}\n- Open-runner retries: ${summary.operatorQueue?.summary?.openRunnerRetry || 0}\n- Recovery items: ${summary.operatorQueue?.summary?.recovery || 0}\n- Warning items: ${summary.operatorQueue?.summary?.warnings || 0}\n\n## Contract Intelligence Readiness\n- ${summary.contractIntelligence?.summaryLine || 'No contract-intelligence summary available.'}\n- Recommended contract-intelligence action: ${summary.contractIntelligence?.nextAction || 'No contract-intelligence remediation suggested.'}\n\n## Operator Queue Items\n${queueLines}\n\n## Blockers\n${blockerLines}\n\n## Execution Posture\n- Proposed trades: ${summary.approvals?.proposedCount || 0}\n- Approved trades: ${summary.approvals?.approvedCount || 0}\n- Fresh actionable approvals: ${summary.approvals?.freshApprovedCount || 0}\n- Stale approvals needing reapproval: ${summary.approvals?.staleApprovalCount || 0}\n- Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}\n- Queued for open runner: ${summary.execution?.tradeState?.queuedForOpenRunner || 0}\n- Queued retries: ${summary.execution?.openRunnerRetryState?.queuedRetry || 0}\n- Blocked rows: ${summary.execution?.tradeState?.blocked || 0}\n- In-flight rows: ${summary.execution?.inFlightCount || 0}\n- Failed rows: ${summary.execution?.failedCount || 0}\n\n## Broker Block Details\n${brokerBlockLines}\n\n## Observability Status\n- Runtime event file present: ${summary.observability?.eventsPresent ? 'yes' : 'no'}\n- Recent runtime events scanned: ${summary.observability?.recentSummary?.total || 0}\n- Blocked execution-policy events: ${summary.observability?.recentSummary?.blockedTrades || 0}\n- Open-runner first handoff events: ${summary.observability?.recentSummary?.openRunnerQueueEvents || 0}\n- Open-runner retry events: ${summary.observability?.recentSummary?.openRunnerRetryEvents || 0}\n- Degraded broker events: ${summary.observability?.recentSummary?.degradedBrokerEvents || 0}\n- Stale-data events: ${summary.observability?.recentSummary?.staleDataEvents || 0}\n\n## Allocation\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${allocationTable}\n\n## Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Latest proposal status | Approval |\n|---|---|---|---:|---|---|\n${instrumentTable}\n\n${onboardingSection}## Recent Material Events\n${eventLines}\n`;
+  return `# Portfolio Summary Page: ${summary.portfolio || 'unknown'}\n\n## Status Snapshot\n- Generated at: ${summary.generatedAt || 'unknown'}\n- Health: ${summary.status?.health || 'unknown'}\n- Strategy status: ${summary.status?.strategy || 'unknown'}\n- Broker health: ${summary.status?.brokerHealth || 'unknown'}\n- Execution posture: ${summary.status?.executionPosture || 'unknown'}\n- Delivery posture: ${summary.status?.deliveryPosture || 'unknown'}\n- Data freshness: ${summary.status?.dataFreshness || 'unknown'}\n- Live readiness: ${summary.readiness ? (summary.readiness.ok ? 'ready' : 'blocked') : 'not-evaluated'}\n- Live arm state: ${summary.readiness ? (summary.readiness.armedForMarketOpen ? `armed until ${summary.readiness.armExpiresAt || 'unknown'}` : 'not armed') : 'not-evaluated'}\n- Live readiness next step: ${summary.readiness?.recommendedNextAction || 'n/a'}\n- Guided remediation next step: ${summary.selfHealPlan?.health?.nextAction || 'No guided remediation action suggested.'}\n\n## Why This Portfolio Looks This Way\n- Drift: ${summary.explanations?.biggestDrift || 'No drift explanation available.'}\n- Execution: ${summary.explanations?.executionBlock || 'No execution explanation available.'}\n- Approvals: ${summary.explanations?.approvalBacklog || 'No approval explanation available.'}\n- Trade posture: ${summary.explanations?.noTradePosture || 'No trade-posture explanation available.'}\n\n## Holdings Snapshot\n- Total value CHF: ${summary.holdings?.totalValueChf || 0}\n- Cash CHF: ${summary.holdings?.cashChf || 0}\n- Invested CHF: ${summary.holdings?.investedChf || 0}\n- Holding count: ${summary.holdings?.holdingCount || 0}\n- Last sync: ${summary.holdings?.lastSyncAt || 'unknown'}\n- Latest snapshot date: ${summary.holdings?.latestSnapshotDate || 'unknown'}\n\n## Recommended Next Step\n- ${summary.recommendedNextStep || 'No recommendation available.'}\n\n## Operator Queue Summary\n- Total queue items: ${summary.operatorQueue?.summary?.total || 0}\n- Blocking items: ${summary.operatorQueue?.summary?.blocking || 0}\n- Approval items: ${summary.operatorQueue?.summary?.approvals || 0}\n- Fresh actionable approvals: ${summary.operatorQueue?.summary?.freshApprovals || 0}\n- Stale approvals needing reapproval: ${summary.operatorQueue?.summary?.staleApprovals || 0}\n- Open-runner first handoffs: ${summary.operatorQueue?.summary?.openRunnerQueue || 0}\n- Open-runner retries: ${summary.operatorQueue?.summary?.openRunnerRetry || 0}\n- Recovery items: ${summary.operatorQueue?.summary?.recovery || 0}\n- Warning items: ${summary.operatorQueue?.summary?.warnings || 0}\n\n## Contract Intelligence Readiness\n- ${summary.contractIntelligence?.summaryLine || 'No contract-intelligence summary available.'}\n- Recommended contract-intelligence action: ${summary.contractIntelligence?.nextAction || 'No contract-intelligence remediation suggested.'}\n\n## Quote Provider Health\n${formatProviderHealthBlock(summary)}\n\n## Operator Queue Items\n${queueLines}\n\n## Blockers\n${blockerLines}\n\n## Execution Posture\n- Proposed trades: ${summary.approvals?.proposedCount || 0}\n- Approved trades: ${summary.approvals?.approvedCount || 0}\n- Fresh actionable approvals: ${summary.approvals?.freshApprovedCount || 0}\n- Stale approvals needing reapproval: ${summary.approvals?.staleApprovalCount || 0}\n- Pending approvals: ${summary.approvals?.pendingApprovalCount || 0}\n- Queued for open runner: ${summary.execution?.tradeState?.queuedForOpenRunner || 0}\n- Queued retries: ${summary.execution?.openRunnerRetryState?.queuedRetry || 0}\n- Blocked rows: ${summary.execution?.tradeState?.blocked || 0}\n- In-flight rows: ${summary.execution?.inFlightCount || 0}\n- Failed rows: ${summary.execution?.failedCount || 0}\n\n## Broker Block Details\n${brokerBlockLines}\n\n## Observability Status\n- Runtime event file present: ${summary.observability?.eventsPresent ? 'yes' : 'no'}\n- Recent runtime events scanned: ${summary.observability?.recentSummary?.total || 0}\n- Blocked execution-policy events: ${summary.observability?.recentSummary?.blockedTrades || 0}\n- Open-runner first handoff events: ${summary.observability?.recentSummary?.openRunnerQueueEvents || 0}\n- Open-runner retry events: ${summary.observability?.recentSummary?.openRunnerRetryEvents || 0}\n- Degraded broker events: ${summary.observability?.recentSummary?.degradedBrokerEvents || 0}\n- Stale-data events: ${summary.observability?.recentSummary?.staleDataEvents || 0}\n\n## Allocation\n| Asset class | Current % | Target % | Drift % | Status |\n|---|---:|---:|---:|---|\n${allocationTable}\n\n## Instruments\n| Ticker / ISIN | Name | Asset class | Target % | Latest proposal status | Approval |\n|---|---|---|---:|---|---|\n${instrumentTable}\n\n${onboardingSection}## Recent Material Events\n${eventLines}\n`;
 }
 
 async function generatePortfolioSummaryArtifacts({ portfolioDir, writeFiles = true, readiness = null }) {

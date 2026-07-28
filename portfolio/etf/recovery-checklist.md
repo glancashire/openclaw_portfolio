@@ -1,21 +1,21 @@
 # Recovery Checklist: etf
 
 ## Incident Status
-- Status: monitor_only
-- Health: attention_needed
-- Broker health: healthy
-- Execution posture: ready_for_review
+- Status: action_required
+- Health: warning
+- Broker health: degraded
+- Execution posture: degraded_dry_run_only
 - Delivery posture: ready
 - Data freshness: current
 - Pending approvals: 0
-- Recommended next step: Portfolio is performing as intended. Hold current positions and review after the next market session.
+- Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 
 ## Why This Incident Exists
-- No explicit execution block is currently surfaced.
+- Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 - 78 blocked row(s) still need explicit operator review before the workflow can advance cleanly.
 
 ## Incident Drivers
-- No active incident drivers were detected; this checklist is a verification pass confirming healthy posture.
+- Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
 
 ## Active Blockers
 1. No active blockers.
@@ -107,25 +107,25 @@
    - Broker order id: 9172
 
 ## Action Checklist
-1. [low] Portfolio is performing as intended. Hold current positions and review after the next market session.
-   - Action: Portfolio is performing as intended. Hold current positions and review after the next market session.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: recommendation_engine
+1. [high] Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+   - Action: Restore broker connectivity before relying on broker-backed pricing or live execution paths.
+   - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
+   - Source: broker_readiness
 
 ## Verification Checks
-- Broker health remains healthy or intentionally degraded with operator awareness.
+- Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.
 - Freshness posture remains current.
 - No approval backlog remains.
 - No active blockers remain.
 
 ## Completion Criteria
-- Portfolio remains in a healthy or intentionally monitored posture.
-- No blocker-class recovery work is outstanding.
-- The next operating step is clear from the summary surface.
+- Blocking recovery items no longer appear in the operator queue.
+- Portfolio health no longer depends on unresolved blocker conditions.
+- The operator can explain the current posture and next operating step without cross-referencing multiple artifacts.
 
 ## Recent Signals
-1. [warn] Transmitted live execution requires dryRun=false.
-2. [warn] Requested instrument is not in Approved Instruments. | Portfolio requires confirmation before first live trade. | Transmitted live execution requires explicit user approval flag. | Transmitted live execution requires the exact transmittedLiveAck confirmation string.
-3. [warn] Requested instrument is not in Approved Instruments.
+1. [warn] Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+2. [warn] Requested instrument is not in Approved Instruments.
+3. [warn] Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.
 4. [warn] Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.
 5. [warn] Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.

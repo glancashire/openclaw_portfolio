@@ -1,5 +1,5 @@
 const { estimateOrderSize, getDraftPrice } = require('./draftPricing');
-const { fetchLatestPrice } = require('../brokers/interactive-brokers/pricing');
+const { getQuote } = require('../quotes');
 
 async function estimateOrderSizeWithBrokerFallback({ instrument, estimatedChf, portfolio = 'etf' }) {
   if (!instrument || instrument.tickerOrIsin === 'CASH-CHF') {
@@ -15,7 +15,12 @@ async function estimateOrderSizeWithBrokerFallback({ instrument, estimatedChf, p
   }
 
   if (instrument.ibkrConid) {
-    const brokerQuote = await fetchLatestPrice({ conid: instrument.ibkrConid, portfolio });
+    const brokerQuote = await getQuote({
+      portfolio,
+      instrument,
+      conid: instrument.ibkrConid,
+      externalSymbol: instrument.externalQuoteSymbol || null,
+    });
     const sizing = estimateFromBrokerQuote({ instrument, estimatedChf, brokerQuote });
     if (sizing) return sizing;
   }
@@ -31,7 +36,7 @@ async function estimateOrderSizeWithBrokerFallback({ instrument, estimatedChf, p
 
 function estimateFromBrokerQuote({ instrument, estimatedChf, brokerQuote }) {
   if (!brokerQuote?.ok) return null;
-  const candidatePrice = brokerQuote.ask || brokerQuote.price || brokerQuote.last;
+  const candidatePrice = brokerQuote.ask || brokerQuote.price || brokerQuote.last || brokerQuote.close;
   const limitPrice = Number(candidatePrice);
   if (!Number.isFinite(limitPrice) || limitPrice <= 0) return null;
 
@@ -48,9 +53,9 @@ function estimateFromBrokerQuote({ instrument, estimatedChf, brokerQuote }) {
     limitPrice,
     estimatedOrderChf,
     sizingNote: quantity > 0
-      ? `Sized with Interactive Brokers market data (ask ${limitPrice} ${currency}, FX ${fxToChf} to CHF).`
-      : 'Estimated CHF amount is below one whole share using current Interactive Brokers market data.',
-    priceSource: 'interactive-brokers-marketdata',
+      ? `Sized with quote service (${brokerQuote.providerLabel || brokerQuote.providerPath || 'market data'}: ${limitPrice} ${currency}, FX ${fxToChf} to CHF).`
+      : 'Estimated CHF amount is below one whole share using current quote service data.',
+    priceSource: brokerQuote.providerPath || 'quote-service',
     currency,
     fxToChf,
   };

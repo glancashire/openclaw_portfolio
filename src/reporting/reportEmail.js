@@ -136,7 +136,34 @@ function buildInvestorMetrics(summary = null) {
     latestSnapshotDate: holdings.latestSnapshotDate || null,
     lastSyncAt: holdings.lastSyncAt || null,
     baseCurrency: holdings.baseCurrency || 'CHF',
+    performanceWindows: summary?.performance?.portfolio?.windows || null,
   };
+}
+
+function formatWindowValue(window = {}, kind = 'currency') {
+  if (!window || window.availability !== 'available' && window.availability !== 'partial' && window.availability !== 'complete') return '—';
+  if (kind === 'percent') return window.gainPct == null ? '—' : formatPercent(window.gainPct);
+  return window.gainChf == null ? '—' : formatSignedCurrency(window.gainChf, 'CHF');
+}
+
+function renderWindowAvailability(window = {}) {
+  if (!window) return '—';
+  if (window.availability === 'partial') return 'partial';
+  if (window.availability === 'portfolio_level_only') return 'portfolio only';
+  if (window.availability === 'missing_history') return 'unavailable';
+  if (window.availability === 'missing') return '—';
+  return window.anchorDate ? `anchor ${window.anchorDate}` : 'available';
+}
+
+function portfolioWindowEntries(summary = null) {
+  const windows = summary?.performance?.portfolio?.windows || {};
+  return [
+    ['Since purchase', windows.sincePurchase],
+    ['Last 7 days', windows.last7d],
+    ['Last 30 days', windows.last30d],
+    ['YTD', windows.ytd],
+    ['Last 365 days', windows.last365d],
+  ];
 }
 
 function investorStatusLabel(summary = null, deliveryStatus = null, topBlocker = null) {
@@ -388,30 +415,36 @@ function buildReportEmailText({ portfolioName, period, summaryMarkdown, summary 
           `Unrealized profit %: ${profitLoss.totalProfitPct == null && metrics.sincePurchasePct == null ? '\u2014' : formatPercent(profitLoss.totalProfitPct ?? metrics.sincePurchasePct)}`,
         ]),
     '',
+    'Portfolio value windows (reference only)',
+    'Historical value-anchor deltas only; not cash-flow-adjusted performance.',
+    'Window | Change CHF | Change % | Coverage',
+    '---|---|---|---',
+    ...portfolioWindowEntries(summary).map(([label, window]) => `${label} | ${formatWindowValue(window, 'currency')} | ${formatWindowValue(window, 'percent')} | ${renderWindowAvailability(window)}`),
+    '',
     'Holdings',
   ];
 
   if (!rows.length) {
     lines.push('No holdings data available.');
   } else {
-    lines.push('Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Weight %');
-    lines.push('---|---|---|---|---|---');
+    lines.push('Instrument | Value CHF | Cost basis CHF | Since purchase | 7d | 30d | YTD | 365d | Weight %');
+    lines.push('---|---|---|---|---|---|---|---|---');
     let totalValue = 0;
     let totalCost = 0;
     let totalProfit = 0;
     for (const row of rows) {
       const costBasis = holdingCostBasisChf(row);
       const gainChf = Number(row.gainSincePurchaseChf);
-      const gainPct = Number(row.gainSincePurchasePct);
       const valueChf = Number(row.valueChf || 0);
       const weight = investedChf && investedChf > 0 ? Number(((valueChf / investedChf) * 100).toFixed(1)) : null;
+      const windows = row.performanceWindows || {};
       totalValue += valueChf;
       if (Number.isFinite(costBasis)) totalCost += costBasis;
       if (Number.isFinite(gainChf)) totalProfit += gainChf;
-      lines.push(`${row.symbol || '\u2014'} | ${formatCurrency(row.valueChf, 'CHF')} | ${costBasis == null ? '\u2014' : formatCurrency(costBasis, 'CHF')} | ${!Number.isFinite(gainChf) ? '\u2014' : formatSignedCurrency(gainChf, 'CHF')} | ${!Number.isFinite(gainPct) ? '\u2014' : formatPercent(gainPct)} | ${weight == null ? '\u2014' : `${weight}%`}`);
+      lines.push(`${row.symbol || '\u2014'} | ${formatCurrency(row.valueChf, 'CHF')} | ${costBasis == null ? '\u2014' : formatCurrency(costBasis, 'CHF')} | ${formatWindowValue(windows.sincePurchase, 'currency')} / ${formatWindowValue(windows.sincePurchase, 'percent')} | ${formatWindowValue(windows.last7d, 'currency')} | ${formatWindowValue(windows.last30d, 'currency')} | ${formatWindowValue(windows.ytd, 'currency')} | ${formatWindowValue(windows.last365d, 'currency')} | ${weight == null ? '\u2014' : `${weight}%`}`);
     }
     const totalProfitPct = totalCost > 0 ? Number(((totalProfit / totalCost) * 100).toFixed(1)) : null;
-    lines.push(`TOTAL | ${formatCurrency(totalValue, 'CHF')} | ${formatCurrency(totalCost, 'CHF')} | ${formatSignedCurrency(totalProfit, 'CHF')} | ${totalProfitPct == null ? '\u2014' : formatPercent(totalProfitPct)} | 100%`);
+    lines.push(`TOTAL | ${formatCurrency(totalValue, 'CHF')} | ${formatCurrency(totalCost, 'CHF')} | ${formatSignedCurrency(totalProfit, 'CHF')} / ${totalProfitPct == null ? '\u2014' : formatPercent(totalProfitPct)} | — | — | — | — | 100%`);
   }
 
   lines.push('');
@@ -500,6 +533,23 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
       </tr></table>
     </div>`;
 
+  const portfolioWindowsRows = portfolioWindowEntries(summary).map(([label, window], index) => {
+    const rowBg = index % 2 === 1 ? '#f8fafc' : '#ffffff';
+    return `<tr style="background:${rowBg};">
+      <td style="padding:10px 10px 10px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#0f172a;font-weight:700;">${escapeHtml(label)}</td>
+      <td style="padding:10px;border-bottom:1px solid #f1f5f9;text-align:right;font-size:13px;color:#0f172a;white-space:nowrap;">${escapeHtml(formatWindowValue(window, 'currency'))}</td>
+      <td style="padding:10px;border-bottom:1px solid #f1f5f9;text-align:right;font-size:13px;color:#0f172a;white-space:nowrap;">${escapeHtml(formatWindowValue(window, 'percent'))}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(renderWindowAvailability(window))}</td>
+    </tr>`;
+  }).join('');
+  const portfolioWindowsTable = `<div style="margin:0 0 8px;font-size:14px;font-weight:700;color:#0f172a;">Portfolio value windows (reference only)</div><div style="margin:0 0 8px;font-size:12px;line-height:1.5;color:#64748b;">Historical value-anchor deltas only. These windows do not neutralize deposits or withdrawals, and should not be read as time-weighted or money-weighted return.</div><div style="margin:0 0 16px;overflow-x:auto;"><table style="width:100%;min-width:520px;border-collapse:collapse;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">
+    <tr style="background:#f8fafc;">
+      <th style="padding:12px 10px 10px 0;text-align:left;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Window</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Change CHF</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Change %</th>
+      <th style="padding:12px 0 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Coverage</th>
+    </tr>${portfolioWindowsRows}</table></div>`;
+
   // Holdings table
   let holdingsTable;
   if (!rows.length) {
@@ -509,8 +559,11 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
       <th style="padding:12px 10px 10px 0;text-align:left;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Instrument</th>
       <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Value CHF</th>
       <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Cost basis CHF</th>
-      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Profit CHF</th>
-      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Profit %</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Since purchase</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">7d</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">30d</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">YTD</th>
+      <th style="padding:12px 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">365d</th>
       <th style="padding:12px 0 10px 10px;text-align:right;border-bottom:2px solid #cbd5e1;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;font-weight:800;">Weight %</th>
     </tr>`;
 
@@ -523,6 +576,7 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
       const gainPct = Number(row.gainSincePurchasePct);
       const valueChf = Number(row.valueChf || 0);
       const weight = investedChf && investedChf > 0 ? Number(((valueChf / investedChf) * 100).toFixed(1)) : null;
+      const windows = row.performanceWindows || {};
       const gainColor = gainChf > 0 || gainPct > 0 ? '#166534' : gainChf < 0 || gainPct < 0 ? '#991b1b' : '#334155';
       const rowBg = index % 2 === 1 ? '#f8fafc' : '#ffffff';
       totalValue += valueChf;
@@ -535,8 +589,11 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
         </td>
         <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:#0f172a;white-space:nowrap;">${escapeHtml(formatCurrency(row.valueChf, 'CHF'))}</td>
         <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#475569;white-space:nowrap;">${escapeHtml(costBasis == null ? '\u2014' : formatCurrency(costBasis, 'CHF'))}</td>
-        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:${gainColor};white-space:nowrap;">${escapeHtml(!Number.isFinite(gainChf) ? '\u2014' : formatSignedCurrency(gainChf, 'CHF'))}</td>
-        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:${gainColor};white-space:nowrap;">${escapeHtml(!Number.isFinite(gainPct) ? '\u2014' : formatPercent(gainPct))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;font-weight:700;color:${gainColor};white-space:nowrap;">${escapeHtml(`${formatWindowValue(windows.sincePurchase, 'currency')} / ${formatWindowValue(windows.sincePurchase, 'percent')}`)}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#475569;white-space:nowrap;">${escapeHtml(formatWindowValue(windows.last7d, 'currency'))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#475569;white-space:nowrap;">${escapeHtml(formatWindowValue(windows.last30d, 'currency'))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#475569;white-space:nowrap;">${escapeHtml(formatWindowValue(windows.ytd, 'currency'))}</td>
+        <td style="padding:11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#475569;white-space:nowrap;">${escapeHtml(formatWindowValue(windows.last365d, 'currency'))}</td>
         <td style="padding:11px 0 11px 10px;border-bottom:1px solid #f1f5f9;text-align:right;vertical-align:top;font-size:13px;color:#0f172a;white-space:nowrap;">${escapeHtml(weight == null ? '\u2014' : `${weight}%`)}</td>
       </tr>`;
     }).join('');
@@ -547,12 +604,15 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
       <td style="padding:12px 10px 12px 0;border-top:2px solid #cbd5e1;font-size:13px;font-weight:800;color:#0f172a;">TOTAL</td>
       <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:#0f172a;white-space:nowrap;">${escapeHtml(formatCurrency(totalValue, 'CHF'))}</td>
       <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:700;color:#475569;white-space:nowrap;">${escapeHtml(formatCurrency(totalCost, 'CHF'))}</td>
-      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:${totalGainColor};white-space:nowrap;">${escapeHtml(formatSignedCurrency(totalProfit, 'CHF'))}</td>
-      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:${totalGainColor};white-space:nowrap;">${escapeHtml(totalProfitPct == null ? '\u2014' : formatPercent(totalProfitPct))}</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:${totalGainColor};white-space:nowrap;">${escapeHtml(`${formatSignedCurrency(totalProfit, 'CHF')} / ${totalProfitPct == null ? '\u2014' : formatPercent(totalProfitPct)}`)}</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;color:#475569;white-space:nowrap;">—</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;color:#475569;white-space:nowrap;">—</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;color:#475569;white-space:nowrap;">—</td>
+      <td style="padding:12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;color:#475569;white-space:nowrap;">—</td>
       <td style="padding:12px 0 12px 10px;border-top:2px solid #cbd5e1;text-align:right;font-size:13px;font-weight:800;color:#0f172a;">100%</td>
     </tr>`;
 
-    holdingsTable = `<div style="margin:0 0 16px;overflow-x:auto;"><table style="width:100%;min-width:600px;border-collapse:collapse;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">${headerRow}${bodyRows}${sumRow}</table></div>`;
+    holdingsTable = `<div style="margin:0 0 16px;overflow-x:auto;"><table style="width:100%;min-width:980px;border-collapse:collapse;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;">${headerRow}${bodyRows}${sumRow}</table></div>`;
   }
 
   const generatedAt = new Date().toISOString().slice(0, 16);
@@ -563,7 +623,7 @@ function buildReportEmailHtml({ portfolioName, period, summaryHtml, summary = nu
     title: `${period} snapshot`,
     subtitle: `${formatCurrency(metrics.totalValueChf, 'CHF')} total value`,
     accent: '#1e293b',
-    bodyHtml: `${heroCard}${profitStrip}${holdingsTable}${footer}`,
+    bodyHtml: `${heroCard}${profitStrip}${portfolioWindowsTable}${holdingsTable}${footer}`,
     footer: 'OpenClaw Portfolio Manager',
   });
 }

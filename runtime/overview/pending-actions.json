@@ -1,25 +1,25 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-15T12:08:36.994Z",
-  "itemCount": 7,
+  "generatedAt": "2026-07-28T20:30:26.598Z",
+  "itemCount": 8,
   "queueSummary": {
-    "total": 7,
-    "blocking": 5,
+    "total": 8,
+    "blocking": 7,
     "approvals": 0,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 0,
+    "recovery": 2,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 1,
+    "workflow": 0,
     "bySeverity": {
-      "high": 5,
+      "high": 7,
       "medium": 1,
-      "low": 1
+      "low": 0
     }
   },
   "items": [
@@ -85,6 +85,30 @@
     },
     {
       "rank": 6,
+      "queueType": "recovery",
+      "portfolio": "acceptance-closure",
+      "kind": "broker",
+      "severity": "high",
+      "status": "degraded",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "blocking": true,
+      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "source": "broker_readiness"
+    },
+    {
+      "rank": 7,
+      "queueType": "recovery",
+      "portfolio": "etf",
+      "kind": "broker",
+      "severity": "high",
+      "status": "degraded",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "blocking": true,
+      "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "source": "broker_readiness"
+    },
+    {
+      "rank": 8,
       "queueType": "delivery",
       "portfolio": "acceptance-closure",
       "kind": "delivery",
@@ -94,18 +118,6 @@
       "blocking": false,
       "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
       "source": "delivery_policy"
-    },
-    {
-      "rank": 7,
-      "queueType": "workflow",
-      "portfolio": "etf",
-      "kind": "workflow",
-      "severity": "low",
-      "status": "recommended",
-      "summary": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-      "blocking": false,
-      "recommendedOperatorAction": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-      "source": "recommendation_engine"
     }
   ]
 }

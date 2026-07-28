@@ -1,23 +1,23 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-15T12:08:51.840Z",
+  "generatedAt": "2026-07-28T20:30:26.594Z",
   "portfolio": "etf",
-  "incidentStatus": "monitor_only",
+  "incidentStatus": "action_required",
   "summary": {
-    "health": "attention_needed",
-    "brokerHealth": "healthy",
-    "executionPosture": "ready_for_review",
+    "health": "warning",
+    "brokerHealth": "degraded",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "ready",
     "dataFreshness": "current",
     "blockerCount": 0,
     "queueItemCount": 1,
     "pendingApprovals": 0,
-    "recommendedNextStep": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-    "executionWhy": "No explicit execution block is currently surfaced.",
+    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionWhy": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "approvalWhy": "78 blocked row(s) still need explicit operator review before the workflow can advance cleanly."
   },
   "incidentDrivers": [
-    "No active incident drivers were detected; this checklist is a verification pass confirming healthy posture."
+    "Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered."
   ],
   "activeBlockers": [],
   "activeBrokerBlocks": [
@@ -319,41 +319,41 @@
   "actionChecklist": [
     {
       "step": 1,
-      "priority": "low",
-      "title": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-      "action": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-      "verification": "Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.",
-      "source": "recommendation_engine"
+      "priority": "high",
+      "title": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "action": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+      "verification": "Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.",
+      "source": "broker_readiness"
     }
   ],
   "verificationChecks": [
-    "Broker health remains healthy or intentionally degraded with operator awareness.",
+    "Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.",
     "Freshness posture remains current.",
     "No approval backlog remains.",
     "No active blockers remain."
   ],
   "completionCriteria": [
-    "Portfolio remains in a healthy or intentionally monitored posture.",
-    "No blocker-class recovery work is outstanding.",
-    "The next operating step is clear from the summary surface."
+    "Blocking recovery items no longer appear in the operator queue.",
+    "Portfolio health no longer depends on unresolved blocker conditions.",
+    "The operator can explain the current posture and next operating step without cross-referencing multiple artifacts."
   ],
   "recentSignals": [
     {
       "rank": 1,
       "severity": "warn",
-      "summary": "Transmitted live execution requires dryRun=false.",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "timestamp": null
     },
     {
       "rank": 2,
       "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments. | Portfolio requires confirmation before first live trade. | Transmitted live execution requires explicit user approval flag. | Transmitted live execution requires the exact transmittedLiveAck confirmation string.",
+      "summary": "Requested instrument is not in Approved Instruments.",
       "timestamp": null
     },
     {
       "rank": 3,
       "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments.",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "timestamp": null
     },
     {

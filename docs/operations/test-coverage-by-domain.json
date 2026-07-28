@@ -1,12 +1,27 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-06-15T12:29:19.055Z",
+  "generatedAt": "2026-07-28T20:21:10.750Z",
   "counts": {
-    "totalTests": 344,
-    "domains": 125
+    "totalTests": 350,
+    "domains": 126
   },
   "domains": [
+    {
+      "domain": "dashboard",
+      "total": 15,
+      "safe": 9,
+      "integration": 6,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 3,
+      "examples": [
+        "scripts/test-dashboard-best-next-step-priority.js",
+        "scripts/test-dashboard-command-center.js",
+        "scripts/test-dashboard-delivery-backfill-dedup.js"
+      ]
+    },
     {
       "domain": "basket",
       "total": 14,
@@ -20,21 +35,6 @@
         "scripts/test-basket-approval-envelope.js",
         "scripts/test-basket-execution-runner.js",
         "scripts/test-basket-lifecycle-defer-contract.js"
-      ]
-    },
-    {
-      "domain": "dashboard",
-      "total": 14,
-      "safe": 8,
-      "integration": 6,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 3,
-      "examples": [
-        "scripts/test-dashboard-best-next-step-priority.js",
-        "scripts/test-dashboard-command-center.js",
-        "scripts/test-dashboard-delivery-backfill-dedup.js"
       ]
     },
     {
@@ -230,6 +230,21 @@
         "scripts/test-execution-authority.js",
         "scripts/test-execution-classification.js",
         "scripts/test-execution-command-surface-doc.js"
+      ]
+    },
+    {
+      "domain": "quote",
+      "total": 6,
+      "safe": 6,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-quote-cache.js",
+        "scripts/test-quote-provider-health.js",
+        "scripts/test-quote-provider-order.js"
       ]
     },
     {
@@ -659,20 +674,6 @@
       "examples": [
         "scripts/test-proposal-distribution-underweight.js",
         "scripts/test-proposal-generator-quote-quality.js"
-      ]
-    },
-    {
-      "domain": "quote",
-      "total": 2,
-      "safe": 2,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-quote-quality-classifier.js",
-        "scripts/test-quote-resolution.js"
       ]
     },
     {
@@ -1308,6 +1309,19 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "scripts/test-partial-fill-status-inference.js"
+      ]
+    },
+    {
+      "domain": "performance",
+      "total": 1,
+      "safe": 1,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-performance-windows.js"
       ]
     },
     {

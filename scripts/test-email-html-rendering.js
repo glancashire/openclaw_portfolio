@@ -20,11 +20,12 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
     },
     investorHoldings: {
       rows: [
-        { symbol: 'SXR8', name: 'iShares Core S&P 500', quantityHeld: 5, valueChf: 3500, gainSincePurchaseChf: 20, gainSincePurchasePct: 0.6, allocationPct: 67, averageBuyPrice: 696 },
-        { symbol: 'CHSPI', name: 'iShares Core SPI', quantityHeld: 10, valueChf: 1710, gainSincePurchaseChf: -65, gainSincePurchasePct: -3.7, allocationPct: 33, averageBuyPrice: 177 },
+        { symbol: 'SXR8', name: 'iShares Core S&P 500', quantityHeld: 5, valueChf: 3500, gainSincePurchaseChf: 20, gainSincePurchasePct: 0.6, allocationPct: 67, averageBuyPrice: 696, performanceWindows: { sincePurchase: { availability: 'available', gainChf: 20, gainPct: 0.6 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } },
+        { symbol: 'CHSPI', name: 'iShares Core SPI', quantityHeld: 10, valueChf: 1710, gainSincePurchaseChf: -65, gainSincePurchasePct: -3.7, allocationPct: 33, averageBuyPrice: 177, performanceWindows: { sincePurchase: { availability: 'available', gainChf: -65, gainPct: -3.7 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } },
       ],
       totals: { rowCount: 2, totalValueChf: 5210.39, totalGainChf: -45.20 },
     },
+    performance: { portfolio: { windows: { sincePurchase: { availability: 'available', gainChf: -45.2, gainPct: -0.87 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } } },
     status: {
       health: 'attention_needed',
       executionPosture: 'ready_for_review',
@@ -53,14 +54,18 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
 
   // Block 2: Profit / Loss strip
   assert(reportHtml.includes('Unrealized Profit'), 'HTML has P/L strip');
+  assert(reportHtml.includes('Portfolio value windows (reference only)'), 'HTML has reference value windows section');
   assert(reportHtml.includes('#991b1b') || reportHtml.includes('991b1b'), 'Negative profit uses red');
 
   // Block 3: Holdings table
   assert(reportHtml.includes('Instrument'), 'HTML has Instrument header');
   assert(reportHtml.includes('Value CHF'), 'HTML has Value CHF header');
   assert(reportHtml.includes('Cost basis CHF'), 'HTML has Cost basis header');
-  assert(reportHtml.includes('Profit CHF'), 'HTML has Profit CHF header');
-  assert(reportHtml.includes('Profit %'), 'HTML has Profit % header');
+  assert(reportHtml.includes('Since purchase'), 'HTML has since purchase header');
+  assert(reportHtml.includes('7d'), 'HTML has 7d header');
+  assert(reportHtml.includes('30d'), 'HTML has 30d header');
+  assert(reportHtml.includes('YTD'), 'HTML has YTD header');
+  assert(reportHtml.includes('365d'), 'HTML has 365d header');
   assert(reportHtml.includes('Weight %'), 'HTML has Weight % header');
   assert(reportHtml.includes('SXR8'), 'HTML has SXR8');
   assert(reportHtml.includes('CHSPI'), 'HTML has CHSPI');
@@ -95,6 +100,7 @@ const { buildTradeEmailHtml, buildTradeEmailText } = require('../lib/tradeNotifi
   assert(reportText.includes('Cash: CHF 116.64'), 'Text has cash');
   assert(reportText.includes("Invested: CHF 5'210.39"), 'Text has invested');
   assert(reportText.includes('Profit / Loss'), 'Text has P/L section');
+  assert(reportText.includes('Portfolio value windows (reference only)'), 'Text has reference value windows section');
   assert(reportText.includes('Holdings'), 'Text has holdings section');
   assert(reportText.includes('SXR8'), 'Text has SXR8');
   assert(reportText.includes('CHSPI'), 'Text has CHSPI');

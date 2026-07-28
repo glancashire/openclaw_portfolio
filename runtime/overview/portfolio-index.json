@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-15T12:08:36.992Z",
+  "generatedAt": "2026-07-28T20:30:26.597Z",
   "portfolioCount": 2,
-  "totalValueChf": 152964.68,
+  "totalValueChf": 152977.99,
   "portfolios": [
     {
       "portfolio": "acceptance-closure",
@@ -15,7 +15,7 @@
       "latestSnapshotDate": "YYYY-MM-DD",
       "pendingApprovals": 0,
       "blockers": 5,
-      "pendingActions": 6,
+      "pendingActions": 7,
       "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
@@ -38,24 +38,24 @@
           "driftPct": -30
         }
       ],
-      "brokerHealth": "healthy",
-      "executionPosture": "ready_for_review",
+      "brokerHealth": "degraded",
+      "executionPosture": "degraded_dry_run_only",
       "deliveryPosture": "needs_operator_attention",
       "dataFreshness": "stale"
     },
     {
       "portfolio": "etf",
-      "status": "attention_needed",
-      "strategyStatus": "rebalance_needed",
-      "totalValueChf": 152964.67780566003,
-      "cashChf": 209.64,
-      "investedChf": 152755.03780566002,
-      "lastSyncAt": "2026-06-15 11:44:11",
-      "latestSnapshotDate": "2026-06-15",
+      "status": "warning",
+      "strategyStatus": "blocked",
+      "totalValueChf": 152977.9926173,
+      "cashChf": 208.26,
+      "investedChf": 152769.7326173,
+      "lastSyncAt": "2026-07-27 08:05:16",
+      "latestSnapshotDate": "2026-07-27",
       "pendingApprovals": 0,
       "blockers": 0,
       "pendingActions": 1,
-      "recommendedNextStep": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
+      "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
       "blockedTradeCount": 21,
@@ -71,12 +71,12 @@
         {
           "assetClass": "Global equities",
           "status": "out_of_bounds",
-          "driftPct": 17.11
+          "driftPct": 16.6
         },
         {
           "assetClass": "Swiss equities",
           "status": "on_track",
-          "driftPct": -2.25
+          "driftPct": -1.74
         },
         {
           "assetClass": "Bonds / cash-like",
@@ -84,30 +84,30 @@
           "driftPct": -14.86
         }
       ],
-      "brokerHealth": "healthy",
-      "executionPosture": "ready_for_review",
+      "brokerHealth": "degraded",
+      "executionPosture": "degraded_dry_run_only",
       "deliveryPosture": "ready",
       "dataFreshness": "current"
     }
   ],
   "queueSummary": {
-    "total": 7,
-    "blocking": 5,
+    "total": 8,
+    "blocking": 7,
     "approvals": 0,
     "execution": 0,
     "freshApprovals": 0,
     "staleApprovals": 0,
     "openRunnerQueue": 0,
     "openRunnerRetry": 0,
-    "recovery": 0,
+    "recovery": 2,
     "delivery": 1,
     "data": 0,
     "warnings": 5,
-    "workflow": 1,
+    "workflow": 0,
     "bySeverity": {
-      "high": 5,
+      "high": 7,
       "medium": 1,
-      "low": 1
+      "low": 0
     }
   }
 }

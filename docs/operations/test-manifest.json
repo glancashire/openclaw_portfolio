@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 344,
-    "safe": 259,
+    "total": 350,
+    "safe": 265,
     "integration": 80,
     "live-smoke": 3,
     "external": 2,
@@ -503,6 +503,13 @@
     },
     {
       "path": "scripts/test-dashboard-open-runner-retry-visibility.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-dashboard-quote-provenance.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -1547,6 +1554,13 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-performance-windows.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-pipeline-end-to-end.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -1646,6 +1660,27 @@
       "quarantined": false
     },
     {
+      "path": "scripts/test-quote-cache.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-quote-provider-health.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-quote-provider-order.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
       "path": "scripts/test-quote-quality-classifier.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
@@ -1654,6 +1689,13 @@
     },
     {
       "path": "scripts/test-quote-resolution.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-quote-service-fallback.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

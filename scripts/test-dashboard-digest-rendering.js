@@ -54,6 +54,7 @@ function seed(repoRoot) {
   assert.strictEqual(digest.subject, '[demo] Weekly portfolio digest — week of 2026-05-23');
   assert(digest.html.includes('OpenClaw Portfolio Digest'));
   assert(digest.html.includes('Portfolio performance'));
+  assert(digest.html.includes('Portfolio value windows (reference only)'));
   assert(digest.html.includes('Portfolio trend'));
   // Allocation health line — either ✓ all on track, or ⚠ with count of off-track sleeves
   assert(digest.html.includes('All sleeves within target bands') || digest.html.includes('sleeve(s) off-track'));
@@ -71,6 +72,7 @@ function seed(repoRoot) {
   assert(digest.html.includes('health-monitor'));
   assert(digest.text.includes('Cron health: 1/2 healthy, 1 failing'));
   assert(digest.text.includes('Portfolio value (incl cash):'));
+  assert(digest.text.includes('Portfolio value windows (reference only)'));
   assert(digest.text.includes('Unrealized profit on held positions:'));
   console.log(JSON.stringify({ ok: true }, null, 2));
 })().catch((error) => {

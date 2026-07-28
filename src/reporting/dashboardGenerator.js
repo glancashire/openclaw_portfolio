@@ -66,6 +66,33 @@ function countHoldingRows(text) {
   return count;
 }
 
+function summarizeQuoteProvenance(rows = []) {
+  const counts = new Map();
+  let oldestAgeSeconds = null;
+  for (const row of rows) {
+    const key = `${row.quoteSource || 'unknown'}|${row.quoteQuality || 'unknown'}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+    const age = Number(row.quoteAgeSeconds);
+    if (Number.isFinite(age)) oldestAgeSeconds = oldestAgeSeconds == null ? age : Math.max(oldestAgeSeconds, age);
+  }
+  const parts = Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, count]) => {
+      const [source, quality] = key.split('|');
+      return `${count} ${source} ${quality}`;
+    });
+  return {
+    summaryLine: parts.length ? parts.join(', ') : 'no quote provenance available',
+    oldestAgeSeconds,
+  };
+}
+
+function formatQuoteAge(ageLabel, asOf) {
+  if (ageLabel && ageLabel !== 'unknown') return ageLabel;
+  if (asOf) return `as of ${asOf}`;
+  return 'unknown';
+}
+
 function strategyStatus(allocations, brokerReadiness, blockers = []) {
   if (blockers.length > 0 || brokerReadiness?.fallbackRequired) return 'blocked';
   if (allocations.some((row) => row.status === 'out_of_bounds')) return 'rebalance_needed';
@@ -605,6 +632,7 @@ async function generateDashboard({ portfolioName, tradesPath = '', holdingsText,
     approvedInstruments,
     avgCostByKey,
   });
+  const quoteProvenance = summarizeQuoteProvenance(resolvedQuotes.rows);
 
   // Compact holdings table sorted by value (CHF) descending
   const holdingsRows = profitLoss.rows.slice().sort((a, b) => (b.valueChf ?? 0) - (a.valueChf ?? 0));
@@ -725,6 +753,10 @@ ${holdingsRows.map((r) => {
 `,
     `- Cost-basis coverage: ${profitLoss.totals.coveredCount}/${profitLoss.rows.length} holdings (CHF ${profitLoss.totals.coveredValueChf} of position value)
 `,
+    `- Quote coverage: ${quoteProvenance.summaryLine}
+`,
+    `- Oldest quote age: ${quoteProvenance.oldestAgeSeconds == null ? 'unknown' : quoteProvenance.oldestAgeSeconds + 's'}
+`,
     `
 ## Profit / Loss
 `,
@@ -737,13 +769,16 @@ ${holdingsRows.map((r) => {
     `- Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 `,
     `
-| Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
-|---|---:|---:|---:|---:|---|
-${formatProfitLossRows(profitLoss.rows)}
+| Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source | Quote source | Quote age |
+|---|---:|---:|---:|---:|---|---|---|
+${profitLoss.rows.map((row) => `| ${row.name || row.tickerOrIsin} | ${row.valueChf} | ${row.costBasisChf == null ? '—' : row.costBasisChf} | ${row.unrealizedProfitChf == null ? '—' : row.unrealizedProfitChf} | ${row.unrealizedProfitPct == null ? '—' : row.unrealizedProfitPct + '%'} | ${row.costBasisSource || '—'} | ${row.quoteSource || '—'} | ${formatQuoteAge(row.quoteAgeLabel, row.quoteAsOf)} |`).join('\n')}
 `,
+
     `## Holdings
 `,
     `Holdings sorted by CHF value (descending).
+`,
+    `- Quote sources and ages are summarized above so the operator can see whether values came from IBKR Web API, IBKR TWS, or free fallback data.
 `,
     `
 ${holdingsTable}

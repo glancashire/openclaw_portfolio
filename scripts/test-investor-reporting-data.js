@@ -67,8 +67,11 @@ const {
   assert.strictEqual(snapshot.rows[0].valueChf, 360);
   assert.strictEqual(snapshot.rows[0].gainSincePurchaseChf, 60);
   assert.strictEqual(snapshot.rows[0].gainSincePurchasePct, 20);
-  assert.strictEqual(snapshot.rows[0].ytdChf, 500);
-  assert.strictEqual(snapshot.rows[0].ytdPct, Number(((500 / 4500) * 100).toFixed(1)));
+  assert(snapshot.rows[0].performanceWindows, 'expected performance windows on investor holding');
+  assert.strictEqual(snapshot.rows[0].performanceWindows.sincePurchase.gainChf, 60);
+  assert.strictEqual(snapshot.rows[0].performanceWindows.sincePurchase.gainPct, 20);
+  assert.strictEqual(snapshot.rows[0].performanceWindows.ytd.availability, 'missing_history');
+  assert.strictEqual(snapshot.rows[0].availability.ytd, 'missing_history');
 
   const brokerishHoldings = `# Holdings: etf
 

@@ -1,40 +1,34 @@
 {
   "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-06-15T08:00:34.186Z",
+  "generatedAt": "2026-07-28T20:00:13.352Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-06-15T08:00:28.900Z",
+    "generatedAt": "2026-07-28T20:00:09.525Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": true,
-      "reachable": true,
-      "mode": "native-socket",
-      "fallbackRequired": false,
-      "marketDataMode": "live_or_realtime",
-      "marketDataDetail": "Live/realtime bid/ask/last values are available via generic control SXR8.",
-      "marketDataProbe": {
-        "conid": "75776072",
-        "symbol": "SXR8",
-        "tickerOrIsin": "IE00B5BMR087",
-        "label": "generic control SXR8",
-        "source": "generic_control"
-      },
-      "reason": "ready",
-      "portalSessionState": "unknown_or_separate",
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
       "operatorState": {
-        "code": "ibkr_ready",
-        "summary": "IBKR connectivity and live/realtime market data are available.",
-        "detail": "Live/realtime bid/ask/last values are available via generic control SXR8."
+        "code": "ibkr_socket_dead",
+        "summary": "IBKR gateway appears offline or unreachable on the native API socket.",
+        "detail": "connect ECONNREFUSED 127.0.0.1:4001"
       },
-      "guidance": "Broker path is healthy.",
-      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
+      "guidance": "Restore native IBKR gateway connectivity first, then rerun readiness. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "errorState": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-05T14:00:45.008Z",
+      "lastAt": "2026-06-15T11:43:57.677Z",
       "stopAutomation": false,
       "threshold": 3
     },
@@ -63,13 +57,13 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-06-12",
+      "latestHistoryDate": "2026-07-27",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1781445637410.055,
+        "dashboardMtimeMs": 1785258318488.7837,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-        "newestSourceMtimeMs": 1781284806748.4246
+        "newestSourceMtimeMs": 1785171934312.8547
       },
       "lifecycleSummary": {
         "proposed": 0,
@@ -79,20 +73,20 @@
         "submitted": 0,
         "submittedAwaitingReconcile": 0,
         "partiallyFilled": 0,
-        "filled": 3,
+        "filled": 1,
         "cancelled": 0,
-        "failed": 5,
+        "failed": 0,
         "actionableFailed": 0,
-        "inactive": 12,
+        "inactive": 20,
         "simulated": 0,
         "planned": 1,
-        "withBrokerOrderId": 20
+        "withBrokerOrderId": 21
       },
       "brokerErrorState": {
         "consecutive": 0,
         "lastReason": null,
         "lastMessage": null,
-        "lastAt": "2026-06-05T14:00:45.008Z",
+        "lastAt": "2026-06-15T11:43:57.677Z",
         "stopAutomation": false,
         "threshold": 3
       },
@@ -108,7 +102,8 @@
           9146,
           9147,
           9150,
-          9151
+          9151,
+          9173
         ],
         "reconciledUnnotifiedFills": [],
         "acknowledgedBackfilledFills": [
@@ -120,7 +115,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-06-15T08:00:28.899Z",
+      "generatedAt": "2026-07-28T20:00:09.524Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -172,13 +167,13 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-06-12",
+        "latestHistoryDate": "2026-07-27",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1781445637410.055,
+          "dashboardMtimeMs": 1785258318488.7837,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-          "newestSourceMtimeMs": 1781284806748.4246
+          "newestSourceMtimeMs": 1785171934312.8547
         },
         "lifecycleSummary": {
           "proposed": 0,
@@ -188,20 +183,20 @@
           "submitted": 0,
           "submittedAwaitingReconcile": 0,
           "partiallyFilled": 0,
-          "filled": 3,
+          "filled": 1,
           "cancelled": 0,
-          "failed": 5,
+          "failed": 0,
           "actionableFailed": 0,
-          "inactive": 12,
+          "inactive": 20,
           "simulated": 0,
           "planned": 1,
-          "withBrokerOrderId": 20
+          "withBrokerOrderId": 21
         },
         "brokerErrorState": {
           "consecutive": 0,
           "lastReason": null,
           "lastMessage": null,
-          "lastAt": "2026-06-05T14:00:45.008Z",
+          "lastAt": "2026-06-15T11:43:57.677Z",
           "stopAutomation": false,
           "threshold": 3
         },
@@ -217,7 +212,8 @@
             9146,
             9147,
             9150,
-            9151
+            9151,
+            9173
           ],
           "reconciledUnnotifiedFills": [],
           "acknowledgedBackfilledFills": [
@@ -245,20 +241,20 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-06-12",
+        "latestHistoryDate": "2026-07-27",
         "freshnessStale": false,
-        "failedTrades": 5,
+        "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 13,
+          "blockedTradeCount": 21,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
             "name": "UBS SLI ETF (SMI gleichgewichtet)",
             "blockCode": "contract_resolution_failed",
             "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
             "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-            "brokerOrderId": "9163"
+            "brokerOrderId": "9172"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."
@@ -276,7 +272,8 @@
         9146,
         9147,
         9150,
-        9151
+        9151,
+        9173
       ],
       "reconciledUnnotifiedFills": [],
       "acknowledgedBackfilledFills": [
@@ -285,50 +282,51 @@
     },
     "generatedStateIssues": [],
     "health": {
-      "health": "healthy",
-      "severity": "low",
-      "state": "healthy",
-      "summary": "All systems normal.",
-      "canonicalNextAction": null,
-      "blockerCount": 0,
-      "blockers": [],
-      "recommendedActions": [],
-      "nextAction": "No immediate operator action is required."
+      "health": "blocked",
+      "severity": "high",
+      "state": "critical",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
     }
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-06-15T08:00:34.186Z",
+    "generatedAt": "2026-07-28T20:00:13.351Z",
     "brokerReadiness": {
       "configured": true,
-      "authenticated": true,
-      "reachable": true,
-      "mode": "native-socket",
-      "fallbackRequired": false,
-      "marketDataMode": "live_or_realtime",
-      "marketDataDetail": "Live/realtime bid/ask/last values are available via generic control SXR8.",
-      "marketDataProbe": {
-        "conid": "75776072",
-        "symbol": "SXR8",
-        "tickerOrIsin": "IE00B5BMR087",
-        "label": "generic control SXR8",
-        "source": "generic_control"
-      },
-      "reason": "ready",
-      "portalSessionState": "unknown_or_separate",
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
       "operatorState": {
-        "code": "ibkr_ready",
-        "summary": "IBKR connectivity and live/realtime market data are available.",
-        "detail": "Live/realtime bid/ask/last values are available via generic control SXR8."
+        "code": "ibkr_socket_dead",
+        "summary": "IBKR gateway appears offline or unreachable on the native API socket.",
+        "detail": "connect ECONNREFUSED 127.0.0.1:4001"
       },
-      "guidance": "Broker path is healthy.",
-      "message": "Interactive Brokers read-only connectivity and live/realtime market data are available."
+      "guidance": "Restore native IBKR gateway connectivity first, then rerun readiness. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
     },
     "errorState": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-06-05T14:00:45.008Z",
+      "lastAt": "2026-06-15T11:43:57.677Z",
       "stopAutomation": false,
       "threshold": 3
     },
@@ -357,13 +355,13 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-06-12",
+      "latestHistoryDate": "2026-07-27",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1781510431488.275,
+        "dashboardMtimeMs": 1785268812989.6782,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-        "newestSourceMtimeMs": 1781284806748.4246
+        "newestSourceMtimeMs": 1785171934312.8547
       },
       "lifecycleSummary": {
         "proposed": 0,
@@ -373,20 +371,20 @@
         "submitted": 0,
         "submittedAwaitingReconcile": 0,
         "partiallyFilled": 0,
-        "filled": 3,
+        "filled": 1,
         "cancelled": 0,
-        "failed": 5,
+        "failed": 0,
         "actionableFailed": 0,
-        "inactive": 12,
+        "inactive": 20,
         "simulated": 0,
         "planned": 1,
-        "withBrokerOrderId": 20
+        "withBrokerOrderId": 21
       },
       "brokerErrorState": {
         "consecutive": 0,
         "lastReason": null,
         "lastMessage": null,
-        "lastAt": "2026-06-05T14:00:45.008Z",
+        "lastAt": "2026-06-15T11:43:57.677Z",
         "stopAutomation": false,
         "threshold": 3
       },
@@ -402,7 +400,8 @@
           9146,
           9147,
           9150,
-          9151
+          9151,
+          9173
         ],
         "reconciledUnnotifiedFills": [],
         "acknowledgedBackfilledFills": [
@@ -414,7 +413,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-06-15T08:00:34.185Z",
+      "generatedAt": "2026-07-28T20:00:13.350Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -466,13 +465,13 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-06-12",
+        "latestHistoryDate": "2026-07-27",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1781510431488.275,
+          "dashboardMtimeMs": 1785268812989.6782,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-          "newestSourceMtimeMs": 1781284806748.4246
+          "newestSourceMtimeMs": 1785171934312.8547
         },
         "lifecycleSummary": {
           "proposed": 0,
@@ -482,20 +481,20 @@
           "submitted": 0,
           "submittedAwaitingReconcile": 0,
           "partiallyFilled": 0,
-          "filled": 3,
+          "filled": 1,
           "cancelled": 0,
-          "failed": 5,
+          "failed": 0,
           "actionableFailed": 0,
-          "inactive": 12,
+          "inactive": 20,
           "simulated": 0,
           "planned": 1,
-          "withBrokerOrderId": 20
+          "withBrokerOrderId": 21
         },
         "brokerErrorState": {
           "consecutive": 0,
           "lastReason": null,
           "lastMessage": null,
-          "lastAt": "2026-06-05T14:00:45.008Z",
+          "lastAt": "2026-06-15T11:43:57.677Z",
           "stopAutomation": false,
           "threshold": 3
         },
@@ -511,7 +510,8 @@
             9146,
             9147,
             9150,
-            9151
+            9151,
+            9173
           ],
           "reconciledUnnotifiedFills": [],
           "acknowledgedBackfilledFills": [
@@ -539,20 +539,20 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-06-12",
+        "latestHistoryDate": "2026-07-27",
         "freshnessStale": false,
-        "failedTrades": 5,
+        "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
         "brokerBlockContext": {
-          "blockedTradeCount": 13,
+          "blockedTradeCount": 21,
           "topBrokerBlock": {
             "tickerOrIsin": "CH0032912732",
             "name": "UBS SLI ETF (SMI gleichgewichtet)",
             "blockCode": "contract_resolution_failed",
             "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
             "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying.",
-            "brokerOrderId": "9163"
+            "brokerOrderId": "9172"
           }
         },
         "recommendedNextAction": "No delivery-side operator action is currently required."
@@ -570,7 +570,8 @@
         9146,
         9147,
         9150,
-        9151
+        9151,
+        9173
       ],
       "reconciledUnnotifiedFills": [],
       "acknowledgedBackfilledFills": [
@@ -579,36 +580,161 @@
     },
     "generatedStateIssues": [],
     "health": {
-      "health": "healthy",
-      "severity": "low",
-      "state": "healthy",
-      "summary": "All systems normal.",
-      "canonicalNextAction": null,
-      "blockerCount": 0,
-      "blockers": [],
-      "recommendedActions": [],
-      "nextAction": "No immediate operator action is required."
+      "health": "blocked",
+      "severity": "high",
+      "state": "critical",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
     }
   },
   "health": {
-    "health": "healthy",
-    "severity": "low",
-    "state": "healthy",
-    "summary": "All systems normal.",
-    "canonicalNextAction": null,
-    "blockerCount": 0,
-    "blockers": [],
-    "recommendedActions": [],
-    "nextAction": "No immediate operator action is required."
+    "health": "blocked",
+    "severity": "high",
+    "state": "critical",
+    "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
+    "blockerCount": 1,
+    "blockers": [
+      {
+        "code": "broker_unready",
+        "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      }
+    ],
+    "recommendedActions": [
+      "Restore native IBKR connectivity before relying on executable live-state surfaces."
+    ],
+    "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
   },
   "selfHeal": {
     "dryRun": false,
-    "plannedActions": [],
-    "classified": [],
-    "openIssues": [],
-    "operatorCommands": [],
-    "recoveryLadders": [],
+    "plannedActions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ],
+    "classified": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "symptom": "IBKR gateway appears offline or unreachable on the native API socket.",
+        "recommendedAction": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "healable": true,
+        "recipe": "restart_ibkr_gateway_if_socket_dead",
+        "recoveryLadder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          },
+          {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ],
+    "openIssues": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "symptom": "IBKR gateway appears offline or unreachable on the native API socket."
+      }
+    ],
+    "operatorCommands": [
+      {
+        "category": "ibkr_socket_dead",
+        "command": "/home/ubuntu/ibgateway-native/start-ibc.sh"
+      }
+    ],
+    "recoveryLadders": [
+      {
+        "category": "ibkr_socket_dead",
+        "ladder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          },
+          {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ],
     "actions": [
+      {
+        "ok": true,
+        "kind": "restart_ibkr_gateway_if_socket_dead",
+        "applied": false,
+        "blocked": "outside_daytime_window",
+        "summary": "Skipped IBKR restart because the check ran outside the daytime window.",
+        "budget": {
+          "blocked": null,
+          "attempts": 0,
+          "lastAttemptAt": null
+        }
+      },
       {
         "kind": "regenerate_dashboard",
         "ok": true,
@@ -624,88 +750,22 @@
       }
     ],
     "secondPass": {
-      "skippedReason": "state_healthy",
       "attempted": [],
-      "rateLimited": [],
+      "rateLimited": [
+        {
+          "code": "broker_unready",
+          "fixerKey": "broker_unready",
+          "lastAttemptedAt": "2026-07-28T08:00:10.707Z",
+          "nextEligibleAt": "2026-07-29T08:00:10.707Z"
+        }
+      ],
       "skipped": []
     }
   },
   "trends": {
     "recent": [
       {
-        "at": "2026-06-13T14:05:06.766Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "broker_connected_quote_state_unclear"
-        ],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "broker_connected_quote_state_unclear"
-        ]
-      },
-      {
-        "at": "2026-06-13T14:10:19.449Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "broker_connected_quote_state_unclear"
-        ],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "broker_connected_quote_state_unclear"
-        ]
-      },
-      {
-        "at": "2026-06-13T14:16:57.016Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "broker_connected_quote_state_unclear"
-        ],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "broker_connected_quote_state_unclear"
-        ]
-      },
-      {
-        "at": "2026-06-13T20:04:57.640Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "broker_connected_quote_state_unclear"
-        ],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "broker_connected_quote_state_unclear"
-        ]
-      },
-      {
-        "at": "2026-06-14T08:00:10.142Z",
+        "at": "2026-07-27T08:00:23.148Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "blocked",
@@ -724,7 +784,7 @@
         ]
       },
       {
-        "at": "2026-06-14T14:02:00.763Z",
+        "at": "2026-07-27T08:19:28.599Z",
         "kind": "health_check",
         "portfolio": "etf",
         "health": "healthy",
@@ -738,25 +798,106 @@
         "openIssues": []
       },
       {
-        "at": "2026-06-14T20:04:31.528Z",
+        "at": "2026-07-27T14:00:14.149Z",
         "kind": "health_check",
         "portfolio": "etf",
-        "health": "healthy",
-        "severity": "low",
-        "blockerCount": 0,
-        "classified": [],
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
         "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
           "regenerate_dashboard",
           "regenerate_reporting_artifacts"
         ],
-        "openIssues": []
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-27T20:00:10.825Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-28T08:00:12.372Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-28T14:00:10.542Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-28T14:00:16.105Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
       }
     ],
     "counts": {
-      "blocked": 5,
-      "healthy": 2
+      "blocked": 6,
+      "healthy": 1
     },
     "direction": "worsening",
-    "summary": "Health direction is worsening: 5 of the last 7 checks showed blocked or paused posture."
+    "summary": "Health direction is worsening: 6 of the last 7 checks showed blocked or paused posture."
   }
 }

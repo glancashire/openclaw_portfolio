@@ -80,10 +80,11 @@ const inFlight        = get('In-flight execution rows');
 // ── Build output ──────────────────────────────────────────────────────────────
 const lines = [];
 
-// ── Header: portfolio name + total value + all-time return ───────────────────
+// ── Header: portfolio name + total value + explicit return basis ─────────────
 const headlineReturnPct = trueReturnPct != null ? trueReturnPct : profitPct;
 const headlineReturnChf = trueReturnChf != null ? trueReturnChf : profitChf;
-lines.push(`📊 ${portfolio.toUpperCase()} Portfolio — CHF ${fmt(total)}   ${pct(headlineReturnPct)} all-time`);
+const headlineLabel = trueReturnPct != null ? 'vs net deposited' : 'unrealized P/L';
+lines.push(`📊 ${portfolio.toUpperCase()} Portfolio — CHF ${fmt(total)}   ${pct(headlineReturnPct)} ${headlineLabel}`);
 lines.push('');
 
 // ── Performance ───────────────────────────────────────────────────────────────
@@ -96,7 +97,7 @@ const weeklyChfStr = weeklyKnown ? signed(weeklyChf).padStart(10) : '       —'
 const weeklyPctStr = weeklyKnown ? pct(weeklyPct) : 'unknown';
 lines.push(`  Today      ${dailyChfStr} CHF  (${dailyPctStr})`);
 lines.push(`  This week  ${weeklyChfStr} CHF  (${weeklyPctStr})`);
-lines.push(`  All-time   ${signed(headlineReturnChf).padStart(10)} CHF  (${pct(headlineReturnPct)})`);
+lines.push(`  ${String(headlineLabel).replace(/^./, (c) => c.toUpperCase()).padEnd(15)} ${signed(headlineReturnChf).padStart(10)} CHF  (${pct(headlineReturnPct)})`);
 if (!dailyKnown || !weeklyKnown) {
   lines.push('  (broker quote posture is degraded — daily/weekly deltas not available)');
 }

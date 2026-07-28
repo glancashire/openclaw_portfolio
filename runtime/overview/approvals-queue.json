@@ -1,29 +1,12 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-15T12:08:36.995Z",
-  "itemCount": 1,
-  "items": [
-    {
-      "portfolio": "etf",
-      "urgency": "medium",
-      "status": "basket_approved",
-      "summary": "2 approved basket(s) are ready for execution.",
-      "explanation": "2 approved basket(s) are executable now; row-level proposed trades remain legacy context.",
-      "effectIfApproved": "The operator can transmit the approved basket without re-approving row-level trade log entries.",
-      "effectIfIgnored": "The basket remains ready but unsubmitted, so the portfolio stays staged instead of executing.",
-      "recommendedOperatorAction": "Review the approved basket and submit when satisfied with the price bands and market window.",
-      "queueType": "approval",
-      "severity": "medium",
-      "group": "actionable",
-      "rank": 1
-    }
-  ],
+  "generatedAt": "2026-07-28T20:30:26.598Z",
+  "itemCount": 0,
+  "items": [],
   "groups": {
     "actionable": {
-      "count": 1,
-      "ranks": [
-        1
-      ]
+      "count": 0,
+      "ranks": []
     },
     "stale": {
       "count": 0,

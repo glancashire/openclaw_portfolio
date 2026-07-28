@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-06-15T12:08:36.996Z",
+  "generatedAt": "2026-07-28T20:30:26.598Z",
   "totals": {
     "portfolioCount": 2,
-    "totalCashChf": 209.64,
-    "approvalCount": 1,
+    "totalCashChf": 208.26,
+    "approvalCount": 0,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
   },
   "healthHeadline": "warning",
-  "cashWaitingToDeployChf": 209.64,
+  "cashWaitingToDeployChf": 208.26,
   "biggestDrift": {
     "portfolio": "acceptance-closure",
     "assetClass": "Global equities",
@@ -18,16 +18,16 @@
     "status": "out_of_bounds",
     "absDrift": 50
   },
-  "brokerHealth": "healthy",
+  "brokerHealth": "degraded",
   "reportingHealth": "attention_needed",
-  "pendingApprovals": 1,
-  "recommendedNextStep": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-  "biggestDriftWhy": "Global equities is 17.11% over target and outside the allowed band around the 65% target.",
+  "pendingApprovals": 0,
+  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+  "biggestDriftWhy": "Global equities is 16.6% over target and outside the allowed band around the 65% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
-    "health": "attention_needed",
-    "cashChf": 209.64,
-    "brokerHealth": "healthy",
+    "health": "warning",
+    "cashChf": 208.26,
+    "brokerHealth": "degraded",
     "deliveryPosture": "ready",
     "pendingApprovals": 0,
     "blockedTradeCount": 21,
@@ -38,7 +38,7 @@
       "blockReason": "Broker rejected the order because the contract identity or venue resolution was not accepted.",
       "nextAction": "Verify conid, symbol, exchange, and primary exchange before retrying."
     },
-    "recommendedNextStep": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
+    "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "whyNow": "Broker rejected the order because the contract identity or venue resolution was not accepted."
   }
 }

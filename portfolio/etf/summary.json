@@ -1,31 +1,121 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-15T12:08:51.840Z",
+  "generatedAt": "2026-07-28T20:30:26.594Z",
   "portfolio": "etf",
   "status": {
-    "health": "attention_needed",
-    "strategy": "rebalance_needed",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
+    "health": "warning",
+    "strategy": "blocked",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "ready",
     "dataFreshness": "current"
   },
-  "readiness": null,
+  "readiness": {
+    "ok": false,
+    "portfolio": "etf",
+    "generatedAt": "2026-07-28T20:30:26.373Z",
+    "executionMode": "transmitted_live",
+    "armedForMarketOpen": false,
+    "armExpiresAt": "2026-05-22T12:00:00Z",
+    "brokerReadiness": {
+      "configured": true,
+      "authenticated": false,
+      "reachable": false,
+      "mode": "unknown",
+      "fallbackRequired": true,
+      "marketDataMode": "unavailable",
+      "marketDataDetail": null,
+      "marketDataProbe": null,
+      "reason": "native_error",
+      "portalSessionState": "not_applicable",
+      "operatorState": {
+        "code": "ibkr_socket_dead",
+        "summary": "IBKR gateway appears offline or unreachable on the native API socket.",
+        "detail": "connect ECONNREFUSED 127.0.0.1:4001"
+      },
+      "guidance": "Restore native IBKR gateway connectivity first, then rerun readiness. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+    },
+    "marketWindow": {
+      "exchange": "EBS",
+      "openNow": false,
+      "reason": "After close (17:30)",
+      "source": "heuristic",
+      "nextOpen": "2026-07-29T09:00:00.000Z",
+      "diagnostics": []
+    },
+    "approvalState": {
+      "basketApprovalState": {
+        "approvedCount": 0,
+        "executableCount": 0,
+        "hasApprovedBasket": false,
+        "hasExecutableApprovedBasket": false,
+        "executableBaskets": [],
+        "latestApprovedAt": null,
+        "approvedBaskets": []
+      },
+      "proposedCount": 0,
+      "approvedCount": 0,
+      "basketApprovedCount": 0,
+      "basketExecutableCount": 0,
+      "hasApprovedBasket": false,
+      "hasExecutableApprovedBasket": false,
+      "executableCount": 0,
+      "latestApprovedAt": null,
+      "approvalAgeHours": null,
+      "staleApproval": false,
+      "staleApprovedRows": [],
+      "maxApprovalAgeHours": 24,
+      "ambiguousQueuedCount": 0,
+      "hasAnyApprovedRows": false,
+      "hasExecutableApprovedRows": false,
+      "executableRows": [],
+      "excludedApprovedRows": []
+    },
+    "rows": [],
+    "excludedRows": [],
+    "blockers": [
+      {
+        "code": "not_armed_for_market_open",
+        "message": "Live execution is not armed for the next market-open window."
+      },
+      {
+        "code": "broker_unready",
+        "message": "Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+      },
+      {
+        "code": "no_approved_rows",
+        "message": "No approved trade rows or approved basket exist for live execution."
+      },
+      {
+        "code": "no_executable_rows",
+        "message": "No executable approved trade rows or approved basket are currently eligible for submission."
+      }
+    ],
+    "warnings": [
+      {
+        "code": "market_closed",
+        "message": "Market is currently closed (After close (17:30)). Next open: 2026-07-29T09:00:00.000Z"
+      }
+    ],
+    "recommendedNextAction": "Arm live execution explicitly for the next intended market-open window, then rerun preflight.",
+    "diagnosticArtifactPath": "/home/ubuntu/.openclaw/workspace/runtime/pre-submit-diagnostics/etf-live-readiness.json"
+  },
   "holdings": {
-    "totalValueChf": 152964.67780566003,
-    "cashChf": 209.64,
-    "investedChf": 152755.03780566002,
+    "totalValueChf": 152977.9926173,
+    "cashChf": 208.26,
+    "investedChf": 152769.7326173,
     "holdingCount": 19,
     "baseCurrency": "CHF",
-    "lastSyncAt": "2026-06-15 11:44:11",
+    "lastSyncAt": "2026-07-27 08:05:16",
     "source": "broker_api",
-    "latestSnapshotDate": "2026-06-15",
+    "latestSnapshotDate": "2026-07-27",
     "dailyChangeChf": 0,
     "dailyChangePct": 0,
     "depositedCapitalChf": 150000,
-    "accountProfitChf": 2964.68,
-    "accountProfitPct": 1.98
+    "accountProfitChf": 2977.99,
+    "accountProfitPct": 1.99
   },
   "investorHoldings": {
     "rows": [
@@ -33,72 +123,219 @@
         "symbol": "UKGBPB",
         "name": "UBS MSCI United Kingdom UCITS ETF GBP acc",
         "quantityHeld": 180,
-        "averageBuyPrice": 46.7888,
-        "lastTradedPrice": 43.055,
-        "totalValue": 8494.9133868,
-        "gainSincePurchase": 0.87,
-        "gainSincePurchaseChf": 72.93,
-        "gainSincePurchasePct": 0.87,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 8494.9133868,
+        "averageBuyPrice": 47.2764,
+        "lastTradedPrice": 44.279999,
+        "totalValue": 8827.67211344,
+        "gainSincePurchase": -100,
+        "gainSincePurchaseChf": -8509.76,
+        "gainSincePurchasePct": -100,
+        "valueChf": 8827.67211344,
         "currency": "GBP",
-        "allocationPct": 5.6,
+        "allocationPct": 5.8,
         "targetPct": 7,
-        "driftPct": -1.4,
-        "costBasisChf": 8421.98,
+        "driftPct": -1.2,
+        "costBasisChf": 8509.76,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 8509.76,
+            "currentTotalChf": 0,
+            "gainChf": -8509.76,
+            "gainPct": -100
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "AIFS",
         "name": "iShares AI Infrastructure UCITS ETF USD (Acc)",
         "quantityHeld": 520,
-        "averageBuyPrice": 9.1474,
-        "lastTradedPrice": 10.036,
-        "totalValue": 4775.29579904,
-        "gainSincePurchase": 0.39,
-        "gainSincePurchaseChf": 18.67,
-        "gainSincePurchasePct": 0.39,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 4775.29579904,
+        "averageBuyPrice": 9.2427,
+        "lastTradedPrice": 9.263,
+        "totalValue": 4453.42697644,
+        "gainSincePurchase": -7.34,
+        "gainSincePurchaseChf": -352.77,
+        "gainSincePurchasePct": -7.34,
+        "valueChf": 4453.42697644,
         "currency": "EUR",
-        "allocationPct": 3.1,
+        "allocationPct": 2.9,
         "targetPct": 5,
-        "driftPct": -1.9,
-        "costBasisChf": 4756.63,
+        "driftPct": -2.1,
+        "costBasisChf": 4806.2,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4806.2,
+            "currentTotalChf": 4453.43,
+            "gainChf": -352.77,
+            "gainPct": -7.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "DXS0",
         "name": "Xtrackers SLI UCITS ETF 1D",
         "quantityHeld": 12,
-        "averageBuyPrice": 225.0525,
-        "lastTradedPrice": 255.85,
-        "totalValue": 2809.3312464,
-        "gainSincePurchase": 4.02,
-        "gainSincePurchaseChf": 108.7,
-        "gainSincePurchasePct": 4.02,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 2809.3312464,
+        "averageBuyPrice": 227.3975,
+        "lastTradedPrice": 261.75,
+        "totalValue": 2904.071229,
+        "gainSincePurchase": 7.52,
+        "gainSincePurchaseChf": 205.26,
+        "gainSincePurchasePct": 7.52,
+        "valueChf": 2904.071229,
         "currency": "EUR",
-        "allocationPct": 1.8,
+        "allocationPct": 1.9,
         "targetPct": 2,
-        "driftPct": -0.2,
-        "costBasisChf": 2700.63,
+        "driftPct": -0.1,
+        "costBasisChf": 2728.77,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 2728.77,
+            "currentTotalChf": 2934.03,
+            "gainChf": 205.26,
+            "gainPct": 7.5
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -106,23 +343,72 @@
         "name": "Xtrackers MSCI World Energy UCITS ETF 1C",
         "quantityHeld": 80,
         "averageBuyPrice": 56.0835,
-        "lastTradedPrice": 58.81,
-        "totalValue": 4305.0425536,
-        "gainSincePurchase": -4.05,
-        "gainSincePurchaseChf": -181.64,
-        "gainSincePurchasePct": -4.05,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 4305.0425536,
+        "lastTradedPrice": 62.74,
+        "totalValue": 4640.5967248,
+        "gainSincePurchase": 2.31,
+        "gainSincePurchaseChf": 103.62,
+        "gainSincePurchasePct": 2.31,
+        "valueChf": 4640.5967248,
         "currency": "EUR",
-        "allocationPct": 2.8,
+        "allocationPct": 3,
         "targetPct": 3,
-        "driftPct": -0.2,
+        "driftPct": 0,
         "costBasisChf": 4486.68,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4486.68,
+            "currentTotalChf": 4590.3,
+            "gainChf": 103.62,
+            "gainPct": 2.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -130,23 +416,72 @@
         "name": "UBS SLI ETF (SMI gleichgewichtet)",
         "quantityHeld": 68,
         "averageBuyPrice": 162.0082,
-        "lastTradedPrice": 165.78,
-        "totalValue": 11273.04,
-        "gainSincePurchase": 2.33,
-        "gainSincePurchaseChf": 256.48,
-        "gainSincePurchasePct": 2.33,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 11273.04,
+        "lastTradedPrice": 170.86,
+        "totalValue": 11618.48,
+        "gainSincePurchase": 6.7,
+        "gainSincePurchaseChf": 737.92,
+        "gainSincePurchasePct": 6.7,
+        "valueChf": 11618.48,
         "currency": "CHF",
-        "allocationPct": 7.4,
+        "allocationPct": 7.6,
         "targetPct": 9,
-        "driftPct": -1.6,
+        "driftPct": -1.4,
         "costBasisChf": 11016.56,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 11016.56,
+            "currentTotalChf": 11754.48,
+            "gainChf": 737.92,
+            "gainPct": 6.7
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -154,23 +489,72 @@
         "name": "iShares Global Clean Energy Transition UCITS ETF",
         "quantityHeld": 57,
         "averageBuyPrice": 26.2053,
-        "lastTradedPrice": 27.08,
-        "totalValue": 1412.40679392,
-        "gainSincePurchase": -5.44,
-        "gainSincePurchaseChf": -81.29,
-        "gainSincePurchasePct": -5.44,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 1412.40679392,
+        "lastTradedPrice": 23.255,
+        "totalValue": 1225.54856941,
+        "gainSincePurchase": -17.95,
+        "gainSincePurchaseChf": -268.15,
+        "gainSincePurchasePct": -17.95,
+        "valueChf": 1225.54856941,
         "currency": "EUR",
-        "allocationPct": 0.9,
+        "allocationPct": 0.8,
         "targetPct": 1,
-        "driftPct": -0.1,
+        "driftPct": -0.2,
         "costBasisChf": 1493.7,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 1493.7,
+            "currentTotalChf": 1225.55,
+            "gainChf": -268.15,
+            "gainPct": -17.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -178,71 +562,218 @@
         "name": "UBS SPI Mid ETF (SPI ohne SMI)",
         "quantityHeld": 101,
         "averageBuyPrice": 129.4524,
-        "lastTradedPrice": null,
-        "totalValue": 13074.69000125,
-        "gainSincePurchase": 0,
-        "gainSincePurchaseChf": 0,
-        "gainSincePurchasePct": 0,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 13074.69000125,
+        "lastTradedPrice": 132.78,
+        "totalValue": 13410.78,
+        "gainSincePurchase": 3.51,
+        "gainSincePurchaseChf": 459.31,
+        "gainSincePurchasePct": 3.51,
+        "valueChf": 13410.78,
         "currency": "CHF",
-        "allocationPct": 8.5,
+        "allocationPct": 8.8,
         "targetPct": 11,
-        "driftPct": -2.5,
+        "driftPct": -2.2,
         "costBasisChf": 13074.69,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 13074.69,
+            "currentTotalChf": 13534,
+            "gainChf": 459.31,
+            "gainPct": 3.5
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "MWEQ",
         "name": "Invesco MSCI World Equal Weight UCITS ETF Acc",
         "quantityHeld": 903,
-        "averageBuyPrice": 5.2508,
-        "lastTradedPrice": 5.813,
-        "totalValue": 4803.13015745,
-        "gainSincePurchase": 1.3,
-        "gainSincePurchaseChf": 61.7,
-        "gainSincePurchasePct": 1.3,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 4803.13015745,
+        "averageBuyPrice": 5.3055,
+        "lastTradedPrice": 5.939,
+        "totalValue": 4958.38680777,
+        "gainSincePurchase": 4.19,
+        "gainSincePurchaseChf": 200.93,
+        "gainSincePurchasePct": 4.19,
+        "valueChf": 4958.38680777,
         "currency": "EUR",
-        "allocationPct": 3.1,
+        "allocationPct": 3.2,
         "targetPct": 4,
-        "driftPct": -0.9,
-        "costBasisChf": 4741.43,
+        "driftPct": -0.8,
+        "costBasisChf": 4790.85,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4790.85,
+            "currentTotalChf": 4991.78,
+            "gainChf": 200.93,
+            "gainPct": 4.2
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "HMCD",
         "name": "HSBC MSCI China UCITS ETF USD",
         "quantityHeld": 1086,
-        "averageBuyPrice": 6.4352,
-        "lastTradedPrice": 7.6,
-        "totalValue": 6922.9463544,
-        "gainSincePurchase": -0.94,
-        "gainSincePurchaseChf": -65.64,
-        "gainSincePurchasePct": -0.94,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 6922.9463544,
+        "averageBuyPrice": 6.5022,
+        "lastTradedPrice": 7.47,
+        "totalValue": 6875.45442324,
+        "gainSincePurchase": -1.93,
+        "gainSincePurchaseChf": -136.5,
+        "gainSincePurchasePct": -1.93,
+        "valueChf": 6875.45442324,
         "currency": "USD",
         "allocationPct": 4.5,
         "targetPct": 5,
         "driftPct": -0.5,
-        "costBasisChf": 6988.59,
+        "costBasisChf": 7061.43,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 7061.43,
+            "currentTotalChf": 6924.93,
+            "gainChf": -136.5,
+            "gainPct": -1.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -250,47 +781,145 @@
         "name": "VanEck Uranium and Nuclear Technologies UCITS ETF",
         "quantityHeld": 63,
         "averageBuyPrice": 47.4651,
-        "lastTradedPrice": null,
-        "totalValue": 2995.2950013,
-        "gainSincePurchase": 0.17,
-        "gainSincePurchaseChf": 5,
-        "gainSincePurchasePct": 0.17,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 2995.2950013,
+        "lastTradedPrice": 40.625,
+        "totalValue": 2559.375,
+        "gainSincePurchase": -15.89,
+        "gainSincePurchaseChf": -475.03,
+        "gainSincePurchasePct": -15.89,
+        "valueChf": 2559.375,
         "currency": "CHF",
-        "allocationPct": 2,
+        "allocationPct": 1.7,
         "targetPct": 2,
-        "driftPct": 0,
+        "driftPct": -0.3,
         "costBasisChf": 2990.3,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 2990.3,
+            "currentTotalChf": 2515.27,
+            "gainChf": -475.03,
+            "gainPct": -15.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "XAIX",
         "name": "Xtrackers Artificial Intelligence & Big Data UCITS ETF 1C",
         "quantityHeld": 23,
-        "averageBuyPrice": 201.0148,
-        "lastTradedPrice": 209.8,
-        "totalValue": 4415.3954128,
-        "gainSincePurchase": -4.5,
-        "gainSincePurchaseChf": -207.94,
-        "gainSincePurchasePct": -4.5,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 4415.3954128,
+        "averageBuyPrice": 203.1096,
+        "lastTradedPrice": 195.58,
+        "totalValue": 4159.02571546,
+        "gainSincePurchase": -12.94,
+        "gainSincePurchaseChf": -604.36,
+        "gainSincePurchasePct": -12.94,
+        "valueChf": 4159.02571546,
         "currency": "EUR",
-        "allocationPct": 2.9,
+        "allocationPct": 2.7,
         "targetPct": 5,
-        "driftPct": -2.1,
-        "costBasisChf": 4623.34,
+        "driftPct": -2.3,
+        "costBasisChf": 4671.52,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4671.52,
+            "currentTotalChf": 4067.16,
+            "gainChf": -604.36,
+            "gainPct": -12.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -298,95 +927,291 @@
         "name": "SPDR Russell 2000 US Small Cap UCITS ETF",
         "quantityHeld": 32,
         "averageBuyPrice": 75.3134,
-        "lastTradedPrice": 65.11,
-        "totalValue": 2283.81294464,
-        "gainSincePurchase": -5.24,
-        "gainSincePurchaseChf": -126.22,
-        "gainSincePurchasePct": -5.24,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 2283.81294464,
+        "lastTradedPrice": 64.98,
+        "totalValue": 2303.00972352,
+        "gainSincePurchase": -4.81,
+        "gainSincePurchaseChf": -115.88,
+        "gainSincePurchasePct": -4.81,
+        "valueChf": 2303.00972352,
         "currency": "GBP",
         "allocationPct": 1.5,
         "targetPct": 2,
         "driftPct": -0.5,
         "costBasisChf": 2410.03,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 2410.03,
+            "currentTotalChf": 2294.15,
+            "gainChf": -115.88,
+            "gainPct": -4.8
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "CEBL",
         "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
         "quantityHeld": 47,
-        "averageBuyPrice": 245.8185,
-        "lastTradedPrice": 270.25,
-        "totalValue": 11622.507706,
-        "gainSincePurchase": 0.6,
-        "gainSincePurchaseChf": 69.04,
-        "gainSincePurchasePct": 0.6,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 11622.507706,
+        "averageBuyPrice": 248.3806,
+        "lastTradedPrice": 252.65,
+        "totalValue": 10978.84081895,
+        "gainSincePurchase": -9.32,
+        "gainSincePurchaseChf": -1088.31,
+        "gainSincePurchasePct": -9.32,
+        "valueChf": 10978.84081895,
         "currency": "EUR",
-        "allocationPct": 7.6,
+        "allocationPct": 7.2,
         "targetPct": 8,
-        "driftPct": -0.4,
-        "costBasisChf": 11553.47,
+        "driftPct": -0.8,
+        "costBasisChf": 11673.89,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 11673.89,
+            "currentTotalChf": 10585.58,
+            "gainChf": -1088.31,
+            "gainPct": -9.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "SEC0",
         "name": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
         "quantityHeld": 575,
-        "averageBuyPrice": 16.4624,
-        "lastTradedPrice": 19.834,
-        "totalValue": 10435.5281956,
-        "gainSincePurchase": 10.24,
-        "gainSincePurchaseChf": 969.66,
-        "gainSincePurchasePct": 10.24,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 10435.5281956,
+        "averageBuyPrice": 16.634,
+        "lastTradedPrice": 17.668,
+        "totalValue": 9392.7889279,
+        "gainSincePurchase": -11.67,
+        "gainSincePurchaseChf": -1115.91,
+        "gainSincePurchasePct": -11.67,
+        "valueChf": 9392.7889279,
         "currency": "EUR",
-        "allocationPct": 6.8,
+        "allocationPct": 6.1,
         "targetPct": 10,
-        "driftPct": -3.2,
-        "costBasisChf": 9465.87,
+        "driftPct": -3.9,
+        "costBasisChf": 9564.53,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 9564.53,
+            "currentTotalChf": 8448.62,
+            "gainChf": -1115.91,
+            "gainPct": -11.7
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "LCUJ",
         "name": "Amundi Core MSCI Japan UCITS ETF Acc",
         "quantityHeld": 453,
-        "averageBuyPrice": 20.0903,
-        "lastTradedPrice": 22.471,
-        "totalValue": 9314.44288462,
-        "gainSincePurchase": 2.35,
-        "gainSincePurchaseChf": 213.54,
-        "gainSincePurchasePct": 2.35,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 9314.44288462,
+        "averageBuyPrice": 20.2997,
+        "lastTradedPrice": 22.466,
+        "totalValue": 9409.42932076,
+        "gainSincePurchase": -0.05,
+        "gainSincePurchaseChf": -4.53,
+        "gainSincePurchasePct": -0.05,
+        "valueChf": 9409.42932076,
         "currency": "EUR",
-        "allocationPct": 6.1,
+        "allocationPct": 6.2,
         "targetPct": 6,
-        "driftPct": 0.1,
-        "costBasisChf": 9100.9,
+        "driftPct": 0.2,
+        "costBasisChf": 9195.75,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 9195.75,
+            "currentTotalChf": 9191.22,
+            "gainChf": -4.53,
+            "gainPct": -0.1
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -394,47 +1219,145 @@
         "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
         "quantityHeld": 447,
         "averageBuyPrice": 38.2572,
-        "lastTradedPrice": 42.4,
-        "totalValue": 17342.4184896,
-        "gainSincePurchase": 1.41,
-        "gainSincePurchaseChf": 241.47,
-        "gainSincePurchasePct": 1.41,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 17342.4184896,
+        "lastTradedPrice": 42.645,
+        "totalValue": 17624.42551723,
+        "gainSincePurchase": -100,
+        "gainSincePurchaseChf": -17100.95,
+        "gainSincePurchasePct": -100,
+        "valueChf": 17624.42551723,
         "currency": "EUR",
-        "allocationPct": 11.3,
+        "allocationPct": 11.5,
         "targetPct": 14,
-        "driftPct": -2.7,
+        "driftPct": -2.5,
         "costBasisChf": 17100.95,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 17100.95,
+            "currentTotalChf": 0,
+            "gainChf": -17100.95,
+            "gainPct": -100
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "XDEW",
         "name": "Xtrackers S&P 500 Equal Weight UCITS ETF 1C",
         "quantityHeld": 82,
-        "averageBuyPrice": 91.6771,
-        "lastTradedPrice": 102.22,
-        "totalValue": 7669.83482528,
-        "gainSincePurchase": 2.03,
-        "gainSincePurchaseChf": 152.31,
-        "gainSincePurchasePct": 2.03,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 7669.83482528,
+        "averageBuyPrice": 92.6327,
+        "lastTradedPrice": 104.84,
+        "totalValue": 7948.40874472,
+        "gainSincePurchase": 6.32,
+        "gainSincePurchaseChf": 479.9,
+        "gainSincePurchasePct": 6.32,
+        "valueChf": 7948.40874472,
         "currency": "EUR",
-        "allocationPct": 5,
+        "allocationPct": 5.2,
         "targetPct": 6,
-        "driftPct": -1,
-        "costBasisChf": 7517.52,
+        "driftPct": -0.8,
+        "costBasisChf": 7595.88,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 7595.88,
+            "currentTotalChf": 8075.78,
+            "gainChf": 479.9,
+            "gainPct": 6.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
@@ -442,56 +1365,1177 @@
         "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
         "quantityHeld": 39,
         "averageBuyPrice": 659.6928,
-        "lastTradedPrice": 697.9,
-        "totalValue": 24905.4324792,
-        "gainSincePurchase": -3.2,
-        "gainSincePurchaseChf": -822.59,
-        "gainSincePurchasePct": -3.2,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 24905.4324792,
+        "lastTradedPrice": 706.3,
+        "totalValue": 25467.9003033,
+        "gainSincePurchase": -1.47,
+        "gainSincePurchaseChf": -376.95,
+        "gainSincePurchasePct": -1.47,
+        "valueChf": 25467.9003033,
         "currency": "EUR",
-        "allocationPct": 16.3,
+        "allocationPct": 16.6,
         "targetPct": 25,
-        "driftPct": -8.7,
+        "driftPct": -8.4,
         "costBasisChf": 25728.02,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 25728.02,
+            "currentTotalChf": 25351.07,
+            "gainChf": -376.95,
+            "gainPct": -1.5
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       },
       {
         "symbol": "IS3H",
         "name": "iShares MSCI EMU Mid Cap UCITS ETF EUR (Acc)",
         "quantityHeld": 54,
-        "averageBuyPrice": 70.06,
-        "lastTradedPrice": 78.92,
-        "totalValue": 3899.57357376,
-        "gainSincePurchase": 3.07,
-        "gainSincePurchaseChf": 116.33,
-        "gainSincePurchasePct": 3.07,
-        "ytdChf": 148011.26,
-        "ytdPct": 2960.2,
-        "valueChf": 3899.57357376,
+        "averageBuyPrice": 70.7902,
+        "lastTradedPrice": 80.36,
+        "totalValue": 4012.11170136,
+        "gainSincePurchase": 4.84,
+        "gainSincePurchaseChf": 184.95,
+        "gainSincePurchasePct": 4.84,
+        "valueChf": 4012.11170136,
         "currency": "EUR",
-        "allocationPct": 2.5,
+        "allocationPct": 2.6,
         "targetPct": 3,
-        "driftPct": -0.5,
-        "costBasisChf": 3783.24,
+        "driftPct": -0.4,
+        "costBasisChf": 3822.67,
+        "performanceWindows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 3822.67,
+            "currentTotalChf": 4007.62,
+            "gainChf": 184.95,
+            "gainPct": 4.8
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        },
         "availability": {
           "averageBuyPrice": "available",
           "gainSincePurchaseChf": "available",
-          "ytd": "portfolio_level_only"
+          "sincePurchase": "available",
+          "last7d": "missing_history",
+          "last30d": "missing_history",
+          "ytd": "missing_history",
+          "last365d": "missing_history"
         }
       }
     ],
     "totals": {
       "rowCount": 19,
-      "totalValueChf": 152755.03780566002,
-      "totalGainChf": 800.51,
-      "totalGainPct": 0.5
+      "totalValueChf": 152769.7326173,
+      "totalGainChf": -27777.21,
+      "totalGainPct": -15.4
     }
+  },
+  "performance": {
+    "portfolio": {
+      "windows": {
+        "sincePurchase": {
+          "label": "Since purchase",
+          "availability": "complete",
+          "anchorDate": null,
+          "anchorTotalChf": 152722.18,
+          "currentTotalChf": 152977.99,
+          "gainChf": -27777.21,
+          "gainPct": -18.2
+        },
+        "last7d": {
+          "label": "Last 7 days",
+          "availability": "available",
+          "anchorDate": "2026-07-21",
+          "anchorTotalChf": 151827.73,
+          "currentTotalChf": 152977.99,
+          "gainChf": 1150.26,
+          "gainPct": 0.8
+        },
+        "last30d": {
+          "label": "Last 30 days",
+          "availability": "available",
+          "anchorDate": "2026-06-26",
+          "anchorTotalChf": 152747.62,
+          "currentTotalChf": 152977.99,
+          "gainChf": 230.37,
+          "gainPct": 0.2
+        },
+        "ytd": {
+          "label": "YTD",
+          "availability": "partial",
+          "anchorDate": "2026-04-28",
+          "anchorTotalChf": 5000,
+          "currentTotalChf": 152977.99,
+          "gainChf": 147977.99,
+          "gainPct": 2959.6
+        },
+        "last365d": {
+          "label": "Last 365 days",
+          "availability": "missing_history",
+          "anchorDate": null,
+          "anchorTotalChf": 0,
+          "currentTotalChf": 152977.99,
+          "gainChf": 0,
+          "gainPct": 0
+        }
+      },
+      "asOfDate": "2026-07-27"
+    },
+    "instruments": [
+      {
+        "symbol": "UKGBPB",
+        "name": "UBS MSCI United Kingdom UCITS ETF GBP acc",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 8509.76,
+            "currentTotalChf": 0,
+            "gainChf": -8509.76,
+            "gainPct": -100
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "AIFS",
+        "name": "iShares AI Infrastructure UCITS ETF USD (Acc)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4806.2,
+            "currentTotalChf": 4453.43,
+            "gainChf": -352.77,
+            "gainPct": -7.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "DXS0",
+        "name": "Xtrackers SLI UCITS ETF 1D",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 2728.77,
+            "currentTotalChf": 2934.03,
+            "gainChf": 205.26,
+            "gainPct": 7.5
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "XDW0",
+        "name": "Xtrackers MSCI World Energy UCITS ETF 1C",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4486.68,
+            "currentTotalChf": 4590.3,
+            "gainChf": 103.62,
+            "gainPct": 2.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "CHSPI",
+        "name": "UBS SLI ETF (SMI gleichgewichtet)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 11016.56,
+            "currentTotalChf": 11754.48,
+            "gainChf": 737.92,
+            "gainPct": 6.7
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "INRE",
+        "name": "iShares Global Clean Energy Transition UCITS ETF",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 1493.7,
+            "currentTotalChf": 1225.55,
+            "gainChf": -268.15,
+            "gainPct": -17.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "SPMCHA",
+        "name": "UBS SPI Mid ETF (SPI ohne SMI)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 13074.69,
+            "currentTotalChf": 13534,
+            "gainChf": 459.31,
+            "gainPct": 3.5
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "MWEQ",
+        "name": "Invesco MSCI World Equal Weight UCITS ETF Acc",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4790.85,
+            "currentTotalChf": 4991.78,
+            "gainChf": 200.93,
+            "gainPct": 4.2
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "HMCD",
+        "name": "HSBC MSCI China UCITS ETF USD",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 7061.43,
+            "currentTotalChf": 6924.93,
+            "gainChf": -136.5,
+            "gainPct": -1.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "NUCL",
+        "name": "VanEck Uranium and Nuclear Technologies UCITS ETF",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 2990.3,
+            "currentTotalChf": 2515.27,
+            "gainChf": -475.03,
+            "gainPct": -15.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "XAIX",
+        "name": "Xtrackers Artificial Intelligence & Big Data UCITS ETF 1C",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 4671.52,
+            "currentTotalChf": 4067.16,
+            "gainChf": -604.36,
+            "gainPct": -12.9
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "R2SC",
+        "name": "SPDR Russell 2000 US Small Cap UCITS ETF",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 2410.03,
+            "currentTotalChf": 2294.15,
+            "gainChf": -115.88,
+            "gainPct": -4.8
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "CEBL",
+        "name": "iShares MSCI EM Asia UCITS ETF (Acc)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 11673.89,
+            "currentTotalChf": 10585.58,
+            "gainChf": -1088.31,
+            "gainPct": -9.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "SEC0",
+        "name": "iShares MSCI Global Semiconductors UCITS ETF USD (Acc)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 9564.53,
+            "currentTotalChf": 8448.62,
+            "gainChf": -1115.91,
+            "gainPct": -11.7
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "LCUJ",
+        "name": "Amundi Core MSCI Japan UCITS ETF Acc",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 9195.75,
+            "currentTotalChf": 9191.22,
+            "gainChf": -4.53,
+            "gainPct": -0.1
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "EMUAA",
+        "name": "UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 17100.95,
+            "currentTotalChf": 0,
+            "gainChf": -17100.95,
+            "gainPct": -100
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "XDEW",
+        "name": "Xtrackers S&P 500 Equal Weight UCITS ETF 1C",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 7595.88,
+            "currentTotalChf": 8075.78,
+            "gainChf": 479.9,
+            "gainPct": 6.3
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "SXR8",
+        "name": "iShares Core S&P 500 UCITS ETF USD (Acc)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 25728.02,
+            "currentTotalChf": 25351.07,
+            "gainChf": -376.95,
+            "gainPct": -1.5
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      },
+      {
+        "symbol": "IS3H",
+        "name": "iShares MSCI EMU Mid Cap UCITS ETF EUR (Acc)",
+        "windows": {
+          "sincePurchase": {
+            "label": "Since purchase",
+            "availability": "available",
+            "anchorDate": null,
+            "anchorTotalChf": 3822.67,
+            "currentTotalChf": 4007.62,
+            "gainChf": 184.95,
+            "gainPct": 4.8
+          },
+          "last7d": {
+            "label": "Last 7 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last30d": {
+            "label": "Last 30 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "ytd": {
+            "label": "YTD",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          },
+          "last365d": {
+            "label": "Last 365 days",
+            "availability": "missing_history",
+            "anchorDate": null,
+            "anchorTotalChf": 0,
+            "currentTotalChf": 0,
+            "gainChf": 0,
+            "gainPct": 0
+          }
+        }
+      }
+    ]
   },
   "profitLoss": {
     "rows": [
@@ -501,15 +2545,15 @@
         "name": "UKGBPB",
         "currency": "GBP",
         "quantity": 180,
-        "valueChf": 8494.9133868,
-        "costBasisChf": 8421.98,
+        "valueChf": 0,
+        "costBasisChf": 8509.76,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 72.93,
-        "unrealizedProfitPct": 0.87,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -8509.76,
+        "unrealizedProfitPct": -100,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for UKGBPB.SW.",
         "quoteTrusted": true
       },
       {
@@ -518,16 +2562,16 @@
         "name": "AIFS",
         "currency": "EUR",
         "quantity": 520,
-        "valueChf": 4775.29579904,
-        "costBasisChf": 4756.63,
+        "valueChf": 4453.42697644,
+        "costBasisChf": 4806.2,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 18.67,
-        "unrealizedProfitPct": 0.39,
+        "unrealizedProfitChf": -352.77,
+        "unrealizedProfitPct": -7.34,
         "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
+        "quoteQuality": "stale_or_unknown",
         "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
-        "quoteTrusted": true
+        "quoteNote": "Using the latest holdings snapshot value because broker/service quote resolution did not produce a fresher usable valuation.",
+        "quoteTrusted": false
       },
       {
         "tickerOrIsin": "53524044",
@@ -535,15 +2579,15 @@
         "name": "DXS0",
         "currency": "EUR",
         "quantity": 12,
-        "valueChf": 2809.3312464,
-        "costBasisChf": 2700.63,
+        "valueChf": 2934.03,
+        "costBasisChf": 2728.77,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 108.7,
-        "unrealizedProfitPct": 4.02,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 205.26,
+        "unrealizedProfitPct": 7.52,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for DXS0.DE.",
         "quoteTrusted": true
       },
       {
@@ -552,15 +2596,15 @@
         "name": "XDW0",
         "currency": "EUR",
         "quantity": 80,
-        "valueChf": 4305.0425536,
+        "valueChf": 4590.3,
         "costBasisChf": 4486.68,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": -181.64,
-        "unrealizedProfitPct": -4.05,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 103.62,
+        "unrealizedProfitPct": 2.31,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for XDW0.DE.",
         "quoteTrusted": true
       },
       {
@@ -569,15 +2613,15 @@
         "name": "CHSPI",
         "currency": "CHF",
         "quantity": 68,
-        "valueChf": 11273.04,
+        "valueChf": 11754.48,
         "costBasisChf": 11016.56,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": 256.48,
-        "unrealizedProfitPct": 2.33,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 737.92,
+        "unrealizedProfitPct": 6.7,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for CHSPI.SW.",
         "quoteTrusted": true
       },
       {
@@ -586,16 +2630,16 @@
         "name": "INRE",
         "currency": "EUR",
         "quantity": 57,
-        "valueChf": 1412.40679392,
+        "valueChf": 1225.54856941,
         "costBasisChf": 1493.7,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": -81.29,
-        "unrealizedProfitPct": -5.44,
+        "unrealizedProfitChf": -268.15,
+        "unrealizedProfitPct": -17.95,
         "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
+        "quoteQuality": "stale_or_unknown",
         "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
-        "quoteTrusted": true
+        "quoteNote": "Using the latest holdings snapshot value because broker/service quote resolution did not produce a fresher usable valuation.",
+        "quoteTrusted": false
       },
       {
         "tickerOrIsin": "91639399",
@@ -603,15 +2647,15 @@
         "name": "SPMCHA",
         "currency": "CHF",
         "quantity": 101,
-        "valueChf": 13074.69000125,
+        "valueChf": 13534,
         "costBasisChf": 13074.69,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 0,
-        "unrealizedProfitPct": 0,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 459.31,
+        "unrealizedProfitPct": 3.51,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for SPMCHA.SW.",
         "quoteTrusted": true
       },
       {
@@ -620,15 +2664,15 @@
         "name": "MWEQ",
         "currency": "EUR",
         "quantity": 903,
-        "valueChf": 4803.13015745,
-        "costBasisChf": 4741.43,
+        "valueChf": 4991.78,
+        "costBasisChf": 4790.85,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 61.7,
-        "unrealizedProfitPct": 1.3,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 200.93,
+        "unrealizedProfitPct": 4.19,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for MWEQ.DE.",
         "quoteTrusted": true
       },
       {
@@ -637,15 +2681,15 @@
         "name": "HMCD",
         "currency": "USD",
         "quantity": 1086,
-        "valueChf": 6922.9463544,
-        "costBasisChf": 6988.59,
+        "valueChf": 6924.93,
+        "costBasisChf": 7061.43,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": -65.64,
-        "unrealizedProfitPct": -0.94,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -136.5,
+        "unrealizedProfitPct": -1.93,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for HMCD.L.",
         "quoteTrusted": true
       },
       {
@@ -654,15 +2698,15 @@
         "name": "NUCL",
         "currency": "CHF",
         "quantity": 63,
-        "valueChf": 2995.2950013,
+        "valueChf": 2515.27,
         "costBasisChf": 2990.3,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": 5,
-        "unrealizedProfitPct": 0.17,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -475.03,
+        "unrealizedProfitPct": -15.89,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for NUCL.SW.",
         "quoteTrusted": true
       },
       {
@@ -671,15 +2715,15 @@
         "name": "XAIX",
         "currency": "EUR",
         "quantity": 23,
-        "valueChf": 4415.3954128,
-        "costBasisChf": 4623.34,
+        "valueChf": 4067.16,
+        "costBasisChf": 4671.52,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": -207.94,
-        "unrealizedProfitPct": -4.5,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -604.36,
+        "unrealizedProfitPct": -12.94,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for XAIX.DE.",
         "quoteTrusted": true
       },
       {
@@ -688,15 +2732,15 @@
         "name": "R2SC",
         "currency": "GBP",
         "quantity": 32,
-        "valueChf": 2283.81294464,
+        "valueChf": 2294.15,
         "costBasisChf": 2410.03,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": -126.22,
-        "unrealizedProfitPct": -5.24,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -115.88,
+        "unrealizedProfitPct": -4.81,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for R2SC.L.",
         "quoteTrusted": true
       },
       {
@@ -705,15 +2749,15 @@
         "name": "CEBL",
         "currency": "EUR",
         "quantity": 47,
-        "valueChf": 11622.507706,
-        "costBasisChf": 11553.47,
+        "valueChf": 10585.58,
+        "costBasisChf": 11673.89,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 69.04,
-        "unrealizedProfitPct": 0.6,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -1088.31,
+        "unrealizedProfitPct": -9.32,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for CEBL.DE.",
         "quoteTrusted": true
       },
       {
@@ -722,15 +2766,15 @@
         "name": "SEC0",
         "currency": "EUR",
         "quantity": 575,
-        "valueChf": 10435.5281956,
-        "costBasisChf": 9465.87,
+        "valueChf": 8448.62,
+        "costBasisChf": 9564.53,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 969.66,
-        "unrealizedProfitPct": 10.24,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -1115.91,
+        "unrealizedProfitPct": -11.67,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for SEC0.DE.",
         "quoteTrusted": true
       },
       {
@@ -739,15 +2783,15 @@
         "name": "LCUJ",
         "currency": "EUR",
         "quantity": 453,
-        "valueChf": 9314.44288462,
-        "costBasisChf": 9100.9,
+        "valueChf": 9191.22,
+        "costBasisChf": 9195.75,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 213.54,
-        "unrealizedProfitPct": 2.35,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -4.53,
+        "unrealizedProfitPct": -0.05,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for LCUJ.DE.",
         "quoteTrusted": true
       },
       {
@@ -756,15 +2800,15 @@
         "name": "EMUAA",
         "currency": "EUR",
         "quantity": 447,
-        "valueChf": 17342.4184896,
+        "valueChf": 0,
         "costBasisChf": 17100.95,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": 241.47,
-        "unrealizedProfitPct": 1.41,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -17100.95,
+        "unrealizedProfitPct": -100,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for EMUAA.SW.",
         "quoteTrusted": true
       },
       {
@@ -773,15 +2817,15 @@
         "name": "XDEW",
         "currency": "EUR",
         "quantity": 82,
-        "valueChf": 7669.83482528,
-        "costBasisChf": 7517.52,
+        "valueChf": 8075.78,
+        "costBasisChf": 7595.88,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 152.31,
-        "unrealizedProfitPct": 2.03,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 479.9,
+        "unrealizedProfitPct": 6.32,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for XDEW.DE.",
         "quoteTrusted": true
       },
       {
@@ -790,15 +2834,15 @@
         "name": "SXR8",
         "currency": "EUR",
         "quantity": 39,
-        "valueChf": 24905.4324792,
+        "valueChf": 25351.07,
         "costBasisChf": 25728.02,
         "costBasisSource": "trades_md",
-        "unrealizedProfitChf": -822.59,
-        "unrealizedProfitPct": -3.2,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": -376.95,
+        "unrealizedProfitPct": -1.47,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for SXR8.DE.",
         "quoteTrusted": true
       },
       {
@@ -807,24 +2851,24 @@
         "name": "IS3H",
         "currency": "EUR",
         "quantity": 54,
-        "valueChf": 3899.57357376,
-        "costBasisChf": 3783.24,
+        "valueChf": 4007.62,
+        "costBasisChf": 3822.67,
         "costBasisSource": "ibkr_avg_cost",
-        "unrealizedProfitChf": 116.33,
-        "unrealizedProfitPct": 3.07,
-        "quoteSource": "holdings_snapshot",
-        "quoteQuality": "live_or_realtime",
-        "quoteAsOf": null,
-        "quoteNote": "Using broker-backed holdings snapshot from the latest healthy IBKR sync.",
+        "unrealizedProfitChf": 184.95,
+        "unrealizedProfitPct": 4.84,
+        "quoteSource": "yahoo_last_close",
+        "quoteQuality": "last_close",
+        "quoteAsOf": "2026-07-28T07:00:00.000Z",
+        "quoteNote": "Resolved from Yahoo Finance chart close series for IS3H.DE.",
         "quoteTrusted": true
       }
     ],
     "totals": {
-      "totalProfitChf": 800.51,
-      "totalCostBasisChf": 151954.53,
-      "coveredValueChf": 152755.04,
+      "totalProfitChf": -27777.21,
+      "totalCostBasisChf": 152722.18,
+      "coveredValueChf": 124944.97,
       "coveredCount": 19,
-      "totalProfitPct": 0.53
+      "totalProfitPct": -18.19
     },
     "index": {
       "byIsin": {},
@@ -952,36 +2996,36 @@
   "operatorQueue": {
     "summary": {
       "total": 1,
-      "blocking": 0,
+      "blocking": 1,
       "approvals": 0,
       "execution": 0,
       "freshApprovals": 0,
       "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 0,
+      "recovery": 1,
       "delivery": 0,
       "data": 0,
       "warnings": 0,
-      "workflow": 1,
+      "workflow": 0,
       "bySeverity": {
-        "high": 0,
+        "high": 1,
         "medium": 0,
-        "low": 1
+        "low": 0
       }
     },
     "items": [
       {
         "rank": 1,
-        "queueType": "workflow",
+        "queueType": "recovery",
         "portfolio": "etf",
-        "kind": "workflow",
-        "severity": "low",
-        "status": "recommended",
-        "summary": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-        "blocking": false,
-        "recommendedOperatorAction": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
-        "source": "recommendation_engine"
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
       }
     ]
   },
@@ -1729,24 +3773,24 @@
     "proposalTotals": {
       "plannedCashSleeve": 2024.13,
       "executableBuys": 0,
-      "residualTradableCash": 150940.55
+      "residualTradableCash": 150953.86
     }
   },
   "allocation": [
     {
       "assetClass": "Global equities",
-      "currentPct": 82.11,
+      "currentPct": 81.6,
       "targetPct": 65,
-      "driftPct": 17.11,
+      "driftPct": 16.6,
       "minPct": 60,
       "maxPct": 70,
       "status": "out_of_bounds"
     },
     {
       "assetClass": "Swiss equities",
-      "currentPct": 17.75,
+      "currentPct": 18.26,
       "targetPct": 20,
-      "driftPct": -2.25,
+      "driftPct": -1.74,
       "minPct": 15,
       "maxPct": 25,
       "status": "on_track"
@@ -1990,69 +4034,183 @@
     }
   ],
   "pendingActions": [
-    "Portfolio is performing as intended. Hold current positions and review after the next market session."
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
   ],
-  "recommendedNextStep": "Portfolio is performing as intended. Hold current positions and review after the next market session.",
+  "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
   "selfHealPlan": {
     "ok": true,
     "dryRun": true,
     "portfolio": "etf",
     "health": {
-      "health": "healthy",
-      "severity": "low",
-      "state": "healthy",
-      "summary": "All systems normal.",
-      "canonicalNextAction": null,
-      "blockerCount": 0,
-      "blockers": [],
-      "recommendedActions": [],
-      "nextAction": "No immediate operator action is required."
+      "health": "blocked",
+      "severity": "high",
+      "state": "critical",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
+      "blockerCount": 1,
+      "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        }
+      ],
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
     },
-    "classified": [],
-    "healed": [],
-    "openIssues": [],
-    "actions": [],
-    "recoveryLadders": []
+    "classified": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "symptom": "IBKR gateway appears offline or unreachable on the native API socket.",
+        "recommendedAction": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "healable": true,
+        "recipe": "restart_ibkr_gateway_if_socket_dead",
+        "recoveryLadder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          },
+          {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ],
+    "healed": [
+      {
+        "ok": true,
+        "kind": "restart_ibkr_gateway_if_socket_dead",
+        "applied": false,
+        "blocked": "outside_daytime_window",
+        "summary": "Skipped IBKR restart because the check ran outside the daytime window.",
+        "budget": {
+          "blocked": null,
+          "attempts": 0,
+          "lastAttemptAt": null
+        }
+      }
+    ],
+    "openIssues": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "symptom": "IBKR gateway appears offline or unreachable on the native API socket."
+      }
+    ],
+    "actions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ],
+    "recoveryLadders": [
+      {
+        "category": "ibkr_socket_dead",
+        "ladder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          },
+          {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ]
   },
   "explanations": {
-    "biggestDrift": "Global equities is 17.11% over target and outside the allowed band around the 65% target.",
-    "noTradePosture": "Trade posture is driven by the current proposal and approval state.",
-    "executionBlock": "No explicit execution block is currently surfaced.",
+    "biggestDrift": "Global equities is 16.6% over target and outside the allowed band around the 65% target.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionBlock": "Execution is blocked because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "approvalBacklog": "78 blocked row(s) still need explicit operator review before the workflow can advance cleanly.",
-    "growthSummary": "Global equities is 17.1% over target and outside the allowed band around the 65% target — rebalance recommended.",
-    "deploymentOpportunity": "A small cash position of CHF 209.64 is in place."
+    "growthSummary": "Global equities is 16.6% over target and outside the allowed band around the 65% target — rebalance recommended.",
+    "deploymentOpportunity": "A small cash position of CHF 208.26 is in place."
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-06-15 11:34:09.956 UTC",
-      "eventType": "transmitted_live_blocked",
+      "time": "2026-07-28 20:30:16.787 UTC",
+      "eventType": "live_execution_blocked",
       "severity": "warn",
-      "summary": "Transmitted live execution requires dryRun=false.",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-15 11:31:28.158 UTC",
-      "eventType": "transmitted_live_blocked",
-      "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments. | Portfolio requires confirmation before first live trade. | Transmitted live execution requires explicit user approval flag. | Transmitted live execution requires the exact transmittedLiveAck confirmation string.",
-      "nextStep": "Resolve the blocking condition before proceeding."
-    },
-    {
-      "time": "2026-06-15 11:28:28.553 UTC",
-      "eventType": "transmitted_live_blocked",
+      "time": "2026-07-28 20:30:16.784 UTC",
+      "eventType": "draft_execution_blocked",
       "severity": "warn",
       "summary": "Requested instrument is not in Approved Instruments.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-04 07:24:16.672 UTC",
+      "time": "2026-07-28 20:28:35.556 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-04 07:24:14.222 UTC",
+      "time": "2026-07-28 20:28:33.338 UTC",
+      "eventType": "safety_controls_blocked",
+      "severity": "warn",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "nextStep": "Resolve the blocking condition before proceeding."
+    },
+    {
+      "time": "2026-07-28 20:28:29.660 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
@@ -2067,8 +4225,8 @@
         "warn": 100
       },
       "byCategory": {
-        "risk": 63,
-        "execution_policy": 37
+        "risk": 61,
+        "execution_policy": 39
       },
       "blockedTrades": 100,
       "degradedBrokerEvents": 0,
@@ -2165,5 +4323,36 @@
       "approval": "broker_inactive",
       "brokerOrderId": "9172"
     }
+  ],
+  "quoteProviderHealth": [
+    {
+      "providerId": "ibkr_web_api",
+      "lastSuccessAt": null,
+      "lastFailureAt": "2026-07-28T20:30:25.462Z",
+      "consecutiveFailures": 2,
+      "lastError": "ibkr_web_api_request_failed",
+      "cooldownUntil": "2026-07-28T20:31:25.462Z"
+    },
+    {
+      "providerId": "ibkr_tws",
+      "lastSuccessAt": null,
+      "lastFailureAt": "2026-07-28T20:30:25.463Z",
+      "consecutiveFailures": 2,
+      "lastError": "auth_failed",
+      "cooldownUntil": "2026-07-28T20:31:25.463Z"
+    },
+    {
+      "providerId": "yahoo_last_close",
+      "lastSuccessAt": "2026-07-28T20:30:26.332Z",
+      "lastFailureAt": "2026-07-28T20:30:26.589Z",
+      "consecutiveFailures": 2,
+      "lastError": "fetch_failed",
+      "cooldownUntil": "2026-07-28T20:31:26.589Z"
+    }
+  ],
+  "quoteProviderOrder": [
+    "ibkr_web_api",
+    "ibkr_tws",
+    "yahoo_last_close"
   ]
 }

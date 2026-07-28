@@ -1,13 +1,13 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-06-11T20:00:13.911Z",
+  "generatedAt": "2026-07-28T20:30:26.461Z",
   "portfolio": "acceptance-closure",
   "status": {
     "health": "warning",
     "strategy": "blocked",
-    "brokerHealth": "healthy",
-    "brokerMessage": "Interactive Brokers read-only connectivity and live/realtime market data are available.",
-    "executionPosture": "ready_for_review",
+    "brokerHealth": "degraded",
+    "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+    "executionPosture": "degraded_dry_run_only",
     "deliveryPosture": "needs_operator_attention",
     "dataFreshness": "stale"
   },
@@ -36,6 +36,59 @@
       "totalGainPct": null
     }
   },
+  "performance": {
+    "portfolio": {
+      "windows": {
+        "sincePurchase": {
+          "label": "Since purchase",
+          "availability": "complete",
+          "anchorDate": null,
+          "anchorTotalChf": 0,
+          "currentTotalChf": 0,
+          "gainChf": 0,
+          "gainPct": 0
+        },
+        "last7d": {
+          "label": "Last 7 days",
+          "availability": "missing_history",
+          "anchorDate": null,
+          "anchorTotalChf": 0,
+          "currentTotalChf": 0,
+          "gainChf": 0,
+          "gainPct": 0
+        },
+        "last30d": {
+          "label": "Last 30 days",
+          "availability": "missing_history",
+          "anchorDate": null,
+          "anchorTotalChf": 0,
+          "currentTotalChf": 0,
+          "gainChf": 0,
+          "gainPct": 0
+        },
+        "ytd": {
+          "label": "YTD",
+          "availability": "missing_history",
+          "anchorDate": null,
+          "anchorTotalChf": 0,
+          "currentTotalChf": 0,
+          "gainChf": 0,
+          "gainPct": 0
+        },
+        "last365d": {
+          "label": "Last 365 days",
+          "availability": "missing_history",
+          "anchorDate": null,
+          "anchorTotalChf": 0,
+          "currentTotalChf": 0,
+          "gainChf": 0,
+          "gainPct": 0
+        }
+      },
+      "asOfDate": null
+    },
+    "instruments": []
+  },
   "profitLoss": {
     "rows": [],
     "totals": {
@@ -61,21 +114,21 @@
   },
   "operatorQueue": {
     "summary": {
-      "total": 6,
-      "blocking": 5,
+      "total": 7,
+      "blocking": 6,
       "approvals": 0,
       "execution": 0,
       "freshApprovals": 0,
       "staleApprovals": 0,
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
-      "recovery": 0,
+      "recovery": 1,
       "delivery": 1,
       "data": 0,
       "warnings": 5,
       "workflow": 0,
       "bySeverity": {
-        "high": 5,
+        "high": 6,
         "medium": 1,
         "low": 0
       }
@@ -143,6 +196,18 @@
       },
       {
         "rank": 6,
+        "queueType": "recovery",
+        "portfolio": "acceptance-closure",
+        "kind": "broker",
+        "severity": "high",
+        "status": "degraded",
+        "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+        "blocking": true,
+        "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
+        "source": "broker_readiness"
+      },
+      {
+        "rank": 7,
         "queueType": "delivery",
         "portfolio": "acceptance-closure",
         "kind": "delivery",
@@ -411,6 +476,7 @@
     "Missing concrete risk limit: Max single ETF allocation.",
     "Missing concrete risk limit: Max single issuer allocation.",
     "Portfolio still has open questions; trade execution must remain blocked.",
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "Dashboard/report freshness is stale relative to source state."
   ],
   "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
@@ -419,30 +485,143 @@
     "dryRun": true,
     "portfolio": "acceptance-closure",
     "health": {
-      "health": "degraded",
-      "severity": "low",
-      "state": "attention",
-      "summary": "Dashboard/report freshness is stale relative to source state.",
-      "canonicalNextAction": null,
-      "blockerCount": 1,
+      "health": "blocked",
+      "severity": "high",
+      "state": "critical",
+      "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
+      "blockerCount": 2,
       "blockers": [
+        {
+          "code": "broker_unready",
+          "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        },
         {
           "code": "delivery_attention",
           "message": "Dashboard/report freshness is stale relative to source state."
         }
       ],
-      "recommendedActions": [],
-      "nextAction": "No immediate operator action is required."
+      "recommendedActions": [
+        "Restore native IBKR connectivity before relying on executable live-state surfaces."
+      ],
+      "nextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces."
     },
-    "classified": [],
-    "healed": [],
-    "openIssues": [],
-    "actions": [],
-    "recoveryLadders": []
+    "classified": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "symptom": "IBKR gateway appears offline or unreachable on the native API socket.",
+        "recommendedAction": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "healable": true,
+        "recipe": "restart_ibkr_gateway_if_socket_dead",
+        "recoveryLadder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          },
+          {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ],
+    "healed": [
+      {
+        "ok": true,
+        "kind": "restart_ibkr_gateway_if_socket_dead",
+        "applied": false,
+        "blocked": "outside_daytime_window",
+        "summary": "Skipped IBKR restart because the check ran outside the daytime window.",
+        "budget": {
+          "blocked": null,
+          "attempts": 0,
+          "lastAttemptAt": null
+        }
+      }
+    ],
+    "openIssues": [
+      {
+        "category": "ibkr_socket_dead",
+        "severity": "high",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
+        "symptom": "IBKR gateway appears offline or unreachable on the native API socket."
+      }
+    ],
+    "actions": [
+      {
+        "kind": "command",
+        "command": "node scripts/trade.js reconcile-live portfolio/etf --json",
+        "reason": "Rebuild truthful broker evidence once native connectivity is available."
+      }
+    ],
+    "recoveryLadders": [
+      {
+        "category": "ibkr_socket_dead",
+        "ladder": [
+          {
+            "rank": 1,
+            "action": "verify_gateway_running",
+            "description": "Confirm whether the native IBKR gateway is up and the API socket is reachable on 127.0.0.1:4001.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          },
+          {
+            "rank": 2,
+            "action": "restart_native_gateway",
+            "description": "Restart the native IB gateway via the known-good launcher (uses the pinned install4j JRE — see TOOLS.md).",
+            "command": "/home/ubuntu/ibgateway-native/start-ibc.sh",
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 3,
+            "action": "complete_two_factor",
+            "description": "Complete the IB Gateway login / second-factor approval on display :99 so the API port is exposed.",
+            "command": null,
+            "automated": false,
+            "risk": "medium"
+          },
+          {
+            "rank": 4,
+            "action": "verify_post_restart",
+            "description": "Re-run readiness to confirm the API port is live and the gateway accepts orders again.",
+            "command": "node scripts/check-interactive-brokers-readiness.js",
+            "automated": false,
+            "risk": "low"
+          }
+        ]
+      }
+    ]
   },
   "explanations": {
     "biggestDrift": "Global equities is 50% under target and outside the allowed band around the 50% target.",
-    "noTradePosture": "Execution should stay blocked because the supporting dashboard/holdings inputs are stale.",
+    "noTradePosture": "No live-ready trade path is available because broker readiness is degraded: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "executionBlock": "Execution is blocked because Portfolio still has open questions; trade execution must remain blocked.",
     "approvalBacklog": "There is no active approval backlog.",
     "growthSummary": "Global equities is 50.0% under target and outside the allowed band around the 50% target — rebalance recommended.",
@@ -450,35 +629,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-06-11 20:00:13.335 UTC",
+      "time": "2026-07-28 20:30:26.387 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-11 14:00:11.099 UTC",
+      "time": "2026-07-28 20:30:23.389 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-11 09:46:49.996 UTC",
+      "time": "2026-07-28 20:27:53.977 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-11 09:30:43.874 UTC",
+      "time": "2026-07-28 20:27:50.941 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-06-11 08:01:20.598 UTC",
+      "time": "2026-07-28 20:21:40.470 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
@@ -516,5 +695,36 @@
     "lastBrokerErrorReason": null,
     "lastBrokerErrorAt": null
   },
-  "recentTrades": []
+  "recentTrades": [],
+  "quoteProviderHealth": [
+    {
+      "providerId": "ibkr_web_api",
+      "lastSuccessAt": null,
+      "lastFailureAt": "2026-07-28T20:30:25.462Z",
+      "consecutiveFailures": 2,
+      "lastError": "ibkr_web_api_request_failed",
+      "cooldownUntil": "2026-07-28T20:31:25.462Z"
+    },
+    {
+      "providerId": "ibkr_tws",
+      "lastSuccessAt": null,
+      "lastFailureAt": "2026-07-28T20:30:25.463Z",
+      "consecutiveFailures": 2,
+      "lastError": "auth_failed",
+      "cooldownUntil": "2026-07-28T20:31:25.463Z"
+    },
+    {
+      "providerId": "yahoo_last_close",
+      "lastSuccessAt": "2026-07-28T20:30:26.332Z",
+      "lastFailureAt": "2026-07-28T20:30:25.681Z",
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "cooldownUntil": null
+    }
+  ],
+  "quoteProviderOrder": [
+    "ibkr_web_api",
+    "ibkr_tws",
+    "yahoo_last_close"
+  ]
 }

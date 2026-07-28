@@ -1,69 +1,72 @@
 # Dashboard: etf
 ## Portfolio Value Snapshot
-- Total value CHF: 152964.67780566003
-- Cash CHF: 209.64
-- Invested CHF: 152755.03780566002
-- Daily move CHF: 0
-- Daily move %: 0
-- Since last report CHF: 0
-- Since last report %: 0
+- Total value CHF: 152977.9926173
+- Cash CHF: 208.26
+- Invested CHF: 152769.7326173
+- Daily move CHF: unknown
+- Daily move %: unknown
+- Since last report CHF: unknown
+- Since last report %: unknown
 - Number of holdings: 19
-- Latest snapshot date: 2026-06-15
-- Total unrealized profit CHF: 800.51
-- Total unrealized profit %: 0.53
-- Cost-basis coverage: 19/19 holdings (CHF 152755.04 of position value)
+- Latest snapshot date: 2026-07-27
+- Total unrealized profit CHF: -27777.21
+- Total unrealized profit %: -18.19
+- Cost-basis coverage: 19/19 holdings (CHF 124944.97 of position value)
+- Quote coverage: 17 yahoo_last_close last_close, 2 holdings_snapshot stale_or_unknown
+- Oldest quote age: 48621s
 
 ## Profit / Loss
-- Total unrealized profit CHF: 800.51
-- Total cost basis CHF (covered holdings only): 151954.53
-- Total unrealized profit %: 0.53%
+- Total unrealized profit CHF: -27777.21
+- Total cost basis CHF (covered holdings only): 152722.18
+- Total unrealized profit %: -18.19%
 - Cost-basis source priority: trades.md filled buys, then IBKR avg cost fallback. Holdings without cost-basis history show —.
 
-| Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source |
-|---|---:|---:|---:|---:|---|
-| UKGBPB | 8'494.91 | 8'421.98 | 72.93 | +0.87% | IBKR avg cost |
-| AIFS | 4'775.30 | 4'756.63 | 18.67 | +0.39% | IBKR avg cost |
-| DXS0 | 2'809.33 | 2'700.63 | 108.70 | +4.02% | IBKR avg cost |
-| XDW0 | 4'305.04 | 4'486.68 | -181.64 | -4.05% | trades.md |
-| CHSPI | 11'273.04 | 11'016.56 | 256.48 | +2.33% | trades.md |
-| INRE | 1'412.41 | 1'493.70 | -81.29 | -5.44% | trades.md |
-| SPMCHA | 13'074.69 | 13'074.69 | 0.00 | +0.00% | IBKR avg cost |
-| MWEQ | 4'803.13 | 4'741.43 | 61.70 | +1.30% | IBKR avg cost |
-| HMCD | 6'922.95 | 6'988.59 | -65.64 | -0.94% | IBKR avg cost |
-| NUCL | 2'995.30 | 2'990.30 | 5.00 | +0.17% | trades.md |
-| XAIX | 4'415.40 | 4'623.34 | -207.94 | -4.50% | IBKR avg cost |
-| R2SC | 2'283.81 | 2'410.03 | -126.22 | -5.24% | trades.md |
-| CEBL | 11'622.51 | 11'553.47 | 69.04 | +0.60% | IBKR avg cost |
-| SEC0 | 10'435.53 | 9'465.87 | 969.66 | +10.24% | IBKR avg cost |
-| LCUJ | 9'314.44 | 9'100.90 | 213.54 | +2.35% | IBKR avg cost |
-| EMUAA | 17'342.42 | 17'100.95 | 241.47 | +1.41% | trades.md |
-| XDEW | 7'669.83 | 7'517.52 | 152.31 | +2.03% | IBKR avg cost |
-| SXR8 | 24'905.43 | 25'728.02 | -822.59 | -3.20% | trades.md |
-| IS3H | 3'899.57 | 3'783.24 | 116.33 | +3.07% | IBKR avg cost |
+| Instrument | Value CHF | Cost basis CHF | Profit CHF | Profit % | Cost basis source | Quote source | Quote age |
+|---|---:|---:|---:|---:|---|---|---|
+| UKGBPB | 0 | 8509.76 | -8509.76 | -100% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| AIFS | 4453.42697644 | 4806.2 | -352.77 | -7.34% | ibkr_avg_cost | holdings_snapshot | unknown |
+| DXS0 | 2934.03 | 2728.77 | 205.26 | 7.52% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| XDW0 | 4590.3 | 4486.68 | 103.62 | 2.31% | trades_md | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| CHSPI | 11754.48 | 11016.56 | 737.92 | 6.7% | trades_md | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| INRE | 1225.54856941 | 1493.7 | -268.15 | -17.95% | trades_md | holdings_snapshot | unknown |
+| SPMCHA | 13534 | 13074.69 | 459.31 | 3.51% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| MWEQ | 4991.78 | 4790.85 | 200.93 | 4.19% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| HMCD | 6924.93 | 7061.43 | -136.5 | -1.93% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| NUCL | 2515.27 | 2990.3 | -475.03 | -15.89% | trades_md | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| XAIX | 4067.16 | 4671.52 | -604.36 | -12.94% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| R2SC | 2294.15 | 2410.03 | -115.88 | -4.81% | trades_md | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| CEBL | 10585.58 | 11673.89 | -1088.31 | -9.32% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| SEC0 | 8448.62 | 9564.53 | -1115.91 | -11.67% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| LCUJ | 9191.22 | 9195.75 | -4.53 | -0.05% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| EMUAA | 0 | 17100.95 | -17100.95 | -100% | trades_md | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| XDEW | 8075.78 | 7595.88 | 479.9 | 6.32% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| SXR8 | 25351.07 | 25728.02 | -376.95 | -1.47% | trades_md | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
+| IS3H | 4007.62 | 3822.67 | 184.95 | 4.84% | ibkr_avg_cost | yahoo_last_close | as of 2026-07-28T07:00:00.000Z |
 ## Holdings
 Holdings sorted by CHF value (descending).
+- Quote sources and ages are summarized above so the operator can see whether values came from IBKR Web API, IBKR TWS, or free fallback data.
 
 | Instrument | Value CHF | P/L CHF | P/L % | Weight % |
 |---|---:|---:|---:|---:|
-| SXR8 | 24'905.43 | -822.59 | -3.20% | 16.3% |
-| EMUAA | 17'342.42 | +241.47 | +1.41% | 11.3% |
-| SPMCHA | 13'074.69 | +0.00 | +0.00% | 8.5% |
-| CEBL | 11'622.51 | +69.04 | +0.60% | 7.6% |
-| CHSPI | 11'273.04 | +256.48 | +2.33% | 7.4% |
-| SEC0 | 10'435.53 | +969.66 | +10.24% | 6.8% |
-| LCUJ | 9'314.44 | +213.54 | +2.35% | 6.1% |
-| UKGBPB | 8'494.91 | +72.93 | +0.87% | 5.6% |
-| XDEW | 7'669.83 | +152.31 | +2.03% | 5.0% |
-| HMCD | 6'922.95 | -65.64 | -0.94% | 4.5% |
-| MWEQ | 4'803.13 | +61.70 | +1.30% | 3.1% |
-| AIFS | 4'775.30 | +18.67 | +0.39% | 3.1% |
-| XAIX | 4'415.40 | -207.94 | -4.50% | 2.9% |
-| XDW0 | 4'305.04 | -181.64 | -4.05% | 2.8% |
-| IS3H | 3'899.57 | +116.33 | +3.07% | 2.5% |
-| NUCL | 2'995.30 | +5.00 | +0.17% | 2.0% |
-| DXS0 | 2'809.33 | +108.70 | +4.02% | 1.8% |
-| R2SC | 2'283.81 | -126.22 | -5.24% | 1.5% |
-| INRE | 1'412.41 | -81.29 | -5.44% | 0.9% |
+| SXR8 | 25'351.07 | -376.95 | -1.47% | 16.6% |
+| SPMCHA | 13'534.00 | +459.31 | +3.51% | 8.8% |
+| CHSPI | 11'754.48 | +737.92 | +6.70% | 7.7% |
+| CEBL | 10'585.58 | -1'088.31 | -9.32% | 6.9% |
+| LCUJ | 9'191.22 | -4.53 | -0.05% | 6.0% |
+| SEC0 | 8'448.62 | -1'115.91 | -11.67% | 5.5% |
+| XDEW | 8'075.78 | +479.90 | +6.32% | 5.3% |
+| HMCD | 6'924.93 | -136.50 | -1.93% | 4.5% |
+| MWEQ | 4'991.78 | +200.93 | +4.19% | 3.3% |
+| XDW0 | 4'590.30 | +103.62 | +2.31% | 3.0% |
+| AIFS | 4'453.43 | -352.77 | -7.34% | 2.9% |
+| XAIX | 4'067.16 | -604.36 | -12.94% | 2.7% |
+| IS3H | 4'007.62 | +184.95 | +4.84% | 2.6% |
+| DXS0 | 2'934.03 | +205.26 | +7.52% | 1.9% |
+| NUCL | 2'515.27 | -475.03 | -15.89% | 1.6% |
+| R2SC | 2'294.15 | -115.88 | -4.81% | 1.5% |
+| INRE | 1'225.55 | -268.15 | -17.95% | 0.8% |
+| UKGBPB | 0.00 | -8'509.76 | -100.00% | 0.0% |
+| EMUAA | 0.00 | -17'100.95 | -100.00% | 0.0% |
 ## Instrument Actions Queue
 Value-framed: actions are framed as deploy, grow, or hold — not fix drift.
 
@@ -94,30 +97,30 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 
 | Sleeve | Current % | Target % | Drift % | Within band | Action needed | Reason |
 |---|---:|---:|---:|---|---|---|
-| Global equities | 82.11 | 65 | 17.11 | out_of_bounds | yes | outside min/max band |
-| Swiss equities | 17.75 | 20 | -2.25 | on_track | no | within tolerance |
+| Global equities | 81.6 | 65 | 16.6 | out_of_bounds | yes | outside min/max band |
+| Swiss equities | 18.26 | 20 | -1.74 | on_track | no | within tolerance |
 | Bonds / cash-like | 0.14 | 15 | -14.86 | out_of_bounds | yes | outside min/max band |
 ## Pending Operator Actions
-1. [workflow/recommended/low] Portfolio is performing as intended. Hold current positions and review after the next market session.
+1. [recovery/degraded/high] Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 ## Immediate Status
-- Portfolio status: attention_needed
-- Top blocker: none currently surfaced
-- Next action: Portfolio is performing as intended. Hold current positions and review after the next market session.
-- Broker health: Interactive Brokers read-only connectivity and live/realtime market data are available.
-- Execution posture: ready_for_review
+- Portfolio status: warning
+- Top blocker: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Next action: Restore native IBKR gateway connectivity first, then rerun readiness. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Broker health: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
+- Execution posture: degraded_dry_run_only
 - Delivery posture: ready
 - Active blockers: 0
 - Pending operator queue items: 1
 ## Health Snapshot
-- Strategy status: rebalance_needed
-- Last successful sync: 2026-06-15 11:44:11
+- Strategy status: blocked
+- Last successful sync: 2026-07-27 08:05:16
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
-- Broker/API warnings: 0
+- Broker/API warnings: 1
 - Stale data warnings: 0
 - Execution pause state: active
 - Active blocker detail:
@@ -134,21 +137,21 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Execution items: 0
 - Open-runner first handoffs: 0
 - Open-runner retries: 0
-- Recovery items: 0
+- Recovery items: 1
 - Delivery items: 0
 - Data items: 0
 - Warning items: 0
-- Workflow items: 1
+- Workflow items: 0
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-06-15 11:34:09.956 UTC | transmitted_live_blocked | warn | Transmitted live execution requires dryRun=false. | Resolve the blocking condition before proceeding. |
-| 2026-06-15 11:31:28.158 UTC | transmitted_live_blocked | warn | Requested instrument is not in Approved Instruments. | Portfolio requires confirmation before first live trade. | Transmitted live execution requires explicit user approval flag. | Transmitted live execution requires the exact transmittedLiveAck confirmation string. | Resolve the blocking condition before proceeding. |
-| 2026-06-15 11:28:28.553 UTC | transmitted_live_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-06-04 07:24:16.672 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-06-04 07:24:14.222 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 20:30:16.787 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
+| 2026-07-28 20:30:16.784 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 20:28:35.556 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 20:28:33.338 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 20:28:29.660 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
 ## Report / Delivery Status
-- Weekly report: latest history 2026-06-15
+- Weekly report: latest history 2026-07-27
 - Monthly report: email_and_repo
 - Quarterly report: local_operator_review
 - Delivery readiness: ready
@@ -157,16 +160,17 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Reconciled fills pending notification backfill: 0
 - Acknowledged backfilled fills: 1
 ## Recommended Next Step
-Portfolio is performing as intended. Hold current positions and review after the next market session.
+Broker connectivity recovery: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 ## Status Labels
 - Pending approvals queue count: 0
 - In-flight execution rows: 0
 - Latest action recommendations:
-  - Portfolio is performing as intended. Hold current positions and review after the next market session.
-  - Continue normal monitoring and refresh the portfolio workflow after the next material state change.
+  - Restore Interactive Brokers read-only connectivity before relying on broker-backed pricing or conid resolution.
+  - Keep proposals in dry-run mode and treat current order sizing as draft-only until broker connectivity is healthy.
 ## Risk Warnings
 - Dashboard regeneration currently computes allocation drift at the asset-class level only.
-- Whole-share draft sizing leaves CHF 150940.55 unallocated beyond the intentional CHF cash sleeve.
+- Whole-share draft sizing leaves CHF 150953.86 unallocated beyond the intentional CHF cash sleeve.
+- Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 - Latest history note: 0
 - Observability shows 100 recent blocked execution-policy event(s).
 ## Observability Status

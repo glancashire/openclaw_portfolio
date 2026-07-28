@@ -93,3 +93,50 @@
 | 2026-06-12 | end_of_day | 151083.32148882 | 148650.20148882 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
 | 2026-06-15 | end_of_day | 153011.25594529998 | 150578.1359453 | 150000 | 0 | 0 | 0 | daily sync snapshot |
 | 2026-06-15 | execution_staged | 153024.17766470998 | 150591.05766470998 | 150000 | 0 | 0 | 0 | Transmitted live broker order submitted. |
+
+| 2026-06-17 | end_of_day | 152097.43578565004 | 151887.79578565003 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-19 | end_of_day | 154836.55508257 | 154626.91508257 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-19 | end_of_day | 154817.40954393 | 154607.76954393 | 150000 | 0 | 0 | 0 | daily sync snapshot |
+| 2026-06-19 | end_of_day | 154817.40954393 | 154607.76954393 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-06-22 | end_of_day | 155327.98733923002 | 155118.34733923 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-06-22 | end_of_day | 155327.99746504 | 155118.35746504 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-06-24 | end_of_day | 153022.00534101005 | 152812.36534101004 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-06-25 | end_of_day | 154660.71591436 | 154451.07591435997 | 150000 | 0 | 0 | 0 |  |
+| 2026-06-25 | end_of_day | 153916.65961902004 | 153707.01961902002 | 150000 | 0 | 0 | 0 |  |
+| 2026-06-26 | end_of_day | 152375.48381874 | 152165.84381874 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-06-26 | end_of_day | 152747.64802917998 | 152538.00802917997 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-06-26 | end_of_day | 152747.62225897002 | 152537.98225897 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-06-29 | end_of_day | 152854.66515715 | 152645.02515715 | 150000 | 0 | 0 | 0 | daily maintenance snapshot |
+| 2026-06-29 | end_of_day | 152981.41104423002 | 152771.77104423 | 150000 | 0 | 0 | 0 | daily maintenance snapshot |
+| 2026-06-30 | end_of_day | 154765.36977534002 | 154555.72977534 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-01 | end_of_day | 153717.19631115 | 153507.55631115 | 150000 | 0 | 0 | 0 | monthly report cycle snapshot |
+| 2026-07-01 | end_of_day | 153717.19631115 | 153507.55631115 | 150000 | 0 | 0 | 0 | quarterly report cycle snapshot |
+| 2026-07-02 | end_of_day | 153717.19631115 | 153507.55631115 | 150000 | 0 | 0 | 0 | daily maintenance loop |
+| 2026-07-02 | end_of_day | 151719.76131310003 | 151510.1213131 | 150000 | 0 | 0 | 0 | daily maintenance loop |
+| 2026-07-03 | end_of_day | 151719.76131310003 | 151510.1213131 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-03 | end_of_day | 153951.46955401998 | 153751.16955402 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-03 | end_of_day | 153951.46955401998 | 153751.16955402 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-07-08 | end_of_day | 151958.04837164996 | 151757.74837164997 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-09 | end_of_day | 151958.04837164996 | 151757.74837164997 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-09 | end_of_day | 153446.39116946 | 153246.09116946 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-10 | end_of_day | 153508.23977061998 | 153307.93977062 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-10 | end_of_day | 153508.23977061998 | 153307.93977062 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-07-13 | end_of_day | 153508.23977061998 | 153307.93977062 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-13 | end_of_day | 153508.23977061998 | 153307.93977062 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-14 | end_of_day | 152782.56835785997 | 152582.26835785998 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-14 | end_of_day | 153267.41406061 | 153067.11406061 | 150000 | 0 | 0 | 0 | daily maintenance loop |
+| 2026-07-15 | end_of_day | 153805.58187911997 | 153605.28187911998 | 150000 | 0 | 0 | 0 | daily maintenance loop |
+| 2026-07-16 | end_of_day | 151827.78515108 | 151627.48515108 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-16 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | Daily maintenance loop snapshot |
+| 2026-07-17 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-17 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | daily maintenance loop |
+| 2026-07-17 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-07-20 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-21 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-21 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-22 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-23 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 |  |
+| 2026-07-24 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-24 | end_of_day | 151827.73128482996 | 151627.43128482997 | 150000 | 0 | 0 | 0 | weekly report cycle snapshot |
+| 2026-07-27 | end_of_day | 152977.9926173 | 152769.7326173 | 150000 | 0 | 0 | 0 | daily maintenance loop snapshot |
+| 2026-07-27 | end_of_day | 152977.9926173 | 152769.7326173 | 150000 | 0 | 0 | 0 | daily maintenance loop |

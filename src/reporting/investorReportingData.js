@@ -1,5 +1,7 @@
 'use strict';
 
+const { buildInstrumentPerformanceWindows } = require('./performanceWindows');
+
 function parseNumber(value) {
   if (value == null) return null;
   const raw = String(value).trim();
@@ -73,23 +75,8 @@ function parseHoldingsTable(holdingsText = '') {
   }).filter((row) => row.tickerOrIsin || row.name);
 }
 
-function firstHistoryValue(historyRows = []) {
-  const first = Array.isArray(historyRows) ? historyRows.find((row) => Number.isFinite(Number(row.totalChf))) : null;
-  return first ? Number(first.totalChf) : null;
-}
-
-function lastHistoryValue(historyRows = []) {
-  const rows = Array.isArray(historyRows) ? historyRows.filter((row) => Number.isFinite(Number(row.totalChf))) : [];
-  if (!rows.length) return null;
-  return Number(rows[rows.length - 1].totalChf);
-}
-
 function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [], approvedInstruments = [], profitLossRows = [], totalValueChf = null } = {}) {
   const rows = parseHoldingsTable(holdingsText);
-  const ytdStart = firstHistoryValue(historyRows);
-  const ytdEnd = lastHistoryValue(historyRows);
-  const ytdChf = ytdStart != null && ytdEnd != null ? Number((ytdEnd - ytdStart).toFixed(2)) : null;
-  const ytdPct = ytdChf != null && ytdStart ? Number(((ytdChf / ytdStart) * 100).toFixed(1)) : null;
   const profitLossIndex = new Map();
   for (const row of profitLossRows || []) {
     for (const key of [row.tickerOrIsin, row.symbol, row.name]) {
@@ -139,6 +126,11 @@ function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [], ap
       const driftPct = Number.isFinite(Number(row.driftPct)) && Number(row.driftPct) !== 0
         ? Number(row.driftPct)
         : (Number.isFinite(allocationPct) && Number.isFinite(targetPct) ? Number((allocationPct - targetPct).toFixed(1)) : null);
+      const performanceWindows = buildInstrumentPerformanceWindows({
+        gainSincePurchaseChf,
+        gainSincePurchasePct: gainPct,
+        costBasisChf,
+      });
       return {
         symbol: matchedInstrument?.ibkrLocalSymbol || matchedInstrument?.ibkrSymbol || row.name || row.symbol,
         name: matchedInstrument?.name || row.name || row.symbol,
@@ -149,18 +141,21 @@ function buildInvestorHoldingsSnapshot({ holdingsText = '', historyRows = [], ap
         gainSincePurchase: gainPct,
         gainSincePurchaseChf,
         gainSincePurchasePct: gainPct,
-        ytdChf,
-        ytdPct,
         valueChf: row.valueChf,
         currency: row.currency,
         allocationPct,
         targetPct,
         driftPct,
         costBasisChf,
+        performanceWindows,
         availability: {
           averageBuyPrice: (costBasisChf != null || row.avgBuyPrice != null) ? 'available' : 'missing',
           gainSincePurchaseChf: gainSincePurchaseChf == null ? 'missing' : 'available',
-          ytd: ytdChf == null ? 'missing' : 'portfolio_level_only',
+          sincePurchase: performanceWindows.sincePurchase.availability,
+          last7d: performanceWindows.last7d.availability,
+          last30d: performanceWindows.last30d.availability,
+          ytd: performanceWindows.ytd.availability,
+          last365d: performanceWindows.last365d.availability,
         },
       };
     }),

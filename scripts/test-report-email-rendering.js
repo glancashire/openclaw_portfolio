@@ -38,13 +38,19 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
           lastTradedPrice: 210,
           totalValue: 1050,
           gainSincePurchasePct: 10.5,
-          ytdPct: 4.2,
           valueChf: 1050,
           gainSincePurchaseChf: 100,
           allocationPct: 19.8,
           targetPct: 20,
           driftPct: -0.2,
-          availability: { averageBuyPrice: 'available', gainSincePurchaseChf: 'available', ytd: 'available' },
+          performanceWindows: {
+            sincePurchase: { availability: 'available', gainChf: 100, gainPct: 10.5 },
+            last7d: { availability: 'missing_history', gainChf: null, gainPct: null },
+            last30d: { availability: 'missing_history', gainChf: null, gainPct: null },
+            ytd: { availability: 'missing_history', gainChf: null, gainPct: null },
+            last365d: { availability: 'missing_history', gainChf: null, gainPct: null },
+          },
+          availability: { averageBuyPrice: 'available', gainSincePurchaseChf: 'available', ytd: 'missing_history' },
         },
         {
           symbol: 'CHSPI',
@@ -54,15 +60,32 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
           lastTradedPrice: 98,
           totalValue: 980,
           gainSincePurchasePct: null,
-          ytdPct: null,
           valueChf: 980,
           gainSincePurchaseChf: null,
           allocationPct: 4,
           targetPct: 6,
           driftPct: -2,
-          availability: { averageBuyPrice: 'missing', gainSincePurchaseChf: 'missing', ytd: 'missing' },
+          performanceWindows: {
+            sincePurchase: { availability: 'missing', gainChf: null, gainPct: null },
+            last7d: { availability: 'missing_history', gainChf: null, gainPct: null },
+            last30d: { availability: 'missing_history', gainChf: null, gainPct: null },
+            ytd: { availability: 'missing_history', gainChf: null, gainPct: null },
+            last365d: { availability: 'missing_history', gainChf: null, gainPct: null },
+          },
+          availability: { averageBuyPrice: 'missing', gainSincePurchaseChf: 'missing', ytd: 'missing_history' },
         },
       ],
+    },
+    performance: {
+      portfolio: {
+        windows: {
+          sincePurchase: { availability: 'available', gainChf: 800, gainPct: 8.0, anchorDate: null },
+          last7d: { availability: 'available', gainChf: 120, gainPct: 1.0, anchorDate: '2026-05-17' },
+          last30d: { availability: 'available', gainChf: 350, gainPct: 3.0, anchorDate: '2026-04-24' },
+          ytd: { availability: 'partial', gainChf: 500, gainPct: 4.3, anchorDate: '2026-01-03' },
+          last365d: { availability: 'missing_history', gainChf: null, gainPct: null, anchorDate: null },
+        },
+      },
     },
     status: {
       health: 'healthy',
@@ -98,9 +121,14 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
   assert(html.includes('Instrument'), 'HTML has Instrument column');
   assert(html.includes('Value CHF'), 'HTML has Value CHF column');
   assert(html.includes('Cost basis CHF'), 'HTML has Cost basis column');
-  assert(html.includes('Profit CHF'), 'HTML has Profit CHF column');
-  assert(html.includes('Profit %'), 'HTML has Profit % column');
+  assert(html.includes('Since purchase'), 'HTML has since purchase column');
+  assert(html.includes('7d'), 'HTML has 7d column');
+  assert(html.includes('30d'), 'HTML has 30d column');
+  assert(html.includes('YTD'), 'HTML has YTD column');
+  assert(html.includes('365d'), 'HTML has 365d column');
   assert(html.includes('Weight %'), 'HTML has Weight % column');
+  assert(html.includes('Portfolio value windows (reference only)'), 'HTML has reference value windows section');
+  assert(html.includes('Last 7 days'), 'HTML has 7d window');
   assert(html.includes('Vanguard Total World Stock ETF'), 'HTML contains VT name');
   assert(html.includes('iShares Core SPI'), 'HTML contains CHSPI name');
   assert(html.includes('VT'), 'HTML contains VT symbol');
@@ -131,11 +159,13 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
   assert(text.includes("Cash: CHF 2'000.00"), 'Text has cash');
   assert(text.includes("Invested: CHF 10'000.00"), 'Text has invested');
   assert(text.includes('Profit / Loss'), 'Text has profit/loss section');
+  assert(text.includes('Portfolio value windows (reference only)'), 'Text has reference value windows section');
   assert(text.includes('Holdings'), 'Text has holdings section');
   assert(text.includes('VT'), 'Text contains VT symbol');
   assert(text.includes('CHSPI'), 'Text contains CHSPI symbol');
   assert(text.includes('TOTAL'), 'Text has sum row');
   assert(text.includes('Weight %'), 'Text has weight % header');
+  assert(text.includes('Since purchase | 7d | 30d | YTD | 365d'), 'Text has gain window holding headers');
   assert(!text.includes('Core recommendation'), 'Text does NOT have recommendation');
   assert(!text.includes('Overall analysis'), 'Text does NOT have analysis');
   assert(!text.includes('Improve'), 'Text does NOT have Improve section');
@@ -191,12 +221,13 @@ const { buildReportEmailHtml, buildReportEmailText, loadSummaryEmailSource } = r
     },
     investorHoldings: {
       rows: [
-        { symbol: 'SXR8', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', quantityHeld: 18, valueChf: 12439.53, gainSincePurchaseChf: 50, gainSincePurchasePct: 0.4 },
-        { symbol: 'EMUAA', name: 'UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc', quantityHeld: 151, valueChf: 6052.12, gainSincePurchaseChf: -100, gainSincePurchasePct: -1.6 },
-        { symbol: 'CHSPI', name: 'UBS SLI ETF (SMI gleichgewichtet)', quantityHeld: 23, valueChf: 3717.83, gainSincePurchaseChf: -70, gainSincePurchasePct: -1.9 },
+        { symbol: 'SXR8', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', quantityHeld: 18, valueChf: 12439.53, gainSincePurchaseChf: 50, gainSincePurchasePct: 0.4, performanceWindows: { sincePurchase: { availability: 'available', gainChf: 50, gainPct: 0.4 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } },
+        { symbol: 'EMUAA', name: 'UBS ETF (LU) MSCI EMU UCITS ETF (EUR) A-acc', quantityHeld: 151, valueChf: 6052.12, gainSincePurchaseChf: -100, gainSincePurchasePct: -1.6, performanceWindows: { sincePurchase: { availability: 'available', gainChf: -100, gainPct: -1.6 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } },
+        { symbol: 'CHSPI', name: 'UBS SLI ETF (SMI gleichgewichtet)', quantityHeld: 23, valueChf: 3717.83, gainSincePurchaseChf: -70, gainSincePurchasePct: -1.9, performanceWindows: { sincePurchase: { availability: 'available', gainChf: -70, gainPct: -1.9 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } },
       ],
       totals: { rowCount: 3, totalValueChf: 22209.48, totalGainChf: -120 },
     },
+    performance: { portfolio: { windows: { sincePurchase: { availability: 'available', gainChf: -120.5, gainPct: -0.54 }, last7d: { availability: 'missing_history' }, last30d: { availability: 'missing_history' }, ytd: { availability: 'missing_history' }, last365d: { availability: 'missing_history' } } } },
     status: { health: 'attention_needed' },
     recommendedNextStep: 'Review the current dry-run proposal set.',
   };
