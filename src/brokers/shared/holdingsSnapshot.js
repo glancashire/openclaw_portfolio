@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { readApprovedInstruments } = require('../../analysis/approvedInstruments');
+const { formatCashReconciliationSection } = require('./cashReconciliation');
 
 function resolvedFxToChf(holding) {
   const explicit = Number(holding?.fxRateToChf);
@@ -78,10 +79,11 @@ function matchApprovedInstrument(holding, approved) {
   });
 }
 
-function writeHoldingsSnapshot({ portfolioDir, holdings = [], cashChf = 0, cashBasis = 'unknown', cashDetail = null, source = 'simulated', broker = 'interactive-brokers', normaliseHolding = (h) => h, portfolioCashChf = null, portfolioCashBasis = null }) {
+function writeHoldingsSnapshot({ portfolioDir, holdings = [], cashChf = 0, cashBasis = 'unknown', cashDetail = null, source = 'simulated', broker = 'interactive-brokers', normaliseHolding = (h) => h, portfolioCashChf = null, portfolioCashBasis = null, cashReconciliation = null }) {
   const outPath = path.join(portfolioDir, 'holdings.md');
   const portfolioPath = path.join(portfolioDir, 'portfolio.md');
   const approved = fs.existsSync(portfolioPath) ? readApprovedInstruments(portfolioPath) : [];
+  const reconciliationSection = cashReconciliation ? formatCashReconciliationSection(cashReconciliation) : '';
 
   const normalized = holdings.map((holding) => {
     const norm = normaliseHolding(holding);
@@ -133,7 +135,9 @@ ${normalized.map(formatHoldingRow).join('\n')}
 |---|---|---:|---:|---:|---|
 | Portfolio | CHF | ${portfolioCashChf == null ? 0 : portfolioCashChf} | 1 | ${portfolioCashChf == null ? 0 : portfolioCashChf} | ${portfolioCashBasis || 'unknown'} |
 | Broker account | CHF | ${cashChf} | 1 | ${cashChf} | ${cashBasis} |
-
+${reconciliationSection ? `
+${reconciliationSection}
+` : ''}
 ## Data Quality
 - All holdings matched to approved instruments: ${unmatched.length ? 'no' : 'yes'}
 - Unmatched holdings: ${unmatched.length ? unmatched.map((h) => h.ticker || h.identifier || h.name).join(', ') : 'none'}

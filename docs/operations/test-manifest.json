@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 352,
-    "safe": 267,
+    "total": 353,
+    "safe": 268,
     "integration": 80,
     "live-smoke": 3,
     "external": 2,
@@ -314,6 +314,13 @@
     },
     {
       "path": "scripts/test-cancel-staged-order-reconciliation.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-cash-reconciliation.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

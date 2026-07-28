@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { writeHoldingsSnapshot } = require('../shared/holdingsSnapshot');
+const { reconcileCash } = require('../shared/cashReconciliation');
 const { InteractiveBrokersClient } = require('./client');
 const { normaliseHolding } = require('./types');
 const { readApprovedInstruments } = require('../../analysis/approvedInstruments');
@@ -103,6 +104,8 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
   });
   if (preserved) return preserved;
 
+  const cashReconciliation = reconcileCash({ ledger, fxRates: liveFxRates, brokerCashChf: cash.value });
+
   const result = writeHoldingsSnapshot({
     portfolioDir,
     holdings,
@@ -114,6 +117,7 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     source: 'broker_api',
     broker: 'interactive-brokers',
     normaliseHolding: (h) => h,
+    cashReconciliation,
   });
 
   const dashboardPath = await regenerateDashboard(portfolioDir);
@@ -128,6 +132,7 @@ async function syncInteractiveBrokersHoldings({ portfolioDir, accountId }) {
     portfolioCashBasis: 'broker_reported',
     count: holdings.length,
     result,
+    cashReconciliation,
     dashboardPath,
   };
   });
