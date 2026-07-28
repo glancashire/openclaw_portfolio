@@ -13,7 +13,7 @@
 - Total unrealized profit %: -18.19
 - Cost-basis coverage: 19/19 holdings (CHF 124944.97 of position value)
 - Quote coverage: 17 yahoo_last_close last_close, 2 holdings_snapshot stale_or_unknown
-- Oldest quote age: 48621s
+- Oldest quote age: 53176s
 
 ## Profit / Loss
 - Total unrealized profit CHF: -27777.21
@@ -117,6 +117,12 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 - Data freshness: current
 - Pending approvals: 0
 - In-flight execution rows: 0
+## Quote Provider Health
+Configured provider order and per-provider state from the quote service this cycle.
+
+- ibkr_web_api: status: cooling_down, consecutiveFailures: 2, lastFailure: 2026-07-28T21:46:15.952Z, cooldownUntil: 2026-07-28T21:47:15.952Z, lastError: ibkr_web_api_request_failed
+- ibkr_tws: status: cooling_down, consecutiveFailures: 2, lastFailure: 2026-07-28T21:46:15.954Z, cooldownUntil: 2026-07-28T21:47:15.954Z, lastError: auth_failed
+- yahoo_last_close: status: cooling_down, consecutiveFailures: 2, lastSuccess: 2026-07-28T21:46:16.724Z, lastFailure: 2026-07-28T21:46:16.856Z, cooldownUntil: 2026-07-28T21:47:16.856Z, lastError: fetch_failed
 ## Safety / Risk Diagnostics
 - Safety status: clear
 - Risk-limit warnings: 0
@@ -145,11 +151,11 @@ Allocation drift is tracked as a constraint; see below. All sleeves within targe
 ## Recent Material Events
 | Time | Event type | Severity | Summary | Next step |
 |---|---|---|---|---|
-| 2026-07-28 20:30:16.787 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
-| 2026-07-28 20:30:16.784 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
-| 2026-07-28 20:28:35.556 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-07-28 20:28:33.338 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
-| 2026-07-28 20:28:29.660 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 21:46:12.166 UTC | live_execution_blocked | warn | Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001 | Resolve the blocking condition before proceeding. |
+| 2026-07-28 21:46:12.164 UTC | draft_execution_blocked | warn | Requested instrument is not in Approved Instruments. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 21:46:00.502 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 21:45:58.267 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
+| 2026-07-28 21:45:56.394 UTC | safety_controls_blocked | warn | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment. | Resolve the blocking condition before proceeding. |
 ## Report / Delivery Status
 - Weekly report: latest history 2026-07-27
 - Monthly report: email_and_repo

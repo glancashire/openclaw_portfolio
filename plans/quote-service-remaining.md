@@ -7,14 +7,11 @@ Consolidated from three now-shipped plans:
 
 ## Still pending
 
-### Phase B — console provider-health block
-The service already exposes `snapshotProviderHealth()`; only the console surface is missing.
-- Add a provider-health block to `scripts/show-dashboard.js`:
-  - configured provider order
-  - per-provider state: lastSuccessAt / lastFailureAt / consecutiveFailures / cooldownUntil
-  - cooldown status flag
-- Reference the existing quote-provenance summary line from the health block.
-- Test: `scripts/test-quote-provider-health.js` already covers the snapshot; add a console-render assertion.
+### Phase B — console provider-health block → **SHIPPED** (2026-07-28)
+The generator now persists provider state into `dashboard.md` at generation time and the console renders it.
+- `dashboardGenerator.js`: `summarizeProviderHealth()` (configured order + per-provider state, cooldown-aware) + `formatProviderHealthLines()` write a `## Quote Provider Health` section; snapshot captured right after `resolveHoldingQuotes`.
+- `scripts/show-dashboard.js`: renders a `📡 Quote providers` block, flagging cooling-down (🧊) / failing (⚠️) providers; suppresses the empty placeholder.
+- Test: `scripts/test-dashboard-provider-health-block.js` (order preservation, cooldown/expiry/idle states, placeholder). `scripts/test-quote-provider-health.js` still covers the runtime snapshot.
 
 ### Phase C — local daemon boundary
 - Extract service internals to support a future long-lived process while keeping the in-process `resolveQuote/resolveQuotes` API stable.

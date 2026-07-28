@@ -1,16 +1,16 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-07-28T20:21:10.750Z",
+  "generatedAt": "2026-07-28T21:45:21.705Z",
   "counts": {
-    "totalTests": 350,
+    "totalTests": 351,
     "domains": 126
   },
   "domains": [
     {
       "domain": "dashboard",
-      "total": 15,
-      "safe": 9,
+      "total": 16,
+      "safe": 10,
       "integration": 6,
       "live-smoke": 0,
       "external": 0,

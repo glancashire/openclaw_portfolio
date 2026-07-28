@@ -234,6 +234,28 @@ try {
   }
 } catch { /* trend log is optional */ }
 
+// ── Quote provider health (Phase B) ───────────────────────────────────────────
+const providerHealthBody = section('Quote Provider Health');
+if (providerHealthBody) {
+  const healthLines = providerHealthBody
+    .split(/\r?\n/)
+    .filter((l) => l.trim().startsWith('- '))
+    .map((l) => l.replace(/^\s*-\s*/, '').trim());
+  // Skip the generic "no activity" placeholder to avoid noise.
+  const meaningful = healthLines.filter((l) => l && !/no quote-provider activity/i.test(l));
+  if (meaningful.length) {
+    lines.push('');
+    lines.push('📡 Quote providers');
+    for (const raw of meaningful) {
+      const [provider, rest = ''] = raw.split(/:\s*(.+)/);
+      const cooling = /cooling_down/i.test(rest);
+      const failing = /status:\s*failing/i.test(rest);
+      const flag = cooling ? '🧊' : failing ? '⚠️' : '✓';
+      lines.push(`  ${flag} ${provider.trim().padEnd(16)} ${rest.trim()}`);
+    }
+  }
+}
+
 // ── Sanity check ──────────────────────────────────────────────────────────────
 if (total != null && invested != null && cash != null) {
   const diff = Math.abs(total - (invested + cash));

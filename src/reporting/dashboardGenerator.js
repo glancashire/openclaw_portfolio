@@ -23,6 +23,7 @@ const { readTradesTable, summarizeOpenRunnerRetryState } = require('../execution
 const { parseHoldingsTable } = require('./investorReportingData');
 const { buildProfitLossSummary } = require('./costBasis');
 const { resolveHoldingQuotes } = require('./quoteResolution');
+const { snapshotProviderHealth, configuredProviderOrder } = require('../quotes');
 
 function parsePortfolioDepositedCapital(portfolioText = '') {
   const m = String(portfolioText || '').match(/- Total capital deposited CHF:\s*(.+)/);
@@ -91,6 +92,46 @@ function formatQuoteAge(ageLabel, asOf) {
   if (ageLabel && ageLabel !== 'unknown') return ageLabel;
   if (asOf) return `as of ${asOf}`;
   return 'unknown';
+}
+
+// Phase B: surface quote-service provider health (configured order + per-provider
+// state) so the console dashboard can show whether a provider is cooling down.
+function summarizeProviderHealth({ order = [], health = [], now = Date.now() } = {}) {
+  const byId = new Map(health.map((state) => [state.providerId, state]));
+  const seen = new Set();
+  const rows = [];
+  const push = (providerId) => {
+    if (!providerId || seen.has(providerId)) return;
+    seen.add(providerId);
+    const state = byId.get(providerId) || {};
+    const cooldownUntilMs = state.cooldownUntil ? Date.parse(state.cooldownUntil) : NaN;
+    const coolingDown = Number.isFinite(cooldownUntilMs) && cooldownUntilMs > now;
+    rows.push({
+      providerId,
+      status: coolingDown ? 'cooling_down' : (state.lastSuccessAt ? 'ok' : (state.lastFailureAt ? 'failing' : 'idle')),
+      consecutiveFailures: Number(state.consecutiveFailures || 0),
+      lastSuccessAt: state.lastSuccessAt || null,
+      lastFailureAt: state.lastFailureAt || null,
+      cooldownUntil: coolingDown ? state.cooldownUntil : null,
+      lastError: state.lastError || null,
+    });
+  };
+  for (const id of order) push(id);
+  for (const state of health) push(state.providerId);
+  return rows;
+}
+
+function formatProviderHealthLines(rows = []) {
+  if (!rows.length) return '- No quote-provider activity recorded this cycle.';
+  return rows.map((row) => {
+    const bits = [`status: ${row.status}`];
+    if (row.consecutiveFailures > 0) bits.push(`consecutiveFailures: ${row.consecutiveFailures}`);
+    if (row.lastSuccessAt) bits.push(`lastSuccess: ${row.lastSuccessAt}`);
+    if (row.lastFailureAt) bits.push(`lastFailure: ${row.lastFailureAt}`);
+    if (row.cooldownUntil) bits.push(`cooldownUntil: ${row.cooldownUntil}`);
+    if (row.lastError) bits.push(`lastError: ${row.lastError}`);
+    return `- ${row.providerId}: ${bits.join(', ')}`;
+  }).join('\n');
 }
 
 function strategyStatus(allocations, brokerReadiness, blockers = []) {
@@ -633,6 +674,12 @@ async function generateDashboard({ portfolioName, tradesPath = '', holdingsText,
     avgCostByKey,
   });
   const quoteProvenance = summarizeQuoteProvenance(resolvedQuotes.rows);
+  // Phase B: capture provider-health after quotes resolved this cycle so the
+  // static dashboard.md carries provider state for the console renderer.
+  const providerHealthRows = summarizeProviderHealth({
+    order: (() => { try { return configuredProviderOrder(); } catch { return []; } })(),
+    health: (() => { try { return snapshotProviderHealth(); } catch { return []; } })(),
+  });
 
   // Compact holdings table sorted by value (CHF) descending
   const holdingsRows = profitLoss.rows.slice().sort((a, b) => (b.valueChf ?? 0) - (a.valueChf ?? 0));
@@ -835,6 +882,13 @@ ${formatAllocationRows(allocations)}
 `,
     `- In-flight execution rows: ${inFlightCount}
 `,
+    `## Quote Provider Health
+`,
+    `Configured provider order and per-provider state from the quote service this cycle.
+`,
+    `
+${formatProviderHealthLines(providerHealthRows)}
+`,
     `## Safety / Risk Diagnostics
 `,
     `- Safety status: ${blockers.length ? 'blocked_or_warning' : 'clear'}
@@ -976,4 +1030,4 @@ async function regenerateDashboard(portfolioDir) {
   return dashboardPath;
 }
 
-module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, buildContractIntelligenceQueueItems, quotePostureUnknown };
+module.exports = { generateDashboard, regenerateDashboard, formatExecutionLifecycle, fileFreshnessSummary, buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep, formatPendingQueueRows, formatQueueSummary, buildContractIntelligenceQueueItems, quotePostureUnknown, __test__: { summarizeProviderHealth, formatProviderHealthLines } };
