@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 351,
-    "safe": 266,
+    "total": 352,
+    "safe": 267,
     "integration": 80,
     "live-smoke": 3,
     "external": 2,
@@ -1696,6 +1696,13 @@
     },
     {
       "path": "scripts/test-quote-resolution.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-quote-service-client-boundary.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,

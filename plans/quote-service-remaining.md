@@ -13,9 +13,11 @@ The generator now persists provider state into `dashboard.md` at generation time
 - `scripts/show-dashboard.js`: renders a `📡 Quote providers` block, flagging cooling-down (🧊) / failing (⚠️) providers; suppresses the empty placeholder.
 - Test: `scripts/test-dashboard-provider-health-block.js` (order preservation, cooldown/expiry/idle states, placeholder). `scripts/test-quote-provider-health.js` still covers the runtime snapshot.
 
-### Phase C — local daemon boundary
-- Extract service internals to support a future long-lived process while keeping the in-process `resolveQuote/resolveQuotes` API stable.
-- Keep broker writes separate from quote reads (existing safety posture).
+### Phase C — local daemon boundary → **SHIPPED** (2026-07-28)
+- `src/quotes/client.js`: `QuoteServiceClient` facade over a swappable transport. Contract = `getQuote` / `getQuotes` / `getProviderHealth` + `kind`. Default `createInProcessTransport()` wraps the existing runtime (cache + provider health + cooldown); a future long-lived daemon slots in by supplying an IPC/HTTP transport honouring the same contract — zero caller changes.
+- Process-wide singleton via `getQuoteServiceClient()`; `setQuoteServiceTransport()` swaps/reset (test + daemon hook). Re-exported lazily from `src/quotes/index.js` to avoid a require cycle. Existing `getQuote`/`getQuotes` API unchanged.
+- Read-only posture enforced by contract: no write/order methods on the boundary; broker submission stays in the execution layer.
+- Test: `scripts/test-quote-service-client-boundary.js` (contract, transport swap, malformed-transport rejection, singleton/reset, read-only posture).
 
 ## Verification
 - `npm run verify` (verify-repo.js)

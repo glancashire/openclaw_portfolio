@@ -56,3 +56,12 @@ module.exports = {
   getQuotes,
   snapshotProviderHealth,
 };
+
+// Phase C boundary: lazily re-export the client facade to avoid a require cycle
+// (client.js depends on this module's defaultProviders()).
+Object.defineProperties(module.exports, {
+  QuoteServiceClient: { enumerable: true, get() { return require('./client').QuoteServiceClient; } },
+  getQuoteServiceClient: { enumerable: true, get() { return require('./client').getQuoteServiceClient; } },
+  setQuoteServiceTransport: { enumerable: true, get() { return require('./client').setQuoteServiceTransport; } },
+  createInProcessTransport: { enumerable: true, get() { return require('./client').createInProcessTransport; } },
+});

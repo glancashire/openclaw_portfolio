@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-07-28T21:45:21.705Z",
+  "generatedAt": "2026-07-28T21:49:23.180Z",
   "counts": {
-    "totalTests": 351,
+    "totalTests": 352,
     "domains": 126
   },
   "domains": [
@@ -188,6 +188,21 @@
       ]
     },
     {
+      "domain": "quote",
+      "total": 7,
+      "safe": 7,
+      "integration": 0,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 0,
+      "examples": [
+        "scripts/test-quote-cache.js",
+        "scripts/test-quote-provider-health.js",
+        "scripts/test-quote-provider-order.js"
+      ]
+    },
+    {
       "domain": "broker",
       "total": 6,
       "safe": 6,
@@ -230,21 +245,6 @@
         "scripts/test-execution-authority.js",
         "scripts/test-execution-classification.js",
         "scripts/test-execution-command-surface-doc.js"
-      ]
-    },
-    {
-      "domain": "quote",
-      "total": 6,
-      "safe": 6,
-      "integration": 0,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 0,
-      "examples": [
-        "scripts/test-quote-cache.js",
-        "scripts/test-quote-provider-health.js",
-        "scripts/test-quote-provider-order.js"
       ]
     },
     {
