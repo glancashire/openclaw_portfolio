@@ -99,11 +99,22 @@ async function main() {
     log(`Saved approved basket envelope (approvalId=${approvalId}).`);
 
     try {
+      // L2.C: compute basket CHF notional so the gate can enforce the
+      // multi-party co-sign threshold on large baskets. Same math as the
+      // daily-transmit-cap (limitPrice * quantity * fx-to-CHF).
+      const notionalChf = (approvedEnvelope.legs || []).reduce((sum, leg) => {
+        const price = Number(leg.limitPrice || 0);
+        const qty = Number(leg.quantity || 0);
+        const ccy = String(leg.currency || 'CHF').toUpperCase();
+        const fx = ccy === 'CHF' ? 1 : (Number(leg.fxToChf) || 1);
+        return sum + price * qty * fx;
+      }, 0);
       requireApprovalIntent({
         approvalId,
         rootDir: ROOT,
         scriptName: 'execute-approved-basket-end-to-end',
         scope: 'basket-execute',
+        notionalChf,
       });
     } catch (error) {
       console.error(`Approval gate denied (${error.reason || error.code || 'unknown'}): ${error.message}`);

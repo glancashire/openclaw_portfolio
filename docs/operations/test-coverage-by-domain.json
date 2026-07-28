@@ -1,9 +1,9 @@
 {
   "generatedBy": "scripts/discover-test-suites.js",
   "description": "Naming-based domain summary derived from test file stems. Useful for coverage transparency, not a formal proof of functional coverage.",
-  "generatedAt": "2026-07-28T22:10:27.445Z",
+  "generatedAt": "2026-07-28T22:15:44.907Z",
   "counts": {
-    "totalTests": 354,
+    "totalTests": 355,
     "domains": 128
   },
   "domains": [
@@ -663,6 +663,20 @@
       ]
     },
     {
+      "domain": "multi",
+      "total": 2,
+      "safe": 1,
+      "integration": 1,
+      "live-smoke": 0,
+      "external": 0,
+      "quarantined": 0,
+      "inVerifyRepoChecks": 2,
+      "examples": [
+        "scripts/test-multi-party-approval.js",
+        "scripts/test-multi-portfolio-overview.js"
+      ]
+    },
+    {
       "domain": "proposal",
       "total": 2,
       "safe": 2,
@@ -1270,19 +1284,6 @@
       "inVerifyRepoChecks": 0,
       "examples": [
         "tests/test-monitorFills.js"
-      ]
-    },
-    {
-      "domain": "multi",
-      "total": 1,
-      "safe": 0,
-      "integration": 1,
-      "live-smoke": 0,
-      "external": 0,
-      "quarantined": 0,
-      "inVerifyRepoChecks": 1,
-      "examples": [
-        "scripts/test-multi-portfolio-overview.js"
       ]
     },
     {

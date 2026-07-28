@@ -34,10 +34,12 @@ Safety posture unchanged: ETF-only, CHF-first, approval-gated live execution. No
 - [x] Threshold: pct (default 8%) OR absolute CHF floor, whichever trips first; `skipDailyLossBreaker` escape hatch
 - [x] Test `scripts/test-daily-loss-circuit-breaker.js` (19 asserts incl. runner integration) + manifest regen; full suite 354/354 green
 
-### Wave 3 — L2.C multi-party approval for baskets > CHF 25k
-- [ ] TBD from map §3 — extend approvalGate; second-channel sign-off
-- [ ] Threshold config; basket notional computed for gate
-- [ ] Test
+### Wave 3 — L2.C multi-party approval for baskets > CHF 25k ✅ DONE (2026-07-28)
+- [x] Extended `approvalGate.js` `requireApprovalIntent` additively: new `notionalChf` param; baskets ≥ threshold (default CHF 25k, override `OPENCLAW_MULTI_PARTY_THRESHOLD_CHF`) require a `secondParty` attestation
+- [x] Second approver has own credentials (`OPENCLAW_APPROVAL_SECOND_SAFEWORD`/`_PIN`) and MUST originate from a channel distinct from the primary (`cosign_same_channel` guard); co-sign freshness enforced
+- [x] `writeApprovalIntent` persists optional `channel` + `secondParty`; `execute-approved-basket-end-to-end.js` computes basket CHF notional and passes it into the gate
+- [x] Denial reasons: `cosign_unconfigured`, `cosign_missing`, `cosign_mismatch`, `cosign_channel_missing`, `cosign_same_channel`, `cosign_stale`; never leaks credentials
+- [x] Test `scripts/test-multi-party-approval.js` (17 asserts) + existing gate test back-compat green; manifest regen; full suite 355/355
 
 ### Wave 4 — L2.A file signing + boot tamper check
 - [ ] TBD from map §4 — signing util + agent-boot verify hook

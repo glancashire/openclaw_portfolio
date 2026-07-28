@@ -23,6 +23,9 @@ const path = require('path');
 
 const DEFAULT_MAX_AGE_MIN = 30;
 const VALID_SCOPES = new Set(['basket-execute', 'trades-execute']);
+// L2.C — baskets at/above this CHF notional require a second-party co-sign
+// from a distinct channel. Override via OPENCLAW_MULTI_PARTY_THRESHOLD_CHF.
+const DEFAULT_MULTI_PARTY_THRESHOLD_CHF = 25000;
 
 function intentPath(rootDir, approvalId) {
   return path.join(rootDir, 'runtime', 'approval-intent', `${approvalId}.json`);
@@ -44,6 +47,8 @@ class ApprovalGateError extends Error {
  * @param {string} params.scriptName        symbolic name of the caller (used in error messages)
  * @param {string} params.scope             'basket-execute' or 'trades-execute'
  * @param {number} [params.maxAgeMinutes]   freshness threshold, default 30
+ * @param {number} [params.notionalChf]     basket CHF notional; drives L2.C co-sign gate
+ * @param {number} [params.multiPartyThresholdChf] override for the co-sign threshold
  * @param {function} [params.logger]        message logger, default console.warn for bypass
  * @returns {void} — throws ApprovalGateError on denial
  */
@@ -54,6 +59,8 @@ function requireApprovalIntent({
   scriptName,
   scope,
   maxAgeMinutes = DEFAULT_MAX_AGE_MIN,
+  notionalChf = null,
+  multiPartyThresholdChf = null,
   logger = console.warn,
 } = {}) {
   if (!approvalId)        throw new Error('requireApprovalIntent: approvalId required');
@@ -133,7 +140,63 @@ function requireApprovalIntent({
     throw new ApprovalGateError('safeword_mismatch', `${scriptName}: intent safe-word/PIN does not match configured value.`);
   }
 
-  return { bypassed: false, ageMinutes: ageMin };
+  // --- L2.C multi-party co-sign (large baskets) ---
+  const threshold = (multiPartyThresholdChf != null && Number.isFinite(Number(multiPartyThresholdChf)))
+    ? Number(multiPartyThresholdChf)
+    : (env.OPENCLAW_MULTI_PARTY_THRESHOLD_CHF != null && env.OPENCLAW_MULTI_PARTY_THRESHOLD_CHF !== '' && Number.isFinite(Number(env.OPENCLAW_MULTI_PARTY_THRESHOLD_CHF)))
+      ? Number(env.OPENCLAW_MULTI_PARTY_THRESHOLD_CHF)
+      : DEFAULT_MULTI_PARTY_THRESHOLD_CHF;
+  const notional = (notionalChf != null) ? Number(notionalChf) : NaN;
+  let multiParty = null;
+  if (Number.isFinite(notional) && notional >= threshold) {
+    const cfg2SafeWord = String(env.OPENCLAW_APPROVAL_SECOND_SAFEWORD || '').trim();
+    const cfg2Pin      = String(env.OPENCLAW_APPROVAL_SECOND_PIN || '').trim();
+    if (!cfg2SafeWord && !cfg2Pin) {
+      throw new ApprovalGateError(
+        'cosign_unconfigured',
+        `${scriptName}: basket notional CHF ${notional.toFixed(0)} ≥ ${threshold} requires a second approver, but OPENCLAW_APPROVAL_SECOND_SAFEWORD/PIN are unset.`,
+      );
+    }
+    const second = artefact.secondParty && typeof artefact.secondParty === 'object' ? artefact.secondParty : null;
+    if (!second) {
+      throw new ApprovalGateError(
+        'cosign_missing',
+        `${scriptName}: basket notional CHF ${notional.toFixed(0)} ≥ ${threshold} requires a second-party co-sign; intent has none.`,
+      );
+    }
+    const s2SafeWord = String(second.safeWord || '').trim();
+    const s2Pin      = String(second.pin || '').trim();
+    if (!s2SafeWord && !s2Pin) {
+      throw new ApprovalGateError('cosign_missing', `${scriptName}: secondParty contains neither safeWord nor pin.`);
+    }
+    const s2SafeWordOk = s2SafeWord && cfg2SafeWord && s2SafeWord === cfg2SafeWord;
+    const s2PinOk      = s2Pin && cfg2Pin && s2Pin === cfg2Pin;
+    if (!s2SafeWordOk && !s2PinOk) {
+      throw new ApprovalGateError('cosign_mismatch', `${scriptName}: second-party safe-word/PIN does not match configured second approver.`);
+    }
+    // Co-signer must originate from a channel distinct from the primary approval
+    // to enforce genuine two-party control (not the same operator twice).
+    const primaryChannel = String(artefact.channel || '').trim().toLowerCase();
+    const secondChannel  = String(second.channel || '').trim().toLowerCase();
+    if (!secondChannel) {
+      throw new ApprovalGateError('cosign_channel_missing', `${scriptName}: second-party co-sign must declare its channel.`);
+    }
+    if (primaryChannel && secondChannel === primaryChannel) {
+      throw new ApprovalGateError('cosign_same_channel', `${scriptName}: second-party co-sign must come from a channel distinct from the primary approval (both "${secondChannel}").`);
+    }
+    const s2IssuedAt = Date.parse(String(second.issuedAt || artefact.issuedAt || ''));
+    if (Number.isFinite(s2IssuedAt)) {
+      const s2AgeMin = (Date.now() - s2IssuedAt) / 60000;
+      if (s2AgeMin > maxAgeMinutes) {
+        throw new ApprovalGateError('cosign_stale', `${scriptName}: second-party co-sign is ${s2AgeMin.toFixed(1)} min old (> ${maxAgeMinutes}); refusing.`);
+      }
+    }
+    multiParty = { required: true, secondChannel, thresholdChf: threshold, notionalChf: notional };
+  } else if (Number.isFinite(notional)) {
+    multiParty = { required: false, thresholdChf: threshold, notionalChf: notional };
+  }
+
+  return { bypassed: false, ageMinutes: ageMin, multiParty };
 }
 
 /**
@@ -146,6 +209,8 @@ function writeApprovalIntent({
   scope,
   safeWord,
   pin,
+  channel,
+  secondParty,
   issuedAt = new Date().toISOString(),
 } = {}) {
   if (!approvalId) throw new Error('writeApprovalIntent: approvalId required');
@@ -161,6 +226,15 @@ function writeApprovalIntent({
   const payload = { approvalId, scope, issuedAt };
   if (safeWord) payload.safeWord = String(safeWord);
   if (pin)      payload.pin      = String(pin);
+  if (channel)  payload.channel  = String(channel);
+  if (secondParty && typeof secondParty === 'object') {
+    const sp = {};
+    if (secondParty.safeWord) sp.safeWord = String(secondParty.safeWord);
+    if (secondParty.pin)      sp.pin      = String(secondParty.pin);
+    if (secondParty.channel)  sp.channel  = String(secondParty.channel);
+    sp.issuedAt = String(secondParty.issuedAt || issuedAt);
+    payload.secondParty = sp;
+  }
   fs.writeFileSync(p, JSON.stringify(payload, null, 2));
   // Lock down perms so other users on the box can't read the safe-word.
   try { fs.chmodSync(p, 0o600); } catch (_) { /* best-effort */ }
