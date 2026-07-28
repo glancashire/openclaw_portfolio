@@ -41,6 +41,7 @@ const checks = [
   ['test:approved-instruments-sentinel-identity', ['scripts/test-approved-instruments-sentinel-identity.js']],
   ['test:cancel-broker-only-orderid', ['scripts/test-cancel-broker-only-orderid.js']],
   ['test:clear-circuit-breaker-audit', ['scripts/test-clear-circuit-breaker-audit.js']],
+  ['test:daily-loss-circuit-breaker', ['scripts/test-daily-loss-circuit-breaker.js']],
   ['test:cron-job-policy', ['scripts/test-cron-job-policy.js']],
   ['test:repo-root-cleanliness', ['scripts/test-repo-root-cleanliness.js']],
   ['test:health-trend-synthesis', ['scripts/test-health-trend-synthesis.js']],

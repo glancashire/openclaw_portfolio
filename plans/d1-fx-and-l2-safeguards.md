@@ -28,10 +28,11 @@ Safety posture unchanged: ETF-only, CHF-first, approval-gated live execution. No
 - [x] Flags: `chf_cash_drift`, `non_chf_cash`, `missing_fx`; drift vs legacy CHF-only path surfaced
 - [x] Test `scripts/test-cash-reconciliation.js` (21 asserts) + FX regression green; full suite 353/353
 
-### Wave 2 — L2.B daily-loss circuit breaker
-- [ ] TBD from map §2 — slot beside L1.B daily-cap aggregate read
-- [ ] Freeze transmit when intra-day NLV drop exceeds threshold; config’d default
-- [ ] Test (breaker trips / clears / boundary)
+### Wave 2 — L2.B daily-loss circuit breaker ✅ DONE (2026-07-28)
+- [x] New `src/execution/dailyLossCircuitBreaker.js`: start-of-day NLV baseline (per-UTC-day, sticky) + `evaluateDailyLossCircuitBreaker` returning L1.B-style `{ok, code, reason, ...}`
+- [x] Wired into `basketExecutionRunner.js` right after the daily transmit cap, before the leg loop — transmit-freeze only, never sells; injectable `currentNlvChf`/`fetchNlvChf` via `safeguardConfig`
+- [x] Threshold: pct (default 8%) OR absolute CHF floor, whichever trips first; `skipDailyLossBreaker` escape hatch
+- [x] Test `scripts/test-daily-loss-circuit-breaker.js` (19 asserts incl. runner integration) + manifest regen; full suite 354/354 green
 
 ### Wave 3 — L2.C multi-party approval for baskets > CHF 25k
 - [ ] TBD from map §3 — extend approvalGate; second-channel sign-off

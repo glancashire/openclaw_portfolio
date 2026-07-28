@@ -182,6 +182,67 @@ async function executeApprovedBasket({ portfolioDir, approvalId, rootDir = proce
     }
   }
 
+  // Phase L2.B (2026-07-28): daily-loss circuit breaker. Freeze transmit if
+  // the portfolio NLV has dropped intra-day beyond a threshold vs the
+  // start-of-day baseline. This is a transmit freeze only — it never sells.
+  // Enforced only when a current NLV reading is available (from the live
+  // ledger). Override thresholds via safeguardConfig.maxDailyLossPct /
+  // .maxDailyLossChf; skip entirely with safeguardConfig.skipDailyLossBreaker.
+  if (safeguardConfig.skipDailyLossBreaker !== true) {
+    let currentNlvChf = Number.isFinite(safeguardConfig.currentNlvChf)
+      ? Number(safeguardConfig.currentNlvChf)
+      : undefined;
+    if (currentNlvChf === undefined && typeof safeguardConfig.fetchNlvChf === 'function') {
+      try { currentNlvChf = Number(await safeguardConfig.fetchNlvChf()); } catch (_) { currentNlvChf = undefined; }
+    }
+    const { evaluateDailyLossCircuitBreaker } = require('./dailyLossCircuitBreaker');
+    const lossResult = evaluateDailyLossCircuitBreaker({
+      portfolio,
+      rootDir,
+      currentNlvChf,
+      now,
+      maxDailyLossPct: Number.isFinite(safeguardConfig.maxDailyLossPct) ? Number(safeguardConfig.maxDailyLossPct) : undefined,
+      maxDailyLossChf: Number.isFinite(safeguardConfig.maxDailyLossChf) ? Number(safeguardConfig.maxDailyLossChf) : undefined,
+    });
+    if (!lossResult.ok) {
+      for (const leg of envelope.legs || []) {
+        state.legs[leg.legId] = {
+          legId: leg.legId,
+          instrument: leg.instrument,
+          attempts: 0,
+          status: 'blocked',
+          lastReason: `safeguard_${lossResult.code}: ${lossResult.reason}`,
+          safeguardDetail: {
+            baselineNlvChf: lossResult.baselineNlvChf,
+            currentNlvChf: lossResult.currentNlvChf,
+            dropChf: lossResult.dropChf,
+            dropPct: lossResult.dropPct,
+            maxDailyLossPct: lossResult.maxDailyLossPct,
+            maxDailyLossChf: lossResult.maxDailyLossChf,
+          },
+          updatedAt: new Date(now).toISOString(),
+        };
+      }
+      persistRunState(statePath, summarizeRun(state), now);
+      return {
+        path: statePath,
+        runState: summarizeRun(state),
+        approvalId,
+        portfolio,
+        safeguardBlockers: [{
+          code: lossResult.code,
+          reason: lossResult.reason,
+          detail: {
+            baselineNlvChf: lossResult.baselineNlvChf,
+            currentNlvChf: lossResult.currentNlvChf,
+            dropChf: lossResult.dropChf,
+            dropPct: lossResult.dropPct,
+          },
+        }],
+      };
+    }
+  }
+
   for (const leg of envelope.legs || []) {
     const eligibility = legEligible(leg, state);
     if (!eligibility.ok) {

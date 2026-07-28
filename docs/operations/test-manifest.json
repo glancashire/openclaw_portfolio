@@ -9,12 +9,12 @@
     "external"
   ],
   "counts": {
-    "total": 353,
-    "safe": 268,
+    "total": 354,
+    "safe": 269,
     "integration": 80,
     "live-smoke": 3,
     "external": 2,
-    "inVerifyRepoChecks": 52,
+    "inVerifyRepoChecks": 53,
     "quarantined": 3
   },
   "entries": [
@@ -429,6 +429,13 @@
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-daily-loss-circuit-breaker.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": true,
       "quarantined": false
     },
     {
