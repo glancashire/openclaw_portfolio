@@ -41,10 +41,11 @@ Safety posture unchanged: ETF-only, CHF-first, approval-gated live execution. No
 - [x] Denial reasons: `cosign_unconfigured`, `cosign_missing`, `cosign_mismatch`, `cosign_channel_missing`, `cosign_same_channel`, `cosign_stale`; never leaks credentials
 - [x] Test `scripts/test-multi-party-approval.js` (17 asserts) + existing gate test back-compat green; manifest regen; full suite 355/355
 
-### Wave 4 — L2.A file signing + boot tamper check
-- [ ] TBD from map §4 — signing util + agent-boot verify hook
-- [ ] Sign portfolio.md + memory/*.md; detect + surface tampering
-- [ ] Test
+### Wave 4 — L2.A file signing + tamper detection ✅ DONE (2026-07-29)
+- [x] `src/execution/portfolioSigning.js`: HMAC-SHA256 sign/verify of control files (default `portfolio.md`). Fail-open states `disabled`/`unsigned`/`verified`; only positive `tampered` blocks. Key from `OPENCLAW_PORTFOLIO_SIGNING_KEY` env — never persisted/printed; manifest stores sig+bytes, no content.
+- [x] Wired additively into `evaluateExecutionPolicy` (portfolioExecution.js) as a **live-only** blocker (`portfolio_tamper` code); unsigned setups unaffected. `requireTrustedPortfolio` available for hard preflight.
+- [x] `scripts/sign-portfolio.js` operator CLI (`sign`/`verify`); exit 2 only on tamper.
+- [x] Test `scripts/test-portfolio-signing.js` (18 asserts: disabled/unsigned/verified/tampered/missing/wrong-key/enforcement). Manifest regen → 356. Full verify green.
 
 ### Wave 5 — L2.E DR-drill runbook (doc-only)
 - [ ] Monthly disaster-recovery drill procedure in operations runbook

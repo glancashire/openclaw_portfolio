@@ -12,6 +12,7 @@ const { markTradeApproved, rejectTradeProposal, reconcileOrderStatus, appendTrad
 const { recordBrokerError, clearBrokerErrors, brokerErrorStatus, recordBrokerOnlyCancel } = require('./runtimeState');
 const { recordRuntimeEvent } = require('../observability/runtimeEvents');
 const { prepareOrderForSubmission } = require('./orderPreparation');
+const { verifyPortfolioFiles } = require('./portfolioSigning');
 
 function parsePortfolioStatus(text) {
   return captureLine(text, 'Status');
@@ -82,6 +83,7 @@ function codeForBlocker(message) {
   if (text.includes('execution mode')) return 'execution_mode_blocked';
   if (text.includes('account reference')) return 'account_reference_unresolved';
   if (text.includes('automation is paused')) return 'broker_automation_paused';
+  if (text.includes('signature verification')) return 'portfolio_tamper';
   return 'policy_blocked';
 }
 
@@ -175,6 +177,17 @@ async function evaluateExecutionPolicy({ portfolioDir, order, live = false, tran
   if (transmittedIntent && order?.userApproved !== true) blockers.push('Transmitted live execution requires explicit user approval flag.');
   if (transmittedIntent && order?.transmittedLiveAck !== 'I UNDERSTAND THIS WILL TRANSMIT A LIVE ORDER') blockers.push('Transmitted live execution requires the exact transmittedLiveAck confirmation string.');
   if (live && errorState.stopAutomation) blockers.push(`Broker automation is paused after ${errorState.consecutive} consecutive broker errors.`);
+  if (live) {
+    try {
+      const tamper = verifyPortfolioFiles({ portfolioDir });
+      if (tamper.state === 'tampered') {
+        const files = [...(tamper.tampered || []), ...(tamper.missing || [])].join(', ');
+        blockers.push(`Portfolio control files failed signature verification (${tamper.reason}: ${files}). Re-review and re-sign before live action.`);
+      }
+    } catch (err) {
+      blockers.push(`Portfolio signature verification errored: ${err.message}`);
+    }
+  }
   for (const blocker of safetyBlockers) blockers.push(blocker.message);
 
   const blockerObjects = blockers.map((message) => ({ code: codeForBlocker(message), message }));

@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 355,
+    "total": 356,
     "safe": 270,
-    "integration": 80,
+    "integration": 81,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 54,
@@ -1647,6 +1647,13 @@
     },
     {
       "path": "scripts/test-portfolio-order-lifecycle-e2e.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-portfolio-signing.js",
       "lane": "integration",
       "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
