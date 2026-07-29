@@ -78,6 +78,7 @@ This is the active incident, execution, and reporting reference.
 - Confirm command evidence in `runtime/events/runtime-events.jsonl`: successful first handoffs emit `queue_open_runner` with `retry: false`, while retries emit `queue_open_runner` with `retry: true`.
 - If `Blocked rows` is non-zero, inspect blocker fields in `trades.md` and use the recovery/requeue workflow before retrying.
 - If broker readiness is degraded, treat pricing as review-only unless readiness returns to live-safe posture.
+- Run the monthly disaster-recovery drill from `docs/operations/dr-drill.md` (secrets/code/broker/gate/reconciliation recoverability); log each run in `memory/YYYY-MM-DD.md`.
 
 ## Obsolete material
 - The orphan dashboard-email helper trio was retired to `archive/scripts/legacy-dashboard-email/`.

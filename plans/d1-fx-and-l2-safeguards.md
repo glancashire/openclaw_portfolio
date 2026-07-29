@@ -47,8 +47,10 @@ Safety posture unchanged: ETF-only, CHF-first, approval-gated live execution. No
 - [x] `scripts/sign-portfolio.js` operator CLI (`sign`/`verify`); exit 2 only on tamper.
 - [x] Test `scripts/test-portfolio-signing.js` (18 asserts: disabled/unsigned/verified/tampered/missing/wrong-key/enforcement). Manifest regen → 356. Full verify green.
 
-### Wave 5 — L2.E DR-drill runbook (doc-only)
-- [ ] Monthly disaster-recovery drill procedure in operations runbook
+### Wave 5 — L2.E DR-drill runbook ✅ DONE (2026-07-29)
+- [x] `docs/operations/dr-drill.md`: monthly 5-part read-only drill (secrets/env, code+clean-clone rebuild, broker-connection ladder, safety-gate integrity incl. L2.A/B/C, reconciliation truthfulness). All referenced commands verified to exist.
+- [x] Pointer added to `docs/operator-runbooks.md` reading guide; operator-runbooks contract still green.
+- [x] Drill is explicitly read-only — never transmits, never restarts a healthy gateway, never overwrites live `.env`/`portfolio.md`, never prints secrets/safe-word.
 
 ---
 
