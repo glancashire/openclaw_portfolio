@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-07-28 21:23 UTC · **Repo head:** `711422d` · **Tests:** 350 discovered (265 safe, 3 quarantined) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-07-29 00:35 UTC · **Repo head:** `a52cd08` · **Tests:** 356 discovered (safe lane green) · **Health:** 🟢 healthy
 
 ---
 
@@ -35,17 +35,20 @@
 | Phase | Status | Blocker | Action holder |
 |---|---|---|---|
 | **220** | **DONE 2026-07-28** — performance windows + quote-service layer (health/cache/provenance) shipped & pushed | **none** | **—** |
-| **Quote svc B/C** | PENDING — console provider-health block + local daemon boundary | none | bb8 (queued) |
+| **Quote svc B/C** | **DONE 2026-07-29** — console provider-health block + stable quote-service client boundary shipped | **none** | **—** |
+| **D1** | **DONE 2026-07-28** — multi-currency FX cash reconciliation (additive; CHF totals unchanged) | **none** | **—** |
+| **L2.A/B/C/E** | **DONE 2026-07-29** — file signing+tamper preflight / daily-loss breaker / ≥CHF25k co-sign / DR-drill runbook | **none** | **—** |
+| **L2.D** | DEFER — YubiKey/hardware safe-word; only worth it >CHF 500k per audit | operator hardware | Graham |
 | **M** | **DONE 2026-06-15** — R2SC filled + market-rule tick resolver shipped | **none** | **—** |
 | **L** | **L0 + L1.A–L1.D done; L1.E CLOSED won't fix 2026-06-11** | **none** | **—** |
 | H2/H3 | CALENDAR | 2026-06-17 review | Graham (decision) |
 | F4 + G3 | OPERATOR | XLS file | Graham (drop file) |
 | B5 | RECURRING | 2FA prompts | Graham (when alert fires) |
-| D1/D2/D3 | PARKED | explicit reactivation | Graham |
+| D2/D3 | PARKED | explicit reactivation | Graham |
 
-**Shipped 2026-06-05 → 2026-07-28:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11, Phase M (R2SC small-cap sleeve filled + IBKR market-rule tick resolver) 2026-06-15, **Phase 220** (dashboard return-metrics cleanup + performance windows with per-metric availability + `src/quotes/` service layer: ordered provider fallback, health/cooldown, TTL cache, quote provenance/age surfacing) 2026-07-28.
+**Shipped 2026-06-05 → 2026-07-28:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11, Phase M (R2SC small-cap sleeve filled + IBKR market-rule tick resolver) 2026-06-15, **Phase 220** (dashboard return-metrics cleanup + performance windows + `src/quotes/` service layer: ordered provider fallback, health/cooldown, TTL cache, provenance/age) 2026-07-28, **Quote svc B/C** (console provider-health block + stable client boundary) 2026-07-29, **D1** (multi-currency FX cash reconciliation, CHF-neutral) 2026-07-28, **L2.A/B/C/E** (portfolio-file signing+tamper preflight, daily-loss circuit breaker, ≥CHF25k multi-party co-sign, monthly DR-drill runbook) 2026-07-28→29.
 
-**Next queued:** quote-service Phase B (console `show-dashboard.js` provider-health block — the service already snapshots health via `snapshotProviderHealth`, only the console surface is missing) + Phase C (extract to a long-lived daemon boundary while keeping the in-process API stable). Plan: `plans/quote-service-remaining.md`.
+**Next queued:** nothing in autonomous engineering scope. Remaining open items are calendar-gated (H2/H3 review), operator-gated (F4+G3 XLS drop, B5 2FA, L2.D hardware), or parked pending explicit reactivation (D2/D3). Plans: `plans/d1-fx-and-l2-safeguards.md` (L2.D deferred), `plans/quote-service-remaining.md` (fully shipped).
 
 Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`. L1.E close-out: `memory/2026-06-11.md`. Phase M tick-size doc: `docs/operations/ibkr-tick-sizes.md`.
 
