@@ -1,7 +1,7 @@
 # Health Report: etf
 
 ## Management summary
-- Generated at: 2026-07-28T20:00:13.352Z
+- Generated at: 2026-07-29T20:00:12.159Z
 - Current status: blocked (high)
 - Management summary: Restore native IBKR connectivity before relying on executable live-state surfaces.
 - Next step: Restore native IBKR connectivity before relying on executable live-state surfaces.
@@ -17,7 +17,7 @@
 - Main detected symptom: IBKR gateway appears offline or unreachable on the native API socket.
 
 ## Health direction
-- Health direction is worsening: 6 of the last 7 checks showed blocked or paused posture.
+- Health direction is worsening: 7 of the last 7 checks showed blocked or paused posture.
 
 ## Remaining status and reference details
 - Generated-state issues: 0

@@ -439,6 +439,12 @@ async function getInteractiveBrokersReadinessBounded({
   timeoutMs = 10000,
   authTimeoutMs = null,
   postureTimeoutMs = null,
+  // Injectable hooks (tests only) — forwarded to runStagedReadiness so the
+  // timeout-routing behaviour can be exercised deterministically instead of
+  // depending on real gateway/network timing.
+  buildClient = null,
+  authenticate = null,
+  posture = null,
 } = {}) {
   // Default split: auth gets ~40% of the budget, posture gets ~70% of the
   // budget (overlapping is fine because the stages run sequentially and the
@@ -456,6 +462,9 @@ async function getInteractiveBrokersReadinessBounded({
       portfolio,
       authTimeoutMs: authBudget,
       postureTimeoutMs: postureBudget,
+      ...(buildClient ? { buildClient } : {}),
+      ...(authenticate ? { authenticate } : {}),
+      ...(posture ? { posture } : {}),
     });
   } catch (error) {
     // Defensive fallback to the legacy timeout shape so callers always get a

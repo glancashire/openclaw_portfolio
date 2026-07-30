@@ -13,7 +13,7 @@ const { evaluateSafetyControls } = require('../validation/safetyControls');
 const { markdownToBasicHtml } = require('./pdfExport');
 const { writeJsonIfChanged, writeTextIfChanged } = require('./artifactWriter');
 const { buildPendingOperatorActions, buildMaterialEvents, bestNextStep, formatRecommendedStep } = require('./dashboardGenerator');
-const { snapshotProviderHealth, configuredProviderOrder } = require('../quotes');
+const { configuredProviderOrder } = require('../quotes');
 const { classifyActionSeverity, queueTypeForItem, summarizeOperatorQueue } = require('./operatorQueue');
 const { buildSparklineSvg } = require('./sparkline');
 const { readNetLiqHistory, lastNDays } = require('./historyDigest');
@@ -523,7 +523,9 @@ async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, ho
   const staleApprovals = staleApprovalInventory(tradesPath);
   const openRunnerRetryState = summarizeOpenRunnerRetryState(tradesPath);
   const latestActions = recommendedActions(existingTrades, latestProposals, totalValue, brokerReadiness, lifecycleSummary);
-  const quoteProviderHealth = snapshotProviderHealth();
+  // Provider *order* is config-stable (safe to persist). Live per-provider
+  // health is volatile telemetry — it lives in the gitignored runtime sidecar
+  // (see providerHealthSidecar.js), never in the deterministic summary.
   const quoteProviderOrder = configuredProviderOrder();
   const pendingActions = buildPendingActionItems({
     portfolioName,
@@ -535,7 +537,6 @@ async function buildPortfolioSummaryModel({ portfolioName, tradesPath = null, ho
     openRunnerRetryState,
     safetyDiagnostics,
     fillNotificationState: deliveryStatus?.fillNotificationState || null,
-    quoteProviderHealth,
     quoteProviderOrder,
     recommended: latestActions,
     latestProposals,
@@ -758,7 +759,6 @@ function buildDeploymentOpportunity(holdingsText = '', totalValue = 0) {
       lastBrokerErrorAt: brokerErrorState?.lastAt || null,
     },
     recentTrades: existingTrades,
-    quoteProviderHealth,
     quoteProviderOrder,
   };
 }
@@ -1139,17 +1139,14 @@ body { margin: 0; padding: 28px; color: var(--text); font-family: Inter, ui-sans
 }
 
 function formatProviderHealthBlock(summary = {}) {
+  // Deterministic: only the config-stable provider order is rendered here. Live
+  // per-provider health is volatile telemetry and would break this artifact's
+  // regenerate-twice byte-idempotency, so it is written to the gitignored
+  // runtime sidecar and surfaced by the console dashboard instead.
   const order = Array.isArray(summary.quoteProviderOrder) ? summary.quoteProviderOrder : [];
-  const health = Array.isArray(summary.quoteProviderHealth) ? summary.quoteProviderHealth : [];
   const lines = [];
   lines.push(`- Provider order: ${order.length ? order.join(' -> ') : 'unknown'}`);
-  if (!health.length) {
-    lines.push('- Provider state: no provider attempts recorded in this process yet');
-    return lines.join('\n');
-  }
-  for (const item of health) {
-    lines.push(`- ${item.providerId}: failures=${item.consecutiveFailures || 0}, lastSuccess=${item.lastSuccessAt || 'never'}, lastFailure=${item.lastFailureAt || 'never'}, cooldownUntil=${item.cooldownUntil || 'none'}`);
-  }
+  lines.push('- Live per-provider health: see the console dashboard (runtime sidecar).');
   return lines.join('\n');
 }
 

@@ -24,6 +24,7 @@ const { parseHoldingsTable } = require('./investorReportingData');
 const { buildProfitLossSummary } = require('./costBasis');
 const { resolveHoldingQuotes } = require('./quoteResolution');
 const { snapshotProviderHealth, configuredProviderOrder } = require('../quotes');
+const { writeProviderHealthSidecar } = require('./providerHealthSidecar');
 
 function parsePortfolioDepositedCapital(portfolioText = '') {
   const m = String(portfolioText || '').match(/- Total capital deposited CHF:\s*(.+)/);
@@ -676,10 +677,16 @@ async function generateDashboard({ portfolioName, tradesPath = '', holdingsText,
   const quoteProvenance = summarizeQuoteProvenance(resolvedQuotes.rows);
   // Phase B: capture provider-health after quotes resolved this cycle so the
   // static dashboard.md carries provider state for the console renderer.
+  // Provider health is volatile process-global telemetry; it must not enter the
+  // deterministic dashboard.md (that breaks byte-idempotency and churns git).
+  // Persist it to a gitignored runtime sidecar the console view reads instead.
   const providerHealthRows = summarizeProviderHealth({
     order: (() => { try { return configuredProviderOrder(); } catch { return []; } })(),
     health: (() => { try { return snapshotProviderHealth(); } catch { return []; } })(),
   });
+  if (portfolioDirForSidecar) {
+    writeProviderHealthSidecar({ portfolioDir: portfolioDirForSidecar, rows: providerHealthRows });
+  }
 
   // Compact holdings table sorted by value (CHF) descending
   const holdingsRows = profitLoss.rows.slice().sort((a, b) => (b.valueChf ?? 0) - (a.valueChf ?? 0));
@@ -881,13 +888,6 @@ ${formatAllocationRows(allocations)}
     `- Pending approvals: ${pendingApprovalCount}
 `,
     `- In-flight execution rows: ${inFlightCount}
-`,
-    `## Quote Provider Health
-`,
-    `Configured provider order and per-provider state from the quote service this cycle.
-`,
-    `
-${formatProviderHealthLines(providerHealthRows)}
 `,
     `## Safety / Risk Diagnostics
 `,

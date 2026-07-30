@@ -1,10 +1,10 @@
 {
   "schemaVersion": "2.1",
   "portfolio": "etf",
-  "generatedAt": "2026-07-28T20:00:13.352Z",
+  "generatedAt": "2026-07-29T20:00:12.159Z",
   "before": {
     "portfolio": "etf",
-    "generatedAt": "2026-07-28T20:00:09.525Z",
+    "generatedAt": "2026-07-29T20:00:08.739Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": false,
@@ -57,13 +57,13 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-07-27",
+      "latestHistoryDate": "2026-07-29",
       "freshness": {
-        "stale": false,
+        "stale": true,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1785258318488.7837,
+        "dashboardMtimeMs": 1785344710282.7427,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-        "newestSourceMtimeMs": 1785171934312.8547
+        "newestSourceMtimeMs": 1785344723966.4543
       },
       "lifecycleSummary": {
         "proposed": 0,
@@ -110,12 +110,14 @@
           9107
         ]
       },
-      "pendingActions": [],
-      "ready": true
+      "pendingActions": [
+        "Dashboard/report freshness is stale relative to source state."
+      ],
+      "ready": false
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-07-28T20:00:09.524Z",
+      "generatedAt": "2026-07-29T20:00:08.737Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -167,13 +169,13 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-07-27",
+        "latestHistoryDate": "2026-07-29",
         "freshness": {
-          "stale": false,
+          "stale": true,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1785258318488.7837,
+          "dashboardMtimeMs": 1785344710282.7427,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-          "newestSourceMtimeMs": 1785171934312.8547
+          "newestSourceMtimeMs": 1785344723966.4543
         },
         "lifecycleSummary": {
           "proposed": 0,
@@ -220,12 +222,14 @@
             9107
           ]
         },
-        "pendingActions": [],
-        "ready": true
+        "pendingActions": [
+          "Dashboard/report freshness is stale relative to source state."
+        ],
+        "ready": false
       },
       "emailDelivery": {
         "enabled": true,
-        "ready": true,
+        "ready": false,
         "mode": "email_and_repo",
         "recipient": "lancashire@swift.ch",
         "recipients": [
@@ -234,15 +238,17 @@
         "provider": "mailgun",
         "providerConfigured": true,
         "providerError": null,
-        "classification": "email_ready",
-        "missing": [],
-        "reason": "Email delivery is configured and ready."
+        "classification": "email_blocked_pending_actions",
+        "missing": [
+          "pendingDeliveryActions"
+        ],
+        "reason": "Email delivery is not ready: missing pendingDeliveryActions."
       },
       "deliveryPosture": {
-        "ready": true,
-        "pendingActionCount": 0,
-        "latestHistoryDate": "2026-07-27",
-        "freshnessStale": false,
+        "ready": false,
+        "pendingActionCount": 1,
+        "latestHistoryDate": "2026-07-29",
+        "freshnessStale": true,
         "failedTrades": 0,
         "inFlightOrders": 0,
         "brokerAutomationPaused": false,
@@ -257,7 +263,7 @@
             "brokerOrderId": "9172"
           }
         },
-        "recommendedNextAction": "No delivery-side operator action is currently required."
+        "recommendedNextAction": "Email delivery is not ready: missing pendingDeliveryActions."
       }
     },
     "fillNotificationState": {
@@ -287,11 +293,15 @@
       "state": "critical",
       "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
-      "blockerCount": 1,
+      "blockerCount": 2,
       "blockers": [
         {
           "code": "broker_unready",
           "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
+        },
+        {
+          "code": "delivery_attention",
+          "message": "Dashboard/report freshness is stale relative to source state."
         }
       ],
       "recommendedActions": [
@@ -302,7 +312,7 @@
   },
   "after": {
     "portfolio": "etf",
-    "generatedAt": "2026-07-28T20:00:13.351Z",
+    "generatedAt": "2026-07-29T20:00:12.158Z",
     "brokerReadiness": {
       "configured": true,
       "authenticated": false,
@@ -355,13 +365,13 @@
       ],
       "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
       "overrideLoaded": true,
-      "latestHistoryDate": "2026-07-27",
+      "latestHistoryDate": "2026-07-29",
       "freshness": {
         "stale": false,
         "dashboardExists": true,
-        "dashboardMtimeMs": 1785268812989.6782,
+        "dashboardMtimeMs": 1785355211904.6748,
         "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-        "newestSourceMtimeMs": 1785171934312.8547
+        "newestSourceMtimeMs": 1785344723966.4543
       },
       "lifecycleSummary": {
         "proposed": 0,
@@ -413,7 +423,7 @@
     },
     "deliveryPosture": {
       "schemaVersion": "1.0",
-      "generatedAt": "2026-07-28T20:00:13.350Z",
+      "generatedAt": "2026-07-29T20:00:12.157Z",
       "portfolio": "etf",
       "policy": {
         "deliveryMode": "email_and_repo",
@@ -465,13 +475,13 @@
         ],
         "policyPath": "/home/ubuntu/.openclaw/workspace/config/report_delivery_policy.json",
         "overrideLoaded": true,
-        "latestHistoryDate": "2026-07-27",
+        "latestHistoryDate": "2026-07-29",
         "freshness": {
           "stale": false,
           "dashboardExists": true,
-          "dashboardMtimeMs": 1785268812989.6782,
+          "dashboardMtimeMs": 1785355211904.6748,
           "newestSourcePath": "/home/ubuntu/.openclaw/workspace/portfolio/etf/history.md",
-          "newestSourceMtimeMs": 1785171934312.8547
+          "newestSourceMtimeMs": 1785344723966.4543
         },
         "lifecycleSummary": {
           "proposed": 0,
@@ -539,7 +549,7 @@
       "deliveryPosture": {
         "ready": true,
         "pendingActionCount": 0,
-        "latestHistoryDate": "2026-07-27",
+        "latestHistoryDate": "2026-07-29",
         "freshnessStale": false,
         "failedTrades": 0,
         "inFlightOrders": 0,
@@ -755,8 +765,8 @@
         {
           "code": "broker_unready",
           "fixerKey": "broker_unready",
-          "lastAttemptedAt": "2026-07-28T08:00:10.707Z",
-          "nextEligibleAt": "2026-07-29T08:00:10.707Z"
+          "lastAttemptedAt": "2026-07-29T08:00:14.508Z",
+          "nextEligibleAt": "2026-07-30T08:00:14.508Z"
         }
       ],
       "skipped": []
@@ -764,77 +774,6 @@
   },
   "trends": {
     "recent": [
-      {
-        "at": "2026-07-27T08:00:23.148Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "ibkr_socket_dead"
-        ],
-        "healed": [
-          "restart_ibkr_gateway_if_socket_dead",
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "ibkr_socket_dead"
-        ]
-      },
-      {
-        "at": "2026-07-27T08:19:28.599Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "healthy",
-        "severity": "low",
-        "blockerCount": 0,
-        "classified": [],
-        "healed": [
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": []
-      },
-      {
-        "at": "2026-07-27T14:00:14.149Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "ibkr_socket_dead"
-        ],
-        "healed": [
-          "restart_ibkr_gateway_if_socket_dead",
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "ibkr_socket_dead"
-        ]
-      },
-      {
-        "at": "2026-07-27T20:00:10.825Z",
-        "kind": "health_check",
-        "portfolio": "etf",
-        "health": "blocked",
-        "severity": "high",
-        "blockerCount": 1,
-        "classified": [
-          "ibkr_socket_dead"
-        ],
-        "healed": [
-          "restart_ibkr_gateway_if_socket_dead",
-          "regenerate_dashboard",
-          "regenerate_reporting_artifacts"
-        ],
-        "openIssues": [
-          "ibkr_socket_dead"
-        ]
-      },
       {
         "at": "2026-07-28T08:00:12.372Z",
         "kind": "health_check",
@@ -891,13 +830,88 @@
         "openIssues": [
           "ibkr_socket_dead"
         ]
+      },
+      {
+        "at": "2026-07-28T20:00:13.354Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-29T08:00:16.189Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-29T08:00:24.722Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
+      },
+      {
+        "at": "2026-07-29T14:00:16.072Z",
+        "kind": "health_check",
+        "portfolio": "etf",
+        "health": "blocked",
+        "severity": "high",
+        "blockerCount": 1,
+        "classified": [
+          "ibkr_socket_dead"
+        ],
+        "healed": [
+          "restart_ibkr_gateway_if_socket_dead",
+          "regenerate_dashboard",
+          "regenerate_reporting_artifacts"
+        ],
+        "openIssues": [
+          "ibkr_socket_dead"
+        ]
       }
     ],
     "counts": {
-      "blocked": 6,
-      "healthy": 1
+      "blocked": 7
     },
     "direction": "worsening",
-    "summary": "Health direction is worsening: 6 of the last 7 checks showed blocked or paused posture."
+    "summary": "Health direction is worsening: 7 of the last 7 checks showed blocked or paused posture."
   }
 }

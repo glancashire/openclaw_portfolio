@@ -234,24 +234,29 @@ try {
   }
 } catch { /* trend log is optional */ }
 
-// ── Quote provider health (Phase B) ───────────────────────────────────────────
-const providerHealthBody = section('Quote Provider Health');
-if (providerHealthBody) {
-  const healthLines = providerHealthBody
-    .split(/\r?\n/)
-    .filter((l) => l.trim().startsWith('- '))
-    .map((l) => l.replace(/^\s*-\s*/, '').trim());
-  // Skip the generic "no activity" placeholder to avoid noise.
-  const meaningful = healthLines.filter((l) => l && !/no quote-provider activity/i.test(l));
+// ── Quote provider health (Phase B; sidecar-backed 2026-07-29) ────────────────
+// Live per-provider health is volatile telemetry and is no longer embedded in
+// the deterministic dashboard.md. It is read from the gitignored runtime sidecar
+// written at dashboard-generation time.
+{
+  const { readProviderHealthSidecar } = require('../src/reporting/providerHealthSidecar');
+  const portfolioDir = path.join(__dirname, '..', 'portfolio', portfolio);
+  const { rows: healthRows } = readProviderHealthSidecar({ portfolioDir });
+  const meaningful = Array.isArray(healthRows)
+    ? healthRows.filter((r) => r && r.status && r.status !== 'idle')
+    : [];
   if (meaningful.length) {
     lines.push('');
     lines.push('📡 Quote providers');
-    for (const raw of meaningful) {
-      const [provider, rest = ''] = raw.split(/:\s*(.+)/);
-      const cooling = /cooling_down/i.test(rest);
-      const failing = /status:\s*failing/i.test(rest);
+    for (const r of meaningful) {
+      const cooling = r.status === 'cooling_down';
+      const failing = r.status === 'failing';
       const flag = cooling ? '🧊' : failing ? '⚠️' : '✓';
-      lines.push(`  ${flag} ${provider.trim().padEnd(16)} ${rest.trim()}`);
+      const bits = [`status: ${r.status}`];
+      if (r.consecutiveFailures > 0) bits.push(`fails: ${r.consecutiveFailures}`);
+      if (r.cooldownUntil) bits.push(`cooldownUntil: ${r.cooldownUntil}`);
+      if (r.lastError) bits.push(`lastError: ${r.lastError}`);
+      lines.push(`  ${flag} ${String(r.providerId).padEnd(16)} ${bits.join(', ')}`);
     }
   }
 }

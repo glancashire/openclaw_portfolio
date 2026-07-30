@@ -91,18 +91,35 @@ function makeStubClient(overrides = {}) {
   });
 
   await test('bounded wrapper routes posture timeout to new fallback', async () => {
-    // Stub by replacing detectMarketDataPosture indirectly is hard; verify the
-    // wrapper at least returns a well-formed result quickly when given tiny
-    // budgets. Production verification: see runStagedReadiness tests above.
+    // Deterministically force the posture-timeout path via injected hooks:
+    // auth resolves fast/ok, posture never resolves so the posture budget wins.
+    // (Previously this used a 1ms real budget, which was environment-dependent:
+    // in a gateway-down env auth fails fast → native_error instead of a timeout.)
     const out = await getInteractiveBrokersReadinessBounded({
       portfolio: 'etf',
-      authTimeoutMs: 1,
-      postureTimeoutMs: 1,
-      timeoutMs: 1,
+      buildClient: makeStubClient(),
+      authenticate: async () => ({ ok: true, mode: 'native-socket' }),
+      posture: async () => new Promise(() => {}), // never resolves → posture timeout
+      authTimeoutMs: 25,
+      postureTimeoutMs: 25,
     });
     assert.strictEqual(out.fallbackRequired, true);
-    assert(['timeout', 'posture_detection_timeout'].includes(out.reason),
-      `unexpected reason: ${out.reason}`);
+    assert.strictEqual(out.reason, 'posture_detection_timeout',
+      `expected posture_detection_timeout, got: ${out.reason}`);
+    assert(typeof out.message === 'string' && out.message.length > 0);
+  });
+
+  await test('bounded wrapper surfaces auth failure as fallback', async () => {
+    // Auth resolves but not ok → summarizeReadiness path, still fallbackRequired.
+    const out = await getInteractiveBrokersReadinessBounded({
+      portfolio: 'etf',
+      buildClient: makeStubClient(),
+      authenticate: async () => ({ ok: false, error: 'native_error' }),
+      posture: async () => ({ posture: 'live_or_realtime', detail: 'x' }),
+      authTimeoutMs: 25,
+      postureTimeoutMs: 25,
+    });
+    assert.strictEqual(out.fallbackRequired, true);
     assert(typeof out.message === 'string' && out.message.length > 0);
   });
 

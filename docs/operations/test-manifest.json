@@ -9,9 +9,9 @@
     "external"
   ],
   "counts": {
-    "total": 356,
+    "total": 357,
     "safe": 270,
-    "integration": 81,
+    "integration": 82,
     "live-smoke": 3,
     "external": 2,
     "inVerifyRepoChecks": 54,
@@ -1691,6 +1691,13 @@
       "path": "scripts/test-proposal-generator-quote-quality.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-provider-health-sidecar.js",
+      "lane": "integration",
+      "reason": "default: needs filesystem / portfolio fixtures",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
