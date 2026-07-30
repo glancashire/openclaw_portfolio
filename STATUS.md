@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-07-29 00:35 UTC · **Repo head:** `a52cd08` · **Tests:** 356 discovered (safe lane green) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-07-30 00:32 UTC · **Repo head:** `25d2593` · **Tests:** 357 discovered (safe lane 267/0 green) · **Health:** 🟢 healthy
 
 ---
 
