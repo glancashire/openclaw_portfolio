@@ -2,7 +2,40 @@
 
 const assert = require('assert');
 const { mapExternalQuoteSymbol, resolveHoldingQuotes, extractYahooLastClose } = require('../src/reporting/quoteResolution');
+const { QuoteServiceClient } = require('../src/quotes');
 const { enrichHoldings } = require('../src/reporting/costBasis');
+
+
+// Hermetic transport: this test asserts *fallback* resolution behaviour, so it
+// must not depend on live broker/network state (a live IBKR gateway would
+// otherwise return ibkr_tws and make these assertions non-deterministic).
+function createFallbackTransport() {
+  return {
+    kind: 'test_fallback_stub',
+    async getQuote({ context = {} } = {}) {
+      if (!context.externalSymbol) {
+        return { ok: false, reason: 'missing_symbol', attempts: [] };
+      }
+      return {
+        ok: true,
+        price: 42.5,
+        close: 42.5,
+        currency: 'EUR',
+        providerPath: 'yahoo_last_close',
+        providerLabel: 'Yahoo Finance (last close)',
+        quality: 'last_close',
+        asOf: '2026-07-30T07:00:00.000Z',
+        ageSeconds: 60,
+        ageLabel: '1m',
+        note: 'Resolved from Yahoo Finance chart close series for ' + context.externalSymbol + '.',
+        attempts: [],
+      };
+    },
+    async getQuotes() { return []; },
+    async getProviderHealth() { return []; },
+  };
+}
+const fallbackClient = new QuoteServiceClient({ transport: createFallbackTransport() });
 
 (async function main() {
   assert.strictEqual(mapExternalQuoteSymbol({ ibkrSymbol: 'SXR8', ibkrPrimaryExchange: 'IBIS2' }), 'SXR8.DE');
@@ -35,6 +68,7 @@ const { enrichHoldings } = require('../src/reporting/costBasis');
     approvedInstruments,
     portfolio: 'etf',
     brokerReadiness: { fallbackRequired: true, reason: 'native_error' },
+    quoteClient: fallbackClient,
   });
 
   assert.ok(['holdings_snapshot', 'yahoo_last_close'].includes(resolved.rows[0].quoteSource));
@@ -71,6 +105,7 @@ const { enrichHoldings } = require('../src/reporting/costBasis');
     ],
     portfolio: 'etf',
     brokerReadiness: { fallbackRequired: true, reason: 'native_error' },
+    quoteClient: fallbackClient,
   });
   assert.ok(['yahoo_last_close', 'holdings_snapshot'].includes(emuaaResolved.rows[0].quoteSource));
   if (emuaaResolved.rows[0].quoteSource === 'yahoo_last_close') {

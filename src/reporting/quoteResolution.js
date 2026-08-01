@@ -1,7 +1,7 @@
 'use strict';
 
 const { extractYahooLastClose, fetchYahooLastClose, fetchExternalLastClose } = require('../quotes/externalFallback');
-const { getQuote } = require('../quotes');
+const { getQuoteServiceClient } = require('../quotes');
 
 function asNumber(value) {
   const n = Number(value);
@@ -29,7 +29,10 @@ function mapExternalQuoteSymbol(instrument = {}) {
 }
 
 
-async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = [], portfolio = 'etf', brokerReadiness = null } = {}) {
+async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = [], portfolio = 'etf', brokerReadiness = null, quoteClient = null } = {}) {
+  // Phase C boundary: resolve quotes through the client seam so callers (and
+  // tests) can swap the transport without touching provider internals.
+  const client = quoteClient || getQuoteServiceClient();
   const approvedByKey = new Map();
   for (const instrument of approvedInstruments) {
     const noteText = String(instrument.notes || instrument.note || '');
@@ -83,7 +86,7 @@ async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = []
 
     const shouldTryServiceQuote = Boolean(instrument);
     if (shouldTryServiceQuote) {
-      const serviceQuote = await getQuote({
+      const serviceQuote = await client.getQuote({
         portfolio,
         instrument,
         conid: instrument.ibkrConid || row.conid || null,

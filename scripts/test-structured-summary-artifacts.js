@@ -3,14 +3,66 @@ const path = require('path');
 const os = require('os');
 const { collectPortfolioSummary, buildPortfolioIndex, buildPendingActionsOverview, generatePortfolioSummaryArtifacts, renderPortfolioSummaryMarkdown, buildRecoveryChecklist, renderRecoveryChecklistMarkdown } = require('../src/reporting/summaryArtifacts');
 const { regenerateDashboard } = require('../src/reporting/dashboardGenerator');
+const { setQuoteServiceTransport } = require('../src/quotes');
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+
+// This test exercises the full summary/dashboard artifact surface for the ETF
+// portfolio. It must be hermetic on two axes:
+//   - Deterministic quotes: it resolves 19 holdings, and against a live IBKR
+//     gateway that means ~150s of network calls plus non-deterministic prices
+//     (which also blows the 60s per-test budget). Pin a stub transport.
+//   - No live writes: regenerateDashboard() and generatePortfolioSummaryArtifacts
+//     ({ writeFiles: true }) publish into the portfolio dir they are given, so we
+//     run against a temp copy instead of the operator-visible portfolio/etf.
+function createDeterministicTransport() {
+  return {
+    kind: 'test_deterministic_stub',
+    async getQuote({ context = {} } = {}) {
+      const key = String(context.conid || context.externalSymbol || 'x');
+      let hash = 0;
+      for (let i = 0; i < key.length; i += 1) hash = (hash * 31 + key.charCodeAt(i)) % 100000;
+      const price = Number((10 + (hash % 9000) / 100).toFixed(2));
+      return {
+        ok: true,
+        price,
+        close: price,
+        currency: null,
+        providerPath: 'test_deterministic_stub',
+        providerLabel: 'Deterministic test stub',
+        quality: 'last_close',
+        asOf: '2026-07-30T07:00:00.000Z',
+        ageSeconds: 60,
+        ageLabel: '1m',
+        note: 'Deterministic stubbed quote for structured-summary artifact testing.',
+        attempts: [],
+      };
+    },
+    async getQuotes() { return []; },
+    async getProviderHealth() { return []; },
+  };
+}
+
+function createSandboxPortfolio(sourceDir) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ssa-'));
+  const sandboxDir = path.join(root, 'etf');
+  fs.mkdirSync(sandboxDir, { recursive: true });
+  for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    fs.copyFileSync(path.join(sourceDir, entry.name), path.join(sandboxDir, entry.name));
+  }
+  return { root, sandboxDir };
+}
+
 async function main() {
   const repoRoot = path.resolve(__dirname, '..');
-  const portfolioDir = path.join(repoRoot, 'portfolio', 'etf');
+  const sourcePortfolioDir = path.join(repoRoot, 'portfolio', 'etf');
+  const { root: sandboxRoot, sandboxDir: portfolioDir } = createSandboxPortfolio(sourcePortfolioDir);
+  setQuoteServiceTransport(createDeterministicTransport());
+  try {
   const runtimeEventsPath = path.join(repoRoot, 'runtime', 'events', 'runtime-events.jsonl');
   const executionStatePath = path.join(repoRoot, 'runtime', 'execution-state.json');
   const runtimeEventsBefore = fs.existsSync(runtimeEventsPath) ? fs.readFileSync(runtimeEventsPath, 'utf8') : null;
@@ -146,10 +198,16 @@ async function main() {
     fs.writeFileSync(executionStatePath, executionStateBefore);
   }
 
-  console.log(JSON.stringify({ ok: true, pendingActions: pending.itemCount, investorHoldings: summary.investorHoldings.rows.length, dashboardPath }, null, 2));
+  assert(path.resolve(dashboardPath).startsWith(path.resolve(sandboxRoot)), `Dashboard must be written inside sandbox, got: ${dashboardPath}`);
+
+  console.log(JSON.stringify({ ok: true, pendingActions: pending.itemCount, investorHoldings: summary.investorHoldings.rows.length, dashboardPath, sandboxed: true }, null, 2));
+  } finally {
+    setQuoteServiceTransport(null);
+    fs.rmSync(sandboxRoot, { recursive: true, force: true });
+  }
 }
 
 main().catch((error) => {
   console.error(error?.stack || error?.message || String(error));
-  process.exit(1);
+  process.exitCode = 1;
 });
