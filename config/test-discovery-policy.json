@@ -1,6 +1,9 @@
 {
   "version": 1,
-  "scanDirs": ["scripts", "tests"],
+  "scanDirs": [
+    "scripts",
+    "tests"
+  ],
   "skips": {
     "scripts/test-all.js": "legacy runner wrapper, not a test"
   },
@@ -76,6 +79,14 @@
     "scripts/test-test-manifest-shape.js": {
       "lane": "safe",
       "reason": "validates the manifest itself"
+    },
+    "scripts/test-profit-loss-surface-consistency.js": {
+      "lane": "safe",
+      "reason": "hermetic: deterministic stub transport + temp sandbox copy of portfolio dir; no live network or portfolio writes (2026-08-05)"
+    },
+    "scripts/test-structured-summary-artifacts.js": {
+      "lane": "safe",
+      "reason": "hermetic: deterministic stub transport + temp sandbox copy of portfolio dir; asserts live artifacts untouched (2026-08-05)"
     }
   },
   "quarantines": {

@@ -95,7 +95,11 @@ async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = []
       quoteAttempts = Array.isArray(serviceQuote?.attempts) ? serviceQuote.attempts : [];
       if (serviceQuote?.ok && quantity != null && fxToChf != null) {
         const candidatePrice = asNumber(serviceQuote.price ?? serviceQuote.ask ?? serviceQuote.last ?? serviceQuote.close);
-        if (candidatePrice != null) {
+        // Fail-closed: only accept a strictly positive price. A zero / negative
+        // price (e.g. an empty Yahoo series from a wrong external symbol) would
+        // otherwise resolve to valueChf=0 and be marked trusted, injecting a
+        // phantom -100% loss into the P&L surface.
+        if (candidatePrice != null && candidatePrice > 0) {
           resolvedPriceNative = candidatePrice;
           resolvedValueChf = Number((candidatePrice * quantity * fxToChf).toFixed(2));
           quoteSource = serviceQuote.providerPath || quoteSource;
@@ -106,6 +110,10 @@ async function resolveHoldingQuotes({ holdingRows = [], approvedInstruments = []
           quoteAgeLabel = serviceQuote.ageLabel || 'unknown';
           quoteNote = serviceQuote.note || quoteNote;
         }
+      } else if (serviceQuote?.ok && !(asNumber(serviceQuote.price ?? serviceQuote.ask ?? serviceQuote.last ?? serviceQuote.close) > 0)) {
+        // Service claimed success but returned a non-positive/empty price.
+        // Reject it and fall back to the snapshot; never trust a zero valuation.
+        quoteNote = `Rejected ${serviceQuote.providerPath || 'service'} quote with non-positive price for ${externalSymbol || 'instrument'}; using holdings snapshot value instead.`;
       } else if (!brokerSupportsSnapshotValuation && snapshotValueChf != null) {
         quoteNote = 'Using the latest holdings snapshot value because broker/service quote resolution did not produce a fresher usable valuation.';
       }

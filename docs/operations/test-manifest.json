@@ -9,8 +9,8 @@
     "external"
   ],
   "counts": {
-    "total": 357,
-    "safe": 270,
+    "total": 358,
+    "safe": 271,
     "integration": 82,
     "live-smoke": 3,
     "external": 2,
@@ -1676,7 +1676,7 @@
     {
       "path": "scripts/test-profit-loss-surface-consistency.js",
       "lane": "safe",
-      "reason": "pure assert-style unit test",
+      "reason": "hermetic: deterministic stub transport + temp sandbox copy of portfolio dir; no live network or portfolio writes (2026-08-05)",
       "inVerifyRepoChecks": false,
       "quarantined": false
     },
@@ -1724,6 +1724,13 @@
     },
     {
       "path": "scripts/test-quote-quality-classifier.js",
+      "lane": "safe",
+      "reason": "pure assert-style unit test",
+      "inVerifyRepoChecks": false,
+      "quarantined": false
+    },
+    {
+      "path": "scripts/test-quote-resolution-zero-price-guard.js",
       "lane": "safe",
       "reason": "pure assert-style unit test",
       "inVerifyRepoChecks": false,
@@ -2089,7 +2096,7 @@
     {
       "path": "scripts/test-structured-summary-artifacts.js",
       "lane": "safe",
-      "reason": "pure assert-style unit test",
+      "reason": "hermetic: deterministic stub transport + temp sandbox copy of portfolio dir; asserts live artifacts untouched (2026-08-05)",
       "inVerifyRepoChecks": true,
       "quarantined": false
     },
