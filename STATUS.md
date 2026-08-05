@@ -2,7 +2,7 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-08-01 00:35 UTC · **Repo head:** `5085ca1` · **Tests:** 357 discovered (safe lane 267/0 green) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-08-05 00:25 UTC · **Repo head:** `ea029a0` · **Tests:** 358 discovered (safe lane 268/0 green) · **Health:** 🟢 healthy
 
 ---
 
@@ -39,6 +39,7 @@
 | **D1** | **DONE 2026-07-28** — multi-currency FX cash reconciliation (additive; CHF totals unchanged) | **none** | **—** |
 | **L2.A/B/C/E** | **DONE 2026-07-29** — file signing+tamper preflight / daily-loss breaker / ≥CHF25k co-sign / DR-drill runbook | **none** | **—** |
 | **Test hermeticity** | **DONE 2026-08-01** — routed resolveHoldingQuotes through Phase C client boundary; 3 tests (quote-resolution, profit-loss-consistency, structured-summary-artifacts) now use deterministic stub + temp sandbox, no live network/artifact writes | **none** | **—** |
+| **Quote fail-closed** | **DONE 2026-08-05** — non-positive fallback prices no longer accepted/trusted; stops phantom -100% P&L (UKGBPB/EMUAA via wrong Yahoo `.SW` symbols while TWS down); regression test added | **none** | **—** |
 | **L2.D** | DEFER — YubiKey/hardware safe-word; only worth it >CHF 500k per audit | operator hardware | Graham |
 | **M** | **DONE 2026-06-15** — R2SC filled + market-rule tick resolver shipped | **none** | **—** |
 | **L** | **L0 + L1.A–L1.D done; L1.E CLOSED won't fix 2026-06-11** | **none** | **—** |
