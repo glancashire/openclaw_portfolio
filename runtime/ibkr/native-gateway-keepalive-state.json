@@ -1,8 +1,8 @@
 {
   "lastRestartAt": "2026-05-17T11:02:57.836Z",
-  "lastReadyAt": "2026-07-16T08:00:11.712Z",
-  "awaiting2faSince": "2026-07-16T13:00:28.471Z",
-  "awaiting2faMailSentAt": "2026-07-27T13:01:13.135Z",
+  "lastReadyAt": "2026-08-29T13:00:39.612Z",
+  "awaiting2faSince": "2026-08-30T08:00:08.974Z",
+  "awaiting2faMailSentAt": "2026-08-30T08:00:09.116Z",
   "lastError": "awaiting_login_or_2fa",
-  "downMailSentAt": "2026-07-16T13:00:12.186Z"
+  "downMailSentAt": null
 }

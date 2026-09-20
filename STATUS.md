@@ -2,7 +2,9 @@
 
 > Single source of truth for current operational state.
 
-**Last refreshed:** 2026-08-05 00:25 UTC · **Repo head:** `ea029a0` · **Tests:** 358 discovered (safe lane 268/0 green) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-08-07 08:20 UTC · **Repo head:** `dbbd5f4` · **Tests:** 358 discovered (safe lane 268/0 green) · **Health:** 🟢 healthy
+
+> 2026-08-07 audit: `docs/audit/2026-08-07-ibkr-mcp-and-fx-audit.md`. IBKR native gateway recovered 2026-08-06 (stale-JVM pileup, cleared + re-auth). IBKR hosted **MCP read layer** now live. Dashboard↔broker FX drift root-caused; live-rate fix queued as **Phase N** (not yet built).
 
 ---
 
@@ -25,6 +27,8 @@
 | Safe-lane verification | 🟢 255 passed, 0 failed, 3 quarantined (fixture clock-drift resolved 2026-06-15) |
 | Pre-flight order safeguards | 🟢 SELL/BUY price floor+ceiling, notional caps, stale-quote, sellApproved gate, BUY trend guard |
 | IBKR tick-size conformance | 🟢 limit prices resolved from live market rules, not flat minTick (Phase M, 2026-06-15) |
+| IBKR hosted MCP read layer | 🟢 live (`openclaw.json` → `mcp.servers.ibkr`, OAuth, read-only tool filter, 20 read tools verified) — read+research only, execution stays native `:4001` |
+| Dashboard FX conversion | 🟡 seeds from stale `portfolio.md` hints (ledger carries no `ExchangeRate`); ~CHF 3.9k drift vs live net-liq. Fix designed → Phase N |
 | Daily transmit cap | 🟢 CHF 50k/day across all baskets (Phase L1.B) |
 | Approval intent | 🟢 consumed after every transmit attempt (Phase L1.A, no reuse window) |
 | Cron tool grants | 🟢 no live cron job carries `write`/`edit` (Phase L1.C) |
@@ -40,6 +44,8 @@
 | **L2.A/B/C/E** | **DONE 2026-07-29** — file signing+tamper preflight / daily-loss breaker / ≥CHF25k co-sign / DR-drill runbook | **none** | **—** |
 | **Test hermeticity** | **DONE 2026-08-01** — routed resolveHoldingQuotes through Phase C client boundary; 3 tests (quote-resolution, profit-loss-consistency, structured-summary-artifacts) now use deterministic stub + temp sandbox, no live network/artifact writes | **none** | **—** |
 | **Quote fail-closed** | **DONE 2026-08-05** — non-positive fallback prices no longer accepted/trusted; stops phantom -100% P&L (UKGBPB/EMUAA via wrong Yahoo `.SW` symbols while TWS down); regression test added | **none** | **—** |
+| **N** | **QUEUED (engineering)** — live-rate FX seed in holdingsSync (request `$LEDGER:ALL`/balances `exchange_rate`) + `sync-ibkr-accounting-snapshot.js` arg-parse fix | none (ready to build) | bb8 |
+| **MCP read layer** | **DONE 2026-08-06** — IBKR hosted MCP registered read-only in `openclaw.json`, OAuth authorized, verified | none | — |
 | **L2.D** | DEFER — YubiKey/hardware safe-word; only worth it >CHF 500k per audit | operator hardware | Graham |
 | **M** | **DONE 2026-06-15** — R2SC filled + market-rule tick resolver shipped | **none** | **—** |
 | **L** | **L0 + L1.A–L1.D done; L1.E CLOSED won't fix 2026-06-11** | **none** | **—** |
@@ -50,7 +56,7 @@
 
 **Shipped 2026-06-05 → 2026-07-28:** Phase K (energy sleeve filled), Phase L0 (pre-flight safeguards), Phase L1.A–L1.D (intent cleanup, daily cap, cron tightening, trend guard), Phase L1.E **CLOSED won't fix** 2026-06-11, Phase M (R2SC small-cap sleeve filled + IBKR market-rule tick resolver) 2026-06-15, **Phase 220** (dashboard return-metrics cleanup + performance windows + `src/quotes/` service layer: ordered provider fallback, health/cooldown, TTL cache, provenance/age) 2026-07-28, **Quote svc B/C** (console provider-health block + stable client boundary) 2026-07-29, **D1** (multi-currency FX cash reconciliation, CHF-neutral) 2026-07-28, **L2.A/B/C/E** (portfolio-file signing+tamper preflight, daily-loss circuit breaker, ≥CHF25k multi-party co-sign, monthly DR-drill runbook) 2026-07-28→29.
 
-**Next queued:** nothing in autonomous engineering scope. Remaining open items are calendar-gated (H2/H3 review), operator-gated (F4+G3 XLS drop, B5 2FA, L2.D hardware), or parked pending explicit reactivation (D2/D3). Plans: `plans/d1-fx-and-l2-safeguards.md` (L2.D deferred), `plans/quote-service-remaining.md` (fully shipped).
+**Next queued:** **Phase N** (FX live-rate seed + accounting-snapshot arg-parse fix) is the one autonomous-engineering item ready to build — see `docs/audit/2026-08-07-ibkr-mcp-and-fx-audit.md` §3–4. Other open items are calendar-gated (H2/H3 review), operator-gated (F4+G3 XLS drop, B5 2FA, L2.D hardware), or parked pending explicit reactivation (D2/D3). Plans: `plans/d1-fx-and-l2-safeguards.md` (L2.D deferred).
 
 Full plan: `PLAN.md`. Risk audit: `docs/risk-audit-2026-06-05.md`. L1.E close-out: `memory/2026-06-11.md`. Phase M tick-size doc: `docs/operations/ibkr-tick-sizes.md`.
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1",
-  "generatedAt": "2026-07-30T00:25:15.235Z",
+  "generatedAt": "2026-09-20T08:00:56.612Z",
   "portfolio": "acceptance-closure",
   "status": {
     "health": "warning",
@@ -8,8 +8,8 @@
     "brokerHealth": "degraded",
     "brokerMessage": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
     "executionPosture": "degraded_dry_run_only",
-    "deliveryPosture": "needs_operator_attention",
-    "dataFreshness": "stale"
+    "deliveryPosture": "ready",
+    "dataFreshness": "current"
   },
   "readiness": null,
   "holdings": {
@@ -114,7 +114,7 @@
   },
   "operatorQueue": {
     "summary": {
-      "total": 7,
+      "total": 6,
       "blocking": 6,
       "approvals": 0,
       "execution": 0,
@@ -123,13 +123,13 @@
       "openRunnerQueue": 0,
       "openRunnerRetry": 0,
       "recovery": 1,
-      "delivery": 1,
+      "delivery": 0,
       "data": 0,
       "warnings": 5,
       "workflow": 0,
       "bySeverity": {
         "high": 6,
-        "medium": 1,
+        "medium": 0,
         "low": 0
       }
     },
@@ -205,18 +205,6 @@
         "blocking": true,
         "recommendedOperatorAction": "Restore broker connectivity before relying on broker-backed pricing or live execution paths.",
         "source": "broker_readiness"
-      },
-      {
-        "rank": 7,
-        "queueType": "delivery",
-        "portfolio": "acceptance-closure",
-        "kind": "delivery",
-        "severity": "medium",
-        "status": "pending",
-        "summary": "Dashboard/report freshness is stale relative to source state.",
-        "blocking": false,
-        "recommendedOperatorAction": "Review report delivery readiness and clear the pending action.",
-        "source": "delivery_policy"
       }
     ]
   },
@@ -476,8 +464,7 @@
     "Missing concrete risk limit: Max single ETF allocation.",
     "Missing concrete risk limit: Max single issuer allocation.",
     "Portfolio still has open questions; trade execution must remain blocked.",
-    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-    "Dashboard/report freshness is stale relative to source state."
+    "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
   ],
   "recommendedNextStep": "Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.",
   "selfHealPlan": {
@@ -490,15 +477,11 @@
       "state": "critical",
       "summary": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "canonicalNextAction": "Restore native IBKR connectivity before relying on executable live-state surfaces.",
-      "blockerCount": 2,
+      "blockerCount": 1,
       "blockers": [
         {
           "code": "broker_unready",
           "message": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001"
-        },
-        {
-          "code": "delivery_attention",
-          "message": "Dashboard/report freshness is stale relative to source state."
         }
       ],
       "recommendedActions": [
@@ -555,8 +538,8 @@
         "ok": true,
         "kind": "restart_ibkr_gateway_if_socket_dead",
         "applied": false,
-        "blocked": "outside_daytime_window",
-        "summary": "Skipped IBKR restart because the check ran outside the daytime window.",
+        "blocked": "operator_present_restart_only",
+        "summary": "Restart the native IBKR gateway during market hours or notify the operator.",
         "budget": {
           "blocked": null,
           "attempts": 0,
@@ -629,35 +612,35 @@
   },
   "recentMaterialEvents": [
     {
-      "time": "2026-07-30 00:25:15.161 UTC",
+      "time": "2026-09-20 08:00:56.558 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-07-30 00:25:12.296 UTC",
+      "time": "2026-09-20 08:00:09.868 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-07-30 00:24:35.167 UTC",
+      "time": "2026-09-19 20:00:23.428 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-07-29 20:00:12.017 UTC",
+      "time": "2026-09-19 14:00:09.747 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "nextStep": "Resolve the blocking condition before proceeding."
     },
     {
-      "time": "2026-07-29 14:00:15.931 UTC",
+      "time": "2026-09-19 08:00:07.594 UTC",
       "eventType": "safety_controls_blocked",
       "severity": "warn",
       "summary": "Portfolio still has open questions; trade execution must remain blocked. | Holdings and pricing are still simulated. | Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
@@ -682,12 +665,10 @@
     }
   },
   "delivery": {
-    "ready": false,
+    "ready": true,
     "mode": "email_and_repo",
     "failureAlertMode": "local_operator_review",
-    "pendingActions": [
-      "Dashboard/report freshness is stale relative to source state."
-    ]
+    "pendingActions": []
   },
   "runtimeState": {
     "brokerAutomationPaused": false,

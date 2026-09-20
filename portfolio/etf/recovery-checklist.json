@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-07-30T00:25:15.361Z",
+  "generatedAt": "2026-09-20T08:00:56.689Z",
   "portfolio": "etf",
   "incidentStatus": "action_required",
   "summary": {
@@ -341,13 +341,13 @@
     {
       "rank": 1,
       "severity": "warn",
-      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "timestamp": null
     },
     {
       "rank": 2,
       "severity": "warn",
-      "summary": "Requested instrument is not in Approved Instruments.",
+      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
       "timestamp": null
     },
     {
@@ -365,7 +365,7 @@
     {
       "rank": 5,
       "severity": "warn",
-      "summary": "Missing concrete risk limit: Max single ETF allocation. | Missing concrete risk limit: Max single issuer allocation. | Missing concrete risk limit: Max cash drag after full deployment.",
+      "summary": "Portfolio requires confirmation before first live trade. | Broker readiness is not healthy: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
       "timestamp": null
     }
   ]

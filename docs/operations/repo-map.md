@@ -39,7 +39,7 @@ A 60-second orientation for the live repo. Updated 2026-06-02 during current-doc
 
 ### Current engineering truth
 - `SPECIFICATION.md` - system contract
-- `CURRENT_PLAN.md` - open work, open decisions, recommended execution order
+- `PLAN.md` - open work, open decisions, recommended execution order
 - `STATUS.md` - operational health / blocked state snapshot
 
 ## Current docs worth reading first
@@ -68,7 +68,7 @@ A 60-second orientation for the live repo. Updated 2026-06-02 during current-doc
 
 - **What is the system supposed to do?** -> `SPECIFICATION.md`
 - **What is the current health/blocker picture?** -> `STATUS.md`
-- **What is still open, and in what order?** -> `CURRENT_PLAN.md`
+- **What is still open, and in what order?** -> `PLAN.md`
 - **What is running on timers?** -> `docs/operations/active-cron-jobs.md`
 - **Why is live trading blocked?** -> `docs/operations/ibkr-recovery.md`
 - **How do I verify a change safely?** -> `docs/test-governance.md` then `npm test`

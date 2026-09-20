@@ -4,13 +4,13 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-07-28T20:30:16.881Z"
+      "lastAt": "2026-08-24T08:55:08.035Z"
     },
     "portfolio": {
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-07-28T20:30:51.689Z"
+      "lastAt": "2026-09-18T09:31:48.414Z"
     },
     "execution-safety-closure-404Wwt": {
       "consecutive": 0,
@@ -28,7 +28,7 @@
       "consecutive": 1,
       "lastReason": "status_error",
       "lastMessage": "temporary issue",
-      "lastAt": "2026-07-28T20:30:27.703Z"
+      "lastAt": "2026-08-24T08:55:18.329Z"
     },
     "etf": {
       "consecutive": 0,
@@ -82,7 +82,7 @@
       "consecutive": 0,
       "lastReason": null,
       "lastMessage": null,
-      "lastAt": "2026-07-28T09:30:42.076Z"
+      "lastAt": "2026-09-18T09:31:40.904Z"
     },
     "execution-safety-closure-hRd2yl": {
       "consecutive": 0,
@@ -749,6 +749,228 @@
       "lastReason": null,
       "lastMessage": null,
       "lastAt": "2026-07-28T09:30:15.809Z"
+    },
+    "execution-safety-closure-pHhRf9": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-29T00:19:53.570Z"
+    },
+    "execution-safety-closure-WRNoHy": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-29T00:20:00.859Z"
+    },
+    "execution-safety-closure-tjXyWK": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-29T09:30:28.310Z"
+    },
+    "execution-safety-closure-c6jvYz": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-30T00:24:14.280Z"
+    },
+    "execution-safety-closure-U5mBI2": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-30T09:30:19.429Z"
+    },
+    "execution-safety-closure-rHcmkt": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-30T09:32:47.169Z"
+    },
+    "execution-safety-closure-tOx2kJ": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-31T09:30:24.504Z"
+    },
+    "execution-safety-closure-7fHQtc": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-31T19:08:19.119Z"
+    },
+    "execution-safety-closure-xDebJj": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-31T19:12:45.389Z"
+    },
+    "execution-safety-closure-0T2klE": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-07-31T19:24:45.481Z"
+    },
+    "execution-safety-closure-URe65I": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-03T09:30:24.073Z"
+    },
+    "execution-safety-closure-Qaogny": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-04T09:30:26.684Z"
+    },
+    "execution-safety-closure-l96Rte": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-05T00:20:04.604Z"
+    },
+    "execution-safety-closure-BRtXSv": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-05T00:21:49.776Z"
+    },
+    "execution-safety-closure-yLDbuF": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-05T09:30:23.866Z"
+    },
+    "execution-safety-closure-XKiJhR": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-06T09:30:21.295Z"
+    },
+    "execution-safety-closure-LNFVKP": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-07T09:30:20.839Z"
+    },
+    "execution-safety-closure-sheGnG": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-24T09:30:17.428Z"
+    },
+    "execution-safety-closure-Nb3de8": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-24T09:31:15.367Z"
+    },
+    "execution-safety-closure-o0CzmC": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-25T09:30:16.982Z"
+    },
+    "execution-safety-closure-b4X8VU": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-26T09:30:16.342Z"
+    },
+    "execution-safety-closure-FehKre": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-27T09:30:49.242Z"
+    },
+    "execution-safety-closure-gRdYLo": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-27T09:32:53.410Z"
+    },
+    "execution-safety-closure-oJzW9e": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-28T09:30:17.127Z"
+    },
+    "execution-safety-closure-Tz4KpJ": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-31T09:30:19.343Z"
+    },
+    "execution-safety-closure-lAsbBk": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-31T09:34:47.286Z"
+    },
+    "execution-safety-closure-VamK7e": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-08-31T09:35:51.757Z"
+    },
+    "execution-safety-closure-GW8HmA": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-01T09:30:14.641Z"
+    },
+    "execution-safety-closure-7iDWp2": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-02T09:30:16.165Z"
+    },
+    "execution-safety-closure-KitaUS": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-03T09:30:37.428Z"
+    },
+    "execution-safety-closure-HMkdVt": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-04T09:30:15.871Z"
+    },
+    "execution-safety-closure-P0Zjdt": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-10T09:30:18.522Z"
+    },
+    "execution-safety-closure-aS4sW4": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-10T09:35:59.460Z"
+    },
+    "execution-safety-closure-ME1xVw": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-11T09:30:39.427Z"
+    },
+    "execution-safety-closure-B07l3F": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-14T09:30:19.200Z"
+    },
+    "execution-safety-closure-WRoTS1": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-15T09:30:32.802Z"
+    },
+    "execution-safety-closure-XhBlBD": {
+      "consecutive": 0,
+      "lastReason": null,
+      "lastMessage": null,
+      "lastAt": "2026-09-18T09:31:19.418Z"
     }
   },
   "liveExecutionArms": {

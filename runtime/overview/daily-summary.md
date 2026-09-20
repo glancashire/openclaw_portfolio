@@ -3,20 +3,20 @@
 ## Headline
 - Overall health: warning
 - Portfolios tracked: 2
-- Cash waiting to deploy CHF: 208.26
+- Cash waiting to deploy CHF: 223.36
 - Pending approvals: 0
 - Broker health: degraded
-- Reporting health: attention_needed
+- Reporting health: ready
 - Recommended next step: Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001
 
 ## Biggest Drift Today
 - acceptance-closure: Global equities drift -50% (out_of_bounds)
-- Why it matters: Global equities is 16.6% over target and outside the allowed band around the 65% target.
+- Why it matters: Global equities is 17.13% over target and outside the allowed band around the 65% target.
 
 ## Highlighted Portfolio
 - Portfolio: etf
 - Health: warning
-- Cash CHF: 208.26
+- Cash CHF: 223.36
 - Broker health: degraded
 - Delivery posture: ready
 - Pending approvals: 0

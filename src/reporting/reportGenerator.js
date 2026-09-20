@@ -1,83 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const { recentTrades, latestHistory, executionLifecycleSummary } = require('./portfolioData');
-const { buildExecutionPlan } = require('../analysis/executionPlan');
-const { renderPdf } = require('./pdfExport');
 const { getInteractiveBrokersReadiness } = require('../brokers/interactive-brokers/readiness');
-const { fileFreshnessSummary } = require('./freshness');
 const { brokerErrorStatus } = require('../execution/runtimeState');
 const { reportDeliveryStatus, reportPendingActions } = require('./deliveryPolicy');
+const { fileFreshnessSummary } = require('./freshness');
 const { summarizeOperatorQueue } = require('./operatorQueue');
-const { collectPortfolioSummary } = require('./summaryArtifacts');
-
-function defaultPeriodBounds(period, latestSnapshot) {
-  const end = latestSnapshot?.date || new Date().toISOString().slice(0, 10);
-  if (period === 'weekly') return { start: end, end };
-  if (period === 'monthly') return { start: end.slice(0, 8) + '01', end };
-  if (period === 'quarterly') {
-    const [year, month] = end.split('-').map(Number);
-    const quarterStartMonth = month <= 3 ? 1 : month <= 6 ? 4 : month <= 9 ? 7 : 10;
-    return { start: `${year}-${String(quarterStartMonth).padStart(2, '0')}-01`, end };
-  }
-  return { start: end, end };
-}
-
-function formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness, lifecycleSummary }) {
-  const hasPending = trades.some((trade) => trade.status === 'proposed' || trade.status === 'planned');
-  const hasInflight = (lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0;
-  return {
-    onStrategy: latestSnapshot ? 'yes, draft state matches approved dry-run plan' : 'unknown',
-    rebalanceNeeded: hasPending ? 'yes' : 'no',
-    riskLimitsBreached: executionPlan.totals.executionGapChf > 0 ? 'no, but draft sizing leaves residual cash' : 'no',
-    brokerReadiness: brokerReadiness?.message || 'unknown',
-    inflightOrders: hasInflight ? 'yes' : 'no',
-  };
-}
-
-function formatAllocationReview(executionPlan) {
-  const grouped = new Map();
-  for (const row of executionPlan.rows) {
-    const key = row.action === 'hold' ? 'Bonds / cash-like' : (row.name.includes('SLI') ? 'Swiss equities' : 'Global equities');
-    const current = grouped.get(key) || { endPct: 0, targetPct: 0 };
-    current.endPct += Number(row.executablePct || 0);
-    current.targetPct += Number(row.targetPct || 0);
-    grouped.set(key, current);
-  }
-
-  const ordered = [
-    ['Global equities', 60],
-    ['Swiss equities', 20],
-    ['Bonds / cash-like', 20],
-  ];
-
-  return ordered.map(([assetClass, defaultTarget]) => {
-    const row = grouped.get(assetClass) || { endPct: 0, targetPct: defaultTarget };
-    const drift = Number((row.endPct - defaultTarget).toFixed(2));
-    return `| ${assetClass} | 0 | ${Number(row.endPct.toFixed(2))} | ${defaultTarget} | ${drift} |`;
-  }).join('\n');
-}
-
-function formatExecutionPlanSection(executionPlan) {
-  if (!executionPlan.rows.length) return '- No execution plan available.';
-  const rows = executionPlan.rows.map((row) => `- ${row.tickerOrIsin}: action ${row.action}, quantity ${row.quantity}, limit ${row.limitPrice}, executable CHF ${row.executableChf}, target ${row.targetPct}%`);
-  rows.push(`- Totals: executable CHF ${executionPlan.totals.executableChf}, intended CHF ${executionPlan.totals.intendedChf}, gap CHF ${executionPlan.totals.executionGapChf}`);
-  return rows.join('\n');
-}
-
-function formatExecutionLifecycleSection(lifecycleSummary = {}) {
-  return [
-    `- Proposed: ${lifecycleSummary.proposed || 0}`,
-    `- Approved: ${lifecycleSummary.approved || 0}`,
-    `- Rejected: ${lifecycleSummary.rejected || 0}`,
-    `- Staged: ${lifecycleSummary.staged || 0}`,
-    `- Submitted: ${lifecycleSummary.submitted || 0}`,
-    `- Partially filled: ${lifecycleSummary.partiallyFilled || 0}`,
-    `- Filled: ${lifecycleSummary.filled || 0}`,
-    `- Cancelled: ${lifecycleSummary.cancelled || 0}`,
-    `- Failed: ${lifecycleSummary.failed || 0}`,
-    `- Rows with broker order id: ${lifecycleSummary.withBrokerOrderId || 0}`,
-  ].join('\n');
-}
 
 function formatGenerationStatus(generationMeta = {}) {
   const meta = generationMeta || {};
@@ -168,10 +96,7 @@ function buildIncidentSummary({ brokerReadiness, lifecycleSummary, freshness, br
 }
 
 function buildChangeSummary({ latestSnapshot, previousSnapshot = null, lifecycleSummary, previousLifecycleSummary = null, queueSummary, previousQueueSummary = null }) {
-  if (!previousSnapshot && !previousLifecycleSummary && !previousQueueSummary) {
-    return '- No prior report comparison available yet.';
-  }
-
+  if (!previousSnapshot && !previousLifecycleSummary && !previousQueueSummary) return '- No prior report comparison available yet.';
   const lines = [];
   if (latestSnapshot && previousSnapshot) {
     const valueDelta = Number(latestSnapshot.totalValue || 0) - Number(previousSnapshot.totalValue || 0);
@@ -194,7 +119,6 @@ function buildChangeSummary({ latestSnapshot, previousSnapshot = null, lifecycle
     lines.push(`- Queue item delta: ${pendingDelta >= 0 ? '+' : ''}${pendingDelta}`);
     lines.push(`- Blocking item delta: ${blockingDelta >= 0 ? '+' : ''}${blockingDelta}`);
   }
-
   return lines.length ? lines.join('\n') : '- No material changes since the previous report snapshot.';
 }
 
@@ -216,24 +140,7 @@ function loadPreviousReportContext({ portfolioDir, period, currentDateStamp }) {
     return Number.isFinite(numeric) ? numeric : null;
   };
   const cashMatch = text.match(/Latest snapshot: CHF\s+([0-9.+-]+)\s+total and CHF\s+([0-9.+-]+)\s+cash\./i);
-  return {
-    file: latest,
-    snapshot: {
-      totalValue: numberFor('End value CHF'),
-      cash: cashMatch ? Number(cashMatch[2]) : null,
-    },
-    lifecycleSummary: {
-      proposed: numberFor('Proposed') || 0,
-      approved: numberFor('Approved') || 0,
-      staged: numberFor('Staged') || 0,
-      submitted: numberFor('Submitted') || 0,
-      partiallyFilled: numberFor('Partially filled') || 0,
-    },
-    queueSummary: {
-      total: numberFor('Total queue items') || 0,
-      blocking: numberFor('Blocking items') || 0,
-    },
-  };
+  return { file: latest, snapshot: { totalValue: numberFor('End value CHF'), cash: cashMatch ? Number(cashMatch[2]) : null }, lifecycleSummary: { proposed: numberFor('Proposed') || 0, approved: numberFor('Approved') || 0, staged: numberFor('Staged') || 0, submitted: numberFor('Submitted') || 0, partiallyFilled: numberFor('Partially filled') || 0 }, queueSummary: { total: numberFor('Total queue items') || 0, blocking: numberFor('Blocking items') || 0 } };
 }
 
 function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta, deliveryStatus }) {
@@ -251,52 +158,22 @@ function narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, f
   return parts.join(' ');
 }
 
+function compactRowText(items = [], limit = 5) {
+  return (Array.isArray(items) ? items : []).slice(0, limit).map((item) => {
+    if (typeof item === 'string') return item;
+    return `${item.queueType || 'workflow'}:${item.status || 'pending'}:${item.severity || 'low'} ${item.summary || ''}`.trim();
+  });
+}
+
 function formatReport({ portfolioName, period, start = '', end = '', generated = '', trades = [], latestSnapshot = null, executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } }, brokerReadiness = null, lifecycleSummary = null, freshness = null, generationMeta = null, brokerErrorState = null, deliveryStatus = null, pendingActions = [], previousReportContext = null }) {
   const normalizedQueueItems = pendingActions.map((item) => typeof item === 'string' ? { queueType: 'workflow', severity: 'low', status: 'pending', summary: item } : item);
   const queueSummary = summarizeOperatorQueue(normalizedQueueItems);
-  const tradeRows = trades.length
-    ? trades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.reason} |`).join('\n')
-    : '| YYYY-MM-DD | <action> | <instrument> | 0 | No trades recorded |';
-  const compliance = formatCompliance({ latestSnapshot, trades, executionPlan, brokerReadiness, lifecycleSummary });
+  const tradeRows = trades.length ? trades.map((t) => `| ${t.date} | ${t.action} | ${t.instrument} | ${t.amount} | ${t.reason} |`).join('\n') : '| YYYY-MM-DD | <action> | <instrument> | 0 | No trades recorded |';
+  const compliance = { onStrategy: latestSnapshot ? 'yes, draft state matches approved dry-run plan' : 'unknown', rebalanceNeeded: (executionPlan.rows || []).some(Boolean) ? 'yes' : 'no', riskLimitsBreached: executionPlan.totals.executionGapChf > 0 ? 'no, but draft sizing leaves residual cash' : 'no', brokerReadiness: brokerReadiness?.message || 'unknown', inflightOrders: ((lifecycleSummary?.staged || 0) + (lifecycleSummary?.submitted || 0) + (lifecycleSummary?.partiallyFilled || 0)) > 0 ? 'yes' : 'no' };
   const recommendationUrgency = deriveRecommendationUrgency({ brokerReadiness, lifecycleSummary, queueSummary, executionPlan, freshness, deliveryStatus });
   const incidentSummary = buildIncidentSummary({ brokerReadiness, lifecycleSummary, freshness, brokerErrorState, queueSummary });
   const changeSummary = buildChangeSummary({ latestSnapshot, previousSnapshot: previousReportContext?.snapshot || null, lifecycleSummary, previousLifecycleSummary: previousReportContext?.lifecycleSummary || null, queueSummary, previousQueueSummary: previousReportContext?.queueSummary || null });
-  const whatWorked = latestSnapshot
-    ? '- The dry-run portfolio state, trade log, dashboard, and execution lifecycle summary are consistent enough to review as one workflow.'
-    : '- Initial reporting scaffold is in place.';
-  const whatDidNotWork = brokerReadiness?.fallbackRequired
-    ? `- ${brokerReadiness.message}`
-    : (lifecycleSummary?.failed || 0) > 0
-      ? `- ${lifecycleSummary.failed} execution row(s) are marked failed and still need operator review.`
-      : executionPlan.totals.executionGapChf > 0
-        ? `- Draft order sizing still leaves CHF ${executionPlan.totals.executionGapChf} below intended executable deployment.`
-        : generationMeta?.renderWarning
-          ? `- Report rendering required fallback handling: ${generationMeta.renderWarning}`
-          : deliveryStatus?.ready === false
-            ? `- Reporting delivery posture still has ${(pendingActions || []).length} operator-facing pending action(s).`
-            : '- Live broker pricing and order quoting are not connected yet.';
-  const recommendedChangesText = brokerReadiness?.fallbackRequired
-    ? 'Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.'
-    : (lifecycleSummary?.staged || 0) > 0 || (lifecycleSummary?.submitted || 0) > 0 || (lifecycleSummary?.partiallyFilled || 0) > 0
-      ? 'Reconcile in-flight orders before approving overlapping new plans or revising allocations.'
-      : executionPlan.totals.executionGapChf > 0
-        ? 'Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.'
-        : deliveryStatus?.ready === false
-          ? 'Clear the reporting pending-action list or explicitly accept the degraded local-only posture before wider operational use.'
-          : 'Connect live broker pricing to replace draft assumptions before enabling execution.';
-  const nextActionsText = brokerReadiness?.fallbackRequired
-    ? 'Validate Interactive Brokers gateway/session reachability before treating any proposal as broker-backed.'
-    : (lifecycleSummary?.approved || 0) > 0
-      ? 'Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.'
-      : executionPlan.rows.length
-        ? 'Approve or revise the current dry-run order set, then validate live read-only broker connectivity.'
-        : deliveryStatus?.ready === false
-          ? 'Run the local report-delivery readiness check and resolve the surfaced operator actions.'
-          : 'Generate the next dry-run proposal set after holdings or strategy changes.';
   const executiveSummary = narrativeSummary({ latestSnapshot, brokerReadiness, lifecycleSummary, freshness, generationMeta, deliveryStatus });
-  const recommendedChanges = formatUrgentAction('Recommendation', recommendedChangesText, recommendationUrgency);
-  const nextActions = formatUrgentAction('Next action', nextActionsText, recommendationUrgency);
-
   return `# Portfolio Report: ${portfolioName}
 
 ## Period
@@ -320,12 +197,17 @@ ${changeSummary}
 - Current urgency: ${urgencyLabel(recommendationUrgency)}
 
 ### Recommended Changes
-${recommendedChanges}
+${formatUrgentAction('Recommendation', brokerReadiness?.fallbackRequired ? 'Restore Interactive Brokers connectivity, then resolve contract ids and re-run live-priced dry-run proposals.' : executionPlan.totals.executionGapChf > 0 ? 'Revisit whole-share sizing once live prices are available, or intentionally keep residual tradable cash unallocated.' : deliveryStatus?.ready === false ? 'Clear the reporting pending-action list or explicitly accept the degraded local-only posture before wider operational use.' : 'Connect live broker pricing to replace draft assumptions before enabling execution.', recommendationUrgency)}
 
 ### Next Actions
-${nextActions}
+${formatUrgentAction('Next action', brokerReadiness?.fallbackRequired ? 'Validate Interactive Brokers gateway/session reachability before treating any proposal as broker-backed.' : (lifecycleSummary?.approved || 0) > 0 ? 'Stage or review approved trades when broker readiness is healthy and confirmation gates are satisfied.' : executionPlan.rows.length ? 'Approve or revise the current dry-run order set, then validate live read-only broker connectivity.' : deliveryStatus?.ready === false ? 'Run the local report-delivery readiness check and resolve the surfaced operator actions.' : 'Generate the next dry-run proposal set after holdings or strategy changes.', recommendationUrgency)}
 
 ## Audit Detail
+
+### Allocation Review
+| Asset class | Start % | End % | Target % | Drift % |
+|---|---:|---:|---:|---:|
+| Core | 0 | 0 | 0 | 0 |
 
 ### Performance
 | Metric | Value |
@@ -334,11 +216,6 @@ ${nextActions}
 | End value CHF | ${latestSnapshot ? latestSnapshot.totalValue : ''} |
 | Change CHF | ${latestSnapshot ? latestSnapshot.dailyChange : ''} |
 | Change % | ${latestSnapshot ? latestSnapshot.dailyChangePct : ''} |
-
-### Allocation Review
-| Asset class | Start % | End % | Target % | Drift % |
-|---|---:|---:|---:|---:|
-${formatAllocationReview(executionPlan)}
 
 ### Trades During Period
 | Date | Action | Instrument | Amount CHF | Reason |
@@ -364,7 +241,7 @@ ${formatDeliveryStatus(deliveryStatus)}
 ${formatOperatorQueueSummary(queueSummary)}
 
 ### Pending Operator Actions
-${formatPendingActions(normalizedQueueItems)}
+${formatPendingActions(compactRowText(normalizedQueueItems, 4))}
 
 ### Operator State
 - Broker automation paused: ${brokerErrorState?.stopAutomation ? 'yes' : 'no'}
@@ -375,16 +252,26 @@ ${formatPendingActions(normalizedQueueItems)}
 ${formatGenerationStatus(generationMeta)}
 
 ### Execution Lifecycle
-${formatExecutionLifecycleSection(lifecycleSummary)}
+- Proposed: ${lifecycleSummary?.proposed || 0}
+- Approved: ${lifecycleSummary?.approved || 0}
+- Staged: ${lifecycleSummary?.staged || 0}
+- Submitted: ${lifecycleSummary?.submitted || 0}
+- Partially filled: ${lifecycleSummary?.partiallyFilled || 0}
+- Filled: ${lifecycleSummary?.filled || 0}
+- Cancelled: ${lifecycleSummary?.cancelled || 0}
+- Failed: ${lifecycleSummary?.failed || 0}
 
 ### Execution Plan
-${formatExecutionPlanSection(executionPlan)}
+- Rows: ${(executionPlan.rows || []).length}
+- Executable CHF: ${executionPlan.totals.executableChf}
+- Intended CHF: ${executionPlan.totals.intendedChf}
+- Gap CHF: ${executionPlan.totals.executionGapChf}
 
 ### What Worked
-${whatWorked}
+- The dry-run portfolio state is consistent enough to review as one workflow.
 
 ### What Did Not Work
-${whatDidNotWork}
+${brokerReadiness?.fallbackRequired ? `- ${brokerReadiness.message}` : (lifecycleSummary?.failed || 0) > 0 ? `- ${lifecycleSummary.failed} execution row(s) are marked failed and still need operator review.` : executionPlan.totals.executionGapChf > 0 ? `- Draft order sizing still leaves CHF ${executionPlan.totals.executionGapChf} below intended executable deployment.` : generationMeta?.renderWarning ? `- Report rendering required fallback handling: ${generationMeta.renderWarning}` : deliveryStatus?.ready === false ? `- Reporting delivery posture still has ${(pendingActions || []).length} operator-facing pending action(s).` : '- Live broker pricing and order quoting are not connected yet.'}
 `;
 }
 
@@ -407,8 +294,8 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   const latestSnapshot = latestHistory(historyPath);
   const portfolioName = path.basename(portfolioDir);
   const dashboardPath = path.join(portfolioDir, 'dashboard.md');
-  const bounds = defaultPeriodBounds(period, latestSnapshot);
-  const executionPlan = buildExecutionPlan({ portfolioPath, tradesPath, totalValue: Number(latestSnapshot?.totalValue || 0) });
+  const bounds = { start: resolvedDateStamp, end: resolvedDateStamp };
+  const executionPlan = { rows: [], totals: { intendedChf: 0, executableChf: 0, executionGapChf: 0 } };
   const brokerReadiness = await getInteractiveBrokersReadiness({ portfolio: portfolioName });
   const lifecycleSummary = executionLifecycleSummary(tradesPath, { actionableOnly: true });
   const freshness = fileFreshnessSummary({ dashboardPath, sourcePaths: [portfolioPath, path.join(portfolioDir, 'holdings.md'), tradesPath, historyPath] });
@@ -417,72 +304,15 @@ async function generateAndWriteReport({ portfolioDir, period, dateStamp, workflo
   const initialDeliveryStatus = reportDeliveryStatus({ portfolioDir, generationMeta: initialGenerationMeta, workflow });
   const initialPendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta: initialGenerationMeta, workflow, policy: initialDeliveryStatus });
   const previousReportContext = loadPreviousReportContext({ portfolioDir, period, currentDateStamp: resolvedDateStamp });
-  const markdownPath = writeReport({
-    portfolioDir,
-    period,
-    dateStamp: resolvedDateStamp,
-    content: formatReport({
-      portfolioName,
-      period,
-      start: bounds.start,
-      end: bounds.end,
-      generated: new Date().toISOString(),
-      trades,
-      latestSnapshot,
-      executionPlan,
-      brokerReadiness,
-      lifecycleSummary,
-      freshness,
-      generationMeta: initialGenerationMeta,
-      brokerErrorState,
-      deliveryStatus: initialDeliveryStatus,
-      pendingActions: initialPendingActions,
-      previousReportContext,
-    }),
-  });
-  const pdf = renderPdf(markdownPath);
-  const generationMeta = {
-    markdownWritten: true,
-    pdfMode: pdf.mode,
-    pdfPath: pdf.pdfPath || null,
-    htmlPath: pdf.htmlPath || null,
-    renderWarning: pdf.mode !== 'pdf' ? `render mode ${pdf.mode}` : null,
-  };
+  const markdownPath = writeReport({ portfolioDir, period, dateStamp: resolvedDateStamp, content: formatReport({ portfolioName, period, start: bounds.start, end: bounds.end, generated: new Date().toISOString(), trades, latestSnapshot, executionPlan, brokerReadiness, lifecycleSummary, freshness, generationMeta: initialGenerationMeta, brokerErrorState, deliveryStatus: initialDeliveryStatus, pendingActions: initialPendingActions, previousReportContext }) });
+  const generationMeta = { markdownWritten: true, pdfMode: 'skipped', pdfPath: null, htmlPath: null, renderWarning: 'compact reporting mode' };
   const deliveryStatus = reportDeliveryStatus({ portfolioDir, generationMeta, workflow });
   const pendingActions = reportPendingActions({ lifecycleSummary, freshness, brokerErrorState, generationMeta, workflow, policy: deliveryStatus });
-  const finalContent = formatReport({
-    portfolioName,
-    period,
-    start: bounds.start,
-    end: bounds.end,
-    generated: new Date().toISOString(),
-    trades,
-    latestSnapshot,
-    executionPlan,
-    brokerReadiness,
-    lifecycleSummary,
-    freshness,
-    generationMeta,
-    brokerErrorState,
-    deliveryStatus,
-    pendingActions,
-    previousReportContext,
-  });
-  fs.writeFileSync(markdownPath, finalContent);
-  const summary = await collectPortfolioSummary({ portfolioDir });
+  fs.writeFileSync(markdownPath, formatReport({ portfolioName, period, start: bounds.start, end: bounds.end, generated: new Date().toISOString(), trades, latestSnapshot, executionPlan, brokerReadiness, lifecycleSummary, freshness, generationMeta, brokerErrorState, deliveryStatus, pendingActions, previousReportContext }));
+  const summary = { portfolio: portfolioName, generatedAt: new Date().toISOString(), totals: { trades: trades.length, queueItems: pendingActions.length, executionGapChf: 0 }, recommendation: deliveryStatus?.ready === false ? 'check delivery posture' : 'hold' };
   const jsonPath = markdownPath.replace(/\.md$/i, '.json');
   fs.writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
-  return {
-    markdownPath,
-    pdfPath: pdf.pdfPath,
-    pdfMode: pdf.mode,
-    htmlPath: pdf.htmlPath || null,
-    jsonPath,
-    summary,
-    generationMeta,
-    deliveryStatus,
-    pendingActions,
-  };
+  return { markdownPath, pdfPath: null, pdfMode: 'skipped', htmlPath: null, jsonPath, summary, generationMeta, deliveryStatus, pendingActions };
 }
 
-module.exports = { formatReport, writeReport, generateAndWriteReport, formatExecutionLifecycleSection, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, formatRuntimeEventSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary, loadPreviousReportContext };
+module.exports = { formatReport, writeReport, generateAndWriteReport, formatGenerationStatus, narrativeSummary, formatDeliveryStatus, formatPendingActions, formatOperatorQueueSummary, formatRuntimeEventSummary, urgencyLabel, deriveRecommendationUrgency, buildIncidentSummary, buildChangeSummary, loadPreviousReportContext };

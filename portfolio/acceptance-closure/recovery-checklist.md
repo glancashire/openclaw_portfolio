@@ -5,8 +5,8 @@
 - Health: warning
 - Broker health: degraded
 - Execution posture: degraded_dry_run_only
-- Delivery posture: needs_operator_attention
-- Data freshness: stale
+- Delivery posture: ready
+- Data freshness: current
 - Pending approvals: 0
 - Recommended next step: Resolve the active blocker: Portfolio still has open questions; trade execution must remain blocked.
 
@@ -16,7 +16,6 @@
 
 ## Incident Drivers
 - Broker readiness is degraded, so broker-backed pricing/execution paths should be treated as unavailable until recovered.
-- Data freshness is stale, so recommendations and execution paths should be treated as suspect until refreshed.
 - 5 explicit blocker(s) are preventing a healthy operating posture.
 
 ## Active Blockers
@@ -54,14 +53,10 @@
    - Action: Restore broker connectivity before relying on broker-backed pricing or live execution paths.
    - Verify: Confirm the blocking condition is cleared from the operator queue and no longer appears in blockers or status posture.
    - Source: broker_readiness
-7. [medium] Dashboard/report freshness is stale relative to source state.
-   - Action: Review report delivery readiness and clear the pending action.
-   - Verify: Confirm the queue item is resolved, acknowledged, or intentionally deferred with current operator understanding.
-   - Source: delivery_policy
 
 ## Verification Checks
 - Broker health returns to healthy or the operator intentionally keeps the portfolio in draft-only mode.
-- Dashboard, holdings, and summary inputs are refreshed until the stale posture clears.
+- Freshness posture remains current.
 - No approval backlog remains.
 - Active blockers are cleared or explicitly documented as accepted constraints.
 

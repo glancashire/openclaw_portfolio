@@ -1,16 +1,16 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-07-28T20:30:26.598Z",
+  "generatedAt": "2026-09-20T08:00:56.694Z",
   "totals": {
     "portfolioCount": 2,
-    "totalCashChf": 208.26,
+    "totalCashChf": 223.36,
     "approvalCount": 0,
     "healthy": 0,
     "warning": 2,
     "blocked": 0
   },
   "healthHeadline": "warning",
-  "cashWaitingToDeployChf": 208.26,
+  "cashWaitingToDeployChf": 223.36,
   "biggestDrift": {
     "portfolio": "acceptance-closure",
     "assetClass": "Global equities",
@@ -19,14 +19,14 @@
     "absDrift": 50
   },
   "brokerHealth": "degraded",
-  "reportingHealth": "attention_needed",
+  "reportingHealth": "ready",
   "pendingApprovals": 0,
   "recommendedNextStep": "Interactive Brokers is not ready; broker-backed pricing falls back to draft assumptions. Detail: connect ECONNREFUSED 127.0.0.1:4001",
-  "biggestDriftWhy": "Global equities is 16.6% over target and outside the allowed band around the 65% target.",
+  "biggestDriftWhy": "Global equities is 17.13% over target and outside the allowed band around the 65% target.",
   "highlightedPortfolio": {
     "portfolio": "etf",
     "health": "warning",
-    "cashChf": 208.26,
+    "cashChf": 223.36,
     "brokerHealth": "degraded",
     "deliveryPosture": "ready",
     "pendingApprovals": 0,

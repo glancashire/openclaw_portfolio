@@ -1,7 +1,7 @@
 # Health Report: etf
 
 ## Management summary
-- Generated at: 2026-07-29T20:00:12.159Z
+- Generated at: 2026-09-20T08:00:56.707Z
 - Current status: blocked (high)
 - Management summary: Restore native IBKR connectivity before relying on executable live-state surfaces.
 - Next step: Restore native IBKR connectivity before relying on executable live-state surfaces.
@@ -20,7 +20,12 @@
 - Health direction is worsening: 7 of the last 7 checks showed blocked or paused posture.
 
 ## Remaining status and reference details
-- Generated-state issues: 0
+- Generated-state issues: 5
+  - [warning] Missing PDF companion for report portfolio_report_etf_weekly_20260828.md.
+  - [warning] Missing PDF companion for report portfolio_report_etf_weekly_20260904.md.
+  - [warning] Missing PDF companion for report portfolio_report_etf_weekly_20260911.md.
+  - [warning] Missing PDF companion for report portfolio_report_etf_weekly_20260918.md.
+  - [warning] Missing PDF companion for report portfolio_report_etf_monthly_20260901.md.
 - Delivery pending actions: 0
 - Fill backfill review still open: 0
 - Acknowledged backfilled fills: 1

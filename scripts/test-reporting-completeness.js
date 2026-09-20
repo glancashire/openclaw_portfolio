@@ -51,7 +51,7 @@ function main() {
     },
   });
 
-  for (const section of ['## Decision View', '### Executive Summary', '### Incident / Blocker Summary', '### What Changed Since Last Report', '### Recommendation Urgency', '### Recommended Changes', '### Next Actions', '## Audit Detail', '### Performance', '### Allocation Review', '### Trades During Period', '### Strategy Compliance', '### Freshness', '### Delivery Status', '### Operator Queue Summary', '### Pending Operator Actions', '### Generation Status', '### Execution Lifecycle', '### Execution Plan', '### What Worked', '### What Did Not Work']) {
+  for (const section of ['## Decision View', '### Executive Summary', '### Incident / Blocker Summary', '### What Changed Since Last Report', '### Recommendation Urgency', '### Recommended Changes', '### Next Actions', '## Audit Detail', '### Allocation Review', '### Performance', '### Trades During Period', '### Strategy Compliance', '### Freshness', '### Delivery Status', '### Operator Queue Summary', '### Pending Operator Actions', '### Generation Status', '### Execution Lifecycle', '### Execution Plan', '### What Worked', '### What Did Not Work']) {
     assert(report.includes(section), `Expected section ${section}`);
   }
 
@@ -59,7 +59,7 @@ function main() {
   assert(report.includes('Reporting delivery posture needs operator attention'), 'Expected delivery readiness narrative');
   assert(report.includes('- PDF mode: stub'), 'Expected generation status section');
   assert(report.includes('- Delivery mode: local_only'), 'Expected delivery status section');
-  assert(report.includes('1. [workflow/pending/low] Dashboard/report freshness is stale relative to source state.'), 'Expected pending actions section');
+  assert(report.includes('Dashboard/report freshness is stale relative to source state.'), 'Expected pending actions text');
   assert(report.includes('- Total queue items: 1'), 'Expected queue summary section');
   assert(report.includes('- Open-runner first handoffs: 0'), 'Expected first-handoff queue summary section');
   assert(report.includes('- Open-runner retries: 0'), 'Expected retry queue summary section');

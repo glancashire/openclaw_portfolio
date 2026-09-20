@@ -1,8 +1,33 @@
 # PLAN — Portfolio Manager (consolidated)
 
-**Last refreshed:** 2026-06-15 12:20 UTC · **Repo head:** `dd75ee9` · **Tests:** 255/255 safe lane (3 quarantined) · **Health:** 🟢 healthy
+**Last refreshed:** 2026-08-07 08:20 UTC · **Repo head:** `dbbd5f4` · **Tests:** safe lane 268/0 green · **Health:** 🟢 healthy
 
-Single active plan document. Older plans are in `archive/phase-plans/`. Daily operational state lives in `STATUS.md`. Per-portfolio facts live in `MEMORY.md`. Risk audit is at `docs/risk-audit-2026-06-05.md`.
+Single active plan document. Older plans are in `archive/phase-plans/`. Daily operational state lives in `STATUS.md`. Per-portfolio facts live in `MEMORY.md`. Risk audit is at `docs/risk-audit-2026-06-05.md`. Latest audit: `docs/audit/2026-08-07-ibkr-mcp-and-fx-audit.md`.
+
+---
+
+## Phase N — FX live-rate seed + accounting-snapshot arg fix
+
+**Status:** QUEUED · ready to build · opened 2026-08-07 · owner bb8
+
+Root cause + fix design in `docs/audit/2026-08-07-ibkr-mcp-and-fx-audit.md` §3–4.
+
+- [ ] **N1** Native client: expose live per-currency FX (request `$LEDGER:ALL` account group so `ExchangeRate` tags return, or add `fetchBalances()` reading CP `/portfolio/{acct}/ledger` per-currency `exchange_rate`).
+- [ ] **N2** `holdingsSync.js`: prefer live rate as FX seed (live → `portfolio.md` hint → 1); keep scale-to-NetLiq as secondary consistency check; log divergence > tolerance.
+- [ ] **N3** Regression test: known live rates + positions → computed CHF total matches NetLiq within tolerance without stale hints.
+- [ ] **N4** Fix `scripts/sync-ibkr-accounting-snapshot.js` arg parsing (`--portfolio=` currently taken literally → stray `runtime/ibkr-accounting/--portfolio=etf/`).
+
+---
+
+## MCP read layer — IBKR hosted MCP (read + research) · DONE 2026-08-06
+
+**Status:** SHIPPED (live)
+
+- [x] `mcporter` 0.9.0 installed; IBKR registered in `openclaw.json` → `mcp.servers.ibkr` (native registry, not the mcporter plugin).
+- [x] `streamable-http` + OAuth authorized; read-only tool filter (include get_/list_/search_/read_/market/quote/historical/positions/portfolio/account; exclude *order*/*place*/*cancel*/*modify*/*transmit*/*trade*/*submit*).
+- [x] Verified: `openclaw mcp probe ibkr --json` → 20 read tools, `diagnostics: []`; live reads confirmed.
+- [x] Redundant `mcporter` config entry removed (single source of truth).
+- [x] Design: read+research rail only; live order transmission stays on native `:4001` + safe-word/PIN gate.
 
 ---
 
